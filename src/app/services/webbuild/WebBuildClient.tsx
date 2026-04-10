@@ -90,9 +90,9 @@ const WebBuildClient = () => (
           <div className="border border-border rounded-lg p-8 hover:shadow-card-hover transition-shadow">
             <h4 className="font-serif text-[20px] font-normal text-foreground mb-4">Enterprise</h4>
             <p className="text-[14px] text-muted-foreground leading-[1.9] mb-6">
-              가맹 · B2B · 다지점 사업을 위한 대형 풀빌드. 회원 시스템, 예약 · 결제, AI 자동화까지.
+              가맹 · B2B · 다지점 사업을 위한 대형 풀빌드. 회원 시스템, 예약 · 결제, 맞춤형 LLM까지.
             </p>
-            {["회원 · 로그인 시스템", "예약 · 결제 풀스택", "AI 마케팅 자동화 연동", "유지보수 · 기능 확장"].map(li => (
+            {["회원 · 로그인 시스템", "예약 · 결제 풀스택", "맞춤형 LLM · AI 자동화", "유지보수 · 기능 확장"].map(li => (
               <p key={li} className="text-[13px] text-muted-foreground pl-3 py-1.5 border-l-2 border-primary/30 mb-1">{li}</p>
             ))}
           </div>
@@ -112,8 +112,8 @@ const WebBuildClient = () => (
         <Reveal className="mt-16 grid grid-cols-2 lg:grid-cols-3 gap-5">
           {[
             { t: "멀티 페이지 설계", d: "사용자 동선을 분석해 전환 최적화된 페이지 흐름을 만듭니다." },
-            { t: "회원 · 결제 시스템", d: "소셜 로그인, PG사 연동, 구독 결제, 환불 처리를 자동화합니다." },
-            { t: "AI 마케팅 자동화", d: "AI 기반 상품 추천, 챗봇 상담, 자동 이메일 발송을 구현합니다." },
+            { t: "회원 · 결제 시스템", d: "소셜 로그인, PG사 연동, 구독 결제, 환불 처리를 자동화합니다. 회원 등급, 포인트, 쿠폰까지 풀스택으로 구축합니다." },
+            { t: "LLM · AI 자동화", d: "브랜드 맞춤형 LLM을 구축합니다. AI 상담 챗봇, 자동 응대, 콘텐츠 생성, 고객 데이터 기반 맞춤 추천까지 — 24시간 일하는 AI를 웹에 심습니다." },
             { t: "반응형 · 퍼포먼스", d: "Core Web Vitals를 통과하는 빠른 로딩 속도와 완벽한 반응형." },
             { t: "SEO 구조 설계", d: "메타 태그, 스키마 마크업, 사이트맵 등 SEO 기본 구조를 세팅합니다." },
             { t: "유지보수 · 확장", d: "런칭 후 업데이트, 신규 기능 추가, 보안 업데이트를 지원합니다." },
