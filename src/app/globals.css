@@ -134,3 +134,20 @@
 .stagger-4 { animation-delay: 360ms; }
 .stagger-5 { animation-delay: 480ms; }
 .stagger-6 { animation-delay: 600ms; }
+
+/* Article content typography */
+.article-content h1,
+.article-content h2,
+.article-content h3 { font-family: var(--font-noto-serif-kr), Georgia, serif; color: hsl(var(--foreground)); word-break: keep-all; margin-top: 2.5em; margin-bottom: 0.8em; }
+.article-content h1 { font-size: 2em; }
+.article-content h2 { font-size: 1.5em; }
+.article-content h3 { font-size: 1.25em; }
+.article-content p { color: hsl(var(--muted-foreground)); line-height: 2; margin-bottom: 1.5em; font-size: 16px; }
+.article-content a { color: hsl(var(--primary)); text-decoration: none; }
+.article-content a:hover { text-decoration: underline; }
+.article-content strong { color: hsl(var(--foreground)); font-weight: 500; }
+.article-content ul, .article-content ol { color: hsl(var(--muted-foreground)); padding-left: 1.5em; margin-bottom: 1.5em; }
+.article-content li { line-height: 2; margin-bottom: 0.5em; }
+.article-content blockquote { border-left: 3px solid hsl(var(--primary)); padding-left: 1.2em; margin: 2em 0; color: hsl(var(--muted-foreground)); font-style: italic; }
+.article-content img { border-radius: 0.5rem; margin: 2em 0; }
+.article-content hr { border-color: hsl(var(--border)); margin: 3em 0; }

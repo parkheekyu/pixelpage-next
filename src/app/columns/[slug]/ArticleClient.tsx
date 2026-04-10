@@ -49,14 +49,7 @@ const ArticleClient = ({ article, content }: Props) => (
     <section className="py-32 lg:py-40 bg-background">
       <div className="max-w-[760px] mx-auto px-6 lg:px-12">
         <Reveal>
-          <div
-            className="prose prose-lg max-w-none
-              prose-headings:font-serif prose-headings:text-foreground prose-headings:break-keep
-              prose-p:text-muted-foreground prose-p:leading-[2]
-              prose-a:text-primary prose-a:no-underline hover:prose-a:underline
-              prose-strong:text-foreground prose-strong:font-medium
-              prose-li:text-muted-foreground"
-          >
+          <div className="article-content">
             <ReactMarkdown remarkPlugins={[remarkGfm]}>
               {content}
             </ReactMarkdown>
