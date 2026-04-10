@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import logoWhite from "@/assets/logo-white.png";
 
-const darkHeroPages = ["/consult", "/cases", "/products/glue"];
+const darkHeroPages = ["/consult", "/cases", "/products/glue", "/columns"];
 
 const navItems: {
   label: string;
@@ -33,6 +33,7 @@ const navItems: {
     ],
   },
   { label: "성과", href: "/cases" },
+  { label: "칼럼", href: "/columns" },
 ];
 
 const Navbar = () => {
