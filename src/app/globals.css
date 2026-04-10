@@ -1,26 +1,136 @@
-@import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
-
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    /* Claude-inspired warm cream palette */
+    --background: 40 30% 95%;          /* #F2EDE3 warm cream */
+    --foreground: 25 40% 10%;          /* #1A1208 warm dark */
+
+    --card: 40 25% 97%;
+    --card-foreground: 25 40% 10%;
+
+    --popover: 40 25% 97%;
+    --popover-foreground: 25 40% 10%;
+
+    /* Terracotta/coral accent (like Claude) */
+    --primary: 15 55% 58%;             /* #CC7E63 terracotta */
+    --primary-foreground: 40 30% 95%;
+
+    --secondary: 40 18% 91%;
+    --secondary-foreground: 25 40% 10%;
+
+    --muted: 40 18% 91%;
+    --muted-foreground: 25 20% 42%;    /* #6B5744 */
+
+    --accent: 15 55% 58%;
+    --accent-foreground: 40 30% 95%;
+
+    --destructive: 0 60% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 25 15% 88%;
+    --input: 25 15% 88%;
+    --ring: 15 55% 58%;
+
+    --radius: 0.5rem;
+
+    /* Text hierarchy */
+    --text-strong: 25 40% 10%;
+    --text-primary: 25 30% 18%;
+    --text-secondary: 25 20% 42%;
+    --text-tertiary: 25 15% 50%;
+    --text-disabled: 25 10% 60%;
+
+    /* Brand tokens */
+    --cream: 40 30% 95%;
+    --cream-dark: 40 22% 87%;
+    --dark: 25 40% 8%;
+    --dark-mid: 25 25% 14%;
+    --gold: 15 55% 58%;
+    --gold-light: 15 60% 65%;
+    --terracotta: 15 55% 58%;
+
+    --font-serif: 'Noto Serif KR', 'Georgia', serif;
+    --font-sans: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-accent: 'Playfair Display', Georgia, serif;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  * {
+    @apply border-border;
+  }
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-background text-foreground;
+    line-height: 1.7;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 }
+
+/* StyleSeed: Shadow at 4% opacity */
+.shadow-subtle {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02);
+}
+.shadow-card {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+}
+.shadow-card-hover {
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+
+/* Animations */
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes scroll-line {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.2; }
+}
+
+.animate-float { animation: float-gentle 6s ease-in-out infinite; }
+.animate-fade-up { animation: fade-up 0.7s ease forwards; }
+.animate-marquee { animation: marquee 40s linear infinite; }
+
+/* Irregular blob shapes */
+.blob-shape-1 {
+  border-radius: 60% 40% 55% 45% / 50% 60% 40% 50%;
+}
+.blob-shape-2 {
+  border-radius: 45% 55% 40% 60% / 55% 45% 60% 40%;
+}
+.blob-shape-3 {
+  border-radius: 55% 45% 60% 40% / 40% 55% 45% 60%;
+}
+
+.stagger-1 { animation-delay: 0ms; }
+.stagger-2 { animation-delay: 120ms; }
+.stagger-3 { animation-delay: 240ms; }
+.stagger-4 { animation-delay: 360ms; }
+.stagger-5 { animation-delay: 480ms; }
+.stagger-6 { animation-delay: 600ms; }
