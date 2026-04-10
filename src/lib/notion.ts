@@ -45,7 +45,7 @@ function pageToArticle(page: any): Article {
     description: props.Description?.rich_text
       ? extractPlainText(props.Description.rich_text)
       : "",
-    category: props.Category?.select?.name || "",
+    category: props.Category?.select?.name || props.Category?.multi_select?.[0]?.name || "",
     date: props.Date?.date?.start || "",
     coverImage: props.Cover ? extractCover(props.Cover) : null,
   };
@@ -59,7 +59,7 @@ export async function getPublishedArticles(): Promise<Article[]> {
       database_id: databaseId,
       filter: {
         property: "Status",
-        select: { equals: "Published" },
+        status: { equals: "Published" },
       },
       sorts: [{ property: "Date", direction: "descending" }],
     });
