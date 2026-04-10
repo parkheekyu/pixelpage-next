@@ -167,9 +167,9 @@ const PerformanceClient = () => (
         <Reveal>
           <h2 className="font-serif text-[clamp(24px,3vw,36px)] font-normal text-foreground mb-4">퍼포먼스 마케팅이 필요하신가요?</h2>
           <p className="text-[15px] text-muted-foreground mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 브랜드를 함께 진단하고, 최적의 채널 · 예산 · 전략을 제안드립니다.</p>
-          <a href="mailto:contact@pixelpage.co.kr" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
+          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </Reveal>
       </div>
     </section>

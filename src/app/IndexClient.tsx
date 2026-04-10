@@ -285,13 +285,9 @@ const IndexClient = () => {
             <p className="text-[17px] text-cream/70 max-w-[480px] leading-[2] mb-12">
               지금 당장 계약이 목표가 아닙니다. 브랜드를 함께 진단하고, 어떻게 팔 수 있는지 생각해 보는 것부터 시작합니다.
             </p>
-            <a href="mailto:contact@pixelpage.co.kr" className="block font-serif text-[24px] text-cream hover:text-primary transition-colors mb-2">
-              contact@pixelpage.co.kr
-            </a>
-            <p className="text-[13px] text-cream/50 mb-10">보통 24시간 이내 회신드립니다.</p>
-            <a href="mailto:contact@pixelpage.co.kr" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
-              이메일 문의 <ArrowRight className="w-4 h-4" />
-            </a>
+            <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
+              무료 상담 신청 <ArrowRight className="w-4 h-4" />
+            </Link>
           </Reveal>
         </div>
       </section>

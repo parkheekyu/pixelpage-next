@@ -153,9 +153,9 @@ const BrandedClient = () => (
         <Reveal>
           <h2 className="font-serif text-[clamp(24px,3vw,36px)] font-normal text-cream mb-4">브랜디드 콘텐츠가 필요하신가요?</h2>
           <p className="text-[15px] text-cream/60 mb-8 max-w-[440px] mx-auto leading-[1.9]">기획부터 촬영, 편집, 운영까지 원스톱으로. 무료 상담에서 채널 전략을 함께 설계합니다.</p>
-          <a href="mailto:contact@pixelpage.co.kr" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
+          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />
-          </a>
+          </Link>
         </Reveal>
       </div>
     </section>
