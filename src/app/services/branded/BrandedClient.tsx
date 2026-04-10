@@ -16,7 +16,7 @@ const BrandedClient = () => (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">02 · Branded Content</p>
-            <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
+            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
               브랜디드 콘텐츠
             </h1>
             <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[480px] mb-8">
@@ -54,7 +54,7 @@ const BrandedClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">왜 브랜디드 콘텐츠인가요?</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
             광고는 3초 만에 스킵됩니다.<br />콘텐츠는 10분을 붙잡습니다.
           </h2>
         </Reveal>
@@ -77,7 +77,7 @@ const BrandedClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">YouTube Operations</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
             유튜브 운영 상세
           </h2>
         </Reveal>
@@ -104,7 +104,7 @@ const BrandedClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Results</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
             실제 채널 성장 케이스
           </h2>
         </Reveal>
@@ -151,7 +151,7 @@ const BrandedClient = () => (
     <section className="py-24 bg-dark text-center">
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif text-[clamp(24px,3vw,36px)] font-normal text-cream mb-4">브랜디드 콘텐츠가 필요하신가요?</h2>
+          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-normal text-cream mb-4">브랜디드 콘텐츠가 필요하신가요?</h2>
           <p className="text-[15px] text-cream/60 mb-8 max-w-[440px] mx-auto leading-[1.9]">기획부터 촬영, 편집, 운영까지 원스톱으로. 무료 상담에서 채널 전략을 함께 설계합니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />

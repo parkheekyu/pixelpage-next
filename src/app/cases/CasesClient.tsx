@@ -59,7 +59,7 @@ const CasesClient = () => (
         </Link>
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Cases & Downloads</p>
-          <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-6">
+          <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-6">
             성과와 서비스 소개서
           </h1>
           <p className="text-[17px] text-cream/70 leading-[1.85] max-w-[520px]">
@@ -94,7 +94,7 @@ const CasesClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">01 · Case Studies</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
             짧은 기간, 또렷한 결과.
           </h2>
           <p className="text-[17px] text-muted-foreground mt-5 max-w-[500px] leading-[2]">
@@ -127,7 +127,7 @@ const CasesClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">02 · Downloads</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
             서비스 소개서 다운로드
           </h2>
           <p className="text-[17px] text-cream/70 mt-5 max-w-[520px] leading-[2]">
@@ -179,7 +179,7 @@ const CasesClient = () => (
     <section className="py-24 bg-background text-center">
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif text-[clamp(24px,3vw,36px)] font-normal text-foreground mb-4">우리 브랜드에 맞는 전략이 궁금하신가요?</h2>
+          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-normal text-foreground mb-4">우리 브랜드에 맞는 전략이 궁금하신가요?</h2>
           <p className="text-[15px] text-muted-foreground mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 브랜드를 함께 진단하고, 최적의 서비스 조합을 제안드립니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />

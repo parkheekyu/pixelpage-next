@@ -16,7 +16,7 @@ const CrmClient = () => (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">04 · CRM Marketing</p>
-            <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
+            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
               CRM 마케팅
             </h1>
             <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[480px] mb-8">
@@ -40,7 +40,7 @@ const CrmClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">왜 CRM인가요?</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
             광고비의 70%는<br />&apos;관심만 있는 사람&apos;에게 쓰입니다.
           </h2>
         </Reveal>
@@ -63,7 +63,7 @@ const CrmClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">CRM Flow</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
             리드부터 팬덤까지, 4단계 자동화
           </h2>
         </Reveal>
@@ -89,7 +89,7 @@ const CrmClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Channels & Tools</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
             어떤 채널과 도구를 사용하나요?
           </h2>
         </Reveal>
@@ -116,7 +116,7 @@ const CrmClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Use Cases</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
             이런 상황에서 효과적입니다
           </h2>
         </Reveal>
@@ -140,7 +140,7 @@ const CrmClient = () => (
     <section className="py-24 bg-dark text-center">
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif text-[clamp(24px,3vw,36px)] font-normal text-cream mb-4">CRM 자동화가 필요하신가요?</h2>
+          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-normal text-cream mb-4">CRM 자동화가 필요하신가요?</h2>
           <p className="text-[15px] text-cream/60 mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 현재 리드 관리 현황을 진단하고, 최적의 CRM 전략을 제안드립니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />

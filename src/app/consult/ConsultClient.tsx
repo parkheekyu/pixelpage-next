@@ -80,7 +80,7 @@ const ConsultClient = () => {
               <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8">
                 <Check className="w-8 h-8 text-primary" />
               </div>
-              <h1 className="font-serif text-[clamp(32px,5vw,56px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
+              <h1 className="font-serif break-keep text-[clamp(32px,5vw,56px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
                 신청이 완료되었습니다.
               </h1>
               <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[460px] mx-auto mb-10">
@@ -110,7 +110,7 @@ const ConsultClient = () => {
           </Link>
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Free Consultation</p>
-            <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-6">
+            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-6">
               무료 상담 신청
             </h1>
             <p className="text-[17px] text-cream/70 leading-[1.85] max-w-[520px]">

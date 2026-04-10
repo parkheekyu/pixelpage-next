@@ -16,7 +16,7 @@ const PerformanceClient = () => (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">01 · Performance Marketing</p>
-            <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
+            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
               퍼포먼스 마케팅
             </h1>
             <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[480px] mb-8">
@@ -54,7 +54,7 @@ const PerformanceClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">왜 다른가요?</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
             무형 서비스 광고는<br />일반 이커머스 광고와 다릅니다.
           </h2>
         </Reveal>
@@ -77,7 +77,7 @@ const PerformanceClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">서비스 상세</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
             구체적으로 뭘 하나요?
           </h2>
         </Reveal>
@@ -104,7 +104,7 @@ const PerformanceClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Platforms</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
             지원 플랫폼 상세
           </h2>
           <p className="text-[16px] text-muted-foreground mt-5 max-w-[520px] leading-[2]">
@@ -140,7 +140,7 @@ const PerformanceClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Process</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
             데이터 기반 4단계 프로세스
           </h2>
         </Reveal>
@@ -165,7 +165,7 @@ const PerformanceClient = () => (
     <section className="py-24 bg-background text-center">
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif text-[clamp(24px,3vw,36px)] font-normal text-foreground mb-4">퍼포먼스 마케팅이 필요하신가요?</h2>
+          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-normal text-foreground mb-4">퍼포먼스 마케팅이 필요하신가요?</h2>
           <p className="text-[15px] text-muted-foreground mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 브랜드를 함께 진단하고, 최적의 채널 · 예산 · 전략을 제안드립니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />

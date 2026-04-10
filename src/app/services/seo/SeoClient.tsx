@@ -16,7 +16,7 @@ const SeoClient = () => (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">03 · Search Engine Optimization</p>
-            <h1 className="font-serif text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
+            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
               검색엔진 최적화
             </h1>
             <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[480px] mb-8">
@@ -40,7 +40,7 @@ const SeoClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">왜 SEO인가요?</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
             광고를 끄면 유입도 멈춥니다.<br />SEO는 멈추지 않습니다.
           </h2>
         </Reveal>
@@ -63,7 +63,7 @@ const SeoClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Platforms</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
             플랫폼별 SEO 전략
           </h2>
         </Reveal>
@@ -107,7 +107,7 @@ const SeoClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Benefits</p>
-          <h2 className="font-serif text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
             SEO가 만드는 장기적 가치
           </h2>
         </Reveal>
@@ -133,7 +133,7 @@ const SeoClient = () => (
     <section className="py-24 bg-background text-center">
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif text-[clamp(24px,3vw,36px)] font-normal text-foreground mb-4">네이버 SEO는 지금 바로 시작할 수 있습니다.</h2>
+          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-normal text-foreground mb-4">네이버 SEO는 지금 바로 시작할 수 있습니다.</h2>
           <p className="text-[15px] text-muted-foreground mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 현재 검색 노출 현황을 진단하고, 키워드 전략을 함께 설계합니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />

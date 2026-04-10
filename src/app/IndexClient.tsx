@@ -28,7 +28,7 @@ const IndexClient = () => {
               <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6 opacity-0 animate-fade-up stagger-1">
                 교육 · 지식 · 경험 · 문화
               </p>
-              <h1 className="font-serif text-[clamp(48px,7vw,96px)] font-normal leading-[1.1] tracking-[-0.03em] text-foreground mb-7 opacity-0 animate-fade-up stagger-2">
+              <h1 className="font-serif break-keep text-[clamp(48px,7vw,96px)] font-normal leading-[1.1] tracking-[-0.03em] text-foreground mb-7 opacity-0 animate-fade-up stagger-2">
                 만질 수 없는 것을<br /><span className="text-primary">파는 일.</span>
               </h1>
               <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[460px] mb-10 opacity-0 animate-fade-up stagger-3">
@@ -101,7 +101,7 @@ const IndexClient = () => {
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">01 · Philosophy</p>
-            <h2 className="font-serif text-[clamp(32px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] max-w-[700px]">
+            <h2 className="font-serif break-keep text-[clamp(32px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] max-w-[700px]">
               일반 마케팅 회사와는<br />조금 다릅니다.
             </h2>
           </Reveal>
@@ -139,7 +139,7 @@ const IndexClient = () => {
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">02 · Services</p>
-            <h2 className="font-serif text-[clamp(32px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+            <h2 className="font-serif break-keep text-[clamp(32px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
               5가지 서비스,<br />하나의 마케팅 설계.
             </h2>
             <p className="text-[17px] text-muted-foreground mt-5 max-w-[520px] leading-[2]">
@@ -185,7 +185,7 @@ const IndexClient = () => {
                 <Link href={s.href} className={`group grid grid-cols-1 lg:grid-cols-2 gap-12 items-center py-12 border-t border-border hover:bg-card/50 transition-colors px-6 -mx-6 rounded-lg ${i % 2 === 1 ? 'lg:direction-rtl' : ''}`}>
                   <div className={i % 2 === 1 ? 'lg:order-2' : ''}>
                     <span className="font-display text-[12px] tracking-[0.15em] uppercase text-primary">{s.num} · {s.sub}</span>
-                    <h3 className="font-serif text-[clamp(28px,3.5vw,42px)] font-normal text-foreground mt-3 mb-4">{s.name}</h3>
+                    <h3 className="font-serif break-keep text-[clamp(28px,3.5vw,42px)] font-normal text-foreground mt-3 mb-4">{s.name}</h3>
                     <p className="text-[16px] text-muted-foreground leading-[2] mb-6 max-w-[460px]">{s.desc}</p>
                     <div className="flex flex-wrap gap-2 mb-6">
                       {s.tags.map(t => (
@@ -211,7 +211,7 @@ const IndexClient = () => {
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">03 · Case Studies</p>
-            <h2 className="font-serif text-[clamp(32px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+            <h2 className="font-serif break-keep text-[clamp(32px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
               짧은 기간, 또렷한 결과.
             </h2>
             <p className="text-[17px] text-cream/70 mt-5 max-w-[500px] leading-[2]">
@@ -250,7 +250,7 @@ const IndexClient = () => {
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">04 · Process</p>
-            <h2 className="font-serif text-[clamp(32px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+            <h2 className="font-serif break-keep text-[clamp(32px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
               어떻게 일하나요?
             </h2>
             <p className="text-[17px] text-muted-foreground mt-5 max-w-[520px] leading-[2]">
@@ -279,7 +279,7 @@ const IndexClient = () => {
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">05 · Contact</p>
-            <h2 className="font-serif text-[clamp(32px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-6">
+            <h2 className="font-serif break-keep text-[clamp(32px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-6">
               한 번 얘기해봐요.
             </h2>
             <p className="text-[17px] text-cream/70 max-w-[480px] leading-[2] mb-12">
