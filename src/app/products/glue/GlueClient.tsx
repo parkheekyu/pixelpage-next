@@ -15,7 +15,7 @@ const GlueClient = () => (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Product · gloooo</p>
-            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-6">
+            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-medium text-cream leading-[1.15] tracking-[-0.02em] mb-6">
               글루<span className="text-primary">.</span>
             </h1>
             <p className="text-[22px] text-cream/90 font-medium leading-[1.6] mb-4">
@@ -81,7 +81,7 @@ const GlueClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">왜 글루인가요?</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
             광고로 데려온 리드,<br />엑셀에서 관리하고 계신가요?
           </h2>
         </Reveal>
@@ -104,7 +104,7 @@ const GlueClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">핵심 기능</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-cream leading-[1.15] tracking-[-0.02em]">
             글루가 하는 일
           </h2>
         </Reveal>
@@ -134,7 +134,7 @@ const GlueClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">작동 방식</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em]">
             5분이면 시작합니다
           </h2>
         </Reveal>
@@ -160,7 +160,7 @@ const GlueClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">리드 수집</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-cream leading-[1.15] tracking-[-0.02em]">
             리드가 들어오는 4가지 경로
           </h2>
         </Reveal>
@@ -190,7 +190,7 @@ const GlueClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">메시지 채널</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em]">
             4가지 채널, 하나의 발송
           </h2>
           <p className="text-[17px] text-muted-foreground mt-5 max-w-[520px] leading-[2]">
@@ -221,7 +221,7 @@ const GlueClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">활용 사례</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-cream leading-[1.15] tracking-[-0.02em]">
             이런 상황이라면, 글루
           </h2>
         </Reveal>
@@ -246,7 +246,7 @@ const GlueClient = () => (
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">도입 문의</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-4">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em] mb-4">
             글루, 우리 브랜드에도 될까?
           </h2>
           <p className="text-[17px] text-muted-foreground mb-10 max-w-[480px] mx-auto leading-[2]">

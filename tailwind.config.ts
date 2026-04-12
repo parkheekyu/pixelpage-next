@@ -30,6 +30,8 @@ export default {
           DEFAULT: "hsl(var(--dark))",
           mid: "hsl(var(--dark-mid))",
         },
+        "surface-white": "hsl(var(--surface-white))",
+        "surface-beige": "hsl(var(--surface-beige))",
         gold: {
           DEFAULT: "hsl(var(--gold))",
           light: "hsl(var(--gold-light))",

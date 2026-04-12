@@ -16,7 +16,7 @@ const WebBuildClient = () => (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
           <Reveal>
             <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">05 · Web Build</p>
-            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
+            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
               웹 빌드
             </h1>
             <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[480px] mb-8">
@@ -40,7 +40,7 @@ const WebBuildClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">왜 중요한가요?</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-cream leading-[1.15] tracking-[-0.02em] mb-8 max-w-[600px]">
             광고비의 절반은<br />웹사이트에서 낭비됩니다.
           </h2>
         </Reveal>
@@ -63,7 +63,7 @@ const WebBuildClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Service Tiers</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em]">
             필요에 맞는 3가지 빌드
           </h2>
         </Reveal>
@@ -90,9 +90,9 @@ const WebBuildClient = () => (
           <div className="border border-border rounded-lg p-8 hover:shadow-card-hover transition-shadow">
             <h4 className="font-serif text-[20px] font-normal text-foreground mb-4">Enterprise</h4>
             <p className="text-[14px] text-muted-foreground leading-[1.9] mb-6">
-              가맹 · B2B · 다지점 사업을 위한 대형 풀빌드. 회원 시스템, 예약 · 결제, 맞춤형 LLM까지.
+              가맹 · B2B · 다지점 사업을 위한 대형 풀빌드. 회원 시스템, 예약 · 결제, AI 자동화까지.
             </p>
-            {["회원 · 로그인 시스템", "예약 · 결제 풀스택", "맞춤형 LLM · AI 자동화", "유지보수 · 기능 확장"].map(li => (
+            {["회원 · 로그인 시스템", "예약 · 결제 풀스택", "AI 마케팅 자동화 연동", "유지보수 · 기능 확장"].map(li => (
               <p key={li} className="text-[13px] text-muted-foreground pl-3 py-1.5 border-l-2 border-primary/30 mb-1">{li}</p>
             ))}
           </div>
@@ -105,7 +105,7 @@ const WebBuildClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Enterprise Grade</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-cream leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-cream leading-[1.15] tracking-[-0.02em]">
             엔터프라이즈급 웹 빌드 상세
           </h2>
         </Reveal>
@@ -113,7 +113,7 @@ const WebBuildClient = () => (
           {[
             { t: "멀티 페이지 설계", d: "사용자 동선을 분석해 전환 최적화된 페이지 흐름을 만듭니다." },
             { t: "회원 · 결제 시스템", d: "소셜 로그인, PG사 연동, 구독 결제, 환불 처리를 자동화합니다. 회원 등급, 포인트, 쿠폰까지 풀스택으로 구축합니다." },
-            { t: "LLM · AI 자동화", d: "브랜드 맞춤형 LLM을 구축합니다. AI 상담 챗봇, 자동 응대, 콘텐츠 생성, 고객 데이터 기반 맞춤 추천까지 — 24시간 일하는 AI를 웹에 심습니다." },
+            { t: "AI 마케팅 자동화", d: "AI 기반 상품 추천, 챗봇 상담, 자동 이메일 발송을 구현합니다." },
             { t: "반응형 · 퍼포먼스", d: "Core Web Vitals를 통과하는 빠른 로딩 속도와 완벽한 반응형." },
             { t: "SEO 구조 설계", d: "메타 태그, 스키마 마크업, 사이트맵 등 SEO 기본 구조를 세팅합니다." },
             { t: "유지보수 · 확장", d: "런칭 후 업데이트, 신규 기능 추가, 보안 업데이트를 지원합니다." },
@@ -132,7 +132,7 @@ const WebBuildClient = () => (
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">모든 빌드에 포함</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-normal text-foreground leading-[1.15] tracking-[-0.02em]">
+          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em]">
             기본 포함 사항
           </h2>
         </Reveal>
@@ -156,7 +156,7 @@ const WebBuildClient = () => (
     <section className="py-24 bg-dark text-center">
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-normal text-cream mb-4">전환되는 웹사이트가 필요하신가요?</h2>
+          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-medium text-cream mb-4">전환되는 웹사이트가 필요하신가요?</h2>
           <p className="text-[15px] text-cream/60 mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 현재 웹사이트를 진단하고, 전환율을 높이는 최적의 빌드를 제안드립니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />

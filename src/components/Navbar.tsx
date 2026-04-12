@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import logoWhite from "@/assets/logo-white.png";
 
-const darkHeroPages = ["/consult", "/cases", "/products/glue", "/columns"];
+const darkHeroPages = ["/consult", "/cases", "/products/glue", "/columns", "/services/performance"];
 
 const navItems: {
   label: string;
@@ -64,7 +64,7 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-10">
           {navItems.map((item) => (
             <div key={item.label} className="relative group">
-              <Link href={item.href} className={`text-[14px] font-normal transition-colors ${useLight ? "text-cream/70 hover:text-cream" : "text-foreground/70 hover:text-foreground"}`}>
+              <Link href={item.href} className={`text-[15.5px] font-normal transition-colors ${useLight ? "text-cream/70 hover:text-cream" : "text-foreground/70 hover:text-foreground"}`}>
                 {item.label}
               </Link>
               {item.dropdown && (
@@ -84,7 +84,7 @@ const Navbar = () => {
               )}
             </div>
           ))}
-          <Link href="/consult" className="text-[13px] font-bold tracking-[0.03em] px-6 py-2.5 bg-primary text-primary-foreground hover:bg-gold-light transition-colors">
+          <Link href="/consult" className="text-[13px] font-bold tracking-[0.03em] px-6 py-2.5 bg-primary text-primary-foreground hover:bg-gold-light transition-colors rounded-md">
             무료 상담 신청
           </Link>
         </div>
