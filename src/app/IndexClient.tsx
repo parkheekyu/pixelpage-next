@@ -30,10 +30,10 @@ const IndexClient = () => {
               <p className="text-[15px] tracking-[0.2em] uppercase text-muted-foreground mb-6 opacity-0 animate-fade-up stagger-1">
                 교육 &middot; 지식 &middot; 경험 &middot; 문화
               </p>
-              <h1 className="font-serif text-[clamp(52px,7.5vw,96px)] font-semibold leading-[1.1] tracking-[-0.03em] text-foreground mb-7 opacity-0 animate-fade-up stagger-2">
+              <h1 className="font-serif text-[clamp(46px,6.5vw,84px)] font-semibold leading-[1.05] tracking-[-0.04em] text-foreground mb-6 opacity-0 animate-fade-up stagger-2">
                 만질 수 없는 것을<br /><span className="text-primary">파는 일.</span>
               </h1>
-              <p className="text-[20px] text-muted-foreground leading-[1.85] max-w-[480px] mb-10 opacity-0 animate-fade-up stagger-3">
+              <p className="text-[18px] text-muted-foreground leading-[1.85] max-w-[460px] mb-10 opacity-0 animate-fade-up stagger-3">
                 무형의 가치를 파는 브랜드의 전담 마케팅 파트너.<br />
                 짧은 사이클 안에, 관객이 &apos;한 번 경험해 보고 싶다&apos;고
                 느끼는 그 순간까지 설계합니다.
