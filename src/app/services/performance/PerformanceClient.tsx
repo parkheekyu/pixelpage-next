@@ -241,8 +241,8 @@ const SocialProofSection = () => {
         <Reveal className="text-center mb-16 lg:mb-20">
           <img src={iconTrophy.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
           <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
-            이상한마케팅은 후기를 자랑합니다.<br />
-            <span className="text-primary">저희는 수치를 꺼냅니다.</span>
+            감이 아닌<br />
+            <span className="text-primary">숫자로 증명합니다.</span>
           </h2>
         </Reveal>
 
