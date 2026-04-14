@@ -1,65 +1,79 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, ArrowLeft, Play } from "lucide-react";
+import dynamic from "next/dynamic";
+import { ArrowRight, ArrowLeft, Play, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+
+const BrandedHeroArt = dynamic(() => import("@/components/BrandedHeroArt"), { ssr: false });
 
 /* ============================================================
    Section 01 · Hero
    ============================================================ */
 const HeroSection = () => {
-  const clients = ["Genesis", "LG Signature", "쭌난방", "충남도청", "해양경찰", "서울청년센터"];
+  const channels = ["포리얼", "쭌난방 본사", "공간수익", "닥터세사마", "스마트폰면세점", "짐컴퍼니", "무나홈트", "램프캠핑"];
   return (
-    <section className="relative min-h-screen flex items-center pt-32 pb-32 bg-dark overflow-hidden">
-      <div className="absolute top-[15%] right-[10%] w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[150px] pointer-events-none" />
+    <section className="relative min-h-screen flex items-center pt-32 pb-24 bg-dark overflow-hidden">
+      <div className="absolute top-[15%] right-[8%] w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[150px] pointer-events-none" />
 
       <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
         <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
           <ArrowLeft className="w-3 h-3" /> 홈으로
         </Link>
 
-        <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-8 opacity-0 animate-fade-up stagger-1">
-          Branded Content
-        </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-7 opacity-0 animate-fade-up stagger-1">
+              Branded Content
+            </p>
 
-        <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.15] tracking-[-0.03em] text-cream mb-8 max-w-[900px] opacity-0 animate-fade-up stagger-2">
-          영상을 만들어 드리는 게 아닙니다.<br />
-          <span className="text-primary">브랜드가 팔리게</span> 만듭니다
-        </h1>
+            <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.15] tracking-[-0.03em] text-cream mb-7 opacity-0 animate-fade-up stagger-2">
+              유튜브로<br />
+              <span className="text-primary">24시간 영업사원</span>을<br />
+              만듭니다
+            </h1>
 
-        <p className="text-[19px] text-cream/45 leading-[1.9] max-w-[560px] mb-12 opacity-0 animate-fade-up stagger-3">
-          기획부터 납품까지 — Genesis · LG Signature · 쭌난방 · 충남도청이 선택한 크리에이티브 파트너.
-        </p>
+            <p className="text-[18px] text-cream/45 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3">
+              병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
+              기획부터 숏폼까지, 한 팀이 다 합니다.
+            </p>
 
-        <div className="flex items-center gap-4 mb-16 opacity-0 animate-fade-up stagger-4">
-          <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
-            무료 영상 전략 상담
-          </Link>
-          <a href="http://yoon6film.co.kr/services/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/15 text-cream/70 text-[15px] hover:border-cream/30 hover:text-cream transition-colors rounded-md">
-            포트폴리오 전체 보기
-          </a>
-        </div>
-
-        {/* Trust numbers */}
-        <div className="flex flex-wrap gap-10 mb-14 opacity-0 animate-fade-up stagger-5">
-          {[
-            { n: "9년+", l: "현장 제작 경력" },
-            { n: "90%", l: "재계약률" },
-            { n: "4.5×", l: "상담 전환 증가" },
-          ].map(k => (
-            <div key={k.l}>
-              <span className="text-[32px] font-serif font-semibold text-cream tracking-[-0.02em]">{k.n}</span>
-              <span className="block text-[11px] text-cream/25 tracking-[0.08em] uppercase mt-1">{k.l}</span>
+            <div className="flex items-center gap-4 mb-14 opacity-0 animate-fade-up stagger-4">
+              <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
+                무료 상담 신청
+              </Link>
+              <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/15 text-cream/70 text-[15px] hover:border-cream/30 hover:text-cream transition-colors rounded-md">
+                <MessageCircle className="w-4 h-4" /> 카카오톡 문의
+              </a>
             </div>
-          ))}
+
+            {/* Trust numbers */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 opacity-0 animate-fade-up stagger-5">
+              {[
+                { n: "9년+", l: "제작 경력" },
+                { n: "100만+", l: "누적 구독자" },
+                { n: "4배", l: "상담 전환" },
+                { n: "2개월", l: "채널 성장" },
+              ].map(k => (
+                <div key={k.l}>
+                  <span className="text-[26px] font-serif font-semibold text-cream tracking-[-0.02em]">{k.n}</span>
+                  <span className="block text-[11px] text-cream/25 tracking-[0.08em] uppercase mt-1">{k.l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="hidden lg:flex justify-center items-center">
+            <BrandedHeroArt />
+          </div>
         </div>
 
-        {/* Rolling clients */}
-        <div className="relative overflow-hidden border-t border-cream/[0.06] pt-8 opacity-0 animate-fade-up stagger-6">
+        {/* Rolling channels */}
+        <div className="relative overflow-hidden border-t border-cream/[0.06] pt-7 mt-16 opacity-0 animate-fade-up stagger-6">
+          <p className="text-[11px] tracking-[0.15em] uppercase text-cream/25 mb-4 font-medium">Now operating</p>
           <div className="flex gap-12 animate-marquee whitespace-nowrap">
-            {[...clients, ...clients, ...clients].map((c, i) => (
-              <span key={i} className="text-[15px] text-cream/30 tracking-[0.05em] font-medium shrink-0">{c}</span>
+            {[...channels, ...channels, ...channels].map((c, i) => (
+              <span key={i} className="text-[16px] text-cream/40 tracking-[0.02em] font-medium shrink-0">{c}</span>
             ))}
           </div>
         </div>
@@ -69,34 +83,129 @@ const HeroSection = () => {
 };
 
 /* ============================================================
-   Section 02 · Pain
+   Section 02 · Portfolio
    ============================================================ */
-const PainSection = () => {
-  const pains = [
-    { text: "제작비 썼는데 조회수만 나왔어요", cause: "예쁜 영상 ≠ 팔리는 영상" },
-    { text: "유튜브 채널이 1년 넘게 정체 상태예요", cause: "방향 없는 운영의 전형" },
-    { text: "우리 브랜드가 뭔지 영상에 안 담겨요", cause: "기획 없는 제작의 결과" },
-    { text: "숏폼 따로, 유튜브 따로 파편화됩니다", cause: "원스톱 파트너가 없는 문제" },
+const PortfolioSection = () => {
+  const operating = [
+    { name: "포리얼", biz: "비즈니스 · 창업" },
+    { name: "쭌난방 본사", biz: "난방 · 시공" },
+    { name: "공간수익", biz: "부동산 · 에어비앤비" },
+    { name: "닥터세사마", biz: "피부과 · 의료" },
+    { name: "스마트폰면세점", biz: "스마트폰 · IT" },
+    { name: "짐컴퍼니", biz: "태양광 · 에너지" },
+    { name: "무나홈트", biz: "피트니스 · 운동" },
+    { name: "램프캠핑", biz: "캠핑 · 아웃도어" },
+  ];
+
+  const videos = [
+    { title: "AI로 이런 1인 사업이 뜨고 있어요", channel: "포리얼" },
+    { title: "10평 농막 찜질방 온수난방 시공", channel: "쭌난방 본사" },
+    { title: "얼굴 홍조 이유와 치료 방법", channel: "닥터세사마" },
+    { title: "개업 하자마자 50명씩 웨이팅 만든 비결", channel: "포리얼" },
+    { title: "발리에서 에어비앤비에 도전하는 직장인", channel: "공간수익" },
+    { title: "갤럭시 Z 폴드7 최신 유출 정보", channel: "스마트폰면세점" },
+    { title: "태양광 발전소 투자 전 확인할 5가지", channel: "짐컴퍼니" },
+    { title: "복부집중 4주 챌린지", channel: "무나홈트" },
   ];
 
   return (
     <section className="py-28 lg:py-36 bg-surface-white">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-16">
+        <Reveal className="text-center mb-14">
           <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-            영상은 만들었는데<br />문의가 늘지 않았습니다
+            직접 확인하세요
           </h2>
           <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
-            이런 경험 있으시죠?
+            말보다 채널이 먼저입니다.<br />지금 운영 중인 채널들을 보세요.
           </p>
         </Reveal>
 
+        {/* 운영 채널 8개 */}
         <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[800px] mx-auto">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-20">
+            {operating.map(c => (
+              <a
+                key={c.name}
+                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(c.name)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="group block border border-border rounded-xl p-6 bg-card hover:shadow-card-hover hover:border-primary/30 transition-all"
+              >
+                <h4 className="text-[16px] font-semibold text-foreground tracking-[-0.01em] mb-1">{c.name}</h4>
+                <p className="text-[12px] text-muted-foreground">{c.biz}</p>
+                <span className="inline-flex items-center gap-1 text-[11px] text-primary mt-3 group-hover:gap-1.5 transition-all">
+                  채널 보기 <ArrowRight className="w-3 h-3" />
+                </span>
+              </a>
+            ))}
+          </div>
+        </Reveal>
+
+        {/* 대표 영상 썸네일 */}
+        <Reveal className="text-center mb-10">
+          <p className="text-[13px] tracking-[0.15em] uppercase text-primary font-medium">Featured Videos</p>
+        </Reveal>
+        <Reveal>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {videos.map((v, i) => (
+              <a
+                key={i}
+                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(v.title)}`}
+                target="_blank"
+                rel="noreferrer"
+                className="group block"
+              >
+                <div className="relative aspect-video rounded-xl overflow-hidden bg-dark shadow-card group-hover:shadow-card-hover transition-all">
+                  {/* Abstract thumbnail — gradient with play button */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-dark to-dark-mid" />
+                  <div className="absolute inset-0 opacity-20" style={{
+                    backgroundImage: `radial-gradient(circle at 30% 40%, hsl(15 55% 58% / 0.8), transparent 60%)`,
+                  }} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center group-hover:scale-110 transition-transform">
+                      <Play className="w-5 h-5 text-dark ml-0.5" fill="currentColor" />
+                    </div>
+                  </div>
+                  <div className="absolute bottom-3 left-3 right-3">
+                    <p className="text-[10px] text-cream/60 tracking-[0.05em] uppercase">{v.channel}</p>
+                  </div>
+                </div>
+                <h4 className="text-[14px] font-medium text-foreground mt-3 leading-[1.5] tracking-[-0.01em]">{v.title}</h4>
+              </a>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ============================================================
+   Section 03 · Pain
+   ============================================================ */
+const PainSection = () => {
+  const pains = [
+    "유튜브 해야 하는 건 아는데, 뭘 만들어야 할지 모르겠어요",
+    "영상 올리고 있는데 잘 되고 있는 건지 모르겠어요",
+    "몇 편 만들었는데 문의랑 매출에 아무 변화가 없어요",
+    "대표가 직접 찍고 편집할 시간이 없어요",
+    "광고 말고 장기적으로 1등 자리 잡고 싶어요",
+  ];
+
+  return (
+    <section className="py-28 lg:py-36 bg-background">
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-14">
+          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+            이런 고민, 있으시죠?
+          </h2>
+        </Reveal>
+
+        <Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[780px] mx-auto">
             {pains.map((p, i) => (
-              <div key={i} className="border border-border rounded-xl p-7 bg-card shadow-card">
-                <p className="text-[16px] text-foreground leading-[1.7] mb-2">{p.text}</p>
-                <p className="text-[13px] text-muted-foreground tracking-[-0.01em]">&rarr; {p.cause}</p>
+              <div key={i} className="border border-border rounded-xl p-6 bg-card shadow-card">
+                <p className="text-[15px] text-foreground leading-[1.75]">{p}</p>
               </div>
             ))}
           </div>
@@ -104,7 +213,7 @@ const PainSection = () => {
 
         <Reveal className="mt-14 text-center">
           <p className="font-serif text-[22px] lg:text-[26px] text-foreground leading-[1.6] tracking-[-0.02em] max-w-[560px] mx-auto">
-            조회수가 아니라 <span className="text-primary font-semibold">매출이 먼저</span>입니다.
+            하나라도 해당되면, <span className="text-primary font-semibold">저희가 해결해 드립니다.</span>
           </p>
         </Reveal>
       </div>
@@ -113,43 +222,73 @@ const PainSection = () => {
 };
 
 /* ============================================================
-   Section 03 · Services
+   Section 04 · Problem
    ============================================================ */
-interface ServicesProps { onFilter: (cat: string) => void; }
-const ServicesSection = ({ onFilter }: ServicesProps) => {
-  const services = [
-    { t: "브랜드 유튜브 채널 운영 대행", d: "알고리즘 기반 기획부터 댓글 관리, 월간 성과 리포트까지. 클라이언트는 결과만 확인.", filter: "브랜드 유튜브" },
-    { t: "하이엔드 기업 브랜딩 필름", d: "비전 · 가치 · 철학을 압도적 영상미로. 가맹 사업 설득, 투자자 IR, 신규 고객 유치에 직접 쓰이는 영상.", filter: "브랜딩 필름" },
-    { t: "관공서 · 기업 행사 스케치 & 중계", d: "VIP 의전 동선 파악, 멀티캠 + 드론 구성. 다시는 오지 않는 현장을 영화처럼 기록.", filter: "행사 영상" },
-    { t: "숏폼 · SNS 콘텐츠", d: "릴스 · 쇼츠 · 틱톡 최적화. 롱폼 원소스에서 숏폼 다포맷 재가공.", filter: "숏폼" },
-  ];
+const ProblemSection = () => (
+  <section className="py-28 lg:py-36 bg-surface-beige">
+    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+      <Reveal className="text-center mb-14">
+        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          기존 방식으로는 안 됩니다
+        </h2>
+      </Reveal>
 
-  const scrollToPortfolio = (cat: string) => {
-    onFilter(cat);
-    document.getElementById("portfolio")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
+      <Reveal>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[880px] mx-auto">
+          <div className="bg-card border border-border rounded-xl p-8">
+            <span className="text-[11px] font-bold text-red-500/90 tracking-[0.1em] uppercase">문제 A</span>
+            <h3 className="font-serif text-[22px] font-semibold text-foreground mt-3 mb-4 tracking-[-0.01em]">AI 공장형 유튜브</h3>
+            <p className="text-[15px] text-muted-foreground leading-[1.85] mb-5">
+              영상은 깔끔합니다. 근데 우리 브랜드 색이 없습니다. 교과서적 설명만 있고, 대표 철학도 고객 질문도 없습니다.
+            </p>
+            <div className="pt-4 border-t border-border">
+              <span className="text-[13px] font-bold text-red-500/90">결과 &middot;</span>
+              <span className="text-[14px] text-foreground/80 ml-2">브랜드 가치 하락</span>
+            </div>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-8">
+            <span className="text-[11px] font-bold text-red-500/90 tracking-[0.1em] uppercase">문제 B</span>
+            <h3 className="font-serif text-[22px] font-semibold text-foreground mt-3 mb-4 tracking-[-0.01em]">무전략 유튜브</h3>
+            <p className="text-[15px] text-muted-foreground leading-[1.85] mb-5">
+              기획 없이 올리면 알고리즘이 외면합니다. 채널이 저품질로 낙인찍히면 복구가 안 됩니다.
+            </p>
+            <div className="pt-4 border-t border-border">
+              <span className="text-[13px] font-bold text-red-500/90">결과 &middot;</span>
+              <span className="text-[14px] text-foreground/80 ml-2">실고객 유입 Zero</span>
+            </div>
+          </div>
+        </div>
+      </Reveal>
+    </div>
+  </section>
+);
+
+/* ============================================================
+   Section 05 · Services
+   ============================================================ */
+const ServicesSection = () => {
+  const services = [
+    { num: "01", t: "올인원 유튜브 운영", d: "기획 · 촬영 · 편집 · 업로드 · 댓글 관리 · 숏폼 재가공까지. 매달 성과 리포트로 보고합니다." },
+    { num: "02", t: "맞춤 영상 편집", d: "찍어오신 촬영본을 알고리즘에 맞게 편집합니다. 썸네일 3종, 자막, BGM, 유튜브 SEO까지 포함." },
+    { num: "03", t: "익명 · 자막 영상", d: "얼굴 안 나와도 됩니다. 자막형 콘텐츠, 보이스오버로 운영 가능합니다." },
+  ];
 
   return (
     <section className="py-28 lg:py-36 bg-background">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16">
           <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-            기획 · 촬영 · 편집 · 운영<br />외주 없이 한 팀이 끝냅니다
+            그래서 저희가 이렇게 합니다
           </h2>
-          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[540px] mx-auto mt-4">
-            Sony FX3 · 드론 · 짐벌 · 무선마이크 — 장비도 인하우스. 빠르게 테스트하고 바로 반영합니다.
-          </p>
         </Reveal>
 
         <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[1000px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[1000px] mx-auto">
             {services.map(s => (
-              <div key={s.t} className="border border-border rounded-xl p-8 bg-card hover:shadow-card-hover transition-shadow flex flex-col">
-                <h3 className="font-serif text-[22px] font-semibold text-foreground mb-4 tracking-[-0.01em]">{s.t}</h3>
-                <p className="text-[15px] text-muted-foreground leading-[1.9] mb-6 flex-1">{s.d}</p>
-                <button onClick={() => scrollToPortfolio(s.filter)} className="inline-flex items-center gap-1.5 text-[13px] font-medium text-primary hover:gap-2.5 transition-all self-start">
-                  사례 보기 <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+              <div key={s.num} className="border border-border rounded-xl p-8 bg-card hover:shadow-card-hover transition-shadow">
+                <span className="text-[13px] font-display text-primary tracking-[0.1em] font-medium">{s.num}</span>
+                <h3 className="font-serif text-[20px] font-semibold text-foreground mt-4 mb-4 tracking-[-0.01em]">{s.t}</h3>
+                <p className="text-[15px] text-muted-foreground leading-[1.9]">{s.d}</p>
               </div>
             ))}
           </div>
@@ -160,129 +299,14 @@ const ServicesSection = ({ onFilter }: ServicesProps) => {
 };
 
 /* ============================================================
-   Section 04 · Portfolio
-   ============================================================ */
-interface Work { title: string; cat: string; id: string; }
-const ALL_WORKS: Work[] = [
-  // 브랜드 유튜브
-  { title: "기업을 위한 영상 외주 제작사 윤식스필름", cat: "브랜드 유튜브", id: "zdTY2J1Gzl4" },
-  { title: "영상전문프로덕션 윤식스필름", cat: "브랜드 유튜브", id: "R3e97IcifnQ" },
-  { title: "떡볶이 제조업체 인터뷰 영상", cat: "브랜드 유튜브", id: "bvfvAaNATkU" },
-  { title: "유튜브 제품 홍보영상 · 새우장", cat: "브랜드 유튜브", id: "V1l8MPOOl2s" },
-  { title: "헬스장 홍보영상 제작", cat: "브랜드 유튜브", id: "RYNbq4sr5go" },
-  // 브랜딩 필름
-  { title: "영상 테마파크 합천 · 영화의 도시", cat: "브랜딩 필름", id: "84rBb-wcevI" },
-  { title: "기업 · 학교 기념영상 드론촬영", cat: "브랜딩 필름", id: "xUFp-zrjupU" },
-  { title: "개신교 연합 수련회 시네마틱", cat: "브랜딩 필름", id: "UFO9hSHkYM0" },
-  { title: "미술 전시 개인전 스케치", cat: "브랜딩 필름", id: "hF5ijggQtgk" },
-  // 행사 영상
-  { title: "뉴진스 팝업스토어 행사 영상", cat: "행사 영상", id: "cfRmAnDejx0" },
-  { title: "기업 체육대회 행사 영상", cat: "행사 영상", id: "C9P9Ggki68c" },
-  { title: "한국영아발달조기개입협회 행사", cat: "행사 영상", id: "obxC9tNwvro" },
-  { title: "연말 행사 포상식 · 수료식", cat: "행사 영상", id: "9inKmyI8Uec" },
-  // 숏폼
-  { title: "기업 행사 모션그래픽 편집", cat: "숏폼", id: "jgaDCh-Nawk" },
-  { title: "제품 SNS 홍보영상 제작", cat: "숏폼", id: "o-MxpPTcKvs" },
-  { title: "행사 전광판 모션그래픽", cat: "숏폼", id: "LbnTS7Zc2Zw" },
-  // 공공기관
-  { title: "공공기관 · 해양경찰 훈련 교육", cat: "공공기관", id: "F_36PsHEJ6A" },
-  { title: "서울청년센터 공간 소개영상", cat: "공공기관", id: "qobtHTN8ONw" },
-];
-
-const CATEGORIES = ["전체", "브랜드 유튜브", "브랜딩 필름", "행사 영상", "숏폼", "공공기관"];
-
-interface PortfolioProps { filter: string; setFilter: (f: string) => void; }
-const PortfolioSection = ({ filter, setFilter }: PortfolioProps) => {
-  const filtered = filter === "전체" ? ALL_WORKS : ALL_WORKS.filter(w => w.cat === filter);
-
-  return (
-    <section id="portfolio" className="py-28 lg:py-36 bg-surface-beige scroll-mt-20">
-      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-12">
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-            말보다 먼저 보여드립니다
-          </h2>
-          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
-            썸네일을 클릭하면 유튜브 영상으로 바로 이동합니다.
-          </p>
-        </Reveal>
-
-        {/* Filter tabs */}
-        <Reveal>
-          <div className="flex flex-wrap gap-2 justify-center mb-12">
-            {CATEGORIES.map(c => (
-              <button
-                key={c}
-                onClick={() => setFilter(c)}
-                className={`text-[13px] font-medium px-4 py-2 rounded-full transition-all ${
-                  filter === c
-                    ? "bg-foreground text-background"
-                    : "bg-background/50 text-muted-foreground border border-border hover:text-foreground hover:border-foreground/30"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </Reveal>
-
-        <Reveal>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filtered.map(w => (
-              <a
-                key={w.id}
-                href={`https://www.youtube.com/watch?v=${w.id}`}
-                target="_blank"
-                rel="noreferrer"
-                className="group block"
-              >
-                <div className="relative aspect-video rounded-xl overflow-hidden bg-dark shadow-card group-hover:shadow-card-hover transition-all">
-                  <img
-                    src={`https://img.youtube.com/vi/${w.id}/hqdefault.jpg`}
-                    alt={w.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-dark/20 group-hover:bg-dark/40 transition-colors" />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-14 h-14 rounded-full bg-white/90 flex items-center justify-center opacity-80 group-hover:opacity-100 group-hover:scale-110 transition-all">
-                      <Play className="w-5 h-5 text-dark ml-0.5" fill="currentColor" />
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-3 px-1">
-                  <span className="text-[11px] text-primary tracking-[0.08em] uppercase font-medium">{w.cat}</span>
-                  <h4 className="text-[14px] font-medium text-foreground mt-1 leading-[1.5]">{w.title}</h4>
-                </div>
-              </a>
-            ))}
-          </div>
-        </Reveal>
-
-        <Reveal className="mt-16 text-center">
-          <a
-            href="http://yoon6film.co.kr/services/"
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 px-7 py-3.5 border border-foreground/20 text-[14px] font-medium text-foreground hover:border-foreground/40 hover:gap-3 transition-all rounded-md"
-          >
-            전체 포트폴리오 보기 <ArrowRight className="w-4 h-4" />
-          </a>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
-
-/* ============================================================
-   Section 05 · Social Proof
+   Section 06 · Social Proof
    ============================================================ */
 const SocialProofSection = () => (
   <section className="py-28 lg:py-36 bg-surface-white">
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <Reveal className="text-center mb-16">
+      <Reveal className="text-center mb-14">
         <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-          구독자 73명 → 2,500명.<br />2개월이면 됩니다
+          숫자로 말합니다
         </h2>
       </Reveal>
 
@@ -300,10 +324,9 @@ const SocialProofSection = () => (
                 <span className="text-[32px] font-serif font-semibold text-muted-foreground tracking-[-0.02em]">4.4만</span>
                 <span className="text-[13px] text-muted-foreground">누적 조회수</span>
               </div>
-              <p className="text-[13px] text-muted-foreground/70 pt-2 border-t border-border">방향성 불명확</p>
             </div>
           </div>
-          <div className="border-2 border-primary rounded-xl p-8 bg-primary/5 relative">
+          <div className="border-2 border-primary rounded-xl p-8 bg-primary/5">
             <span className="text-[11px] font-bold text-primary tracking-[0.1em] uppercase">After · 대행 2개월</span>
             <div className="mt-6 space-y-4">
               <div className="flex items-baseline gap-2">
@@ -314,7 +337,7 @@ const SocialProofSection = () => (
                 <span className="text-[32px] font-serif font-semibold text-primary tracking-[-0.02em]">44만</span>
                 <span className="text-[13px] text-primary/70">누적 조회수</span>
               </div>
-              <p className="text-[13px] text-primary/80 pt-2 border-t border-primary/20 font-medium">상담 전환 4.5배 증가</p>
+              <p className="text-[13px] text-primary/80 pt-2 border-t border-primary/20 font-medium">상담 4배 증가</p>
             </div>
           </div>
         </div>
@@ -324,10 +347,9 @@ const SocialProofSection = () => (
       <Reveal className="max-w-[880px] mx-auto">
         <div className="space-y-0">
           {[
-            { quote: "유튜브 채널 운영 후 제품 문의 전화가 4.5배 폭증했습니다. 시청자를 실제 구매 고객으로 전환시키는 기획력을 증명해 주었습니다.", person: "쭌난방 대표이사" },
-            { quote: "빛과 구조를 이해하는 탁월한 감각으로, 우리 제품이 놓인 공간의 공기마저 고급스럽게 영상에 담아냈습니다.", person: "LG Signature 브랜드팀 PM" },
-            { quote: "가맹점주와 투자자를 설득하기 위한 비전을 텍스트 제안서보다 훨씬 강력한 설득력으로 담아냈습니다. 가맹 사업 확장에 결정적인 역할을 했습니다.", person: "프랜차이즈 본사 가맹사업본부장" },
-            { quote: "수백 명이 모이는 지자체 행사는 돌발 변수가 많아 경험이 필수적입니다. VIP 의전 동선 파악부터 현장 스케치까지 빈틈없이 수행합니다.", person: "충청남도청 행사 기획 주무관" },
+            { quote: "문의 전화가 4.5배 폭증했습니다. 조회수만 나오는 영상이 아니라 실제 구매로 이어지는 기획력을 증명해 줬습니다.", person: "쭌난방 대표이사" },
+            { quote: "텍스트 제안서보다 훨씬 강력했습니다. 가맹 사업 확장에 결정적인 역할을 했습니다.", person: "프랜차이즈 본사 가맹사업본부장" },
+            { quote: "LG Signature가 추구하는 프리미엄 가치를 공간의 공기마저 고급스럽게 담아냈습니다.", person: "LG Signature 브랜드팀 PM" },
           ].map((r, i) => (
             <div key={i} className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6 lg:gap-12 py-10 border-t border-border items-start">
               <p className="text-[13px] text-muted-foreground tracking-[0.02em]">{r.person}</p>
@@ -343,58 +365,15 @@ const SocialProofSection = () => (
 );
 
 /* ============================================================
-   Section 06 · Differentiation
-   ============================================================ */
-const DifferentiationSection = () => (
-  <section className="py-28 lg:py-36 bg-background">
-    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <Reveal className="text-center mb-16">
-        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-          단순 제작사는 납품하고 끝납니다.<br />
-          <span className="text-primary">저희는 채널이 살 때까지 책임집니다</span>
-        </h2>
-      </Reveal>
-
-      <Reveal>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[880px] mx-auto">
-          <div className="border-l-4 border-red-400 bg-red-50/40 rounded-xl p-8">
-            <span className="text-[13px] font-bold text-red-500/90 tracking-[0.05em] mb-5 block">일반 제작사</span>
-            <ul className="space-y-3">
-              {["기획 없이 받아서 찍는다", "납품 후 소통 끊김", "알고리즘 무관심", "조회수로 성과 포장"].map(t => (
-                <li key={t} className="flex items-start gap-2 text-[15px] text-red-700/60 leading-[1.7]">
-                  <span className="text-red-400 mt-0.5 shrink-0">×</span>
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="border-l-4 border-emerald-500 bg-emerald-50/40 rounded-xl p-8">
-            <span className="text-[13px] font-bold text-emerald-600/90 tracking-[0.05em] mb-5 block">브랜디드 콘텐츠 팀</span>
-            <ul className="space-y-3">
-              {["비즈니스 목표 먼저 분석", "전담 PD 실시간 소통", "알고리즘 기반 기획", "상담 · 매출로 성과 측정"].map(t => (
-                <li key={t} className="flex items-start gap-2 text-[15px] text-emerald-800/70 leading-[1.7]">
-                  <span className="text-emerald-500 mt-0.5 shrink-0">✓</span>
-                  <span>{t}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </Reveal>
-    </div>
-  </section>
-);
-
-/* ============================================================
    Section 07 · Process
    ============================================================ */
 const ProcessSection = () => {
-  const steps = [
-    { s: "01", t: "무료 상담", d: "목표 · 타겟 · 예산 분석. 어떤 영상이 전환으로 이어질지 먼저 설계합니다." },
-    { s: "02", t: "기획", d: "핵심 메시지 도출, 알고리즘 반응 기반 주제 설계, 촬영 콘티 확정." },
-    { s: "03", t: "촬영", d: "Sony FX3 멀티캠 + 드론 + 무선마이크. 현장 돌발 변수 대응 경험 9년." },
-    { s: "04", t: "후반 작업", d: "컷 편집 · 색보정 · 자막 · BGM · 모션그래픽. 피드백 반영 후 수정." },
-    { s: "05", t: "납품", d: "유튜브 · 릴스 · 쇼츠 · 틱톡 포맷 동시 납품. 운영 채널이면 업로드 · 관리까지." },
+  const roadmap = [
+    { period: "1개월차", d: "우리 채널만의 USP를 찾습니다" },
+    { period: "2개월차", d: "알고리즘 반응 보고 주력 방향을 확정합니다" },
+    { period: "3~5개월", d: "검증된 구조로 콘텐츠를 확장합니다" },
+    { period: "6개월~", d: "반복 노출로 채널 포지션을 고정합니다" },
+    { period: "매월", d: "데이터 분석 후 다음 달 전략에 반영합니다" },
   ];
 
   return (
@@ -402,17 +381,16 @@ const ProcessSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16">
           <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-            첫 상담부터 납품까지,<br />어느 단계에서도 연락이 끊기지 않습니다
+            맡기면 이렇게 됩니다
           </h2>
         </Reveal>
 
         <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-5 gap-0 max-w-[1100px] mx-auto">
-            {steps.map(p => (
-              <div key={p.s} className="border-t-2 border-primary pt-7 pr-6 pb-8">
-                <span className="text-[13px] font-display text-primary tracking-[0.1em] font-medium">{p.s}</span>
-                <h3 className="text-[17px] font-semibold text-foreground mt-3 mb-3 tracking-[-0.01em]">{p.t}</h3>
-                <p className="text-[14px] text-muted-foreground leading-[1.85]">{p.d}</p>
+          <div className="max-w-[760px] mx-auto">
+            {roadmap.map((r, i) => (
+              <div key={i} className="grid grid-cols-[120px_1fr] gap-6 lg:gap-10 py-7 border-t border-border items-center">
+                <span className="text-[15px] font-display font-semibold text-primary tracking-[0.05em]">{r.period}</span>
+                <p className="text-[17px] text-foreground leading-[1.7] tracking-[-0.01em]">{r.d}</p>
               </div>
             ))}
           </div>
@@ -430,17 +408,17 @@ const CtaSection = () => (
     <div className="max-w-[1240px] mx-auto px-6">
       <Reveal>
         <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
-          우리 브랜드에 맞는 영상 전략,<br />무료로 먼저 들어보세요
+          채널 방향,<br />무료로 먼저 잡아드립니다
         </h2>
-        <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[540px] mx-auto mt-4 mb-12">
-          30분이면 됩니다. 어떤 영상이 매출로 이어질지, 채널 구조를 어떻게 잡을지 — 방향을 먼저 잡아드립니다.
+        <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[520px] mx-auto mt-4 mb-12">
+          지금 유튜브 현황을 보내주시면<br />어디서 막혀있는지 바로 짚어드립니다.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[16px] font-medium tracking-[0.02em] hover:bg-gold-light transition-all rounded-md">
-            무료 영상 전략 상담 신청 <ArrowRight className="w-4 h-4" />
+            무료 상담 신청하기 <ArrowRight className="w-4 h-4" />
           </Link>
-          <a href="http://yoon6film.co.kr/services/" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-8 py-4 border border-border text-[16px] text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-md">
-            포트폴리오 전체 보기
+          <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-8 py-4 border border-border text-[16px] text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-md">
+            <MessageCircle className="w-4 h-4" /> 카카오톡으로 바로 문의
           </a>
         </div>
       </Reveal>
@@ -451,21 +429,17 @@ const CtaSection = () => (
 /* ============================================================
    Page
    ============================================================ */
-const BrandedClient = () => {
-  const [filter, setFilter] = useState("전체");
-
-  return (
-    <div>
-      <HeroSection />
-      <PainSection />
-      <ServicesSection onFilter={setFilter} />
-      <PortfolioSection filter={filter} setFilter={setFilter} />
-      <SocialProofSection />
-      <DifferentiationSection />
-      <ProcessSection />
-      <CtaSection />
-    </div>
-  );
-};
+const BrandedClient = () => (
+  <div>
+    <HeroSection />
+    <PortfolioSection />
+    <PainSection />
+    <ProblemSection />
+    <ServicesSection />
+    <SocialProofSection />
+    <ProcessSection />
+    <CtaSection />
+  </div>
+);
 
 export default BrandedClient;
