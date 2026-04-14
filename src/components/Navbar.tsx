@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import logoWhite from "@/assets/logo-white.png";
 
-const darkHeroPages = ["/consult", "/cases", "/products/glue", "/columns", "/services/performance"];
+const darkHeroPages = ["/consult", "/cases", "/products/glue", "/columns", "/services/performance", "/services/branded"];
 
 const navItems: {
   label: string;
