@@ -20,7 +20,7 @@ const CrmClient = () => (
               CRM 마케팅
             </h1>
             <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[480px] mb-8">
-              퍼포먼스 광고가 관객을 데려온다면, CRM은 <strong className="text-foreground font-medium">그들이 떠나지 않도록 붙잡고, 구매하게 만들고, 다시 오게 만듭니다.</strong>
+              리드 수집부터 육성, 전환, 그리고 팬덤 설계까지. <strong className="text-foreground font-medium">관객이 브랜드를 발견한 순간부터 충성 고객이 되는 전 과정을 함께 만듭니다.</strong>
             </p>
             <div className="flex flex-wrap gap-2">
               {["카카오 알림톡", "이메일 시퀀스", "문자 자동화"].map(t => (
@@ -51,7 +51,7 @@ const CrmClient = () => (
               무형 서비스의 구매 여정은 깁니다. 광고를 클릭하고 &apos;괜찮은데?&apos;라고 생각했지만, 바로 구매하지는 않습니다. 이 과정에서 대부분의 잠재 고객이 이탈합니다.
             </p>
             <p className="text-[16px] text-cream/70 leading-[2]">
-              CRM 마케팅은 이 이탈 구간을 메웁니다. 관심을 보인 사람에게 <strong className="text-cream font-medium">적절한 타이밍에, 적절한 메시지를, 적절한 채널로</strong> 자동 발송합니다.
+              PIXELPAGE는 이 전 과정을 설계합니다. 리드를 어디서 모을지, 어떤 메시지로 육성할지, 언제 전환시킬지, 그리고 <strong className="text-cream font-medium">한 번 온 고객이 팬이 되는 구조</strong>까지 함께 만듭니다.
             </p>
           </div>
         </Reveal>
@@ -64,7 +64,7 @@ const CrmClient = () => (
         <Reveal>
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">CRM Flow</p>
           <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em]">
-            리드부터 팬덤까지, 4단계 자동화
+            리드 수집부터 팬덤 설계까지, 4단계
           </h2>
         </Reveal>
         <Reveal className="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0">
@@ -140,8 +140,8 @@ const CrmClient = () => (
     <section className="py-24 bg-dark text-center">
       <div className="max-w-[1240px] mx-auto px-6">
         <Reveal>
-          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-medium text-cream mb-4">CRM 자동화가 필요하신가요?</h2>
-          <p className="text-[15px] text-cream/60 mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 현재 리드 관리 현황을 진단하고, 최적의 CRM 전략을 제안드립니다.</p>
+          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-medium text-cream mb-4">리드 수집부터 팬덤까지, 함께 설계할까요?</h2>
+          <p className="text-[15px] text-cream/60 mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 현재 고객 여정을 진단하고, 우리 브랜드에 맞는 CRM 전략을 제안드립니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />
           </Link>

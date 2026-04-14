@@ -14,50 +14,48 @@ import {
   CreativeLifecycleMockup,
 } from "@/components/PerformanceMockups";
 
+import dynamic from "next/dynamic";
+const HeroLineArt = dynamic(() => import("@/components/HeroLineArt"), { ssr: false });
+
 /* --------------- Section 01 - Hero --------------- */
 const HeroSection = () => (
   <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-dark overflow-hidden">
-    <div className="absolute inset-0 z-[1] pointer-events-none opacity-[0.105] mix-blend-multiply" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+    {/* Subtle gradient glow */}
+    <div className="absolute top-[20%] right-[15%] w-[400px] h-[400px] rounded-full bg-primary/[0.05] blur-[140px] pointer-events-none" />
+
     <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
-          <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/50 hover:text-primary transition-colors mb-10 opacity-0 animate-fade-up stagger-1">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-16 opacity-0 animate-fade-up stagger-1">
             <ArrowLeft className="w-3 h-3" /> 홈으로
           </Link>
-          <p className="text-[15px] tracking-[0.2em] uppercase text-cream/40 mb-6 opacity-0 animate-fade-up stagger-1">
+          <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-8 opacity-0 animate-fade-up stagger-1">
             Performance Marketing
           </p>
-          <h1 className="font-serif text-[clamp(52px,7.5vw,96px)] font-semibold leading-[1.1] tracking-[-0.03em] text-cream mb-7 opacity-0 animate-fade-up stagger-2">
+          <h1 className="font-serif text-[clamp(42px,5.5vw,72px)] font-medium leading-[1.15] tracking-[-0.03em] text-cream mb-8 opacity-0 animate-fade-up stagger-2">
             광고비 낭비는<br />
             <span className="text-primary">구조</span>를 모르기<br />때문입니다
           </h1>
-          <p className="text-[20px] text-cream/50 leading-[1.85] max-w-[480px] mb-10 opacity-0 animate-fade-up stagger-3">
-            소재 기획부터 억 단위 예산 집행까지 —<br />
-            감이 아닌 구조로 운영합니다.
+          <p className="text-[17px] text-cream/35 leading-[1.9] max-w-[400px] mb-12 opacity-0 animate-fade-up stagger-3">
+            소재 기획부터 억 단위 예산 집행까지 — 감이 아닌 구조로 운영합니다.
           </p>
-          <div className="flex items-center gap-4 mb-14 opacity-0 animate-fade-up stagger-4">
-            <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[16px] font-medium tracking-[0.02em] hover:bg-gold-light transition-all rounded-md">
-              지금 무료 광고 진단 받기
+          <div className="flex items-center gap-5 opacity-0 animate-fade-up stagger-4">
+            <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
+              무료 광고 진단 받기
             </Link>
           </div>
-          <div className="flex flex-wrap gap-10 opacity-0 animate-fade-up stagger-5">
-            {[
-              { n: "12억+", l: "누적 광고비 운용" },
-              { n: "500%", l: "최고 ROAS" },
-              { n: "280+", l: "캠페인 집행" },
-            ].map(k => (
-              <div key={k.l}>
-                <span className="text-[32px] font-serif font-semibold text-cream tracking-[-0.02em]">{k.n}</span>
-                <span className="block text-[11px] text-cream/30 tracking-[0.08em] uppercase mt-1">{k.l}</span>
-              </div>
-            ))}
-          </div>
         </div>
-        <div className="hidden lg:flex justify-center items-center">
-          <div className="animate-float">
-            <img src={illustHero.src} alt="퍼포먼스 마케팅" className="w-[400px]" width={1024} height={1024} />
-          </div>
+        <div className="hidden lg:flex justify-center items-center relative">
+          <HeroLineArt />
         </div>
+      </div>
+    </div>
+
+    {/* Bottom explore link */}
+    <div className="absolute bottom-10 left-0 right-0 z-10">
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12 flex items-center gap-3">
+        <span className="text-[12px] tracking-[0.12em] uppercase text-cream/20">스크롤</span>
+        <div className="w-[50px] h-px bg-primary/30" style={{ animation: 'scroll-line 2s ease infinite' }} />
       </div>
     </div>
   </section>
