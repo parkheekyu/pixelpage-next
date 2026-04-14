@@ -113,8 +113,9 @@ export const BudgetScalingMockup = () => {
             transition={{ duration: 0.4, delay: 0.2 }}
             preserveAspectRatio="none"
           >
+            {/* 일 예산: 계단식 점진 상승 (테스트 $10 → 안정 $20 → 수직 $30~50 → 수평 $60~120) */}
             <motion.path
-              d="M 5,148 L 70,148 L 90,125 L 150,120 L 170,85 L 210,80 L 230,55 L 290,50 L 310,20 L 355,15"
+              d="M 5,148 L 60,148 L 65,140 L 90,138 L 95,130 L 150,128 L 155,115 L 170,112 L 175,105 L 210,100 L 215,85 L 230,82 L 235,72 L 260,70 L 290,55 L 310,45 L 355,15"
               fill="none"
               stroke="#6366f1"
               strokeWidth="2.5"
@@ -123,8 +124,9 @@ export const BudgetScalingMockup = () => {
               animate={inView ? { pathLength: 1 } : {}}
               transition={{ duration: 1.2, delay: 0.3 }}
             />
+            {/* CPA 추이: 처음 높고 → 안정 후 낮아지다가 → 스케일 시 살짝 올라감 */}
             <motion.path
-              d="M 5,25 L 50,30 L 90,50 L 130,65 L 170,70 L 195,55 L 215,65 L 250,75 L 290,90 L 330,100 L 355,110"
+              d="M 5,30 L 40,40 L 70,55 L 90,65 L 120,72 L 150,75 L 180,72 L 210,68 L 230,60 L 250,55 L 270,58 L 290,65 L 320,72 L 355,78"
               fill="none"
               stroke="#10b981"
               strokeWidth="2"
