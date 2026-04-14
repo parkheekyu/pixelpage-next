@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { ArrowRight, ArrowLeft, Play, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 
@@ -10,124 +10,194 @@ const BrandedHeroArt = dynamic(() => import("@/components/BrandedHeroArt"), { ss
 /* ============================================================
    Section 01 · Hero
    ============================================================ */
-const HeroSection = () => (
-  <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-dark overflow-hidden">
-    <div className="absolute top-[15%] right-[8%] w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[150px] pointer-events-none" />
+const HeroSection = () => {
+  const channels = ["포리얼", "쭌난방 본사", "공간수익", "닥터세사마", "스마트폰면세점", "짐컴퍼니", "무나홈트", "램프캠핑"];
+  return (
+    <section className="relative min-h-screen flex items-center pt-32 pb-24 bg-dark overflow-hidden">
+      <div className="absolute top-[15%] right-[8%] w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[150px] pointer-events-none" />
 
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-      <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
-        <ArrowLeft className="w-3 h-3" /> 홈으로
-      </Link>
+      <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
+          <ArrowLeft className="w-3 h-3" /> 홈으로
+        </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div>
-          <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-7 opacity-0 animate-fade-up stagger-1">
-            Branded Content
-          </p>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-7 opacity-0 animate-fade-up stagger-1">
+              Branded Content
+            </p>
 
-          <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.15] tracking-[-0.03em] text-cream mb-7 opacity-0 animate-fade-up stagger-2">
-            유튜브로<br />
-            <span className="text-primary">24시간 영업사원</span>을<br />
-            만듭니다
-          </h1>
+            <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.15] tracking-[-0.03em] text-cream mb-7 opacity-0 animate-fade-up stagger-2">
+              유튜브로<br />
+              <span className="text-primary">24시간 영업사원</span>을<br />
+              만듭니다
+            </h1>
 
-          <p className="text-[18px] text-cream/45 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3">
-            병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
-            기획부터 숏폼까지, 한 팀이 다 합니다.
-          </p>
+            <p className="text-[18px] text-cream/45 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3">
+              병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
+              기획부터 숏폼까지, 한 팀이 다 합니다.
+            </p>
 
-          <div className="flex items-center gap-4 opacity-0 animate-fade-up stagger-4">
-            <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
-              무료 상담 신청
-            </Link>
-            <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/15 text-cream/70 text-[15px] hover:border-cream/30 hover:text-cream transition-colors rounded-md">
-              <MessageCircle className="w-4 h-4" /> 카카오톡 문의
-            </a>
+            <div className="flex items-center gap-4 mb-12 opacity-0 animate-fade-up stagger-4">
+              <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
+                무료 상담 신청
+              </Link>
+              <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/15 text-cream/70 text-[15px] hover:border-cream/30 hover:text-cream transition-colors rounded-md">
+                <MessageCircle className="w-4 h-4" /> 카카오톡 문의
+              </a>
+            </div>
+
+            {/* 보조 수치 */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 opacity-0 animate-fade-up stagger-5">
+              {[
+                { n: "9년+", l: "제작 경력" },
+                { n: "100만+", l: "누적 구독자" },
+                { n: "4배", l: "상담 전환" },
+                { n: "2개월", l: "채널 성장" },
+              ].map(k => (
+                <div key={k.l}>
+                  <span className="text-[24px] font-serif font-semibold text-cream tracking-[-0.02em]">{k.n}</span>
+                  <span className="block text-[11px] text-cream/25 tracking-[0.08em] uppercase mt-1">{k.l}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="hidden lg:flex justify-center items-center">
+            <BrandedHeroArt />
           </div>
         </div>
 
-        <div className="hidden lg:flex justify-center items-center">
-          <BrandedHeroArt />
-        </div>
-      </div>
-    </div>
-  </section>
-);
-
-/* ============================================================
-   Section 02 · Portfolio
-   ============================================================ */
-const PortfolioSection = () => {
-  // 각 영상마다 다른 그라디언트 톤
-  const videos = [
-    { title: "AI로 이런 1인 사업이 뜨고 있어요", channel: "포리얼", g: "from-violet-600 via-indigo-700 to-dark" },
-    { title: "10평 농막 찜질방 온수난방 시공", channel: "쭌난방 본사", g: "from-orange-500 via-red-700 to-dark" },
-    { title: "얼굴 홍조 이유와 치료 방법", channel: "닥터세사마", g: "from-rose-400 via-pink-700 to-dark" },
-    { title: "개업 하자마자 50명씩 웨이팅 만든 비결", channel: "포리얼", g: "from-amber-500 via-orange-700 to-dark" },
-    { title: "발리에서 에어비앤비에 도전하는 직장인", channel: "공간수익", g: "from-emerald-500 via-teal-700 to-dark" },
-    { title: "갤럭시 Z 폴드7 최신 유출 정보", channel: "스마트폰면세점", g: "from-sky-500 via-blue-700 to-dark" },
-    { title: "태양광 발전소 투자 전 확인할 5가지", channel: "짐컴퍼니", g: "from-yellow-500 via-orange-700 to-dark" },
-    { title: "복부집중 4주 챌린지", channel: "무나홈트", g: "from-lime-500 via-green-700 to-dark" },
-  ];
-
-  return (
-    <section className="py-28 lg:py-36 bg-surface-white">
-      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-16">
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-            직접 확인하세요
-          </h2>
-          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
-            말보다 채널이 먼저입니다.<br />지금 운영 중인 채널들을 보세요.
-          </p>
-        </Reveal>
-
-        <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {videos.map((v, i) => (
-              <a
-                key={i}
-                href={`https://www.youtube.com/results?search_query=${encodeURIComponent(v.title)}`}
-                target="_blank"
-                rel="noreferrer"
-                className="group block"
-              >
-                <div className="relative aspect-video rounded-2xl overflow-hidden shadow-card group-hover:shadow-card-hover transition-all">
-                  {/* Colorful gradient thumbnail */}
-                  <div className={`absolute inset-0 bg-gradient-to-br ${v.g}`} />
-                  {/* Pattern overlay */}
-                  <div className="absolute inset-0 opacity-20" style={{
-                    backgroundImage: `radial-gradient(circle at 20% 30%, rgba(255,255,255,0.4), transparent 50%), radial-gradient(circle at 80% 70%, rgba(0,0,0,0.3), transparent 50%)`,
-                  }} />
-                  {/* Dark bottom fade for text readability */}
-                  <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-
-                  {/* Play button — big and prominent */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full bg-white/95 flex items-center justify-center shadow-xl group-hover:scale-110 group-hover:bg-white transition-all">
-                      <Play className="w-8 h-8 text-black ml-1" fill="currentColor" />
-                    </div>
-                  </div>
-
-                  {/* Title on thumbnail (bottom) */}
-                  <div className="absolute bottom-0 left-0 right-0 p-6">
-                    <div className="inline-flex items-center gap-1.5 bg-white/15 backdrop-blur-sm rounded-full px-3 py-1 mb-3">
-                      <span className="w-1.5 h-1.5 rounded-full bg-red-500" />
-                      <span className="text-[11px] text-white/90 font-semibold tracking-[0.05em]">{v.channel}</span>
-                    </div>
-                    <h3 className="text-[20px] lg:text-[22px] text-white font-bold leading-[1.3] tracking-[-0.01em]">
-                      {v.title}
-                    </h3>
-                  </div>
-                </div>
-              </a>
+        {/* 운영 채널 이름 자동 롤링 */}
+        <div className="relative overflow-hidden border-t border-cream/[0.06] pt-6 mt-16 opacity-0 animate-fade-up stagger-6">
+          <p className="text-[11px] tracking-[0.15em] uppercase text-cream/25 mb-4 font-medium">Now operating</p>
+          <div className="flex gap-12 animate-marquee whitespace-nowrap">
+            {[...channels, ...channels, ...channels].map((c, i) => (
+              <span key={i} className="text-[15px] text-cream/40 tracking-[0.02em] font-medium shrink-0">{c}</span>
             ))}
           </div>
-        </Reveal>
+        </div>
       </div>
     </section>
   );
 };
+
+/* ============================================================
+   Section 02 · Portfolio
+   ============================================================ */
+interface Channel { name: string; biz: string; }
+interface Video { title: string; channel: string; embedId: string; }
+
+const CHANNELS: Channel[] = [
+  { name: "포리얼", biz: "비즈니스 · 창업" },
+  { name: "쭌난방 본사", biz: "난방 · 시공" },
+  { name: "공간수익", biz: "부동산 · 에어비앤비" },
+  { name: "닥터세사마", biz: "피부과 · 의료" },
+  { name: "스마트폰면세점", biz: "스마트폰 · IT" },
+  { name: "짐컴퍼니", biz: "태양광 · 에너지" },
+  { name: "무나홈트", biz: "피트니스 · 운동" },
+  { name: "램프캠핑", biz: "캠핑 · 아웃도어" },
+];
+
+const FEATURED_VIDEOS: Video[] = [
+  // 1열
+  { title: "AI로 이런 1인 사업이 뜨고 있어요", channel: "포리얼", embedId: "IFLV4cI4R_Y" },
+  { title: "10평 농막 찜질방 온수난방 시공", channel: "쭌난방 본사", embedId: "NWrm2WueHLY" },
+  { title: "얼굴 홍조 이유와 치료 방법", channel: "닥터세사마", embedId: "_wejdbdwbNA" },
+  // 2열
+  { title: "개업 하자마자 50명씩 웨이팅 만든 비결", channel: "포리얼", embedId: "1ATfpuC_gY4" },
+  { title: "발리에서 에어비앤비에 도전하는 직장인", channel: "공간수익", embedId: "oIWM3itfnFY" },
+  { title: "갤럭시 Z 폴드7 최신 유출 정보", channel: "스마트폰면세점", embedId: "_yL-RX1RYn8" },
+  // 3열
+  { title: "태양광 발전소 투자 전 확인할 5가지", channel: "짐컴퍼니", embedId: "gAs58TT_OVQ" },
+  { title: "복부집중 4주 챌린지", channel: "무나홈트", embedId: "6oX8sQ6kuL4" },
+  { title: "인간극장 레전드 직접 만남", channel: "아하부장", embedId: "DzQdfxEGKn0" },
+  // 4열
+  { title: "한국 아이템으로 미국 8천 억 사업", channel: "포리얼", embedId: "Q2V1et5cz4E" },
+  { title: "손으로 끼우면 끝나는 바닥 열선 난방", channel: "쭌난방 본사", embedId: "lbiFo4tkG6U" },
+  { title: "오봉집 창업 30살에 결혼 성공", channel: "장사가 머니", embedId: "VoZIKuFM_CU" },
+];
+
+const MORE_VIDEOS: Video[] = [
+  { title: "오토캠핑 산 꼭대기까지 차타고 간 이유", channel: "램프캠핑", embedId: "c4BL2erGBIo" },
+  { title: "유튜브 초보 채널 개설 후 셋팅 9가지", channel: "노피디", embedId: "bDZIOVuODo8" },
+  { title: "음식물 쓰레기로 하루 200만원", channel: "한국에서살아남기", embedId: "lJ1SmJSqaTg" },
+  { title: "스마트폰으로 유튜브 촬영하기", channel: "노피디", embedId: "0wo2B_0sINI" },
+];
+
+const VideoCard = ({ v }: { v: Video }) => (
+  <div className="group">
+    <div className="relative aspect-video rounded-xl overflow-hidden bg-dark shadow-card group-hover:shadow-card-hover transition-all">
+      <iframe
+        src={`https://www.youtube.com/embed/${v.embedId}`}
+        title={v.title}
+        loading="lazy"
+        allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        className="absolute inset-0 w-full h-full border-0"
+      />
+    </div>
+    <div className="mt-3 px-1">
+      <span className="text-[11px] text-primary tracking-[0.08em] uppercase font-medium">{v.channel}</span>
+      <h4 className="text-[14px] font-medium text-foreground mt-1 leading-[1.5] tracking-[-0.01em]">{v.title}</h4>
+    </div>
+  </div>
+);
+
+const PortfolioSection = () => (
+  <section className="py-28 lg:py-36 bg-surface-white">
+    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+      <Reveal className="text-center mb-16">
+        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          직접 확인하세요
+        </h2>
+        <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
+          말보다 채널이 먼저입니다.<br />지금 운영 중인 채널들을 보세요.
+        </p>
+      </Reveal>
+
+      {/* 운영 채널 8개 */}
+      <Reveal>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-20">
+          {CHANNELS.map(c => (
+            <a
+              key={c.name}
+              href={`https://www.youtube.com/results?search_query=${encodeURIComponent(c.name)}`}
+              target="_blank"
+              rel="noreferrer"
+              className="group block border border-border rounded-xl p-6 bg-card hover:shadow-card-hover hover:border-primary/30 transition-all"
+            >
+              <h4 className="text-[16px] font-semibold text-foreground tracking-[-0.01em] mb-1">{c.name}</h4>
+              <p className="text-[12px] text-muted-foreground">{c.biz}</p>
+              <span className="inline-flex items-center gap-1 text-[11px] text-primary mt-3 group-hover:gap-1.5 transition-all">
+                채널 보기 <ArrowRight className="w-3 h-3" />
+              </span>
+            </a>
+          ))}
+        </div>
+      </Reveal>
+
+      {/* Featured Videos — 4 columns × 3 rows = 12 */}
+      <Reveal>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {FEATURED_VIDEOS.map(v => (
+            <VideoCard key={v.embedId} v={v} />
+          ))}
+        </div>
+      </Reveal>
+
+      {/* More Works — 4 */}
+      <Reveal className="mt-20">
+        <p className="text-[13px] tracking-[0.15em] uppercase text-primary font-medium mb-8 text-center">More Works</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {MORE_VIDEOS.map(v => (
+            <VideoCard key={v.embedId} v={v} />
+          ))}
+        </div>
+      </Reveal>
+    </div>
+  </section>
+);
 
 /* ============================================================
    Section 03 · Pain
