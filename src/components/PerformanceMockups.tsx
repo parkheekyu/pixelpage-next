@@ -3,9 +3,9 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
-/* -- Clean white card -- */
+/* -- Tall rounded card container -- */
 const MockupCard = ({ children }: { children: React.ReactNode }) => (
-  <div className="rounded-2xl bg-white border border-neutral-100 overflow-hidden h-[420px] flex items-center justify-center p-6 shadow-sm">
+  <div className="rounded-2xl bg-[#f5f0ea] overflow-hidden h-[420px] flex items-center justify-center p-6">
     {children}
   </div>
 );
