@@ -81,11 +81,11 @@ const IndexClient = () => {
           <Reveal className="text-center mb-16">
             <div>
               <img src={iconTrophy.src} alt="Cases" className="w-10 h-10 mb-5 mx-auto" />
-              <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
+              <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.05] tracking-[-0.05em]">
                 짧은 기간,<br />또렷한 결과.
               </h2>
             </div>
-            <p className="text-[17px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-4">
+            <p className="text-[15px] text-muted-foreground max-w-[460px] mx-auto leading-[1.85] mt-4">
               무형 서비스 브랜드와 함께한 실제 성과입니다.
             </p>
           </Reveal>
@@ -128,13 +128,13 @@ const IndexClient = () => {
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Reveal>
             <img src={iconAt.src} alt="Contact" className="w-10 h-10 mb-5" />
-            <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em] mb-5">
+            <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.05] tracking-[-0.05em] mb-5">
               한 번 얘기해봐요.
             </h2>
-            <p className="text-[19px] text-muted-foreground max-w-[480px] leading-[1.9] mb-10">
+            <p className="text-[16px] text-muted-foreground max-w-[440px] leading-[1.85] mb-9">
               지금 당장 계약이 목표가 아닙니다. 브랜드를 함께 진단하고, 어떻게 팔 수 있는지 생각해 보는 것부터 시작합니다.
             </p>
-            <a href="mailto:contact@pixelpage.co.kr" className="block font-serif text-[30px] font-medium text-foreground/80 hover:text-primary transition-colors mb-2">
+            <a href="mailto:contact@pixelpage.co.kr" className="block font-serif text-[24px] font-medium text-foreground/80 hover:text-primary transition-colors mb-2">
               contact@pixelpage.co.kr
             </a>
             <p className="text-[14px] text-muted-foreground mb-8">보통 24시간 이내 회신드립니다.</p>
