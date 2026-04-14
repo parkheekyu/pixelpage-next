@@ -10,94 +10,54 @@ const BrandedHeroArt = dynamic(() => import("@/components/BrandedHeroArt"), { ss
 /* ============================================================
    Section 01 · Hero
    ============================================================ */
-const HeroSection = () => {
-  const channels = ["포리얼", "쭌난방 본사", "공간수익", "닥터세사마", "스마트폰면세점", "짐컴퍼니", "무나홈트", "램프캠핑"];
-  return (
-    <section className="relative min-h-screen flex items-center pt-32 pb-24 bg-dark overflow-hidden">
-      <div className="absolute top-[15%] right-[8%] w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[150px] pointer-events-none" />
+const HeroSection = () => (
+  <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-dark overflow-hidden">
+    <div className="absolute top-[15%] right-[8%] w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[150px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
-          <ArrowLeft className="w-3 h-3" /> 홈으로
-        </Link>
+    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
+        <ArrowLeft className="w-3 h-3" /> 홈으로
+      </Link>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-7 opacity-0 animate-fade-up stagger-1">
-              Branded Content
-            </p>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-7 opacity-0 animate-fade-up stagger-1">
+            Branded Content
+          </p>
 
-            <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.15] tracking-[-0.03em] text-cream mb-7 opacity-0 animate-fade-up stagger-2">
-              유튜브로<br />
-              <span className="text-primary">24시간 영업사원</span>을<br />
-              만듭니다
-            </h1>
+          <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.15] tracking-[-0.03em] text-cream mb-7 opacity-0 animate-fade-up stagger-2">
+            유튜브로<br />
+            <span className="text-primary">24시간 영업사원</span>을<br />
+            만듭니다
+          </h1>
 
-            <p className="text-[18px] text-cream/45 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3">
-              병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
-              기획부터 숏폼까지, 한 팀이 다 합니다.
-            </p>
+          <p className="text-[18px] text-cream/45 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3">
+            병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
+            기획부터 숏폼까지, 한 팀이 다 합니다.
+          </p>
 
-            <div className="flex items-center gap-4 mb-12 opacity-0 animate-fade-up stagger-4">
-              <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
-                무료 상담 신청
-              </Link>
-              <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/15 text-cream/70 text-[15px] hover:border-cream/30 hover:text-cream transition-colors rounded-md">
-                <MessageCircle className="w-4 h-4" /> 카카오톡 문의
-              </a>
-            </div>
-
-            {/* 보조 수치 */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 opacity-0 animate-fade-up stagger-5">
-              {[
-                { n: "9년+", l: "제작 경력" },
-                { n: "100만+", l: "누적 구독자" },
-                { n: "4배", l: "상담 전환" },
-                { n: "2개월", l: "채널 성장" },
-              ].map(k => (
-                <div key={k.l}>
-                  <span className="text-[24px] font-serif font-semibold text-cream tracking-[-0.02em]">{k.n}</span>
-                  <span className="block text-[11px] text-cream/25 tracking-[0.08em] uppercase mt-1">{k.l}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="hidden lg:flex justify-center items-center">
-            <BrandedHeroArt />
+          <div className="flex items-center gap-4 opacity-0 animate-fade-up stagger-4">
+            <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
+              무료 상담 신청
+            </Link>
+            <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/15 text-cream/70 text-[15px] hover:border-cream/30 hover:text-cream transition-colors rounded-md">
+              <MessageCircle className="w-4 h-4" /> 카카오톡 문의
+            </a>
           </div>
         </div>
 
-        {/* 운영 채널 이름 자동 롤링 */}
-        <div className="relative overflow-hidden border-t border-cream/[0.06] pt-6 mt-16 opacity-0 animate-fade-up stagger-6">
-          <p className="text-[11px] tracking-[0.15em] uppercase text-cream/25 mb-4 font-medium">Now operating</p>
-          <div className="flex gap-12 animate-marquee whitespace-nowrap">
-            {[...channels, ...channels, ...channels].map((c, i) => (
-              <span key={i} className="text-[15px] text-cream/40 tracking-[0.02em] font-medium shrink-0">{c}</span>
-            ))}
-          </div>
+        <div className="hidden lg:flex justify-center items-center">
+          <BrandedHeroArt />
         </div>
       </div>
-    </section>
-  );
-};
+    </div>
+  </section>
+);
 
 /* ============================================================
    Section 02 · Portfolio
    ============================================================ */
-interface Channel { name: string; biz: string; }
 interface Video { title: string; channel: string; embedId: string; }
-
-const CHANNELS: Channel[] = [
-  { name: "포리얼", biz: "비즈니스 · 창업" },
-  { name: "쭌난방 본사", biz: "난방 · 시공" },
-  { name: "공간수익", biz: "부동산 · 에어비앤비" },
-  { name: "닥터세사마", biz: "피부과 · 의료" },
-  { name: "스마트폰면세점", biz: "스마트폰 · IT" },
-  { name: "짐컴퍼니", biz: "태양광 · 에너지" },
-  { name: "무나홈트", biz: "피트니스 · 운동" },
-  { name: "램프캠핑", biz: "캠핑 · 아웃도어" },
-];
 
 const FEATURED_VIDEOS: Video[] = [
   // 1열
@@ -154,27 +114,6 @@ const PortfolioSection = () => (
         <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
           말보다 채널이 먼저입니다.<br />지금 운영 중인 채널들을 보세요.
         </p>
-      </Reveal>
-
-      {/* 운영 채널 8개 */}
-      <Reveal>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-20">
-          {CHANNELS.map(c => (
-            <a
-              key={c.name}
-              href={`https://www.youtube.com/results?search_query=${encodeURIComponent(c.name)}`}
-              target="_blank"
-              rel="noreferrer"
-              className="group block border border-border rounded-xl p-6 bg-card hover:shadow-card-hover hover:border-primary/30 transition-all"
-            >
-              <h4 className="text-[16px] font-semibold text-foreground tracking-[-0.01em] mb-1">{c.name}</h4>
-              <p className="text-[12px] text-muted-foreground">{c.biz}</p>
-              <span className="inline-flex items-center gap-1 text-[11px] text-primary mt-3 group-hover:gap-1.5 transition-all">
-                채널 보기 <ArrowRight className="w-3 h-3" />
-              </span>
-            </a>
-          ))}
-        </div>
       </Reveal>
 
       {/* Featured Videos — 4 columns × 3 rows = 12 */}
