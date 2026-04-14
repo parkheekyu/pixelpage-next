@@ -287,7 +287,7 @@ const PhilosophySection = ({
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-20 lg:mb-28">
           <img src={icon} alt={iconAlt} className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
+          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.05] tracking-[-0.05em]">
             {heading}
           </h2>
         </Reveal>
