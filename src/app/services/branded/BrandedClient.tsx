@@ -78,13 +78,6 @@ const FEATURED_VIDEOS: Video[] = [
   { title: "오봉집 창업 30살에 결혼 성공", channel: "장사가 머니", embedId: "VoZIKuFM_CU" },
 ];
 
-const MORE_VIDEOS: Video[] = [
-  { title: "오토캠핑 산 꼭대기까지 차타고 간 이유", channel: "램프캠핑", embedId: "c4BL2erGBIo" },
-  { title: "유튜브 초보 채널 개설 후 셋팅 9가지", channel: "노피디", embedId: "bDZIOVuODo8" },
-  { title: "음식물 쓰레기로 하루 200만원", channel: "한국에서살아남기", embedId: "lJ1SmJSqaTg" },
-  { title: "스마트폰으로 유튜브 촬영하기", channel: "노피디", embedId: "0wo2B_0sINI" },
-];
-
 const VideoCard = ({ v }: { v: Video }) => (
   <div className="group">
     <div className="relative aspect-video rounded-xl overflow-hidden bg-dark shadow-card group-hover:shadow-card-hover transition-all">
@@ -125,15 +118,6 @@ const PortfolioSection = () => (
         </div>
       </Reveal>
 
-      {/* More Works — 4 */}
-      <Reveal className="mt-20">
-        <p className="text-[13px] tracking-[0.15em] uppercase text-primary font-medium mb-8 text-center">More Works</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {MORE_VIDEOS.map(v => (
-            <VideoCard key={v.embedId} v={v} />
-          ))}
-        </div>
-      </Reveal>
     </div>
   </section>
 );
