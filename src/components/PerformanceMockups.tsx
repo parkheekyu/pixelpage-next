@@ -3,10 +3,21 @@
 import { motion, useInView } from "framer-motion";
 import { useRef } from "react";
 
-/* -- Tall rounded card container (Claude-style) -- */
-const MockupCard = ({ children }: { children: React.ReactNode }) => (
-  <div className="rounded-2xl bg-[#f5f0ea] overflow-hidden h-[420px] flex items-center justify-center p-6">
-    {children}
+/* -- Tall rounded card container with colored bg + subtle pattern -- */
+const MockupCard = ({ children, bg, patternColor }: { children: React.ReactNode; bg: string; patternColor: string }) => (
+  <div className={`rounded-2xl overflow-hidden h-[420px] flex items-center justify-center p-6 relative ${bg}`}>
+    {/* Dot grid pattern */}
+    <div className="absolute inset-0 pointer-events-none" style={{
+      backgroundImage: `radial-gradient(circle, ${patternColor} 1px, transparent 1px)`,
+      backgroundSize: "20px 20px",
+    }} />
+    {/* Subtle noise texture */}
+    <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{
+      backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
+    }} />
+    <div className="relative z-10 w-full">
+      {children}
+    </div>
   </div>
 );
 
@@ -16,7 +27,7 @@ export const AudienceOverlapMockup = () => {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <MockupCard>
+    <MockupCard bg="bg-[#d4a574]/20" patternColor="rgba(180,120,70,0.08)">
       <div ref={ref} className="w-full max-w-[380px]">
         <div className="grid grid-cols-2 gap-3">
           {/* Left: separate */}
@@ -89,7 +100,7 @@ export const BudgetScalingMockup = () => {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <MockupCard>
+    <MockupCard bg="bg-[#7c9eb8]/15" patternColor="rgba(80,130,170,0.07)">
       <div ref={ref} className="w-full max-w-[380px]">
         <motion.div
           initial={{ opacity: 0 }}
@@ -180,7 +191,7 @@ export const CreativeLifecycleMockup = () => {
   const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <MockupCard>
+    <MockupCard bg="bg-[#8b7bb5]/12" patternColor="rgba(120,100,160,0.06)">
       <div ref={ref} className="w-full max-w-[380px]">
         <motion.div
           initial={{ opacity: 0 }}
