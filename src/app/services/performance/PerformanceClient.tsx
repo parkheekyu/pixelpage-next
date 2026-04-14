@@ -156,26 +156,6 @@ const StructureSection = () => {
           </div>
         </Reveal>
 
-        {/* CTR x CPA Matrix */}
-        <Reveal className="mt-24 lg:mt-36 text-center">
-          <h3 className="font-serif text-[clamp(26px,3.5vw,36px)] font-semibold text-foreground mb-10 tracking-[-0.01em]">
-            CTR &times; CPA 판단 매트릭스
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-[640px] mx-auto">
-            {[
-              { ctr: "High", cpa: "Low", action: "전력 스케일", desc: "예산 올려라", bg: "bg-primary/10", border: "border-primary/20", text: "text-primary" },
-              { ctr: "High", cpa: "High", action: "타겟 조정", desc: "입찰 경쟁이 문제", bg: "bg-gold/10", border: "border-gold/20", text: "text-gold" },
-              { ctr: "Low", cpa: "Low", action: "소재 교체", desc: "새 소재 투입", bg: "bg-secondary", border: "border-border", text: "text-muted-foreground" },
-              { ctr: "Low", cpa: "High", action: "즉시 중지", desc: "끄고 점검", bg: "bg-destructive/10", border: "border-destructive/20", text: "text-destructive" },
-            ].map(m => (
-              <div key={m.action} className={`rounded-xl border p-6 text-left ${m.bg} ${m.border}`}>
-                <span className={`text-[12px] font-medium ${m.text} opacity-70`}>CTR {m.ctr} &middot; CPA {m.cpa}</span>
-                <h4 className={`text-[18px] font-bold mt-2 mb-1 ${m.text}`}>{m.action}</h4>
-                <p className={`text-[14px] ${m.text} opacity-60`}>{m.desc}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
       </div>
     </section>
   );
