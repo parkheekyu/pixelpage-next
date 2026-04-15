@@ -1,54 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import dynamic from "next/dynamic";
 import { ArrowRight, ArrowLeft, MessageCircle, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
-
-const BrandedHeroArt = dynamic(() => import("@/components/BrandedHeroArt"), { ssr: false });
 
 /* ============================================================
    Section 01 · Hero
    ============================================================ */
 const HeroSection = () => (
   <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-dark overflow-hidden">
-    <div className="absolute top-[15%] right-[8%] w-[500px] h-[500px] rounded-full bg-primary/[0.05] blur-[150px] pointer-events-none" />
+    {/* YouTube video background */}
+    <div className="absolute inset-0 overflow-hidden pointer-events-none">
+      <iframe
+        src="https://www.youtube.com/embed/4KXp89fMZ6s?autoplay=1&mute=1&loop=1&playlist=4KXp89fMZ6s&start=3&end=30&controls=0&modestbranding=1&rel=0&playsinline=1&showinfo=0&iv_load_policy=3&disablekb=1"
+        title="Background video"
+        allow="autoplay; encrypted-media"
+        className="absolute top-1/2 left-1/2 w-[177.77vh] min-w-full h-[56.25vw] min-h-full -translate-x-1/2 -translate-y-1/2 border-0"
+        style={{ aspectRatio: "16/9" }}
+      />
+    </div>
+
+    {/* Dark overlay */}
+    <div className="absolute inset-0 bg-dark/75 pointer-events-none" />
+    <div className="absolute inset-0 bg-gradient-to-r from-dark/90 via-dark/60 to-dark/40 pointer-events-none" />
 
     <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-      <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/60 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
         <ArrowLeft className="w-3 h-3" /> 홈으로
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div>
-          <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-7 opacity-0 animate-fade-up stagger-1">
-            Branded Content
-          </p>
+      <div className="max-w-[720px]">
+        <p className="text-[13px] tracking-[0.2em] uppercase text-cream/60 mb-7 opacity-0 animate-fade-up stagger-1">
+          Branded Content
+        </p>
 
-          <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.15] tracking-[-0.03em] text-cream mb-7 opacity-0 animate-fade-up stagger-2">
-            유튜브로<br />
-            <span className="text-primary">24시간 영업사원</span>을<br />
-            만듭니다
-          </h1>
+        <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,76px)] font-semibold leading-[1.15] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
+          유튜브로<br />
+          <span className="text-primary">24시간 영업사원</span>을<br />
+          만듭니다
+        </h1>
 
-          <p className="text-[18px] text-cream/45 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3">
-            병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
-            기획부터 숏폼까지, 한 팀이 다 합니다.
-          </p>
+        <p className="text-[18px] text-cream/80 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3" style={{ textShadow: "0 1px 10px rgba(0,0,0,0.6)" }}>
+          병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
+          기획부터 숏폼까지, 한 팀이 다 합니다.
+        </p>
 
-          <div className="flex items-center gap-4 opacity-0 animate-fade-up stagger-4">
-            <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
-              무료 상담 신청
-            </Link>
-            <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/15 text-cream/70 text-[15px] hover:border-cream/30 hover:text-cream transition-colors rounded-md">
-              <MessageCircle className="w-4 h-4" /> 카카오톡 문의
-            </a>
-          </div>
-        </div>
-
-        <div className="hidden lg:flex justify-center items-center">
-          <BrandedHeroArt />
+        <div className="flex items-center gap-4 opacity-0 animate-fade-up stagger-4">
+          <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md shadow-lg">
+            무료 상담 신청
+          </Link>
+          <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/30 text-cream text-[15px] bg-black/20 backdrop-blur-sm hover:border-cream/60 hover:bg-black/40 transition-all rounded-md">
+            <MessageCircle className="w-4 h-4" /> 카카오톡 문의
+          </a>
         </div>
       </div>
     </div>
