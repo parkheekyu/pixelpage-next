@@ -152,33 +152,55 @@ const PortfolioSection = () => {
    ============================================================ */
 const PainSection = () => {
   const pains = [
-    "유튜브 해야 하는 건 아는데, 뭘 만들어야 할지 모르겠어요",
-    "영상 올리고 있는데 잘 되고 있는 건지 모르겠어요",
-    "몇 편 만들었는데 문의랑 매출에 아무 변화가 없어요",
-    "대표가 직접 찍고 편집할 시간이 없어요",
-    "광고 말고 장기적으로 1등 자리 잡고 싶어요",
+    { text: "유튜브 해야 하는 건 아는데, 뭘 만들어야 할지 모르겠어요", emoji: "/emojis/confused.svg" },
+    { text: "영상 올리고 있는데 잘 되고 있는 건지 모르겠어요", emoji: "/emojis/worried.svg" },
+    { text: "몇 편 만들었는데 문의랑 매출에 아무 변화가 없어요", emoji: "/emojis/sad.svg" },
+    { text: "대표가 직접 찍고 편집할 시간이 없어요", emoji: "/emojis/crying.svg" },
+    { text: "광고 말고 장기적으로 1등 자리 잡고 싶어요", emoji: "/emojis/shocked.svg" },
   ];
 
   return (
     <section className="py-28 lg:py-36 bg-background">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-14">
+        <Reveal className="text-center mb-16">
           <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             이런 고민, 있으시죠?
           </h2>
         </Reveal>
 
         <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[780px] mx-auto">
-            {pains.map((p, i) => (
-              <div key={i} className="border border-border rounded-xl p-6 bg-card shadow-card">
-                <p className="text-[15px] text-foreground leading-[1.75]">{p}</p>
-              </div>
-            ))}
+          <div className="max-w-[760px] mx-auto space-y-8">
+            {pains.map((p, i) => {
+              const emojiLeft = i % 2 === 0;
+              return (
+                <div key={i} className={`flex items-center gap-5 md:gap-7 ${emojiLeft ? "" : "flex-row-reverse"}`}>
+                  {/* Emoji */}
+                  <div className="shrink-0 w-[72px] h-[72px] md:w-[90px] md:h-[90px] rounded-full bg-card border border-border flex items-center justify-center shadow-card">
+                    <img src={p.emoji} alt="" className="w-10 h-10 md:w-12 md:h-12" />
+                  </div>
+
+                  {/* Speech bubble */}
+                  <div className={`relative flex-1 bg-card border border-border rounded-2xl px-6 py-5 md:px-7 md:py-6 shadow-card`}>
+                    {/* Bubble tail pointing toward emoji */}
+                    <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 ${
+                      emojiLeft
+                        ? "-left-2 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-r-[10px] border-r-card"
+                        : "-right-2 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[10px] border-l-card"
+                    }`} />
+                    <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 ${
+                      emojiLeft
+                        ? "-left-[10px] border-t-[11px] border-t-transparent border-b-[11px] border-b-transparent border-r-[11px] border-r-border"
+                        : "-right-[10px] border-t-[11px] border-t-transparent border-b-[11px] border-b-transparent border-l-[11px] border-l-border"
+                    }`} style={{ zIndex: -1 }} />
+                    <p className="text-[15px] md:text-[16px] text-foreground leading-[1.7]">{p.text}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </Reveal>
 
-        <Reveal className="mt-14 text-center">
+        <Reveal className="mt-16 text-center">
           <p className="font-serif text-[22px] lg:text-[26px] text-foreground leading-[1.6] tracking-[-0.02em] max-w-[560px] mx-auto">
             하나라도 해당되면, <span className="text-primary font-semibold">저희가 해결해 드립니다.</span>
           </p>
