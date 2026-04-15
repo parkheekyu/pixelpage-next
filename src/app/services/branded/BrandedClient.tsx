@@ -299,37 +299,47 @@ const SocialProofSection = () => (
   <section className="py-28 lg:py-36 bg-surface-white">
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
 
-      {/* Row 1: Studio 목업 + 카피 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-28 lg:mb-36">
-        <Reveal>
-          <span className="font-display text-[13px] tracking-[0.2em] uppercase text-primary font-medium">01 &middot; Proof</span>
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mt-5">
-            숫자로 말합니다
-          </h2>
-          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mt-5">
-            감이 아닌 데이터로 채널을 운영합니다.<br />
-            실제 스튜디오 대시보드가 증명하는 <span className="text-foreground font-medium">현재 진행형</span>의 성장.
-          </p>
-        </Reveal>
-        <Reveal>
-          <YouTubeStudioMockup />
-        </Reveal>
-      </div>
+      <Reveal className="text-center mb-20 lg:mb-28">
+        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          숫자로 말합니다
+        </h2>
+      </Reveal>
 
-      {/* Row 2: 카피 + Before/After 인포그래픽 */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-28 lg:mb-32">
-        <Reveal className="lg:order-2">
-          <span className="font-display text-[13px] tracking-[0.2em] uppercase text-primary font-medium">02 &middot; Growth</span>
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mt-5">
-            73명 &rarr; 2,500명.<br />2개월이면 충분합니다
-          </h2>
-          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mt-5">
-            직접 운영 1년 6개월 동안 제자리였던 채널이<br />
-            대행 2개월 만에 <span className="text-foreground font-medium">34배 성장</span>했습니다.
-          </p>
+      <div className="space-y-24 lg:space-y-36 mb-28 lg:mb-32">
+        {/* Row 1: 목업 + 카피 */}
+        <Reveal>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="lg:order-1">
+              <YouTubeStudioMockup />
+            </div>
+            <div className="lg:order-2">
+              <span className="text-[28px] lg:text-[36px] font-serif font-bold text-primary/20 tracking-tight">01</span>
+              <h3 className="font-serif break-keep text-[clamp(26px,3.5vw,36px)] font-semibold text-foreground mt-3 mb-5 leading-[1.35] tracking-[-0.01em] whitespace-pre-line">
+                {"감이 아니라 데이터로\n채널을 운영합니다."}
+              </h3>
+              <p className="text-[17px] text-muted-foreground leading-[2] max-w-[460px]">
+                조회수, 구독자, 시청시간 — 모든 지표를 실시간으로 추적하고 분석합니다. 대행 기간 동안 어떤 영상이 반응이 좋은지, 왜 좋은지 데이터로 증명하며 채널을 키웁니다.
+              </p>
+            </div>
+          </div>
         </Reveal>
-        <Reveal className="lg:order-1">
-          <BeforeAfterMockup />
+
+        {/* Row 2: 카피 + 목업 */}
+        <Reveal>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
+            <div className="lg:order-2">
+              <BeforeAfterMockup />
+            </div>
+            <div className="lg:order-1">
+              <span className="text-[28px] lg:text-[36px] font-serif font-bold text-primary/20 tracking-tight">02</span>
+              <h3 className="font-serif break-keep text-[clamp(26px,3.5vw,36px)] font-semibold text-foreground mt-3 mb-5 leading-[1.35] tracking-[-0.01em] whitespace-pre-line">
+                {"73명에서 2,500명.\n2개월이면 충분합니다."}
+              </h3>
+              <p className="text-[17px] text-muted-foreground leading-[2] max-w-[460px]">
+                직접 운영 1년 6개월 동안 제자리였던 채널이 대행 2개월 만에 34배 성장했습니다. 상담 전환도 4.5배 늘었습니다. 멈춰있던 채널도, 구조만 바꾸면 다시 뜁니다.
+              </p>
+            </div>
+          </div>
         </Reveal>
       </div>
 
