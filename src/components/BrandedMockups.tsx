@@ -46,9 +46,14 @@ export const YouTubeStudioMockup = () => {
             transition={{ duration: 0.35, delay: 0.1 }}
             className="flex items-center gap-3 mb-5"
           >
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white text-[14px] font-bold">쭌</div>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center">
+              <svg width="18" height="13" viewBox="0 0 18 13" fill="none">
+                <rect width="18" height="13" rx="3" fill="white"/>
+                <path d="M7 4L12 6.5L7 9V4Z" fill="#dc2626"/>
+              </svg>
+            </div>
             <div>
-              <p className="text-[13px] font-semibold text-neutral-800">쭌난방 본사</p>
+              <p className="text-[13px] font-semibold text-neutral-800">내 채널</p>
               <p className="text-[11px] text-neutral-400">최근 28일</p>
             </div>
             <div className="ml-auto flex items-center gap-1 text-[11px] font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
@@ -152,7 +157,7 @@ export const YouTubeStudioMockup = () => {
               <div className="w-0 h-0 border-l-[5px] border-l-white border-t-[3px] border-t-transparent border-b-[3px] border-b-transparent ml-0.5" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-neutral-800 truncate">10평 농막 찜질방 온수난방 시공</p>
+              <p className="text-[11px] font-semibold text-neutral-800 truncate">최근 업로드 영상</p>
               <p className="text-[10px] text-neutral-400">조회수 12.8만 &middot; 2주 전</p>
             </div>
             <span className="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full shrink-0">HIT</span>
