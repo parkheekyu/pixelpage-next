@@ -1,7 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import dynamic from "next/dynamic";
-import { ArrowRight, ArrowLeft, MessageCircle } from "lucide-react";
+import { ArrowRight, ArrowLeft, MessageCircle, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
 
@@ -97,30 +98,54 @@ const VideoCard = ({ v }: { v: Video }) => (
   </div>
 );
 
-const PortfolioSection = () => (
-  <section className="py-28 lg:py-36 bg-surface-white">
-    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <Reveal className="text-center mb-16">
-        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-          직접 확인하세요
-        </h2>
-        <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
-          말보다 채널이 먼저입니다.<br />지금 운영 중인 채널들을 보세요.
-        </p>
-      </Reveal>
+const PortfolioSection = () => {
+  const [expanded, setExpanded] = useState(false);
+  const initialVideos = FEATURED_VIDEOS.slice(0, 9);
+  const moreVideos = FEATURED_VIDEOS.slice(9);
 
-      {/* Featured Videos — 4 columns × 3 rows = 12 */}
-      <Reveal>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          {FEATURED_VIDEOS.map(v => (
-            <VideoCard key={v.embedId} v={v} />
-          ))}
-        </div>
-      </Reveal>
+  return (
+    <section className="py-28 lg:py-36 bg-surface-white">
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-16">
+          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+            직접 확인하세요
+          </h2>
+          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
+            말보다 채널이 먼저입니다.<br />지금 운영 중인 채널들을 보세요.
+          </p>
+        </Reveal>
 
-    </div>
-  </section>
-);
+        {/* Featured Videos — 3 columns × 3 rows = 9 + expandable */}
+        <Reveal>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {initialVideos.map(v => (
+              <VideoCard key={v.embedId} v={v} />
+            ))}
+          </div>
+        </Reveal>
+
+        {expanded && moreVideos.length > 0 && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-6 animate-fade-up">
+            {moreVideos.map(v => (
+              <VideoCard key={v.embedId} v={v} />
+            ))}
+          </div>
+        )}
+
+        {moreVideos.length > 0 && !expanded && (
+          <div className="text-center mt-12">
+            <button
+              onClick={() => setExpanded(true)}
+              className="inline-flex items-center gap-2 px-7 py-3.5 border border-foreground/20 text-[14px] font-medium text-foreground hover:border-foreground/40 transition-colors rounded-md"
+            >
+              더보기 <ChevronDown className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+};
 
 /* ============================================================
    Section 03 · Pain
