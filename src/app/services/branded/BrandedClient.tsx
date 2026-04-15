@@ -4,6 +4,7 @@ import { useState } from "react";
 import { ArrowRight, ArrowLeft, MessageCircle, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import { YouTubeStudioMockup, BeforeAfterMockup } from "@/components/BrandedMockups";
 
 /* ============================================================
    Section 01 · Hero
@@ -297,44 +298,40 @@ const ServicesSection = () => {
 const SocialProofSection = () => (
   <section className="py-28 lg:py-36 bg-surface-white">
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <Reveal className="text-center mb-14">
-        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
-          숫자로 말합니다
-        </h2>
-      </Reveal>
 
-      {/* Before / After */}
-      <Reveal className="max-w-[880px] mx-auto mb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-          <div className="border border-border rounded-xl p-8 bg-card">
-            <span className="text-[11px] font-bold text-muted-foreground tracking-[0.1em] uppercase">Before · 직접 운영 1년 6개월</span>
-            <div className="mt-6 space-y-4">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[32px] font-serif font-semibold text-muted-foreground tracking-[-0.02em]">73</span>
-                <span className="text-[13px] text-muted-foreground">명 구독자</span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-[32px] font-serif font-semibold text-muted-foreground tracking-[-0.02em]">4.4만</span>
-                <span className="text-[13px] text-muted-foreground">누적 조회수</span>
-              </div>
-            </div>
-          </div>
-          <div className="border-2 border-primary rounded-xl p-8 bg-primary/5">
-            <span className="text-[11px] font-bold text-primary tracking-[0.1em] uppercase">After · 대행 2개월</span>
-            <div className="mt-6 space-y-4">
-              <div className="flex items-baseline gap-2">
-                <span className="text-[32px] font-serif font-semibold text-primary tracking-[-0.02em]">2,500</span>
-                <span className="text-[13px] text-primary/70">명 구독자</span>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <span className="text-[32px] font-serif font-semibold text-primary tracking-[-0.02em]">44만</span>
-                <span className="text-[13px] text-primary/70">누적 조회수</span>
-              </div>
-              <p className="text-[13px] text-primary/80 pt-2 border-t border-primary/20 font-medium">상담 4배 증가</p>
-            </div>
-          </div>
-        </div>
-      </Reveal>
+      {/* Row 1: Studio 목업 + 카피 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-28 lg:mb-36">
+        <Reveal>
+          <span className="font-display text-[13px] tracking-[0.2em] uppercase text-primary font-medium">01 &middot; Proof</span>
+          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mt-5">
+            숫자로 말합니다
+          </h2>
+          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mt-5">
+            감이 아닌 데이터로 채널을 운영합니다.<br />
+            실제 스튜디오 대시보드가 증명하는 <span className="text-foreground font-medium">현재 진행형</span>의 성장.
+          </p>
+        </Reveal>
+        <Reveal>
+          <YouTubeStudioMockup />
+        </Reveal>
+      </div>
+
+      {/* Row 2: 카피 + Before/After 인포그래픽 */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center mb-28 lg:mb-32">
+        <Reveal className="lg:order-2">
+          <span className="font-display text-[13px] tracking-[0.2em] uppercase text-primary font-medium">02 &middot; Growth</span>
+          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mt-5">
+            73명 &rarr; 2,500명.<br />2개월이면 충분합니다
+          </h2>
+          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mt-5">
+            직접 운영 1년 6개월 동안 제자리였던 채널이<br />
+            대행 2개월 만에 <span className="text-foreground font-medium">34배 성장</span>했습니다.
+          </p>
+        </Reveal>
+        <Reveal className="lg:order-1">
+          <BeforeAfterMockup />
+        </Reveal>
+      </div>
 
       {/* Reviews */}
       <Reveal className="max-w-[880px] mx-auto">
