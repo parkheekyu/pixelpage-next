@@ -75,7 +75,7 @@ const PainSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Common Problems</p>
-          <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
+          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             광고는 돌리고 있는데,<br />뭐가 문제인지 모르겠습니다
           </h2>
           <p className="text-[17px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-6">
@@ -130,7 +130,7 @@ const StructureSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-20 lg:mb-28">
           <img src={iconRocket.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
+          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             대부분의 광고 실패는<br />세팅 문제가 아닙니다.
           </h2>
           <p className="text-[17px] text-muted-foreground max-w-[520px] mx-auto leading-[1.9] mt-6">
@@ -175,7 +175,7 @@ const DifferentiationSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
           <img src={iconOk.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
+          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             소재 한 장부터<br />월 억 단위 예산 운용까지
           </h2>
           <p className="text-[17px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-6">
@@ -220,7 +220,7 @@ const SocialProofSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
           <img src={iconTrophy.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
+          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             감이 아닌<br />
             <span className="text-primary">숫자로 증명합니다.</span>
           </h2>
@@ -275,7 +275,7 @@ const ProcessSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
           <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Process</p>
-          <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em]">
+          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             계약 후 연락이 끊기는<br />대행사에 지쳤다면 —
           </h2>
           <p className="text-[17px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-6">
@@ -304,7 +304,7 @@ const CtaSection = () => (
   <section className="py-28 lg:py-36 bg-surface-beige">
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal>
-        <h2 className="font-serif text-[clamp(36px,5vw,64px)] font-semibold text-foreground leading-[1.2] tracking-[-0.02em] mb-5">
+        <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
           지금 광고 계정,<br />무료로 진단해드립니다
         </h2>
         <p className="text-[19px] text-muted-foreground max-w-[480px] leading-[1.9] mb-10">
