@@ -6,6 +6,7 @@ import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
 import PhilosophySection from "@/components/PhilosophySection";
 import ComparisonSection from "@/components/ComparisonSection";
+import KnowledgeProductSection from "@/components/KnowledgeProductSection";
 import charMale from "@/assets/char-male.png";
 import charFemale from "@/assets/char-female.png";
 import charCurly from "@/assets/char-curly.png";
@@ -70,6 +71,8 @@ const IndexClient = () => {
           </div>
         </div>
       </section>
+
+      <KnowledgeProductSection />
 
       <ComparisonSection />
 
