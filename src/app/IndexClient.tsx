@@ -30,10 +30,11 @@ const IndexClient = () => {
               <p className="text-[13px] tracking-[0.15em] uppercase text-muted-foreground mb-5 opacity-0 animate-fade-up stagger-1">
                 강의 &middot; 코칭 &middot; 컨설팅 &middot; 학원
               </p>
-              <h1 className="font-serif text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.0] tracking-[-0.05em] text-foreground mb-5 opacity-0 animate-fade-up stagger-2">
-                가르치는 일에 집중하세요.<br /><span className="text-primary">파는 일은 저희가 합니다.</span>
+              <h1 className="font-serif break-keep text-[clamp(36px,5vw,60px)] font-semibold leading-[1.15] tracking-[-0.03em] text-foreground mb-6 opacity-0 animate-fade-up stagger-2">
+                가르치는 일에 집중하세요.<br />
+                <span className="text-primary">파는 일은 저희가 합니다.</span>
               </h1>
-              <p className="text-[16px] text-muted-foreground leading-[1.8] max-w-[420px] mb-9 opacity-0 animate-fade-up stagger-3">
+              <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[440px] mb-9 opacity-0 animate-fade-up stagger-3">
                 지식을 파는 브랜드의 퍼포먼스 파트너.<br />
                 마케팅에 시간 뺏기는 문제를 끝내드립니다.
               </p>
@@ -85,7 +86,7 @@ const IndexClient = () => {
               </h2>
             </div>
             <p className="text-[19px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-4">
-              무형 서비스 브랜드와 함께한 실제 성과입니다.
+              지식 상품 브랜드와 함께한 실제 성과입니다.
             </p>
           </Reveal>
 
@@ -131,7 +132,7 @@ const IndexClient = () => {
               한 번 얘기해봐요.
             </h2>
             <p className="text-[19px] text-muted-foreground max-w-[480px] leading-[1.9] mt-4 mb-10">
-              지금 당장 계약이 목표가 아닙니다. 브랜드를 함께 진단하고, 어떻게 팔 수 있는지 생각해 보는 것부터 시작합니다.
+              지금 당장 계약이 목표가 아닙니다. 강의 · 코칭 · 컨설팅을 어떻게 더 잘 팔 수 있는지, 함께 생각해 보는 것부터 시작합니다.
             </p>
             <a href="mailto:contact@pixelpage.co.kr" className="block font-serif text-[24px] font-medium text-foreground/80 hover:text-primary transition-colors mb-2">
               contact@pixelpage.co.kr
