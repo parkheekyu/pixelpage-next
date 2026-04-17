@@ -28,15 +28,14 @@ const IndexClient = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
             <div>
               <p className="text-[13px] tracking-[0.15em] uppercase text-muted-foreground mb-5 opacity-0 animate-fade-up stagger-1">
-                교육 &middot; 지식 &middot; 경험 &middot; 문화
+                강의 &middot; 코칭 &middot; 컨설팅 &middot; 학원
               </p>
               <h1 className="font-serif text-[clamp(40px,5.5vw,72px)] font-semibold leading-[1.0] tracking-[-0.05em] text-foreground mb-5 opacity-0 animate-fade-up stagger-2">
-                만질 수 없는 것을<br /><span className="text-primary">파는 일.</span>
+                가르치는 일에 집중하세요.<br /><span className="text-primary">파는 일은 저희가 합니다.</span>
               </h1>
               <p className="text-[16px] text-muted-foreground leading-[1.8] max-w-[420px] mb-9 opacity-0 animate-fade-up stagger-3">
-                무형의 가치를 파는 브랜드의 전담 마케팅 파트너.<br />
-                짧은 사이클 안에, 관객이 &apos;한 번 경험해 보고 싶다&apos;고
-                느끼는 그 순간까지 설계합니다.
+                지식을 파는 브랜드의 퍼포먼스 파트너.<br />
+                마케팅에 시간 뺏기는 문제를 끝내드립니다.
               </p>
               <div className="flex items-center gap-4 mb-14 opacity-0 animate-fade-up stagger-4">
                 <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[16px] font-medium tracking-[0.02em] hover:bg-gold-light transition-all rounded-md">
