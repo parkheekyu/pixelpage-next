@@ -34,6 +34,7 @@ const navItems: {
   },
   { label: "성과", href: "/cases" },
   { label: "칼럼", href: "/columns" },
+  { label: "데모", href: "/demo" },
 ];
 
 const Navbar = () => {
