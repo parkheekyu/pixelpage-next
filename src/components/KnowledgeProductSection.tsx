@@ -2,10 +2,12 @@
 
 import Reveal from "@/components/Reveal";
 
-const PLACEHOLDER_COLORS = [
-  "bg-[#c4a882]", "bg-[#8b7b6b]", "bg-[#a39585]",
-  "bg-[#b5a08a]", "bg-[#9c8c7c]", "bg-[#c9b9a5]",
-  "bg-[#a89078]", "bg-[#bfae9a]",
+const REELS = [
+  "/reels/1.mp4",
+  "/reels/2.mp4",
+  "/reels/3.mp4",
+  "/reels/4.mp4",
+  "/reels/5.mp4",
 ];
 
 const KnowledgeProductSection = () => (
@@ -51,20 +53,18 @@ const KnowledgeProductSection = () => (
                 className="flex flex-col"
                 style={{ animation: "reelsScroll 24s ease-in-out infinite" }}
               >
-                {[...PLACEHOLDER_COLORS, ...PLACEHOLDER_COLORS].map((color, i) => (
-                  <div key={i} className={`w-full shrink-0 ${color} relative`} style={{ height: "100%" }}>
-                    {/* Bottom overlay — like reels UI */}
+                {[...REELS, ...REELS].map((src, i) => (
+                  <div key={i} className="w-full shrink-0 bg-black relative" style={{ height: "100%" }}>
+                    <video
+                      src={src}
+                      autoPlay
+                      muted
+                      loop
+                      playsInline
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                    {/* Bottom overlay */}
                     <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent h-1/3 z-10" />
-                    <div className="absolute bottom-16 left-4 z-20">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-7 h-7 rounded-full bg-white/30" />
-                        <span className="text-[12px] text-white font-semibold">channel_{i % 8 + 1}</span>
-                        <span className="text-[10px] text-white/60 border border-white/30 px-2 py-0.5 rounded">Follow</span>
-                      </div>
-                      <p className="text-[11px] text-white/80 max-w-[180px] leading-[1.5]">
-                        {["광고 소재 A/B 테스트 결과", "교육 브랜드 숏폼 전략", "코칭 서비스 리드 전환", "학원 마케팅 캠페인", "컨설팅 브랜딩 영상", "온라인 강의 프로모션", "수강생 후기 콘텐츠", "브랜드 인지도 캠페인"][i % 8]}
-                      </p>
-                    </div>
                     {/* Right side icons */}
                     <div className="absolute bottom-20 right-3 flex flex-col items-center gap-5 z-20">
                       <div className="flex flex-col items-center gap-1">
@@ -77,7 +77,6 @@ const KnowledgeProductSection = () => (
                       </div>
                       <div className="flex flex-col items-center gap-1">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="white" strokeWidth="2" fill="none"/></svg>
-                        <span className="text-[9px] text-white/80">Share</span>
                       </div>
                     </div>
                   </div>
