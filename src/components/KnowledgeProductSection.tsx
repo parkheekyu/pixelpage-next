@@ -49,7 +49,7 @@ const KnowledgeProductSection = () => (
             <div className="absolute inset-0 overflow-hidden">
               <div
                 className="flex flex-col"
-                style={{ animation: "reelsScroll 20s linear infinite" }}
+                style={{ animation: "reelsScroll 24s ease-in-out infinite" }}
               >
                 {[...PLACEHOLDER_COLORS, ...PLACEHOLDER_COLORS].map((color, i) => (
                   <div key={i} className={`w-full shrink-0 ${color} relative`} style={{ height: "100%" }}>
@@ -114,7 +114,22 @@ const KnowledgeProductSection = () => (
     <style jsx>{`
       @keyframes reelsScroll {
         0% { transform: translateY(0); }
-        100% { transform: translateY(-50%); }
+        6% { transform: translateY(0); }
+        12.5% { transform: translateY(-12.5%); }
+        18.5% { transform: translateY(-12.5%); }
+        25% { transform: translateY(-25%); }
+        31% { transform: translateY(-25%); }
+        37.5% { transform: translateY(-37.5%); }
+        43.5% { transform: translateY(-37.5%); }
+        50% { transform: translateY(-50%); }
+        56% { transform: translateY(-50%); }
+        62.5% { transform: translateY(-62.5%); }
+        68.5% { transform: translateY(-62.5%); }
+        75% { transform: translateY(-75%); }
+        81% { transform: translateY(-75%); }
+        87.5% { transform: translateY(-87.5%); }
+        93.5% { transform: translateY(-87.5%); }
+        100% { transform: translateY(-100%); }
       }
     `}</style>
   </section>
