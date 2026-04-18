@@ -157,7 +157,7 @@ const ComparisonSection = () => {
         <Reveal className="mt-16 lg:mt-20 text-center">
           <p className="text-[19px] font-serif text-foreground leading-[1.9] max-w-[560px] mx-auto">
             &ldquo;광고비만 태우고 끝&rdquo;이 아니라,<br />
-            <span className="text-primary font-semibold">유입부터 매출까지</span> 전 과정을 그로스합니다.
+            <span className="text-primary font-semibold">유입부터 매출까지</span> 전 과정을 이해하는 팀입니다.
           </p>
         </Reveal>
       </div>
