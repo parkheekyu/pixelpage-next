@@ -35,54 +35,42 @@ const ScrollColumn = ({ items, speed, offset }: { items: string[]; speed: number
 );
 
 const KnowledgeProductSection = () => (
-  <section className="py-28 lg:py-36 bg-background">
-    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <div className="rounded-2xl bg-white border border-neutral-200 shadow-card overflow-hidden">
-        <div className="grid grid-cols-1 lg:grid-cols-[45%_55%] min-h-[600px]">
-          {/* Left: Text */}
-          <div className="flex items-center p-10 lg:p-16">
-            <Reveal>
-              <div>
-                <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-6">
-                  지식 상품은<br />다르게 팔아야 합니다.
-                </h2>
-                <p className="text-[17px] text-muted-foreground leading-[1.9] max-w-[400px] mb-8">
-                  제품은 사진 한 장으로 팔리지만,<br />
-                  강의는 왜 지금, 왜 당신에게 배워야 하는지가 설득되어야 팝니다.
-                </p>
-                <p className="text-[15px] font-serif text-foreground leading-[1.8]">
-                  그래서 우리는 <span className="text-primary font-semibold">설득 구조부터 설계</span>합니다.
-                </p>
-              </div>
-            </Reveal>
-          </div>
+  <section className="relative bg-background overflow-hidden h-[520px] lg:h-[600px]">
+    {/* Full-width scrolling columns */}
+    <div className="absolute inset-0">
+      {/* Fade overlays */}
+      <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-background to-transparent z-10 pointer-events-none" />
+      <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent z-10 pointer-events-none" />
 
-          {/* Right: Auto-scrolling masonry columns */}
-          <div className="relative overflow-hidden h-[600px] lg:h-auto">
-            {/* Fade overlays */}
-            <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white to-transparent z-10 pointer-events-none" />
-            <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-white to-transparent z-10 pointer-events-none" />
-
-            <div className="grid grid-cols-3 gap-3 h-full p-3">
-              <ScrollColumn
-                items={PLACEHOLDER_COLORS.slice(0, 6)}
-                speed={25}
-                offset={0}
-              />
-              <ScrollColumn
-                items={PLACEHOLDER_COLORS.slice(6, 12)}
-                speed={30}
-                offset={-3}
-              />
-              <ScrollColumn
-                items={PLACEHOLDER_COLORS.slice(12, 18)}
-                speed={22}
-                offset={-6}
-              />
-            </div>
-          </div>
-        </div>
+      <div className="grid grid-cols-4 lg:grid-cols-6 gap-3 h-full px-3">
+        <ScrollColumn items={PLACEHOLDER_COLORS.slice(0, 6)} speed={28} offset={0} />
+        <ScrollColumn items={PLACEHOLDER_COLORS.slice(3, 9)} speed={22} offset={-2} />
+        <ScrollColumn items={PLACEHOLDER_COLORS.slice(6, 12)} speed={32} offset={-5} />
+        <ScrollColumn items={PLACEHOLDER_COLORS.slice(9, 15)} speed={26} offset={-1} />
+        <div className="hidden lg:block"><ScrollColumn items={PLACEHOLDER_COLORS.slice(12, 18)} speed={24} offset={-4} /></div>
+        <div className="hidden lg:block"><ScrollColumn items={PLACEHOLDER_COLORS.slice(1, 7)} speed={30} offset={-3} /></div>
       </div>
+    </div>
+
+    {/* Dark overlay for text readability */}
+    <div className="absolute inset-0 bg-background/80 z-20 pointer-events-none" />
+
+    {/* Text — centered */}
+    <div className="relative z-30 flex items-center justify-center h-full px-6">
+      <Reveal>
+        <div className="text-center">
+          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
+            지식 상품은<br />다르게 팔아야 합니다.
+          </h2>
+          <p className="text-[17px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mb-6">
+            제품은 사진 한 장으로 팔리지만,<br />
+            강의는 왜 지금, 왜 당신에게 배워야 하는지가 설득되어야 팝니다.
+          </p>
+          <p className="text-[17px] font-serif text-foreground leading-[1.8]">
+            그래서 우리는 <span className="text-primary font-semibold">설득 구조부터 설계</span>합니다.
+          </p>
+        </div>
+      </Reveal>
     </div>
 
     <style jsx>{`
