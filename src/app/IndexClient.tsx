@@ -1,19 +1,15 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronDown, FileText } from "lucide-react";
+import { ArrowRight, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
 import PhilosophySection from "@/components/PhilosophySection";
-import ComparisonSection from "@/components/ComparisonSection";
 import KnowledgeProductSection from "@/components/KnowledgeProductSection";
 import charMale from "@/assets/char-male.png";
 import charFemale from "@/assets/char-female.png";
 import charCurly from "@/assets/char-curly.png";
-import iconOk from "@/assets/icon-ok.svg";
 import iconRocket from "@/assets/icon-rocket.svg";
-import iconFileForm from "@/assets/icon-file-form.svg";
 import iconCloud from "@/assets/icon-cloud.svg";
 import iconAt from "@/assets/icon-at.svg";
 import iconTrophy from "@/assets/icon-trophy.svg";
@@ -129,62 +125,8 @@ const ProblemSection = () => {
   );
 };
 
-/* ─── 3. Why Different ─── */
-const WhyDifferentSection = () => (
-  <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
-    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <div className="max-w-[720px] mx-auto">
-        <Reveal>
-          <img src={iconOk.src} alt="" className="w-10 h-10 mb-5" />
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-8">
-            싸구려 후킹으로는,<br />팔지 않습니다.
-          </h2>
-          <p className="text-[17px] text-muted-foreground leading-[2] mb-8">
-            &ldquo;지금 아니면 손해&rdquo;, &ldquo;마감 임박&rdquo; — 클릭만 끌어내는 광고는 쉽습니다.<br />
-            하지만 한 번 실망한 고객은 다시 오지 않습니다.
-          </p>
-          <p className="text-[17px] text-foreground leading-[2]">
-            저희는 <span className="font-bold">유입부터 매출까지, 전 과정을 이해하고</span> 만듭니다.<br />
-            억지 후킹 없이도 팔 수 있는 이유입니다.
-          </p>
-        </Reveal>
-      </div>
-    </div>
-  </section>
-);
+/* ─── 3. 지식 상품은 다르게 + 아이폰 릴스 ─── */
 
-/* ─── 4. How It Works ─── */
-const ProcessSection = () => {
-  const steps = [
-    { t: "진단", d: "지금 퍼널의 어디가 새고 있는지 데이터로 찾습니다." },
-    { t: "메시지 설계", d: "USP 개발, 경쟁사 분석, 고객 페르소나 정의." },
-    { t: "실행", d: "광고 세팅, 콘텐츠 제작, 랜딩 최적화를 동시에 진행합니다." },
-    { t: "리포팅", d: "숫자만 보내지 않습니다. 무엇을 배웠고, 다음에 무엇을 바꿀지 함께 공유합니다." },
-  ];
-  return (
-    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
-      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-16">
-          <img src={iconFileForm.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-            이렇게 진행됩니다.
-          </h2>
-        </Reveal>
-        <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 max-w-[1100px] mx-auto">
-            {steps.map((s, i) => (
-              <div key={s.t} className="border-t-2 border-blue-500 pt-8 pr-6 pb-8">
-                <span className="text-[13px] text-blue-500 tracking-[0.1em] font-semibold">0{i + 1}</span>
-                <h3 className="text-[18px] font-bold text-foreground mt-3 mb-3">{s.t}</h3>
-                <p className="text-[14px] text-muted-foreground leading-[1.9]">{s.d}</p>
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
 
 /* ─── 5. Services — 기존 ServicesTabSection 컴포넌트 사용 ─── */
 
@@ -245,44 +187,6 @@ const LeadMagnetSection = () => (
   </section>
 );
 
-/* ─── 9. FAQ ─── */
-const FaqSection = () => {
-  const [open, setOpen] = useState<number | null>(null);
-  const faqs = [
-    { q: "월 비용은 어느 정도인가요?", a: "프로젝트 규모에 따라 다르지만, 보통 월 600만원부터 시작합니다. 첫 상담에서 예산 범위를 함께 확인합니다." },
-    { q: "최소 계약 기간이 있나요?", a: "퍼포먼스 마케팅은 최소 3개월을 권장합니다. 첫 달은 학습, 두 번째 달부터 최적화가 본격화되기 때문입니다." },
-    { q: "기존 대행사가 있는데도 상담 가능한가요?", a: "물론입니다. 현재 성과를 객관적으로 진단해드리고, 필요한 경우에만 이관을 제안합니다." },
-    { q: "어떤 규모의 브랜드와 일하나요?", a: "월 광고비 300만원 이상, 지식 상품을 판매하는 브랜드를 주로 담당합니다." },
-  ];
-  return (
-    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
-      <div className="max-w-[700px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-14">
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-            자주 묻는 질문.
-          </h2>
-        </Reveal>
-        <Reveal>
-          <div className="space-y-3">
-            {faqs.map((f, i) => (
-              <div key={i} className="border border-[#e5e7eb] rounded-xl overflow-hidden bg-white">
-                <button onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-[#fbfbfb] transition-colors">
-                  <span className="text-[16px] font-semibold text-foreground">{f.q}</span>
-                  <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform shrink-0 ml-4 ${open === i ? "rotate-180" : ""}`} />
-                </button>
-                {open === i && (
-                  <div className="px-6 pb-6">
-                    <p className="text-[15px] text-muted-foreground leading-[1.85]">{f.a}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
 
 /* ─── 10. Final CTA ─── */
 const CtaSection = () => (
@@ -312,11 +216,8 @@ const CtaSection = () => (
 const IndexClient = () => (
   <div>
     <HeroSection />
-    <KnowledgeProductSection />
     <ProblemSection />
-    <ComparisonSection />
-    <WhyDifferentSection />
-    <ProcessSection />
+    <KnowledgeProductSection />
     <ServicesTabSection />
     <CasesSection />
     <PhilosophySection
@@ -325,7 +226,6 @@ const IndexClient = () => (
       iconAlt=""
     />
     <LeadMagnetSection />
-    <FaqSection />
     <CtaSection />
   </div>
 );
