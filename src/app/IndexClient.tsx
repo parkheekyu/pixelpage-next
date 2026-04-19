@@ -97,7 +97,7 @@ const IndexClient = () => {
           <Reveal className="text-center mb-16">
             <div>
               <img src={iconTrophy.src} alt="Cases" className="w-10 h-10 mb-5 mx-auto" />
-              <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.35] tracking-[-0.01em]">
+              <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
                 짧은 기간,<br />또렷한 결과.
               </h2>
             </div>
@@ -144,7 +144,7 @@ const IndexClient = () => {
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Reveal>
             <img src={iconAt.src} alt="Contact" className="w-10 h-10 mb-5" />
-            <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
+            <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
               한 번 얘기해봐요.
             </h2>
             <p className="text-[19px] text-muted-foreground max-w-[480px] leading-[1.9] mt-4 mb-10">

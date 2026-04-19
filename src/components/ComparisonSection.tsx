@@ -138,7 +138,7 @@ const ComparisonSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-20 lg:mb-28">
           <img src={iconOk.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             일반 마케팅 회사와는<br />조금 다릅니다.
           </h2>
           <p className="text-[17px] text-muted-foreground max-w-[520px] mx-auto leading-[1.9] mt-6">

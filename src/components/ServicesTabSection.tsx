@@ -358,7 +358,7 @@ const ServicesTabSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center">
           <img src={iconFolder.src} alt="Services" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             5가지 서비스,<br />하나의 마케팅 설계.
           </h2>
           <p className="text-[19px] text-muted-foreground mt-4 max-w-[480px] mx-auto leading-[1.9]">
