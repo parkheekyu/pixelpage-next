@@ -78,7 +78,10 @@ export default function RootLayout({
       lang="ko"
       className={`${notoSerifKr.variable} ${notoSansKr.variable} ${cormorant.variable} ${playfair.variable}`}
     >
-      <body className="font-sans">
+      <head>
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+      </head>
+      <body className="font-sans" style={{ fontFamily: "'Pretendard', var(--font-noto-sans-kr), -apple-system, BlinkMacSystemFont, sans-serif" }}>
         <Navbar />
         <main>{children}</main>
         <Footer />
