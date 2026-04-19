@@ -20,7 +20,7 @@ const KnowledgeProductSection = () => {
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         {/* Heading */}
         <Reveal className="text-center mb-14 lg:mb-20">
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
             지식 상품은<br />다르게 팔아야 합니다.
           </h2>
           <p className="text-[17px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto">
