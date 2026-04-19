@@ -283,11 +283,11 @@ const PhilosophySection = ({
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-background">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-20 lg:mb-28">
           <img src={icon} alt={iconAlt} className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             {heading}
           </h2>
         </Reveal>
@@ -300,8 +300,8 @@ const PhilosophySection = ({
                   {row.mockup}
                 </div>
                 <div className={`${row.imageFirst ? 'lg:order-2' : 'lg:order-1'}`}>
-                  <span className="text-[28px] lg:text-[36px] font-serif font-bold text-primary/20 tracking-tight">{row.num}</span>
-                  <h3 className="font-serif text-[clamp(26px,3.5vw,36px)] font-semibold text-foreground mt-3 mb-5 leading-[1.35] tracking-[-0.01em] whitespace-pre-line">
+                  <span className="text-[28px] lg:text-[36px] font-bold text-primary/20 tracking-tight">{row.num}</span>
+                  <h3 className="text-[clamp(26px,3.5vw,36px)] font-semibold text-foreground mt-3 mb-5 leading-[1.35] tracking-[-0.01em] whitespace-pre-line">
                     {row.title}
                   </h3>
                   <p className="text-[17px] text-muted-foreground leading-[2] max-w-[460px]">

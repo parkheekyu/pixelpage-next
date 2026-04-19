@@ -134,11 +134,11 @@ const PixelPageFunnel = () => {
 /* -- Comparison Section -- */
 const ComparisonSection = () => {
   return (
-    <section className="py-28 lg:py-36 bg-surface-white">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-20 lg:mb-28">
           <img src={iconOk.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
             일반 마케팅 회사와는<br />조금 다릅니다.
           </h2>
           <p className="text-[17px] text-muted-foreground max-w-[520px] mx-auto leading-[1.9] mt-6">
@@ -155,7 +155,7 @@ const ComparisonSection = () => {
         </Reveal>
 
         <Reveal className="mt-16 lg:mt-20 text-center">
-          <p className="text-[19px] font-serif text-foreground leading-[1.9] max-w-[560px] mx-auto">
+          <p className="text-[19px] text-foreground leading-[1.9] max-w-[560px] mx-auto">
             &ldquo;광고비만 태우고 끝&rdquo;이 아니라,<br />
             <span className="text-primary font-semibold">유입부터 매출까지</span> 전 과정을 이해하는 팀입니다.
           </p>

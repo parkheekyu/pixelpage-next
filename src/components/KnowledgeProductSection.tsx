@@ -16,11 +16,11 @@ const KnowledgeProductSection = () => {
   }, []);
 
   return (
-    <section className="py-28 lg:py-36 bg-background">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         {/* Heading */}
         <Reveal className="text-center mb-14 lg:mb-20">
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
             지식 상품은<br />다르게 팔아야 합니다.
           </h2>
           <p className="text-[17px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto">
@@ -106,7 +106,7 @@ const KnowledgeProductSection = () => {
 
         {/* Bottom text */}
         <Reveal className="mt-14 text-center">
-          <p className="text-[17px] font-serif text-foreground leading-[1.8]">
+          <p className="text-[17px] text-foreground leading-[1.8]">
             그래서 우리는 <span className="text-primary font-semibold">설득 구조부터 설계</span>합니다.
           </p>
         </Reveal>
