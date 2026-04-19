@@ -1,167 +1,369 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronDown, Check, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
-import ServicesTabSection from "@/components/ServicesTabSection";
-import PhilosophySection from "@/components/PhilosophySection";
-import ComparisonSection from "@/components/ComparisonSection";
-import KnowledgeProductSection from "@/components/KnowledgeProductSection";
-import iconCloud from "@/assets/icon-cloud.svg";
-import iconAt from "@/assets/icon-at.svg";
-import iconTrophy from "@/assets/icon-trophy.svg";
 
+/* ─── 1. Hero ─── */
+const HeroSection = () => (
+  <section className="relative min-h-screen flex items-center pt-32 pb-24 overflow-hidden bg-[#0a0f1e]">
+    <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-40" poster="">
+      <source src="/hero-bg.mp4" type="video/mp4" />
+    </video>
+    <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1e]/80 via-[#0a0f1e]/50 to-[#0a0f1e] pointer-events-none" />
+    <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1e]/90 via-transparent to-transparent pointer-events-none" />
+    <div className="absolute top-[20%] left-[50%] w-[600px] h-[600px] rounded-full bg-blue-600/[0.08] blur-[150px] pointer-events-none" />
+    <div className="absolute inset-0 pointer-events-none opacity-[0.04]">
+      {[...Array(12)].map((_, i) => (
+        <div key={i} className="absolute top-0 bottom-0 w-px bg-white" style={{ left: `${8 + i * 8}%` }} />
+      ))}
+    </div>
+    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
+      <div className="max-w-[720px] mx-auto text-center">
+        <p className="text-[13px] tracking-[0.2em] uppercase text-white/40 mb-8 opacity-0 animate-fade-up stagger-1">
+          <span className="inline-flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+            강의 &middot; 코칭 &middot; 컨설팅 &middot; 학원
+          </span>
+        </p>
+        <h1 className="break-keep text-[clamp(38px,5.5vw,68px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2">
+          좋은 강의인데,<br />
+          <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">왜 안 팔릴까요?</span>
+        </h1>
+        <p className="text-[18px] text-white/50 leading-[1.85] max-w-[520px] mx-auto mb-10 opacity-0 animate-fade-up stagger-3">
+          제품은 사진으로 팔리지만, 지식은 설득되어야 팔립니다.<br />
+          강의 · 코칭 · 컨설팅을 파는 브랜드를 위한 퍼포먼스 파트너.
+        </p>
+        <div className="flex items-center justify-center gap-4 opacity-0 animate-fade-up stagger-4">
+          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-white text-[#0a0f1e] text-[16px] font-semibold rounded-xl hover:bg-white/90 transition-all shadow-lg shadow-white/10">
+            무료 진단 받기
+          </Link>
+          <Link href="/#cases" className="inline-flex items-center px-8 py-4 border border-white/20 text-white/70 text-[16px] rounded-xl hover:bg-white/5 hover:border-white/40 transition-all">
+            성과 사례 보기
+          </Link>
+        </div>
+      </div>
+    </div>
+    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
+      <div className="w-px h-10 bg-gradient-to-b from-transparent to-white/30" />
+    </div>
+  </section>
+);
 
-const IndexClient = () => {
+/* ─── 2. Problem Agitation ─── */
+const ProblemSection = () => {
+  const pains = [
+    "광고는 돌아가는데, 상담 신청은 줄지 않는다",
+    "대행사는 '노출·클릭은 좋아요'라고 하는데 매출은 그대로다",
+    "좋은 커리큘럼인데, 왜 경쟁사 후기가 더 많은지 모르겠다",
+    "SNS 콘텐츠도 찍어봤지만, 어떤 게 먹히는지 감이 안 온다",
+  ];
   return (
-    <div>
-      {/* ─── HERO — dark gradient + video bg ─── */}
-      <section className="relative min-h-screen flex items-center pt-32 pb-24 overflow-hidden bg-[#0a0f1e]">
-        {/* Video background */}
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-40"
-          poster=""
-        >
-          <source src="/hero-bg.mp4" type="video/mp4" />
-        </video>
-
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1e]/80 via-[#0a0f1e]/50 to-[#0a0f1e] pointer-events-none" />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1e]/90 via-transparent to-transparent pointer-events-none" />
-
-        {/* Subtle glow */}
-        <div className="absolute top-[20%] left-[50%] w-[600px] h-[600px] rounded-full bg-blue-600/[0.08] blur-[150px] pointer-events-none" />
-        <div className="absolute bottom-[10%] right-[20%] w-[400px] h-[400px] rounded-full bg-indigo-500/[0.06] blur-[120px] pointer-events-none" />
-
-        {/* Vertical light bars — like AIVORA */}
-        <div className="absolute inset-0 pointer-events-none opacity-[0.04]">
-          {[...Array(12)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute top-0 bottom-0 w-px bg-white"
-              style={{ left: `${8 + i * 8}%` }}
-            />
-          ))}
-        </div>
-
-        <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-          <div className="max-w-[720px] mx-auto text-center">
-            <p className="text-[13px] tracking-[0.2em] uppercase text-white/40 mb-8 opacity-0 animate-fade-up stagger-1">
-              <span className="inline-flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-                강의 &middot; 코칭 &middot; 컨설팅 &middot; 학원
-              </span>
-            </p>
-
-            <h1 className="break-keep text-[clamp(38px,5.5vw,68px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2">
-              가르치는 일에 집중하세요.<br />
-              <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">파는 일은 저희가 합니다.</span>
-            </h1>
-
-            <p className="text-[18px] text-white/50 leading-[1.85] max-w-[480px] mx-auto mb-10 opacity-0 animate-fade-up stagger-3">
-              지식을 파는 브랜드의 퍼포먼스 파트너.<br />
-              마케팅에 시간 뺏기는 문제를 끝내드립니다.
-            </p>
-
-            <div className="flex items-center justify-center gap-4 opacity-0 animate-fade-up stagger-4">
-              <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-white text-[#0a0f1e] text-[16px] font-semibold rounded-xl hover:bg-white/90 transition-all shadow-lg shadow-white/10">
-                무료 상담 신청
-              </Link>
-              <Link href="/#cases" className="inline-flex items-center px-8 py-4 border border-white/20 text-white/70 text-[16px] rounded-xl hover:bg-white/5 hover:border-white/40 transition-all">
-                성과 보기
-              </Link>
-            </div>
-          </div>
-        </div>
-
-        {/* Bottom scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
-          <div className="w-px h-10 bg-gradient-to-b from-transparent to-white/30" />
-          <span className="text-[10px] text-white/25 tracking-[0.15em] uppercase">Scroll</span>
-        </div>
-      </section>
-
-      <KnowledgeProductSection />
-
-      <ComparisonSection />
-
-      <ServicesTabSection />
-
-      {/* ─── CASES ─── */}
-      <section id="cases" className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
-        <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-          <Reveal className="text-center mb-16">
-            <div>
-              <img src={iconTrophy.src} alt="Cases" className="w-10 h-10 mb-5 mx-auto" />
-              <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-                짧은 기간,<br />또렷한 결과.
-              </h2>
-            </div>
-            <p className="text-[19px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-4">
-              지식 상품 브랜드와 함께한 실제 성과입니다.
-            </p>
-          </Reveal>
-
-          <div className="space-y-0">
-            {[
-              { cat: "온라인 교육", name: "디지털노마드 하이클래스", quote: "대형 커뮤니티를 보유한 온라인 교육 브랜드. 업계 평균을 크게 웃도는 광고 효율을 달성하며, 한정된 예산으로도 높은 전환 효율을 증명했습니다.", person: "광고 성과 기준" },
-              { cat: "B2B 지식 서비스", name: "부트스트래퍼", quote: "고단가 B2B 지식 상품을 단 4천만 원 예산으로 ROAS 500%를 달성했습니다. 팔기 어려운 상품도 메시지 설계가 정확하면 팔린다는 것을 보여준 사례입니다.", person: "ROAS 500% 달성" },
-              { cat: "오프라인 교육", name: "플러스 스피치 학원", quote: "단일 지점에서 시작해 4개 신규 지점을 오픈하며 매출을 6.6배 성장시켰습니다. 무형의 교육 서비스를 지역 기반으로 확장한 대표 사례입니다.", person: "매출 6.6배 성장" },
-              { cat: "가맹 네트워크", name: "라 컴퍼니", quote: "전국 7개 지점의 가맹 네트워크를 마케팅으로 확장한 프로젝트입니다. 브랜드 통일성을 유지하면서 각 지역에 맞는 메시지를 설계해 전국 커버리지를 완성했습니다.", person: "전국 7개 지점 확장" },
-            ].map((c) => (
-              <Reveal key={c.name}>
-                <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16 py-12 border-t border-border items-start">
-                  <div>
-                    <span className="text-[12px] text-muted-foreground tracking-[0.1em] uppercase">{c.cat}</span>
-                    <h3 className="text-[22px] lg:text-[26px] font-semibold text-foreground mt-2">{c.name}</h3>
-                  </div>
-                  <div>
-                    <p className="text-[17px] lg:text-[19px] text-foreground leading-[1.85] tracking-[-0.01em]">
-                      &ldquo;{c.quote}&rdquo;
-                    </p>
-                    <p className="text-[13px] text-muted-foreground mt-4">{c.person}</p>
-                  </div>
-                </div>
-              </Reveal>
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-14">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
+            혹시 이런 상황인가요?
+          </h2>
+        </Reveal>
+        <Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[800px] mx-auto">
+            {pains.map((p, i) => (
+              <div key={i} className="flex items-start gap-3 border border-[#e5e7eb] rounded-xl p-6 bg-white">
+                <Check className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
+                <p className="text-[15px] text-foreground leading-[1.75]">{p}</p>
+              </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ─── WHY WE DELIVER ─── */}
-      <PhilosophySection
-        heading={<>압도적인 성과를<br />낼 수 있는 이유?</>}
-        icon={iconCloud.src}
-        iconAlt="Why"
-      />
-
-      {/* ─── CONTACT ─── */}
-      <section id="contact" className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
-        <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-          <Reveal>
-            <img src={iconAt.src} alt="Contact" className="w-10 h-10 mb-5" />
-            <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
-              한 번 얘기해봐요.
-            </h2>
-            <p className="text-[19px] text-muted-foreground max-w-[480px] leading-[1.9] mt-4 mb-10">
-              지금 당장 계약이 목표가 아닙니다. 강의 · 코칭 · 컨설팅을 어떻게 더 잘 팔 수 있는지, 함께 생각해 보는 것부터 시작합니다.
-            </p>
-            <a href="mailto:contact@pixelpage.co.kr" className="block text-[24px] font-semibold text-foreground/80 hover:text-primary transition-colors mb-2">
-              contact@pixelpage.co.kr
-            </a>
-            <p className="text-[14px] text-muted-foreground mb-8">보통 24시간 이내 회신드립니다.</p>
-            <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[16px] font-semibold tracking-[0.02em] hover:bg-gold-light transition-all rounded-xl">
-              무료 상담 신청 <ArrowRight className="w-4 h-4" />
-            </Link>
-          </Reveal>
-        </div>
-      </section>
-    </div>
+        </Reveal>
+        <Reveal className="mt-14 text-center">
+          <p className="text-[19px] text-foreground leading-[1.8] max-w-[560px] mx-auto">
+            당신 잘못이 아닙니다.<br />
+            <span className="font-bold">지식 상품은 원래 이렇게 팔면 안 팔립니다.</span>
+          </p>
+        </Reveal>
+      </div>
+    </section>
   );
 };
+
+/* ─── 3. Why Different ─── */
+const WhyDifferentSection = () => (
+  <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
+    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+      <div className="max-w-[720px] mx-auto">
+        <Reveal>
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-8">
+            싸구려 후킹으로는,<br />팔지 않습니다.
+          </h2>
+          <p className="text-[17px] text-muted-foreground leading-[2] mb-8">
+            &ldquo;지금 아니면 손해&rdquo;, &ldquo;마감 임박&rdquo; — 클릭만 끌어내는 광고는 쉽습니다.<br />
+            하지만 한 번 실망한 고객은 다시 오지 않습니다.
+          </p>
+          <p className="text-[17px] text-foreground leading-[2]">
+            저희는 <span className="font-bold">유입부터 매출까지, 전 과정을 이해하고</span> 만듭니다.<br />
+            억지 후킹 없이도 팔 수 있는 이유입니다.
+          </p>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ─── 4. How It Works ─── */
+const ProcessSection = () => {
+  const steps = [
+    { t: "진단", d: "지금 퍼널의 어디가 새고 있는지 데이터로 찾습니다." },
+    { t: "메시지 설계", d: "USP 개발, 경쟁사 분석, 고객 페르소나 정의." },
+    { t: "실행", d: "광고 세팅, 콘텐츠 제작, 랜딩 최적화를 동시에 진행합니다." },
+    { t: "리포팅", d: "숫자만 보내지 않습니다. 무엇을 배웠고, 다음에 무엇을 바꿀지 함께 공유합니다." },
+  ];
+  return (
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-16">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
+            이렇게 진행됩니다.
+          </h2>
+        </Reveal>
+        <Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 max-w-[1100px] mx-auto">
+            {steps.map((s, i) => (
+              <div key={s.t} className="border-t-2 border-blue-500 pt-8 pr-6 pb-8">
+                <span className="text-[13px] text-blue-500 tracking-[0.1em] font-semibold">0{i + 1}</span>
+                <h3 className="text-[18px] font-bold text-foreground mt-3 mb-3">{s.t}</h3>
+                <p className="text-[14px] text-muted-foreground leading-[1.9]">{s.d}</p>
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ─── 5. Services ─── */
+const ServicesSection = () => {
+  const services = [
+    { t: "퍼포먼스 마케팅", d: "사람을 데려옵니다. Meta · Google · 토스 · 당근 광고를 데이터 기반으로 운영합니다.", href: "/services/performance" },
+    { t: "브랜디드 콘텐츠", d: "신뢰를 만듭니다. 유튜브 · 숏폼으로 24시간 일하는 영업사원을 만듭니다.", href: "/services/branded" },
+    { t: "검색엔진 최적화", d: "찾아오게 만듭니다. 네이버 SEO로 광고비 없이도 유입을 만듭니다.", href: "/services/seo" },
+    { t: "CRM 마케팅", d: "떠나지 않게 합니다. 리드 수집부터 팬덤 설계까지 이탈 없는 퍼널을 만듭니다.", href: "/services/crm" },
+    { t: "웹 빌드", d: "전환시킵니다. 보여주기 위한 웹이 아닌, 팔리는 웹을 만듭니다.", href: "/services/webbuild" },
+  ];
+  return (
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-6">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
+            각각 강하고,<br />함께할 때 가장 강력합니다.
+          </h2>
+        </Reveal>
+        <Reveal className="text-center mb-16">
+          <p className="text-[17px] text-muted-foreground leading-[1.9] max-w-[580px] mx-auto">
+            퍼포먼스가 사람을 데려와도, 랜딩이 설득하지 못하면 빠져나갑니다.<br />
+            그래서 5가지를 따로가 아닌 하나의 퍼널로 설계합니다.
+          </p>
+        </Reveal>
+        <Reveal>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {services.map(s => (
+              <Link key={s.t} href={s.href} className="group block border border-[#e5e7eb] rounded-xl p-8 bg-white hover:shadow-lg hover:border-blue-200 transition-all">
+                <h3 className="text-[18px] font-bold text-foreground mb-3">{s.t}</h3>
+                <p className="text-[15px] text-muted-foreground leading-[1.85] mb-5">{s.d}</p>
+                <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-blue-500 group-hover:gap-2.5 transition-all">
+                  자세히 보기 <ArrowRight className="w-3.5 h-3.5" />
+                </span>
+              </Link>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ─── 6. Cases ─── */
+const CasesSection = () => {
+  const cases = [
+    { cat: "온라인 교육", name: "디지털노마드 하이클래스", metric: "ROAS 180% → 420%", quote: "직접 운영했을 때 ROAS 180%에서 협업 후 ROAS 420%로. 대형 커뮤니티를 보유했지만 광고 효율은 평균 수준이었습니다. 메시지 프레임워크를 재설계하고 크리에이티브를 교체한 결과, 6개월간 꾸준히 업계 평균 2배 이상의 효율을 유지하고 있습니다." },
+    { cat: "B2B 지식 서비스", name: "부트스트래퍼", metric: "ROAS 500%", quote: "4천만 원 예산으로 ROAS 500% 달성. 고단가 B2B 지식 상품은 못 판다는 게 업계 통념이었습니다. 정확한 메시지 설계 하나로 팔기 어려운 상품도 팔린다는 걸 증명했습니다." },
+    { cat: "오프라인 교육", name: "플러스 스피치 학원", metric: "매출 6.6배", quote: "1개 지점에서 5개 지점, 매출 6.6배 성장 (24개월). 지역 기반 무형 서비스는 온라인 광고로 확장이 어렵다는 통념을 깼습니다. 지역별 타겟 세그먼트와 지점별 메시지 차별화로 신규 지점 4곳을 순차 오픈했습니다." },
+    { cat: "가맹 네트워크", name: "라 컴퍼니", metric: "전국 7개 지점", quote: "브랜드 통일성은 유지하면서, 지역별로 다른 메시지를 설계했습니다. 전국 커버리지를 완성한 가맹 마케팅 사례입니다." },
+  ];
+  return (
+    <section id="cases" className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-16">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
+            짧은 기간, 또렷한 결과.
+          </h2>
+        </Reveal>
+        <div className="space-y-0">
+          {cases.map(c => (
+            <Reveal key={c.name}>
+              <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16 py-12 border-t border-[#e5e7eb] items-start">
+                <div>
+                  <span className="text-[12px] text-muted-foreground tracking-[0.1em] uppercase">{c.cat}</span>
+                  <h3 className="text-[22px] lg:text-[26px] font-bold text-foreground mt-2">{c.name}</h3>
+                  <span className="inline-block mt-2 text-[13px] font-semibold text-blue-500 bg-blue-50 px-3 py-1 rounded-full">{c.metric}</span>
+                </div>
+                <p className="text-[17px] lg:text-[18px] text-foreground/80 leading-[1.85] tracking-[-0.01em]">
+                  {c.quote}
+                </p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+/* ─── 7. Why It Works ─── */
+const WhyWorksSection = () => {
+  const reasons = [
+    { t: "하나의 메시지를 만듭니다", d: "눈에 보이지 않는 서비스일수록, 고객이 '왜 이걸 선택해야 하는지'가 명확해야 합니다. 철저한 시장 조사와 경쟁사 분석으로 브랜드만의 USP를 개발하고, 단 하나의 차별화된 메시지를 설계합니다." },
+    { t: "사람들이 반응하는 포맷을 찾습니다", d: "무형의 가치를 전달하려면, 사람들이 실제로 멈춰서 보는 포맷이어야 합니다. 자체 데이터 수집 · 분석 기술로 지금 가장 반응이 높은 콘텐츠 유형을 선별합니다." },
+    { t: "동종 업계보다 나은 결과를 만듭니다", d: "보이지 않는 상품도 제대로 된 전략과 포맷이면 팔립니다. 함께한 브랜드들은 동종 업계 평균보다 꾸준히 낮은 결과당 비용을 기록하고 있습니다." },
+    { t: "감이 아니라, 데이터로 결정합니다", d: "모든 의사결정을 데이터로 내립니다. 어떤 오디언스가 반응했고, 다음엔 무엇을 테스트할지 — 매주 숫자와 맥락을 함께 공유합니다." },
+  ];
+  return (
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-20">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
+            압도적인 성과를<br />낼 수 있는 이유.
+          </h2>
+        </Reveal>
+        <div className="space-y-20 max-w-[800px] mx-auto">
+          {reasons.map((r, i) => (
+            <Reveal key={r.t}>
+              <div>
+                <span className="text-[28px] lg:text-[36px] font-bold text-blue-500/20 tracking-tight">0{i + 1}</span>
+                <h3 className="break-keep text-[clamp(24px,3vw,32px)] font-bold text-foreground mt-2 mb-5 leading-[1.3] tracking-[-0.02em]">
+                  {r.t}
+                </h3>
+                <p className="text-[17px] text-muted-foreground leading-[2] max-w-[600px]">{r.d}</p>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+        <Reveal className="mt-20 text-center">
+          <p className="text-[19px] text-foreground leading-[1.8] max-w-[560px] mx-auto font-semibold">
+            광고비는 당신의 돈입니다.<br />쓰는 이유를 알 권리가 있습니다.
+          </p>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ─── 8. Lead Magnet ─── */
+const LeadMagnetSection = () => (
+  <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+      <div className="max-w-[640px] mx-auto text-center">
+        <Reveal>
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-6">
+            아직 상담까지는 이르다면.
+          </h2>
+          <div className="border border-[#e5e7eb] rounded-2xl p-10 bg-[#fbfbfb] mt-10">
+            <FileText className="w-10 h-10 text-blue-500 mx-auto mb-5" />
+            <h3 className="text-[20px] font-bold text-foreground mb-3">
+              지식 상품 퍼널 진단 체크리스트
+            </h3>
+            <p className="text-[14px] text-muted-foreground mb-2">PDF, 12p</p>
+            <p className="text-[15px] text-muted-foreground leading-[1.8] mb-8">
+              당신의 퍼널에서 매출이 새고 있는 7가지 지점을<br />스스로 점검해보세요.
+            </p>
+            <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-4 bg-[#0a0f1e] text-white text-[15px] font-semibold rounded-xl hover:bg-[#0a0f1e]/90 transition-all">
+              무료로 받기 <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+        </Reveal>
+      </div>
+    </div>
+  </section>
+);
+
+/* ─── 9. FAQ ─── */
+const FaqSection = () => {
+  const [open, setOpen] = useState<number | null>(null);
+  const faqs = [
+    { q: "월 비용은 어느 정도인가요?", a: "프로젝트 규모에 따라 다르지만, 보통 월 600만원부터 시작합니다. 첫 상담에서 예산 범위를 함께 확인합니다." },
+    { q: "최소 계약 기간이 있나요?", a: "퍼포먼스 마케팅은 최소 3개월을 권장합니다. 첫 달은 학습, 두 번째 달부터 최적화가 본격화되기 때문입니다." },
+    { q: "기존 대행사가 있는데도 상담 가능한가요?", a: "물론입니다. 현재 성과를 객관적으로 진단해드리고, 필요한 경우에만 이관을 제안합니다." },
+    { q: "어떤 규모의 브랜드와 일하나요?", a: "월 광고비 300만원 이상, 지식 상품을 판매하는 브랜드를 주로 담당합니다." },
+  ];
+  return (
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
+      <div className="max-w-[700px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-14">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
+            자주 묻는 질문.
+          </h2>
+        </Reveal>
+        <Reveal>
+          <div className="space-y-3">
+            {faqs.map((f, i) => (
+              <div key={i} className="border border-[#e5e7eb] rounded-xl overflow-hidden bg-white">
+                <button onClick={() => setOpen(open === i ? null : i)} className="w-full flex items-center justify-between p-6 text-left hover:bg-[#fbfbfb] transition-colors">
+                  <span className="text-[16px] font-semibold text-foreground">{f.q}</span>
+                  <ChevronDown className={`w-5 h-5 text-muted-foreground transition-transform shrink-0 ml-4 ${open === i ? "rotate-180" : ""}`} />
+                </button>
+                {open === i && (
+                  <div className="px-6 pb-6">
+                    <p className="text-[15px] text-muted-foreground leading-[1.85]">{f.a}</p>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </Reveal>
+      </div>
+    </section>
+  );
+};
+
+/* ─── 10. Final CTA ─── */
+const CtaSection = () => (
+  <section id="contact" className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+      <Reveal>
+        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
+          한 번 얘기해봐요.
+        </h2>
+        <p className="text-[19px] text-muted-foreground max-w-[520px] leading-[1.9] mb-10">
+          계약이 목표가 아닙니다. 지금 당신 브랜드의 퍼널 어디가 새고 있는지, 30분 안에 찾아드립니다. 필요한 것만 가져가세요.
+        </p>
+        <a href="mailto:contact@pixelpage.co.kr" className="block text-[24px] font-bold text-foreground/80 hover:text-blue-500 transition-colors mb-2">
+          contact@pixelpage.co.kr
+        </a>
+        <p className="text-[14px] text-muted-foreground mb-8">보통 24시간 이내 회신드립니다.</p>
+        <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-[#0a0f1e] text-white text-[16px] font-semibold rounded-xl hover:bg-[#0a0f1e]/90 transition-all">
+          무료 상담 신청 <ArrowRight className="w-4 h-4" />
+        </Link>
+      </Reveal>
+    </div>
+  </section>
+);
+
+/* ─── Page ─── */
+const IndexClient = () => (
+  <div>
+    <HeroSection />
+    <ProblemSection />
+    <WhyDifferentSection />
+    <ProcessSection />
+    <ServicesSection />
+    <CasesSection />
+    <WhyWorksSection />
+    <LeadMagnetSection />
+    <FaqSection />
+    <CtaSection />
+  </div>
+);
 
 export default IndexClient;
