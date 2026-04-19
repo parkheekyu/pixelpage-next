@@ -4,6 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowRight, ChevronDown, Check, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
+import ServicesTabSection from "@/components/ServicesTabSection";
+import PhilosophySection from "@/components/PhilosophySection";
+import ComparisonSection from "@/components/ComparisonSection";
+import KnowledgeProductSection from "@/components/KnowledgeProductSection";
 import charMale from "@/assets/char-male.png";
 import charFemale from "@/assets/char-female.png";
 import charCurly from "@/assets/char-curly.png";
@@ -175,46 +179,7 @@ const ProcessSection = () => {
   );
 };
 
-/* ─── 5. Services ─── */
-const ServicesSection = () => {
-  const services = [
-    { t: "퍼포먼스 마케팅", d: "사람을 데려옵니다. Meta · Google · 토스 · 당근 광고를 데이터 기반으로 운영합니다.", href: "/services/performance" },
-    { t: "브랜디드 콘텐츠", d: "신뢰를 만듭니다. 유튜브 · 숏폼으로 24시간 일하는 영업사원을 만듭니다.", href: "/services/branded" },
-    { t: "검색엔진 최적화", d: "찾아오게 만듭니다. 네이버 SEO로 광고비 없이도 유입을 만듭니다.", href: "/services/seo" },
-    { t: "CRM 마케팅", d: "떠나지 않게 합니다. 리드 수집부터 팬덤 설계까지 이탈 없는 퍼널을 만듭니다.", href: "/services/crm" },
-    { t: "웹 빌드", d: "전환시킵니다. 보여주기 위한 웹이 아닌, 팔리는 웹을 만듭니다.", href: "/services/webbuild" },
-  ];
-  return (
-    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
-      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-6">
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-            각각 강하고,<br />함께할 때 가장 강력합니다.
-          </h2>
-        </Reveal>
-        <Reveal className="text-center mb-16">
-          <p className="text-[17px] text-muted-foreground leading-[1.9] max-w-[580px] mx-auto">
-            퍼포먼스가 사람을 데려와도, 랜딩이 설득하지 못하면 빠져나갑니다.<br />
-            그래서 5가지를 따로가 아닌 하나의 퍼널로 설계합니다.
-          </p>
-        </Reveal>
-        <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {services.map(s => (
-              <Link key={s.t} href={s.href} className="group block border border-[#e5e7eb] rounded-xl p-8 bg-white hover:shadow-lg hover:border-blue-200 transition-all">
-                <h3 className="text-[18px] font-bold text-foreground mb-3">{s.t}</h3>
-                <p className="text-[15px] text-muted-foreground leading-[1.85] mb-5">{s.d}</p>
-                <span className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-blue-500 group-hover:gap-2.5 transition-all">
-                  자세히 보기 <ArrowRight className="w-3.5 h-3.5" />
-                </span>
-              </Link>
-            ))}
-          </div>
-        </Reveal>
-      </div>
-    </section>
-  );
-};
+/* ─── 5. Services — 기존 ServicesTabSection 컴포넌트 사용 ─── */
 
 /* ─── 6. Cases ─── */
 const CasesSection = () => (
@@ -249,40 +214,7 @@ const CasesSection = () => (
   </section>
 );
 
-/* ─── 7. Why It Works ─── */
-const WhyWorksSection = () => (
-  <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
-    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <Reveal className="text-center mb-20">
-        <img src={iconCloud.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-          압도적인 성과를<br />낼 수 있는 이유.
-        </h2>
-      </Reveal>
-      <div className="space-y-20 max-w-[800px] mx-auto">
-        {[
-          { t: "하나의 메시지를 만듭니다", d: "눈에 보이지 않는 서비스일수록, 고객이 '왜 이걸 선택해야 하는지'가 명확해야 합니다. 철저한 시장 조사와 경쟁사 분석으로 브랜드만의 USP를 개발하고, 단 하나의 차별화된 메시지를 설계합니다." },
-          { t: "사람들이 반응하는 포맷을 찾습니다", d: "무형의 가치를 전달하려면, 사람들이 실제로 멈춰서 보는 포맷이어야 합니다. 자체 데이터 수집 · 분석 기술로 지금 가장 반응이 높은 콘텐츠 유형을 선별합니다." },
-          { t: "동종 업계보다 나은 결과를 만듭니다", d: "보이지 않는 상품도 제대로 된 전략과 포맷이면 팔립니다. 함께한 브랜드들은 동종 업계 평균보다 꾸준히 낮은 결과당 비용을 기록하고 있습니다." },
-          { t: "감이 아니라, 데이터로 결정합니다", d: "모든 의사결정을 데이터로 내립니다. 어떤 오디언스가 반응했고, 다음엔 무엇을 테스트할지 — 매주 숫자와 맥락을 함께 공유합니다." },
-        ].map((r, i) => (
-          <Reveal key={r.t}>
-            <div>
-              <span className="text-[28px] lg:text-[36px] font-bold text-blue-500/20 tracking-tight">0{i + 1}</span>
-              <h3 className="break-keep text-[clamp(24px,3vw,32px)] font-bold text-foreground mt-2 mb-5 leading-[1.3] tracking-[-0.02em]">{r.t}</h3>
-              <p className="text-[17px] text-muted-foreground leading-[2] max-w-[600px]">{r.d}</p>
-            </div>
-          </Reveal>
-        ))}
-      </div>
-      <Reveal className="mt-20 text-center">
-        <p className="text-[19px] text-foreground leading-[1.8] max-w-[560px] mx-auto font-semibold">
-          광고비는 당신의 돈입니다.<br />쓰는 이유를 알 권리가 있습니다.
-        </p>
-      </Reveal>
-    </div>
-  </section>
-);
+/* ─── 7. Why It Works — PhilosophySection (Notion/Sheets/Meta 목업) 사용 ─── */
 
 /* ─── 8. Lead Magnet ─── */
 const LeadMagnetSection = () => (
@@ -373,12 +305,18 @@ const CtaSection = () => (
 const IndexClient = () => (
   <div>
     <HeroSection />
+    <KnowledgeProductSection />
     <ProblemSection />
+    <ComparisonSection />
     <WhyDifferentSection />
     <ProcessSection />
-    <ServicesSection />
+    <ServicesTabSection />
     <CasesSection />
-    <WhyWorksSection />
+    <PhilosophySection
+      heading={<>압도적인 성과를<br />낼 수 있는 이유.</>}
+      icon={iconCloud.src}
+      iconAlt=""
+    />
     <LeadMagnetSection />
     <FaqSection />
     <CtaSection />
