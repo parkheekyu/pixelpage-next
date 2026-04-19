@@ -23,7 +23,7 @@ const KnowledgeProductSection = () => {
           <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
             지식 상품은<br />다르게 팔아야 합니다.
           </h2>
-          <p className="text-[17px] text-muted-foreground leading-[1.9] max-w-[520px] mx-auto">
+          <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[520px] mx-auto">
             클릭만 끌어내는 광고는 쉽습니다.<br />
             하지만 한 번 실망한 고객은 다시 오지 않습니다.
           </p>
@@ -106,7 +106,7 @@ const KnowledgeProductSection = () => {
 
         {/* Bottom text */}
         <Reveal className="mt-14 text-center">
-          <p className="text-[17px] text-foreground leading-[1.9] max-w-[520px] mx-auto">
+          <p className="text-[19px] text-foreground leading-[1.9] max-w-[520px] mx-auto">
             저희는 <span className="font-bold">유입부터 매출까지, 전 과정을 이해하고</span> 만듭니다.<br />
             억지 후킹 없이도 팔 수 있는 이유입니다.
           </p>
