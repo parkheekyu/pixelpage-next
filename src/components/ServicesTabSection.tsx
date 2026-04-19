@@ -246,7 +246,7 @@ const CrmMockup = () => (
           ].map((s, i) => (
             <div key={s.step} className="flex items-start gap-3 py-3 border-b border-neutral-100 last:border-0">
               <div className="flex flex-col items-center">
-                <div className="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center text-[12px] font-bold">{s.step}</div>
+                <div className="w-7 h-7 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-[12px] font-bold">{s.step}</div>
                 {i < 3 && <div className="w-[1px] h-6 bg-neutral-200 mt-1" />}
               </div>
               <div className="flex-1 min-w-0">
@@ -294,7 +294,7 @@ const WebBuildMockup = () => (
         { text: "  );", color: "text-neutral-300" },
         { text: "}", color: "text-amber-400" },
         { text: "", color: "" },
-        { text: "// Lighthouse 98  |  LCP 1.2s  |  전환율 3.2\u00D7 \u2191", color: "text-primary" },
+        { text: "// Lighthouse 98  |  LCP 1.2s  |  전환율 3.2\u00D7 \u2191", color: "text-blue-500" },
       ].map((line, i) => (
         <div key={i} className={line.color || "text-neutral-300"}>
           {line.text || "\u00A0"}
@@ -420,7 +420,7 @@ const ServicesTabSection = () => {
                   </div>
                   <Link
                     href={active.href}
-                    className="inline-flex items-center gap-2 text-[16px] font-medium text-primary hover:translate-x-1 transition-transform w-fit"
+                    className="inline-flex items-center gap-2 text-[16px] font-medium text-blue-500 hover:translate-x-1 transition-transform w-fit"
                   >
                     자세히 보기 <ArrowRight className="w-4 h-4" />
                   </Link>

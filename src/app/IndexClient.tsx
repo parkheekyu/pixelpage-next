@@ -114,12 +114,6 @@ const ProblemSection = () => {
             })}
           </div>
         </Reveal>
-        <Reveal className="mt-16 text-center">
-          <p className="text-[19px] text-foreground leading-[1.8] max-w-[560px] mx-auto">
-            당신 잘못이 아닙니다.<br />
-            <span className="font-bold">지식 상품은 원래 이렇게 팔면 안 팔립니다.</span>
-          </p>
-        </Reveal>
       </div>
     </section>
   );
@@ -132,7 +126,7 @@ const ProblemSection = () => {
 
 /* ─── 6. Cases ─── */
 const CasesSection = () => (
-  <section id="cases" className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+  <section id="cases" className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-16">
         <img src={iconTrophy.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
@@ -190,7 +184,7 @@ const LeadMagnetSection = () => (
 
 /* ─── 10. Final CTA ─── */
 const CtaSection = () => (
-  <section id="contact" className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+  <section id="contact" className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal>
         <img src={iconAt.src} alt="" className="w-10 h-10 mb-5" />

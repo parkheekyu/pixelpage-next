@@ -16,7 +16,7 @@ const KnowledgeProductSection = () => {
   }, []);
 
   return (
-    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         {/* Heading */}
         <Reveal className="text-center mb-14 lg:mb-20">
