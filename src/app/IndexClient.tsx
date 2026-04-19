@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, ChevronDown, Check, FileText } from "lucide-react";
+import { ArrowRight, ChevronDown, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
 import PhilosophySection from "@/components/PhilosophySection";
@@ -87,31 +87,38 @@ const HeroSection = () => (
 /* ─── 2. Problem Agitation ─── */
 const ProblemSection = () => {
   const pains = [
-    "광고는 돌아가는데, 상담 신청은 줄지 않는다",
-    "대행사는 '노출·클릭은 좋아요'라고 하는데 매출은 그대로다",
-    "좋은 커리큘럼인데, 왜 경쟁사 후기가 더 많은지 모르겠다",
-    "SNS 콘텐츠도 찍어봤지만, 어떤 게 먹히는지 감이 안 온다",
+    { text: "광고는 돌아가는데, 상담 신청은 줄지 않는다", emoji: "/emojis/confused.svg" },
+    { text: "대행사는 '노출·클릭은 좋아요'라고 하는데 매출은 그대로다", emoji: "/emojis/sad.svg" },
+    { text: "좋은 커리큘럼인데, 왜 경쟁사 후기가 더 많은지 모르겠다", emoji: "/emojis/crying.svg" },
+    { text: "SNS 콘텐츠도 찍어봤지만, 어떤 게 먹히는지 감이 안 온다", emoji: "/emojis/worried.svg" },
   ];
   return (
     <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="text-center mb-14">
+        <Reveal className="text-center mb-16">
           <img src={iconRocket.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
           <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             혹시 이런 상황인가요?
           </h2>
         </Reveal>
         <Reveal>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[800px] mx-auto">
-            {pains.map((p, i) => (
-              <div key={i} className="flex items-start gap-3 border border-[#e5e7eb] rounded-xl p-6 bg-white">
-                <Check className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
-                <p className="text-[15px] text-foreground leading-[1.75]">{p}</p>
-              </div>
-            ))}
+          <div className="max-w-[760px] mx-auto space-y-8">
+            {pains.map((p, i) => {
+              const emojiLeft = i % 2 === 0;
+              return (
+                <div key={i} className={`flex items-center gap-5 md:gap-7 ${emojiLeft ? "" : "flex-row-reverse"}`}>
+                  <div className="shrink-0 w-[72px] h-[72px] md:w-[90px] md:h-[90px] rounded-full bg-white border border-[#e5e7eb] flex items-center justify-center shadow-sm">
+                    <img src={p.emoji} alt="" className="w-10 h-10 md:w-12 md:h-12" />
+                  </div>
+                  <div className="flex-1 bg-white border border-[#e5e7eb] rounded-2xl px-6 py-5 md:px-7 md:py-6 shadow-sm">
+                    <p className="text-[15px] md:text-[16px] text-foreground leading-[1.7]">{p.text}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </Reveal>
-        <Reveal className="mt-14 text-center">
+        <Reveal className="mt-16 text-center">
           <p className="text-[19px] text-foreground leading-[1.8] max-w-[560px] mx-auto">
             당신 잘못이 아닙니다.<br />
             <span className="font-bold">지식 상품은 원래 이렇게 팔면 안 팔립니다.</span>
