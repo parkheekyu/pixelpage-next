@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { ArrowRight, FileText } from "lucide-react";
-import Spline from "@splinetool/react-spline/next";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
 import PhilosophySection from "@/components/PhilosophySection";
@@ -15,11 +14,7 @@ import iconTrophy from "@/assets/icon-trophy.svg";
 /* ─── 1. Hero ─── */
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-    <div className="absolute inset-0 w-full h-full z-0 pointer-events-none" style={{ top: "15%" }}>
-      <Spline scene="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode" />
-    </div>
-
-    <div className="relative z-20 text-center px-6 pt-32 pb-8 -mt-20">
+    <div className="relative z-10 text-center px-6 pt-32 pb-8 -mt-20">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
         지식 마케팅의<br />새로운 기준
       </h1>
