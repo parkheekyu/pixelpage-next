@@ -161,7 +161,7 @@ const CasesSection = () => (
 
 /* ─── 8. Lead Magnet ─── */
 const LeadMagnetSection = () => (
-  <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+  <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
     <div className="max-w-[640px] mx-auto px-6 lg:px-12 text-center">
       <Reveal>
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-6">
