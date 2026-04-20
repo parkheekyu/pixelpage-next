@@ -65,7 +65,7 @@ const Navbar = () => {
         <div className="hidden lg:flex items-center gap-10">
           {navItems.map((item) => (
             <div key={item.label} className="relative group">
-              <Link href={item.href} className={`text-[15.5px] font-normal transition-colors ${useLight ? "text-cream/70 hover:text-cream" : "text-foreground/70 hover:text-foreground"}`}>
+              <Link href={item.href} className={`text-[15.5px] font-normal transition-colors ${useLight ? "text-white/70 hover:text-white" : "text-foreground/70 hover:text-foreground"}`}>
                 {item.label}
               </Link>
               {item.dropdown && (
@@ -95,7 +95,7 @@ const Navbar = () => {
         </div>
 
         <button className="lg:hidden p-1.5" onClick={() => setMobileOpen(!mobileOpen)}>
-          {mobileOpen ? <X className={`w-5 h-5 ${useLight ? "text-cream" : "text-foreground"}`} /> : <Menu className={`w-5 h-5 ${useLight ? "text-cream" : "text-foreground"}`} />}
+          {mobileOpen ? <X className={`w-5 h-5 ${useLight ? "text-white" : "text-foreground"}`} /> : <Menu className={`w-5 h-5 ${useLight ? "text-white" : "text-foreground"}`} />}
         </button>
       </div>
 
@@ -104,9 +104,9 @@ const Navbar = () => {
           <div className="max-w-[1200px] mx-auto px-6 py-4 flex flex-col gap-1">
             {navItems.map((item) => (
               <div key={item.label}>
-                <Link href={item.href} className="block py-2 text-[14px] font-medium text-t-strong">{item.label}</Link>
+                <Link href={item.href} className="block py-2 text-[14px] font-medium text-foreground">{item.label}</Link>
                 {item.dropdown?.map((d) => (
-                  <Link key={d.href} href={d.href} className="block py-1.5 pl-4 text-[13px] text-t-secondary hover:text-gold transition-colors">
+                  <Link key={d.href} href={d.href} className="block py-1.5 pl-4 text-[13px] text-muted-foreground hover:text-foreground transition-colors">
                     {d.title}
                   </Link>
                 ))}
