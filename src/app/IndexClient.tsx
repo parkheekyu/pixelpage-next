@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ArrowRight, FileText } from "lucide-react";
-import UnicornScene from "unicornstudio-react";
+import Spline from "@splinetool/react-spline/next";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
 import PhilosophySection from "@/components/PhilosophySection";
@@ -15,18 +15,11 @@ import iconTrophy from "@/assets/icon-trophy.svg";
 /* ─── 1. Hero ─── */
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-    <div className="absolute inset-0 w-full h-full">
-      <UnicornScene
-        projectId="L3YxpEa1a21njnKJ4seX"
-        width="100%"
-        height="100%"
-        scale={1}
-        dpi={1.5}
-        sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.9/dist/unicornStudio.umd.js"
-      />
+    <div className="absolute inset-0 w-full h-full" style={{ top: "15%" }}>
+      <Spline scene="loading..." />
     </div>
 
-    <div className="relative z-10 text-center px-6 pt-32 pb-8">
+    <div className="relative z-10 text-center px-6 pt-32 pb-8 -mt-20">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
         지식 마케팅의<br />새로운 기준
       </h1>
@@ -49,10 +42,10 @@ const HeroSection = () => (
 /* ─── 2. Problem Agitation ─── */
 const ProblemSection = () => {
   const pains = [
-    { text: "광고는 돌아가는데, 상담 신청은 줄지 않는다", emoji: "/emojis/confused.svg" },
-    { text: "대행사는 '노출·클릭은 좋아요'라고 하는데 매출은 그대로다", emoji: "/emojis/sad.svg" },
-    { text: "좋은 커리큘럼인데, 왜 경쟁사 후기가 더 많은지 모르겠다", emoji: "/emojis/crying.svg" },
-    { text: "SNS 콘텐츠도 찍어봤지만, 어떤 게 먹히는지 감이 안 온다", emoji: "/emojis/worried.svg" },
+    { text: "좋은 커리큘럼인데, 왜 경쟁사 후기가 더 많은지 모르겠어요", emoji: "/emojis/crying.svg" },
+    { text: "SNS 콘텐츠도 찍어봤지만, 어떤 게 먹히는지 감이 안 와요", emoji: "/emojis/worried.svg" },
+    { text: "대행사는 '노출·클릭은 좋아요'라고 하는데 매출은 그대로인 것 같아요", emoji: "/emojis/sad.svg" },
+    { text: "광고는 돌아가는데, 상담 신청 늘질 않아요", emoji: "/emojis/confused.svg" },
   ];
   return (
     <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
