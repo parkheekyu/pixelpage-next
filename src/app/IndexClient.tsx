@@ -23,13 +23,13 @@ const HeroSection = () => (
 
     {/* Spline 3D — 하단 1/3 잘림 */}
     <div className="absolute bottom-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none z-0">
-      <div className="w-full" style={{ height: "150%", marginTop: "-10%" }}>
-        {/* @ts-ignore */}
-        <spline-viewer
-          url="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode"
-          style={{ width: "100%", height: "100%" }}
-        />
-      </div>
+      <div
+        className="w-full"
+        style={{ height: "150%", marginTop: "-10%" }}
+        dangerouslySetInnerHTML={{
+          __html: `<spline-viewer url="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode" style="width:100%;height:100%;display:block;"></spline-viewer>`,
+        }}
+      />
     </div>
 
     <div className="relative z-10 text-center px-6 pt-32 pb-8 -mt-20">
