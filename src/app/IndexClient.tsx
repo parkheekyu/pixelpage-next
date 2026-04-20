@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Script from "next/script";
 import { ArrowRight, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
@@ -14,6 +15,23 @@ import iconTrophy from "@/assets/icon-trophy.svg";
 /* ─── 1. Hero ─── */
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+    <Script
+      src="https://unpkg.com/@splinetool/viewer@1.12.86/build/spline-viewer.js"
+      type="module"
+      strategy="afterInteractive"
+    />
+
+    {/* Spline 3D — 하단 1/3 잘림 */}
+    <div className="absolute bottom-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none z-0">
+      <div className="w-full" style={{ height: "150%", marginTop: "-10%" }}>
+        {/* @ts-ignore */}
+        <spline-viewer
+          url="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode"
+          style={{ width: "100%", height: "100%" }}
+        />
+      </div>
+    </div>
+
     <div className="relative z-10 text-center px-6 pt-32 pb-8 -mt-20">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
         지식 마케팅의<br />새로운 기준
