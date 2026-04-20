@@ -16,7 +16,7 @@ import iconTrophy from "@/assets/icon-trophy.svg";
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
     <div className="absolute inset-0 w-full h-full" style={{ top: "15%" }}>
-      <Spline scene="loading..." />
+      <Spline scene="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode" />
     </div>
 
     <div className="relative z-10 text-center px-6 pt-32 pb-8 -mt-20">
