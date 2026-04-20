@@ -378,7 +378,7 @@ const ServicesTabSection = () => {
                   className={`inline-flex items-center gap-2 px-6 py-3 rounded-full text-[16px] font-medium transition-all duration-300 ${
                     isActive
                       ? "bg-foreground text-background shadow-lg"
-                      : "bg-background/60 text-muted-foreground hover:bg-background hover:text-foreground border border-border"
+                      : "bg-white/60 text-neutral-500 hover:bg-white hover:text-foreground border border-[#e5e7eb]"
                   }`}
                 >
                   <Icon className="w-[18px] h-[18px]" />
@@ -390,7 +390,7 @@ const ServicesTabSection = () => {
         </Reveal>
 
         <div className="mt-12 relative">
-          <div className="bg-background/30 backdrop-blur-sm rounded-2xl border border-border p-6 lg:p-10">
+          <div className="bg-white/30 backdrop-blur-sm rounded-2xl border border-[#e5e7eb] p-6 lg:p-10">
             <AnimatePresence mode="wait">
               <motion.div
                 key={active.id}
@@ -413,7 +413,7 @@ const ServicesTabSection = () => {
                   </p>
                   <div className="flex flex-wrap gap-2 mb-6">
                     {active.tags.map((t) => (
-                      <span key={t} className="text-[14px] text-foreground/80 bg-[#e8e5e0] px-4 py-1.5 rounded-full">
+                      <span key={t} className="text-[14px] text-foreground/80 bg-[#e5e7eb] px-4 py-1.5 rounded-full">
                         {t}
                       </span>
                     ))}
