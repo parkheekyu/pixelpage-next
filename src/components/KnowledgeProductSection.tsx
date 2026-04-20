@@ -3,11 +3,11 @@
 import Reveal from "@/components/Reveal";
 
 const CARDS = [
-  { bg: "bg-[#0a0f1e]", text: "text-white", title: "광고는 돌리는데\n상담이 안 온다.", sub: "클릭만 끌어내는 광고는\n쉽습니다.", media: "/reels/1.mp4" },
-  { bg: "bg-[#f5f0ea]", text: "text-[#1a1208]", title: "좋은 강의인데\n왜 안 팔릴까.", sub: "지식은 설득되어야\n팔립니다.", media: "/reels/2.mp4" },
-  { bg: "bg-[#0a0f1e]", text: "text-white", title: "콘텐츠를 만들었는데\n반응이 없다.", sub: "포맷이 틀렸을\n가능성이 큽니다.", media: "/reels/3.mp4" },
-  { bg: "bg-[#f5f0ea]", text: "text-[#1a1208]", title: "대행사 보고서에\n숫자만 있다.", sub: "맥락 없는 숫자는\n의미가 없습니다.", media: "/reels/4.mp4" },
-  { bg: "bg-[#0a0f1e]", text: "text-white", title: "전 과정을 이해하는\n팀이 필요하다.", sub: "유입부터 매출까지\n한 팀이 설계합니다.", media: "/reels/5.mp4" },
+  { media: "/reels/1.mp4" },
+  { media: "/reels/2.mp4" },
+  { media: "/reels/3.mp4" },
+  { media: "/reels/4.mp4" },
+  { media: "/reels/5.mp4" },
 ];
 
 const KnowledgeProductSection = () => (
@@ -30,29 +30,17 @@ const KnowledgeProductSection = () => (
         {CARDS.map((card, i) => (
           <div
             key={i}
-            className={`relative w-[280px] lg:w-[320px] h-[420px] lg:h-[480px] rounded-3xl overflow-hidden shrink-0 flex flex-col justify-end p-7 ${card.bg}`}
+            className="relative w-[280px] lg:w-[320px] h-[420px] lg:h-[480px] rounded-3xl overflow-hidden shrink-0 bg-black"
           >
-            {/* Background video */}
             <video
               autoPlay
               muted
               loop
               playsInline
-              className="absolute inset-0 w-full h-full object-cover opacity-30"
+              className="absolute inset-0 w-full h-full object-cover"
             >
               <source src={card.media} type="video/mp4" />
             </video>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-            {/* Text */}
-            <div className="relative z-10">
-              <h3 className={`text-[24px] lg:text-[28px] font-bold leading-[1.25] tracking-[-0.02em] whitespace-pre-line mb-3 ${card.text}`}>
-                {card.title}
-              </h3>
-              <p className={`text-[14px] leading-[1.7] whitespace-pre-line opacity-70 ${card.text}`}>
-                {card.sub}
-              </p>
-            </div>
           </div>
         ))}
       </div>
