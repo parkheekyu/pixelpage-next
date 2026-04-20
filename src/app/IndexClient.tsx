@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
 import { ArrowRight, FileText } from "lucide-react";
+import UnicornScene from "unicornstudio-react";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
 import PhilosophySection from "@/components/PhilosophySection";
@@ -12,96 +12,19 @@ import iconCloud from "@/assets/icon-cloud.svg";
 import iconAt from "@/assets/icon-at.svg";
 import iconTrophy from "@/assets/icon-trophy.svg";
 
-/* ─── Chrome Torus Canvas ─── */
-const ChromeCanvas = () => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio, 2);
-      canvas.width = canvas.offsetWidth * dpr;
-      canvas.height = canvas.offsetHeight * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const drawRing = (
-      cx: number, cy: number, rx: number, ry: number,
-      rotation: number, thickness: number, hueOffset: number, t: number
-    ) => {
-      const steps = 180;
-      for (let i = 0; i < steps; i++) {
-        const a = (i / steps) * Math.PI * 2;
-        const a2 = ((i + 1) / steps) * Math.PI * 2;
-        const cos = Math.cos(rotation);
-        const sin = Math.sin(rotation);
-
-        const x1 = cx + (Math.cos(a) * rx) * cos - (Math.sin(a) * ry) * sin;
-        const y1 = cy + (Math.cos(a) * rx) * sin + (Math.sin(a) * ry) * cos;
-        const x2 = cx + (Math.cos(a2) * rx) * cos - (Math.sin(a2) * ry) * sin;
-        const y2 = cy + (Math.cos(a2) * rx) * sin + (Math.sin(a2) * ry) * cos;
-
-        const depth = Math.sin(a) * 0.5 + 0.5;
-        const hue = (hueOffset + i * 2 + t * 40) % 360;
-        const lightness = 55 + depth * 30;
-        const alpha = 0.3 + depth * 0.7;
-
-        ctx.beginPath();
-        ctx.moveTo(x1, y1);
-        ctx.lineTo(x2, y2);
-        ctx.strokeStyle = `hsla(${hue}, 70%, ${lightness}%, ${alpha})`;
-        ctx.lineWidth = thickness * (0.3 + depth * 0.7);
-        ctx.stroke();
-      }
-    };
-
-    const animate = (time: number) => {
-      const t = time / 1000;
-      const w = canvas.offsetWidth;
-      const h = canvas.offsetHeight;
-      ctx.clearRect(0, 0, w, h);
-
-      const cx = w * 0.5;
-      const cy = h * 0.55;
-      const scale = Math.min(w, h) * 0.0028;
-
-      drawRing(cx, cy, 180 * scale, 70 * scale, t * 0.3, 4 * scale, 200, t);
-      drawRing(cx, cy, 160 * scale, 90 * scale, -t * 0.25 + 1, 3.5 * scale, 280, t);
-      drawRing(cx, cy, 200 * scale, 60 * scale, t * 0.2 + 2, 3 * scale, 160, t);
-      drawRing(cx, cy, 140 * scale, 100 * scale, -t * 0.35 + 3.5, 2.5 * scale, 320, t);
-
-      // glow
-      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 200 * scale);
-      grad.addColorStop(0, "rgba(168,192,255,0.06)");
-      grad.addColorStop(0.5, "rgba(192,132,252,0.03)");
-      grad.addColorStop(1, "transparent");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-
-      animId = requestAnimationFrame(animate);
-    };
-    animId = requestAnimationFrame(animate);
-
-    return () => {
-      cancelAnimationFrame(animId);
-      window.removeEventListener("resize", resize);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
-};
-
 /* ─── 1. Hero ─── */
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-    <ChromeCanvas />
+    <div className="absolute inset-0 w-full h-full">
+      <UnicornScene
+        projectId="L3YxpEa1a21njnKJ4seX"
+        width="100%"
+        height="100%"
+        scale={1}
+        dpi={1.5}
+        sdkUrl="https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@2.1.9/dist/unicornStudio.umd.js"
+      />
+    </div>
 
     <div className="relative z-10 text-center px-6 pt-32 pb-8">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
