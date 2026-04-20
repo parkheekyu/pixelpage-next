@@ -1,84 +1,60 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { ArrowRight, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
 import PhilosophySection from "@/components/PhilosophySection";
 import KnowledgeProductSection from "@/components/KnowledgeProductSection";
-import charMale from "@/assets/char-male.png";
-import charFemale from "@/assets/char-female.png";
-import charCurly from "@/assets/char-curly.png";
 import iconRocket from "@/assets/icon-rocket.svg";
 import iconCloud from "@/assets/icon-cloud.svg";
 import iconAt from "@/assets/icon-at.svg";
 import iconTrophy from "@/assets/icon-trophy.svg";
 
 /* ─── 1. Hero ─── */
-const HeroSection = () => (
-  <section className="relative min-h-screen flex items-center pt-32 pb-24 overflow-hidden bg-[#0a0f1e]">
-    <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover opacity-40" poster="">
-      <source src="/hero-bg.mp4" type="video/mp4" />
-    </video>
-    <div className="absolute inset-0 bg-gradient-to-b from-[#0a0f1e]/80 via-[#0a0f1e]/50 to-[#0a0f1e] pointer-events-none" />
-    <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1e]/90 via-transparent to-transparent pointer-events-none" />
-    <div className="absolute top-[20%] left-[50%] w-[600px] h-[600px] rounded-full bg-blue-600/[0.08] blur-[150px] pointer-events-none" />
-    <div className="absolute inset-0 pointer-events-none opacity-[0.04]">
-      {[...Array(12)].map((_, i) => (
-        <div key={i} className="absolute top-0 bottom-0 w-px bg-white" style={{ left: `${8 + i * 8}%` }} />
-      ))}
-    </div>
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-        <div>
-          <p className="text-[13px] tracking-[0.2em] uppercase text-white/40 mb-8 opacity-0 animate-fade-up stagger-1">
-            <span className="inline-flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-              강의 &middot; 코칭 &middot; 컨설팅 &middot; 학원
-            </span>
-          </p>
-          <h1 className="break-keep text-[clamp(38px,5.5vw,68px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2">
-            좋은 강의인데,<br />
-            <span className="bg-gradient-to-r from-blue-400 to-indigo-400 bg-clip-text text-transparent">왜 안 팔릴까요?</span>
-          </h1>
-          <p className="text-[18px] text-white/50 leading-[1.85] max-w-[480px] mb-10 opacity-0 animate-fade-up stagger-3">
-            제품은 사진으로 팔리지만, 지식은 설득되어야 팔립니다.<br />
-            강의 · 코칭 · 컨설팅을 파는 브랜드를 위한 퍼포먼스 파트너.
-          </p>
-          <div className="flex items-center gap-4 opacity-0 animate-fade-up stagger-4">
-            <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-white text-[#0a0f1e] text-[16px] font-semibold rounded-xl hover:bg-white/90 transition-all shadow-lg shadow-white/10">
-              무료 진단 받기
-            </Link>
-            <Link href="/#cases" className="inline-flex items-center px-8 py-4 border border-white/20 text-white/70 text-[16px] rounded-xl hover:bg-white/5 hover:border-white/40 transition-all">
-              성과 사례 보기
-            </Link>
-          </div>
-        </div>
-        <div className="hidden lg:flex justify-center items-center relative h-[520px]">
-          <div className="absolute top-0 right-4 animate-float stagger-2">
-            <div className="blob-shape-1 w-[220px] h-[220px] overflow-hidden" style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.3)" }}>
-              <img src={charMale.src} alt="" className="w-full h-full object-cover scale-110 object-[center_20%]" />
-            </div>
-            <span className="absolute -top-2 -left-8 z-10 bg-blue-500/20 text-blue-300 text-[13px] font-semibold px-4 py-1.5 rounded-full backdrop-blur-md whitespace-nowrap shadow-sm">Meta Business Partner</span>
-          </div>
-          <div className="absolute bottom-0 right-12 animate-float stagger-4">
-            <div className="blob-shape-2 w-[240px] h-[260px] overflow-hidden" style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.3)" }}>
-              <img src={charFemale.src} alt="" className="w-full h-full object-cover scale-110" />
-            </div>
-          </div>
-          <div className="absolute top-[28%] left-0 animate-float stagger-6">
-            <div className="blob-shape-3 w-[200px] h-[220px] overflow-hidden" style={{ boxShadow: "0 4px 30px rgba(0,0,0,0.3)" }}>
-              <img src={charCurly.src} alt="" className="w-full h-full object-cover scale-110" />
-            </div>
-          </div>
+const HeroSection = () => {
+  useEffect(() => {
+    const u = (window as any).UnicornStudio;
+    if (u && u.init) {
+      u.init();
+      return;
+    }
+    (window as any).UnicornStudio = { isInitialized: false };
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.9/dist/unicornStudio.umd.js";
+    s.onload = () => (window as any).UnicornStudio.init();
+    document.head.appendChild(s);
+  }, []);
+
+  return (
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+      {/* UnicornStudio background */}
+      <div
+        className="absolute inset-0 w-full h-full"
+        data-us-project="L3YxpEa1a21njnKJ4seX"
+      />
+
+      <div className="relative z-10 text-center px-6 pt-32 pb-8">
+        <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
+          지식 마케팅의<br />새로운 기준
+        </h1>
+        <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
+          더 이상 광고비만 태우지 마세요.<br />
+          픽셀페이지가 유입부터 매출까지 설계합니다.
+        </p>
+        <div className="opacity-0 animate-fade-up stagger-3">
+          <Link
+            href="/consult"
+            className="inline-flex items-center gap-2 px-8 py-3.5 border border-white/30 text-white text-[15px] font-medium rounded-lg hover:bg-white/10 hover:border-white/50 transition-all"
+          >
+            무료 진단 받기
+          </Link>
         </div>
       </div>
-    </div>
-    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
-      <div className="w-px h-10 bg-gradient-to-b from-transparent to-white/30" />
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 /* ─── 2. Problem Agitation ─── */
 const ProblemSection = () => {
