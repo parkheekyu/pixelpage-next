@@ -7,9 +7,9 @@ const CARDS = [
   { media: "/reels/2.mp4" },
   { media: "/reels/3.mp4" },
   { media: "/reels/4.mp4" },
-  { media: "/reels/5.mp4" },
-  { media: "/reels/6.mp4" },
   { media: "/reels/7.mp4" },
+  { media: "/reels/6.mp4" },
+  { media: "/reels/5.mp4" },
 ];
 
 const KnowledgeProductSection = () => (
