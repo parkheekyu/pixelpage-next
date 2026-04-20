@@ -85,7 +85,11 @@ const Navbar = () => {
               )}
             </div>
           ))}
-          <Link href="/consult" className="text-[13px] font-bold tracking-[0.03em] px-6 py-2.5 bg-primary text-primary-foreground hover:bg-gold-light transition-colors rounded-md">
+          <Link href="/consult" className={`text-[13px] font-bold tracking-[0.03em] px-6 py-2.5 rounded-md transition-colors ${
+            useLight
+              ? "bg-white text-black hover:bg-white/90"
+              : "bg-[#0a0f1e] text-white hover:bg-[#0a0f1e]/80"
+          }`}>
             무료 상담 신청
           </Link>
         </div>
@@ -108,7 +112,7 @@ const Navbar = () => {
                 ))}
               </div>
             ))}
-            <Link href="/consult" className="mt-3 text-center text-[13px] font-bold px-5 py-2.5 bg-gold text-primary-foreground rounded-md">
+            <Link href="/consult" className="mt-3 text-center text-[13px] font-bold px-5 py-2.5 bg-[#0a0f1e] text-white rounded-md hover:bg-[#0a0f1e]/80 transition-colors">
               상담 신청
             </Link>
           </div>

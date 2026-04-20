@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { ArrowRight, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
@@ -12,49 +12,116 @@ import iconCloud from "@/assets/icon-cloud.svg";
 import iconAt from "@/assets/icon-at.svg";
 import iconTrophy from "@/assets/icon-trophy.svg";
 
-/* ─── 1. Hero ─── */
-const HeroSection = () => {
+/* ─── Chrome Torus Canvas ─── */
+const ChromeCanvas = () => {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
   useEffect(() => {
-    const u = (window as any).UnicornStudio;
-    if (u && u.init) {
-      u.init();
-      return;
-    }
-    (window as any).UnicornStudio = { isInitialized: false };
-    const s = document.createElement("script");
-    s.src = "https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v2.1.9/dist/unicornStudio.umd.js";
-    s.onload = () => (window as any).UnicornStudio.init();
-    document.head.appendChild(s);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let animId: number;
+    const resize = () => {
+      const dpr = Math.min(window.devicePixelRatio, 2);
+      canvas.width = canvas.offsetWidth * dpr;
+      canvas.height = canvas.offsetHeight * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const drawRing = (
+      cx: number, cy: number, rx: number, ry: number,
+      rotation: number, thickness: number, hueOffset: number, t: number
+    ) => {
+      const steps = 180;
+      for (let i = 0; i < steps; i++) {
+        const a = (i / steps) * Math.PI * 2;
+        const a2 = ((i + 1) / steps) * Math.PI * 2;
+        const cos = Math.cos(rotation);
+        const sin = Math.sin(rotation);
+
+        const x1 = cx + (Math.cos(a) * rx) * cos - (Math.sin(a) * ry) * sin;
+        const y1 = cy + (Math.cos(a) * rx) * sin + (Math.sin(a) * ry) * cos;
+        const x2 = cx + (Math.cos(a2) * rx) * cos - (Math.sin(a2) * ry) * sin;
+        const y2 = cy + (Math.cos(a2) * rx) * sin + (Math.sin(a2) * ry) * cos;
+
+        const depth = Math.sin(a) * 0.5 + 0.5;
+        const hue = (hueOffset + i * 2 + t * 40) % 360;
+        const lightness = 55 + depth * 30;
+        const alpha = 0.3 + depth * 0.7;
+
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.strokeStyle = `hsla(${hue}, 70%, ${lightness}%, ${alpha})`;
+        ctx.lineWidth = thickness * (0.3 + depth * 0.7);
+        ctx.stroke();
+      }
+    };
+
+    const animate = (time: number) => {
+      const t = time / 1000;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      ctx.clearRect(0, 0, w, h);
+
+      const cx = w * 0.5;
+      const cy = h * 0.55;
+      const scale = Math.min(w, h) * 0.0028;
+
+      drawRing(cx, cy, 180 * scale, 70 * scale, t * 0.3, 4 * scale, 200, t);
+      drawRing(cx, cy, 160 * scale, 90 * scale, -t * 0.25 + 1, 3.5 * scale, 280, t);
+      drawRing(cx, cy, 200 * scale, 60 * scale, t * 0.2 + 2, 3 * scale, 160, t);
+      drawRing(cx, cy, 140 * scale, 100 * scale, -t * 0.35 + 3.5, 2.5 * scale, 320, t);
+
+      // glow
+      const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, 200 * scale);
+      grad.addColorStop(0, "rgba(168,192,255,0.06)");
+      grad.addColorStop(0.5, "rgba(192,132,252,0.03)");
+      grad.addColorStop(1, "transparent");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, w, h);
+
+      animId = requestAnimationFrame(animate);
+    };
+    animId = requestAnimationFrame(animate);
+
+    return () => {
+      cancelAnimationFrame(animId);
+      window.removeEventListener("resize", resize);
+    };
   }, []);
 
-  return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-      {/* UnicornStudio background */}
-      <div
-        className="absolute inset-0 w-full h-full"
-        data-us-project="L3YxpEa1a21njnKJ4seX"
-      />
-
-      <div className="relative z-10 text-center px-6 pt-32 pb-8">
-        <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
-          지식 마케팅의<br />새로운 기준
-        </h1>
-        <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
-          더 이상 광고비만 태우지 마세요.<br />
-          픽셀페이지가 유입부터 매출까지 설계합니다.
-        </p>
-        <div className="opacity-0 animate-fade-up stagger-3">
-          <Link
-            href="/consult"
-            className="inline-flex items-center gap-2 px-8 py-3.5 border border-white/30 text-white text-[15px] font-medium rounded-lg hover:bg-white/10 hover:border-white/50 transition-all"
-          >
-            무료 진단 받기
-          </Link>
-        </div>
-      </div>
-    </section>
-  );
+  return <canvas ref={canvasRef} className="absolute inset-0 w-full h-full" />;
 };
+
+/* ─── 1. Hero ─── */
+const HeroSection = () => (
+  <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
+    <ChromeCanvas />
+
+    <div className="relative z-10 text-center px-6 pt-32 pb-8">
+      <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
+        지식 마케팅의<br />새로운 기준
+      </h1>
+      <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
+        더 이상 광고비만 태우지 마세요.<br />
+        픽셀페이지가 유입부터 매출까지 설계합니다.
+      </p>
+      <div className="opacity-0 animate-fade-up stagger-3">
+        <Link
+          href="/consult"
+          className="inline-flex items-center gap-2 px-8 py-3.5 border border-white/30 text-white text-[15px] font-medium rounded-lg hover:bg-white/10 hover:border-white/50 transition-all"
+        >
+          무료 진단 받기
+        </Link>
+      </div>
+    </div>
+  </section>
+);
 
 /* ─── 2. Problem Agitation ─── */
 const ProblemSection = () => {
