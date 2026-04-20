@@ -27,7 +27,7 @@ const KnowledgeProductSection = () => (
     {/* Horizontal scroll cards — apple style */}
     <div className="overflow-x-auto scrollbar-hide">
       <div className="flex gap-5 px-6 lg:px-12 pb-4" style={{ width: "max-content" }}>
-        {CARDS.map((card, i) => (
+        {[...CARDS, ...CARDS, ...CARDS].map((card, i) => (
           <div
             key={i}
             className="relative w-[280px] lg:w-[320px] h-[420px] lg:h-[480px] rounded-3xl overflow-hidden shrink-0 bg-black"
