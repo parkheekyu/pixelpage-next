@@ -15,14 +15,14 @@ import iconTrophy from "@/assets/icon-trophy.svg";
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
     {/* 히어로 배경 영상 */}
-    <div className="absolute bottom-[-15%] left-0 right-0 pointer-events-none z-0 flex justify-center">
-      <video autoPlay muted loop playsInline className="w-full max-w-[910px] object-contain">
+    <div className="absolute bottom-[-25%] left-0 right-0 pointer-events-none z-0 flex justify-center">
+      <video autoPlay muted loop playsInline className="w-full max-w-[1180px] object-contain">
         <source src="/hero-bg.mp4" type="video/mp4" />
       </video>
     </div>
 
     <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-32">
-      <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] mb-7 opacity-0 animate-fade-up stagger-1 hero-gradient-text bg-clip-text text-transparent">
+      <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] mb-7 opacity-0 animate-fade-up stagger-1 text-white">
         지식 마케팅의<br />새로운 기준
       </h1>
       <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
@@ -38,12 +38,6 @@ const HeroSection = () => (
         </Link>
       </div>
     </div>
-
-    <style jsx>{`
-      .hero-gradient-text {
-        background-image: linear-gradient(90deg, #9EC1FF, #D8E4FF, #FDFEFF, #ECCCF6, #C15CE0);
-      }
-    `}</style>
   </section>
 );
 
