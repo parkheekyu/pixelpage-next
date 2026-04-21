@@ -52,17 +52,17 @@ const cases = [
 const CasesClient = () => (
   <div>
     {/* Hero */}
-    <section className="pt-32 pb-24 lg:pb-32 bg-dark text-cream">
+    <section className="pt-32 pb-24 lg:pb-32 bg-[#0a0f1e] text-white">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/50 hover:text-primary transition-colors mb-10">
+        <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-white/50 hover:text-blue-500 transition-colors mb-10">
           <ArrowLeft className="w-3 h-3" /> 홈으로
         </Link>
         <Reveal>
-          <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Cases & Downloads</p>
-          <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-medium text-cream leading-[1.15] tracking-[-0.02em] mb-6">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-blue-500 mb-6">Cases & Downloads</p>
+          <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold text-white leading-[1.12] tracking-[-0.03em] mb-6">
             성과와 서비스 소개서
           </h1>
-          <p className="text-[17px] text-cream/70 leading-[1.85] max-w-[520px]">
+          <p className="text-[18px] text-white/50 leading-[1.85] max-w-[520px]">
             무형 서비스 브랜드와 함께한 실제 성과를 확인하고,<br />
             서비스별 소개서를 다운로드하실 수 있습니다.
           </p>
@@ -71,7 +71,7 @@ const CasesClient = () => (
     </section>
 
     {/* KPI */}
-    <section className="py-16 bg-dark border-t border-cream/10">
+    <section className="py-16 bg-[#0a0f1e] border-t border-white/10">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="flex flex-wrap justify-between gap-8">
           {[
@@ -81,8 +81,8 @@ const CasesClient = () => (
             { n: "6.6", u: "×", l: "최고 매출 성장" },
           ].map(k => (
             <div key={k.l} className="text-center">
-              <span className="text-[36px] font-display font-normal text-cream tracking-[-0.02em]">{k.n}<span className="text-[16px] text-cream/40 ml-0.5">{k.u}</span></span>
-              <span className="block text-[11px] text-cream/30 tracking-[0.08em] uppercase mt-1">{k.l}</span>
+              <span className="text-[36px] font-bold text-white tracking-[-0.03em]">{k.n}<span className="text-[16px] text-white/50 ml-0.5">{k.u}</span></span>
+              <span className="block text-[12px] text-white/50 tracking-[0.1em] uppercase mt-1">{k.l}</span>
             </div>
           ))}
         </Reveal>
@@ -90,29 +90,29 @@ const CasesClient = () => (
     </section>
 
     {/* Case Studies */}
-    <section className="py-32 lg:py-40 bg-background">
+    <section className="py-28 lg:py-36 bg-white">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
-          <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">01 · Case Studies</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em]">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-blue-500 mb-6">01 · Case Studies</p>
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             짧은 기간, 또렷한 결과.
           </h2>
-          <p className="text-[17px] text-muted-foreground mt-5 max-w-[500px] leading-[2]">
+          <p className="text-[18px] text-muted-foreground mt-5 max-w-[500px] leading-[1.85]">
             무형 서비스 브랜드와 함께한 실제 성과입니다.
           </p>
         </Reveal>
         <Reveal className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-6">
           {cases.map((c, i) => (
-            <div key={i} className="border border-border rounded-lg p-10 hover:shadow-card-hover transition-shadow">
-              <span className="text-[12px] font-medium tracking-[0.08em] uppercase text-primary">{c.cat}</span>
-              <h3 className="font-serif text-[26px] font-normal text-foreground mt-3 mb-6">{c.name}</h3>
-              <div className="flex gap-10 pt-6 border-t border-border">
+            <div key={i} className="border border-[#e5e7eb] rounded-2xl p-10 shadow-sm hover:shadow-md transition-shadow">
+              <span className="text-[12px] font-medium tracking-[0.1em] uppercase text-blue-500">{c.cat}</span>
+              <h3 className="text-[26px] font-bold text-foreground mt-3 mb-6">{c.name}</h3>
+              <div className="flex gap-10 pt-6 border-t border-[#e5e7eb]">
                 {c.stats.map((s, j) => (
                   <div key={j}>
-                    <span className="text-[36px] font-display font-normal text-foreground tracking-[-0.02em]">
+                    <span className="text-[36px] font-bold text-foreground tracking-[-0.03em]">
                       {s.n}<span className="text-[16px] text-muted-foreground ml-0.5">{s.u}</span>
                     </span>
-                    <span className="block text-[11px] text-muted-foreground tracking-[0.08em] uppercase mt-1">{s.l}</span>
+                    <span className="block text-[12px] text-muted-foreground tracking-[0.1em] uppercase mt-1">{s.l}</span>
                   </div>
                 ))}
               </div>
@@ -123,41 +123,41 @@ const CasesClient = () => (
     </section>
 
     {/* Downloads */}
-    <section className="py-32 lg:py-40 bg-dark text-cream">
+    <section className="py-28 lg:py-36 bg-[#0a0f1e] text-white">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
-          <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">02 · Downloads</p>
-          <h2 className="font-serif break-keep text-[clamp(28px,4vw,48px)] font-medium text-cream leading-[1.15] tracking-[-0.02em]">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-blue-500 mb-6">02 · Downloads</p>
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em]">
             서비스 소개서 다운로드
           </h2>
-          <p className="text-[17px] text-cream/70 mt-5 max-w-[520px] leading-[2]">
+          <p className="text-[18px] text-white/50 mt-5 max-w-[520px] leading-[1.85]">
             각 서비스별 상세 소개서를 PDF로 다운로드하실 수 있습니다.
           </p>
         </Reveal>
         <div className="mt-16 space-y-4">
           {documents.map((doc, i) => (
             <Reveal key={i}>
-              <div className="border border-cream/10 rounded-lg p-8 hover:bg-cream/5 transition-colors group">
+              <div className="border border-white/10 rounded-2xl p-8 hover:bg-white/5 transition-colors group">
                 <div className="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-10">
                   <div className="flex items-start gap-5 flex-1">
-                    <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <FileText className="w-5 h-5 text-primary" />
+                    <div className="w-12 h-12 rounded-2xl bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-blue-500" />
                     </div>
                     <div className="flex-1">
                       <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-[17px] font-medium text-cream">{doc.title}</h3>
-                        <span className="text-[11px] text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">{doc.tag}</span>
+                        <h3 className="text-[17px] font-medium text-white">{doc.title}</h3>
+                        <span className="text-[11px] text-blue-500 bg-blue-50/10 px-2.5 py-0.5 rounded-full">{doc.tag}</span>
                       </div>
-                      <p className="text-[14px] text-cream/55 leading-[1.85] max-w-[560px]">{doc.desc}</p>
+                      <p className="text-[14px] text-white/50 leading-[1.85] max-w-[560px]">{doc.desc}</p>
                       <div className="flex items-center gap-4 mt-3">
-                        <span className="text-[12px] text-cream/35">PDF · {doc.pages}</span>
-                        <span className="text-[12px] text-cream/35">업데이트 {doc.updated}</span>
+                        <span className="text-[12px] text-white/35">PDF · {doc.pages}</span>
+                        <span className="text-[12px] text-white/35">업데이트 {doc.updated}</span>
                       </div>
                     </div>
                   </div>
                   <a
                     href={`mailto:contact@pixelpage.co.kr?subject=소개서 요청: ${doc.title}`}
-                    className="inline-flex items-center gap-2 px-7 py-3.5 border border-primary text-primary text-[13px] font-bold tracking-[0.03em] hover:bg-primary hover:text-primary-foreground transition-all flex-shrink-0"
+                    className="inline-flex items-center gap-2 px-7 py-3.5 border border-white/30 text-white text-[13px] font-bold tracking-[0.03em] rounded-lg hover:bg-white/10 transition-all flex-shrink-0"
                   >
                     <Download className="w-4 h-4" /> 다운로드
                   </a>
@@ -167,21 +167,21 @@ const CasesClient = () => (
           ))}
         </div>
         <Reveal className="mt-12">
-          <p className="text-[14px] text-cream/40">
+          <p className="text-[14px] text-white/40">
             * 소개서 요청 시 이메일로 PDF를 보내드립니다. 빠른 수령을 원하시면{" "}
-            <Link href="/consult" className="text-primary hover:underline">무료 상담 신청</Link>을 이용해 주세요.
+            <Link href="/consult" className="text-blue-500 hover:underline">무료 상담 신청</Link>을 이용해 주세요.
           </p>
         </Reveal>
       </div>
     </section>
 
     {/* CTA */}
-    <section className="py-24 bg-background text-center">
-      <div className="max-w-[1240px] mx-auto px-6">
+    <section className="py-28 lg:py-36 bg-[#fbfbfb] text-center">
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
-          <h2 className="font-serif break-keep text-[clamp(24px,3vw,36px)] font-medium text-foreground mb-4">우리 브랜드에 맞는 전략이 궁금하신가요?</h2>
-          <p className="text-[15px] text-muted-foreground mb-8 max-w-[440px] mx-auto leading-[1.9]">무료 상담에서 브랜드를 함께 진단하고, 최적의 서비스 조합을 제안드립니다.</p>
-          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-4">우리 브랜드에 맞는 전략이 궁금하신가요?</h2>
+          <p className="text-[18px] text-muted-foreground mb-8 max-w-[440px] mx-auto leading-[1.85]">무료 상담에서 브랜드를 함께 진단하고, 최적의 서비스 조합을 제안드립니다.</p>
+          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-[#0a0f1e] text-white text-[14px] font-bold tracking-[0.05em] rounded-xl hover:opacity-90 transition-all hover:-translate-y-0.5">
             무료 상담 신청 <ArrowRight className="w-4 h-4" />
           </Link>
         </Reveal>

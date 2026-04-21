@@ -19,28 +19,28 @@ const HeroLineArt = dynamic(() => import("@/components/HeroLineArt"), { ssr: fal
 
 /* --------------- Section 01 - Hero --------------- */
 const HeroSection = () => (
-  <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-dark overflow-hidden">
+  <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-[#0a0f1e] overflow-hidden">
     {/* Subtle gradient glow */}
-    <div className="absolute top-[20%] right-[15%] w-[400px] h-[400px] rounded-full bg-primary/[0.05] blur-[140px] pointer-events-none" />
+    <div className="absolute top-[20%] right-[15%] w-[400px] h-[400px] rounded-full bg-blue-500/[0.05] blur-[140px] pointer-events-none" />
 
     <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
         <div>
-          <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/35 hover:text-primary transition-colors mb-16 opacity-0 animate-fade-up stagger-1">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-500 transition-colors mb-16 opacity-0 animate-fade-up stagger-1">
             <ArrowLeft className="w-3 h-3" /> 홈으로
           </Link>
-          <p className="text-[13px] tracking-[0.2em] uppercase text-cream/25 mb-8 opacity-0 animate-fade-up stagger-1">
+          <p className="text-[13px] tracking-[0.2em] uppercase text-white/25 mb-8 opacity-0 animate-fade-up stagger-1">
             Performance Marketing
           </p>
-          <h1 className="font-serif text-[clamp(42px,5.5vw,72px)] font-medium leading-[1.15] tracking-[-0.03em] text-cream mb-8 opacity-0 animate-fade-up stagger-2">
+          <h1 className="text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-8 opacity-0 animate-fade-up stagger-2">
             광고비 낭비는<br />
-            <span className="text-primary">구조</span>를 모르기<br />때문입니다
+            <span className="text-blue-500">구조</span>를 모르기<br />때문입니다
           </h1>
-          <p className="text-[17px] text-cream/35 leading-[1.9] max-w-[400px] mb-12 opacity-0 animate-fade-up stagger-3">
+          <p className="text-[18px] text-white/50 leading-[1.85] max-w-[400px] mb-12 opacity-0 animate-fade-up stagger-3">
             소재 기획부터 억 단위 예산 집행까지 — 감이 아닌 구조로 운영합니다.
           </p>
           <div className="flex items-center gap-5 opacity-0 animate-fade-up stagger-4">
-            <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md">
+            <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#0a0f1e] text-white text-[15px] font-medium tracking-[0.01em] hover:bg-[#0a0f1e]/80 transition-all rounded-xl border border-white/20">
               무료 광고 진단 받기
             </Link>
           </div>
@@ -54,8 +54,8 @@ const HeroSection = () => (
     {/* Bottom explore link */}
     <div className="absolute bottom-10 left-0 right-0 z-10">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12 flex items-center gap-3">
-        <span className="text-[12px] tracking-[0.12em] uppercase text-cream/20">스크롤</span>
-        <div className="w-[50px] h-px bg-primary/30" style={{ animation: 'scroll-line 2s ease infinite' }} />
+        <span className="text-[12px] tracking-[0.12em] uppercase text-white/20">스크롤</span>
+        <div className="w-[50px] h-px bg-blue-500/30" style={{ animation: 'scroll-line 2s ease infinite' }} />
       </div>
     </div>
   </section>
@@ -71,14 +71,14 @@ const PainSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-surface-white">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
-          <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Common Problems</p>
-          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-muted-foreground mb-6">Common Problems</p>
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             광고는 돌리고 있는데,<br />뭐가 문제인지 모르겠습니다
           </h2>
-          <p className="text-[17px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-6">
+          <p className="text-[18px] text-muted-foreground max-w-[480px] mx-auto leading-[1.85] mt-6">
             이런 경험 있으시죠?
           </p>
         </Reveal>
@@ -86,8 +86,8 @@ const PainSection = () => {
         <Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[760px] mx-auto">
             {pains.map((p, i) => (
-              <div key={i} className="flex items-start gap-3 border border-border rounded-xl p-6 bg-card shadow-card">
-                <AlertTriangle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
+              <div key={i} className="flex items-start gap-3 rounded-2xl border border-[#e5e7eb] p-6 shadow-sm" style={{ background: "#ffffff" }}>
+                <AlertTriangle className="w-5 h-5 text-blue-500 shrink-0 mt-0.5" />
                 <span className="text-[16px] text-foreground leading-[1.8]">{p}</span>
               </div>
             ))}
@@ -95,9 +95,9 @@ const PainSection = () => {
         </Reveal>
 
         <Reveal className="mt-14 text-center">
-          <p className="text-[19px] font-serif text-foreground leading-[1.9] max-w-[560px] mx-auto">
+          <p className="text-[19px] text-foreground leading-[1.9] max-w-[560px] mx-auto">
             이 질문들에 즉시 답할 수 없다면,<br />
-            지금 광고는 <span className="text-primary font-semibold">감으로 돌아가고 있는 겁니다.</span>
+            지금 광고는 <span className="text-blue-500 font-semibold">감으로 돌아가고 있는 겁니다.</span>
           </p>
         </Reveal>
       </div>
@@ -126,14 +126,14 @@ const StructureSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-background">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-20 lg:mb-28">
           <img src={iconRocket.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             대부분의 광고 실패는<br />세팅 문제가 아닙니다.
           </h2>
-          <p className="text-[17px] text-muted-foreground max-w-[520px] mx-auto leading-[1.9] mt-6">
+          <p className="text-[18px] text-muted-foreground max-w-[520px] mx-auto leading-[1.85] mt-6">
             구조 이해 없이 최적화를 시도한 결과입니다.
           </p>
         </Reveal>
@@ -145,10 +145,10 @@ const StructureSection = () => {
                 <div className="mb-6">
                   {card.mockup}
                 </div>
-                <h3 className="font-serif text-[22px] lg:text-[26px] font-semibold text-foreground mb-3 leading-[1.35] tracking-[-0.01em] whitespace-pre-line">
+                <h3 className="text-[22px] lg:text-[26px] font-bold text-foreground mb-3 leading-[1.12] tracking-[-0.03em] whitespace-pre-line">
                   {card.title}
                 </h3>
-                <p className="text-[15px] text-muted-foreground leading-[1.9]">
+                <p className="text-[15px] text-muted-foreground leading-[1.85]">
                   {card.body}
                 </p>
               </div>
@@ -171,14 +171,14 @@ const DifferentiationSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-surface-beige">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
           <img src={iconOk.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             소재 한 장부터<br />월 억 단위 예산 운용까지
           </h2>
-          <p className="text-[17px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-6">
+          <p className="text-[18px] text-muted-foreground max-w-[480px] mx-auto leading-[1.85] mt-6">
             단순 집행을 넘어선 압도적 범위. 이 팀 하나면 됩니다.
           </p>
         </Reveal>
@@ -186,12 +186,12 @@ const DifferentiationSection = () => {
         <Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             {items.map(item => (
-              <div key={item.t} className="border border-border rounded-2xl p-8 bg-card shadow-card hover:shadow-card-hover transition-shadow">
-                <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary mb-5">
+              <div key={item.t} className="rounded-2xl border border-[#e5e7eb] p-8 shadow-sm hover:shadow-md transition-shadow" style={{ background: "#ffffff" }}>
+                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-500 mb-5">
                   {item.icon}
                 </div>
                 <h4 className="text-[18px] font-semibold text-foreground mb-3">{item.t}</h4>
-                <p className="text-[15px] text-muted-foreground leading-[1.9]">{item.d}</p>
+                <p className="text-[15px] text-muted-foreground leading-[1.85]">{item.d}</p>
               </div>
             ))}
           </div>
@@ -216,22 +216,22 @@ const SocialProofSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-surface-white">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
           <img src={iconTrophy.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
-          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             감이 아닌<br />
-            <span className="text-primary">숫자로 증명합니다.</span>
+            <span className="text-blue-500">숫자로 증명합니다.</span>
           </h2>
         </Reveal>
 
         <Reveal className="mb-16">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {stats.map(s => (
-              <div key={s.metric} className="text-center border border-border rounded-2xl p-8 bg-card shadow-card">
-                <span className="text-[13px] text-muted-foreground tracking-[0.1em] uppercase">{s.metric}</span>
-                <span className="block text-[52px] font-serif font-semibold text-foreground mt-2 tracking-[-0.03em]">{s.value}</span>
+              <div key={s.metric} className="text-center rounded-2xl border border-[#e5e7eb] p-8 shadow-sm">
+                <span className="text-[12px] text-muted-foreground tracking-[0.1em] uppercase">{s.metric}</span>
+                <span className="block text-[52px] font-bold text-foreground mt-2 tracking-[-0.03em]">{s.value}</span>
                 <span className="block text-[15px] text-foreground font-medium mt-2">{s.desc}</span>
                 <span className="block text-[13px] text-muted-foreground mt-1">{s.sub}</span>
               </div>
@@ -242,15 +242,15 @@ const SocialProofSection = () => {
         <div className="space-y-0">
           {cases.map(c => (
             <Reveal key={c.industry}>
-              <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16 py-12 border-t border-border items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16 py-12 border-t border-[#e5e7eb] items-start">
                 <div>
                   <span className="text-[12px] text-muted-foreground tracking-[0.1em] uppercase">{c.industry}</span>
-                  <h3 className="font-serif text-[22px] lg:text-[26px] font-medium text-foreground mt-2">과제: {c.challenge}</h3>
+                  <h3 className="text-[22px] lg:text-[26px] font-bold text-foreground mt-2">과제: {c.challenge}</h3>
                 </div>
                 <div>
-                  <p className="text-[17px] lg:text-[19px] text-foreground leading-[1.85] tracking-[-0.01em]">&ldquo;{c.quote}&rdquo;</p>
+                  <p className="text-[19px] text-foreground leading-[1.9] tracking-[-0.01em]">&ldquo;{c.quote}&rdquo;</p>
                   <p className="text-[14px] text-muted-foreground mt-3">{c.approach}</p>
-                  <p className="text-[13px] text-primary font-semibold mt-2">{c.result}</p>
+                  <p className="text-[13px] text-blue-500 font-semibold mt-2">{c.result}</p>
                 </div>
               </div>
             </Reveal>
@@ -271,14 +271,14 @@ const ProcessSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-background">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-20">
-          <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Process</p>
-          <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-muted-foreground mb-6">Process</p>
+          <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             계약 후 연락이 끊기는<br />대행사에 지쳤다면 —
           </h2>
-          <p className="text-[17px] text-muted-foreground max-w-[480px] mx-auto leading-[1.9] mt-6">
+          <p className="text-[18px] text-muted-foreground max-w-[480px] mx-auto leading-[1.85] mt-6">
             저희는 다릅니다.
           </p>
         </Reveal>
@@ -286,10 +286,10 @@ const ProcessSection = () => {
         <Reveal>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
             {steps.map(s => (
-              <div key={s.n} className="border border-border rounded-2xl p-7 bg-card shadow-card">
-                <span className="text-[28px] font-serif font-bold text-primary/20 tracking-tight">{s.n}</span>
+              <div key={s.n} className="rounded-2xl border border-[#e5e7eb] p-7 shadow-sm" style={{ background: "#ffffff" }}>
+                <span className="text-[28px] font-bold text-blue-500/20 tracking-tight">{s.n}</span>
                 <h3 className="text-[17px] font-semibold text-foreground mt-3 mb-3">{s.t}</h3>
-                <p className="text-[15px] text-muted-foreground leading-[1.9]">{s.d}</p>
+                <p className="text-[15px] text-muted-foreground leading-[1.85]">{s.d}</p>
               </div>
             ))}
           </div>
@@ -301,22 +301,22 @@ const ProcessSection = () => {
 
 /* --------------- Section 07 - CTA --------------- */
 const CtaSection = () => (
-  <section className="py-28 lg:py-36 bg-surface-beige">
+  <section className="py-28 lg:py-36 bg-[#0a0f1e]">
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal>
-        <h2 className="font-serif text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
+        <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em] mb-5">
           지금 광고 계정,<br />무료로 진단해드립니다
         </h2>
-        <p className="text-[19px] text-muted-foreground max-w-[480px] leading-[1.9] mb-10">
+        <p className="text-[19px] text-white/50 max-w-[480px] leading-[1.9] mb-10">
           10분이면 됩니다. 어디서 예산이 새고 있는지,
           다음 소재는 무엇을 테스트해야 하는지 —
           구조로 짚어드립니다.
         </p>
         <div className="flex flex-wrap items-center gap-4">
-          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[16px] font-medium tracking-[0.02em] hover:bg-gold-light transition-all rounded-md">
+          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-white text-[#0a0f1e] text-[16px] font-medium tracking-[0.02em] hover:bg-white/90 transition-all rounded-xl">
             무료 광고 진단 신청하기 <ArrowRight className="w-4.5 h-4.5" />
           </Link>
-          <Link href="/cases" className="inline-flex items-center px-8 py-4 border border-border text-[16px] text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-md">
+          <Link href="/cases" className="inline-flex items-center px-8 py-4 border border-white/20 text-[16px] text-white/50 hover:text-white hover:border-white/40 transition-colors rounded-xl">
             포트폴리오 보기
           </Link>
         </div>

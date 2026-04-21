@@ -10,7 +10,7 @@ import { YouTubeStudioMockup, BeforeAfterMockup } from "@/components/BrandedMock
    Section 01 · Hero
    ============================================================ */
 const HeroSection = () => (
-  <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-dark overflow-hidden">
+  <section className="relative min-h-screen flex items-center pt-32 pb-20 bg-[#0a0f1e] overflow-hidden">
     {/* YouTube video background */}
     <div className="absolute inset-0 overflow-hidden pointer-events-none">
       <iframe
@@ -23,35 +23,35 @@ const HeroSection = () => (
     </div>
 
     {/* Dark overlay */}
-    <div className="absolute inset-0 bg-dark/75 pointer-events-none" />
-    <div className="absolute inset-0 bg-gradient-to-r from-dark/90 via-dark/60 to-dark/40 pointer-events-none" />
+    <div className="absolute inset-0 bg-[#0a0f1e]/75 pointer-events-none" />
+    <div className="absolute inset-0 bg-gradient-to-r from-[#0a0f1e]/90 via-[#0a0f1e]/60 to-[#0a0f1e]/40 pointer-events-none" />
 
     <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-      <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/60 hover:text-primary transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
+      <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-white/60 hover:text-blue-500 transition-colors mb-12 opacity-0 animate-fade-up stagger-1">
         <ArrowLeft className="w-3 h-3" /> 홈으로
       </Link>
 
       <div className="max-w-[720px]">
-        <p className="text-[13px] tracking-[0.2em] uppercase text-cream/60 mb-7 opacity-0 animate-fade-up stagger-1">
+        <p className="text-[13px] tracking-[0.2em] uppercase text-white/60 mb-7 opacity-0 animate-fade-up stagger-1">
           Branded Content
         </p>
 
-        <h1 className="font-serif break-keep text-[clamp(40px,5.5vw,76px)] font-semibold leading-[1.15] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
+        <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5)" }}>
           유튜브로<br />
-          <span className="text-primary">24시간 영업사원</span>을<br />
+          <span className="text-blue-500">24시간 영업사원</span>을<br />
           만듭니다
         </h1>
 
-        <p className="text-[18px] text-cream/80 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3" style={{ textShadow: "0 1px 10px rgba(0,0,0,0.6)" }}>
+        <p className="text-[18px] text-white/50 leading-[1.85] max-w-[500px] mb-10 opacity-0 animate-fade-up stagger-3" style={{ textShadow: "0 1px 10px rgba(0,0,0,0.6)" }}>
           병원 · 사업자 전문 유튜브 채널 운영 대행.<br />
           기획부터 숏폼까지, 한 팀이 다 합니다.
         </p>
 
         <div className="flex items-center gap-4 opacity-0 animate-fade-up stagger-4">
-          <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-primary text-primary-foreground text-[15px] font-medium tracking-[0.01em] hover:bg-gold-light transition-all rounded-md shadow-lg">
+          <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-3.5 bg-[#0a0f1e] text-white text-[15px] font-medium tracking-[0.01em] hover:bg-[#0a0f1e]/80 transition-all rounded-xl border border-white/20 shadow-lg">
             무료 상담 신청
           </Link>
-          <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-cream/30 text-cream text-[15px] bg-black/20 backdrop-blur-sm hover:border-cream/60 hover:bg-black/40 transition-all rounded-md">
+          <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-7 py-3.5 border border-white/30 text-white text-[15px] bg-black/20 backdrop-blur-sm hover:border-white/60 hover:bg-black/40 transition-all rounded-xl">
             <MessageCircle className="w-4 h-4" /> 카카오톡 문의
           </a>
         </div>
@@ -86,7 +86,7 @@ const FEATURED_VIDEOS: Video[] = [
 
 const VideoCard = ({ v }: { v: Video }) => (
   <div className="group">
-    <div className="relative aspect-video rounded-xl overflow-hidden bg-dark shadow-card group-hover:shadow-card-hover transition-all">
+    <div className="relative aspect-video rounded-xl overflow-hidden bg-[#0a0f1e] shadow-sm group-hover:shadow-md transition-all">
       <iframe
         src={`https://www.youtube.com/embed/${v.embedId}`}
         title={v.title}
@@ -97,7 +97,7 @@ const VideoCard = ({ v }: { v: Video }) => (
       />
     </div>
     <div className="mt-3 px-1">
-      <span className="text-[11px] text-primary tracking-[0.08em] uppercase font-medium">{v.channel}</span>
+      <span className="text-[11px] text-blue-500 tracking-[0.08em] uppercase font-medium">{v.channel}</span>
       <h4 className="text-[14px] font-medium text-foreground mt-1 leading-[1.5] tracking-[-0.01em]">{v.title}</h4>
     </div>
   </div>
@@ -109,10 +109,10 @@ const PortfolioSection = () => {
   const moreVideos = FEATURED_VIDEOS.slice(9);
 
   return (
-    <section className="py-28 lg:py-36 bg-surface-white">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16">
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             직접 확인하세요
           </h2>
           <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[480px] mx-auto mt-4">
@@ -141,7 +141,7 @@ const PortfolioSection = () => {
           <div className="text-center mt-12">
             <button
               onClick={() => setExpanded(true)}
-              className="inline-flex items-center gap-2 px-7 py-3.5 border border-foreground/20 text-[14px] font-medium text-foreground hover:border-foreground/40 transition-colors rounded-md"
+              className="inline-flex items-center gap-2 px-7 py-3.5 border border-foreground/20 text-[14px] font-medium text-foreground hover:border-foreground/40 transition-colors rounded-xl"
             >
               더보기 <ChevronDown className="w-4 h-4" />
             </button>
@@ -165,10 +165,10 @@ const PainSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-background">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16">
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             이런 고민, 있으시죠?
           </h2>
         </Reveal>
@@ -180,22 +180,22 @@ const PainSection = () => {
               return (
                 <div key={i} className={`flex items-center gap-5 md:gap-7 ${emojiLeft ? "" : "flex-row-reverse"}`}>
                   {/* Emoji */}
-                  <div className="shrink-0 w-[72px] h-[72px] md:w-[90px] md:h-[90px] rounded-full bg-card border border-border flex items-center justify-center shadow-card">
+                  <div className="shrink-0 w-[72px] h-[72px] md:w-[90px] md:h-[90px] rounded-full border border-[#e5e7eb] flex items-center justify-center shadow-sm" style={{ background: "#ffffff" }}>
                     <img src={p.emoji} alt="" className="w-10 h-10 md:w-12 md:h-12" />
                   </div>
 
                   {/* Speech bubble */}
-                  <div className={`relative flex-1 bg-card border border-border rounded-2xl px-6 py-5 md:px-7 md:py-6 shadow-card`}>
+                  <div className={`relative flex-1 rounded-2xl border border-[#e5e7eb] px-6 py-5 md:px-7 md:py-6 shadow-sm`} style={{ background: "#ffffff" }}>
                     {/* Bubble tail pointing toward emoji */}
                     <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 ${
                       emojiLeft
-                        ? "-left-2 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-r-[10px] border-r-card"
-                        : "-right-2 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[10px] border-l-card"
+                        ? "-left-2 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-r-[10px] border-r-white"
+                        : "-right-2 border-t-[10px] border-t-transparent border-b-[10px] border-b-transparent border-l-[10px] border-l-white"
                     }`} />
                     <div className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 ${
                       emojiLeft
-                        ? "-left-[10px] border-t-[11px] border-t-transparent border-b-[11px] border-b-transparent border-r-[11px] border-r-border"
-                        : "-right-[10px] border-t-[11px] border-t-transparent border-b-[11px] border-b-transparent border-l-[11px] border-l-border"
+                        ? "-left-[10px] border-t-[11px] border-t-transparent border-b-[11px] border-b-transparent border-r-[11px] border-r-[#e5e7eb]"
+                        : "-right-[10px] border-t-[11px] border-t-transparent border-b-[11px] border-b-transparent border-l-[11px] border-l-[#e5e7eb]"
                     }`} style={{ zIndex: -1 }} />
                     <p className="text-[15px] md:text-[16px] text-foreground leading-[1.7]">{p.text}</p>
                   </div>
@@ -206,8 +206,8 @@ const PainSection = () => {
         </Reveal>
 
         <Reveal className="mt-16 text-center">
-          <p className="font-serif text-[22px] lg:text-[26px] text-foreground leading-[1.6] tracking-[-0.02em] max-w-[560px] mx-auto">
-            하나라도 해당되면, <span className="text-primary font-semibold">저희가 해결해 드립니다.</span>
+          <p className="text-[22px] lg:text-[26px] text-foreground leading-[1.6] tracking-[-0.02em] max-w-[560px] mx-auto">
+            하나라도 해당되면, <span className="text-blue-500 font-semibold">저희가 해결해 드립니다.</span>
           </p>
         </Reveal>
       </div>
@@ -219,34 +219,34 @@ const PainSection = () => {
    Section 04 · Problem
    ============================================================ */
 const ProblemSection = () => (
-  <section className="py-28 lg:py-36 bg-surface-beige">
+  <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-14">
-        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
           기존 방식으로는 안 됩니다
         </h2>
       </Reveal>
 
       <Reveal>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-[880px] mx-auto">
-          <div className="bg-card border border-border rounded-xl p-8">
+          <div className="rounded-2xl border border-[#e5e7eb] p-8 shadow-sm" style={{ background: "#ffffff" }}>
             <span className="text-[11px] font-bold text-red-500/90 tracking-[0.1em] uppercase">문제 A</span>
-            <h3 className="font-serif text-[22px] font-semibold text-foreground mt-3 mb-4 tracking-[-0.01em]">AI 공장형 유튜브</h3>
+            <h3 className="text-[22px] lg:text-[26px] font-bold text-foreground mt-3 mb-4 tracking-[-0.03em]">AI 공장형 유튜브</h3>
             <p className="text-[15px] text-muted-foreground leading-[1.85] mb-5">
               영상은 깔끔합니다. 근데 우리 브랜드 색이 없습니다. 교과서적 설명만 있고, 대표 철학도 고객 질문도 없습니다.
             </p>
-            <div className="pt-4 border-t border-border">
+            <div className="pt-4 border-t border-[#e5e7eb]">
               <span className="text-[13px] font-bold text-red-500/90">결과 &middot;</span>
               <span className="text-[14px] text-foreground/80 ml-2">브랜드 가치 하락</span>
             </div>
           </div>
-          <div className="bg-card border border-border rounded-xl p-8">
+          <div className="rounded-2xl border border-[#e5e7eb] p-8 shadow-sm" style={{ background: "#ffffff" }}>
             <span className="text-[11px] font-bold text-red-500/90 tracking-[0.1em] uppercase">문제 B</span>
-            <h3 className="font-serif text-[22px] font-semibold text-foreground mt-3 mb-4 tracking-[-0.01em]">무전략 유튜브</h3>
+            <h3 className="text-[22px] lg:text-[26px] font-bold text-foreground mt-3 mb-4 tracking-[-0.03em]">무전략 유튜브</h3>
             <p className="text-[15px] text-muted-foreground leading-[1.85] mb-5">
               기획 없이 올리면 알고리즘이 외면합니다. 채널이 저품질로 낙인찍히면 복구가 안 됩니다.
             </p>
-            <div className="pt-4 border-t border-border">
+            <div className="pt-4 border-t border-[#e5e7eb]">
               <span className="text-[13px] font-bold text-red-500/90">결과 &middot;</span>
               <span className="text-[14px] text-foreground/80 ml-2">실고객 유입 Zero</span>
             </div>
@@ -268,10 +268,10 @@ const ServicesSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-background">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16">
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             그래서 저희가 이렇게 합니다
           </h2>
         </Reveal>
@@ -279,10 +279,10 @@ const ServicesSection = () => {
         <Reveal>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5 max-w-[1000px] mx-auto">
             {services.map(s => (
-              <div key={s.num} className="border border-border rounded-xl p-8 bg-card hover:shadow-card-hover transition-shadow">
-                <span className="text-[13px] font-display text-primary tracking-[0.1em] font-medium">{s.num}</span>
-                <h3 className="font-serif text-[20px] font-semibold text-foreground mt-4 mb-4 tracking-[-0.01em]">{s.t}</h3>
-                <p className="text-[15px] text-muted-foreground leading-[1.9]">{s.d}</p>
+              <div key={s.num} className="rounded-2xl border border-[#e5e7eb] p-8 shadow-sm hover:shadow-md transition-shadow" style={{ background: "#ffffff" }}>
+                <span className="text-[13px] text-blue-500 tracking-[0.1em] font-medium">{s.num}</span>
+                <h3 className="text-[22px] lg:text-[26px] font-bold text-foreground mt-4 mb-4 tracking-[-0.03em]">{s.t}</h3>
+                <p className="text-[15px] text-muted-foreground leading-[1.85]">{s.d}</p>
               </div>
             ))}
           </div>
@@ -296,11 +296,11 @@ const ServicesSection = () => {
    Section 06 · Social Proof
    ============================================================ */
 const SocialProofSection = () => (
-  <section className="py-28 lg:py-36 bg-surface-white">
+  <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
 
       <Reveal className="text-center mb-20 lg:mb-28">
-        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
           숫자로 말합니다
         </h2>
       </Reveal>
@@ -313,11 +313,11 @@ const SocialProofSection = () => (
               <YouTubeStudioMockup />
             </div>
             <div className="lg:order-2">
-              <span className="text-[28px] lg:text-[36px] font-serif font-bold text-primary/20 tracking-tight">01</span>
-              <h3 className="font-serif break-keep text-[clamp(26px,3.5vw,36px)] font-semibold text-foreground mt-3 mb-5 leading-[1.35] tracking-[-0.01em] whitespace-pre-line">
+              <span className="text-[28px] lg:text-[36px] font-bold text-blue-500/20 tracking-tight">01</span>
+              <h3 className="break-keep text-[clamp(26px,3.5vw,36px)] font-bold text-foreground mt-3 mb-5 leading-[1.12] tracking-[-0.03em] whitespace-pre-line">
                 {"감이 아니라 데이터로\n채널을 운영합니다."}
               </h3>
-              <p className="text-[17px] text-muted-foreground leading-[2] max-w-[460px]">
+              <p className="text-[18px] text-muted-foreground leading-[1.85] max-w-[460px]">
                 조회수, 구독자, 시청시간 — 모든 지표를 실시간으로 추적하고 분석합니다. 대행 기간 동안 어떤 영상이 반응이 좋은지, 왜 좋은지 데이터로 증명하며 채널을 키웁니다.
               </p>
             </div>
@@ -331,11 +331,11 @@ const SocialProofSection = () => (
               <BeforeAfterMockup />
             </div>
             <div className="lg:order-1">
-              <span className="text-[28px] lg:text-[36px] font-serif font-bold text-primary/20 tracking-tight">02</span>
-              <h3 className="font-serif break-keep text-[clamp(26px,3.5vw,36px)] font-semibold text-foreground mt-3 mb-5 leading-[1.35] tracking-[-0.01em] whitespace-pre-line">
+              <span className="text-[28px] lg:text-[36px] font-bold text-blue-500/20 tracking-tight">02</span>
+              <h3 className="break-keep text-[clamp(26px,3.5vw,36px)] font-bold text-foreground mt-3 mb-5 leading-[1.12] tracking-[-0.03em] whitespace-pre-line">
                 {"73명에서 2,500명.\n2개월이면 충분합니다."}
               </h3>
-              <p className="text-[17px] text-muted-foreground leading-[2] max-w-[460px]">
+              <p className="text-[18px] text-muted-foreground leading-[1.85] max-w-[460px]">
                 직접 운영 1년 6개월 동안 제자리였던 채널이 대행 2개월 만에 34배 성장했습니다. 상담 전환도 4.5배 늘었습니다. 멈춰있던 채널도, 구조만 바꾸면 다시 뜁니다.
               </p>
             </div>
@@ -351,9 +351,9 @@ const SocialProofSection = () => (
             { quote: "텍스트 제안서보다 훨씬 강력했습니다. 가맹 사업 확장에 결정적인 역할을 했습니다.", person: "프랜차이즈 본사 가맹사업본부장" },
             { quote: "LG Signature가 추구하는 프리미엄 가치를 공간의 공기마저 고급스럽게 담아냈습니다.", person: "LG Signature 브랜드팀 PM" },
           ].map((r, i) => (
-            <div key={i} className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6 lg:gap-12 py-10 border-t border-border items-start">
+            <div key={i} className="grid grid-cols-1 lg:grid-cols-[220px_1fr] gap-6 lg:gap-12 py-10 border-t border-[#e5e7eb] items-start">
               <p className="text-[13px] text-muted-foreground tracking-[0.02em]">{r.person}</p>
-              <p className="font-serif text-[18px] lg:text-[20px] text-foreground leading-[1.75] tracking-[-0.01em]">
+              <p className="text-[18px] lg:text-[20px] text-foreground leading-[1.75] tracking-[-0.01em]">
                 &ldquo;{r.quote}&rdquo;
               </p>
             </div>
@@ -377,10 +377,10 @@ const ProcessSection = () => {
   ];
 
   return (
-    <section className="py-28 lg:py-36 bg-surface-beige">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16">
-          <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em]">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             맡기면 이렇게 됩니다
           </h2>
         </Reveal>
@@ -388,9 +388,9 @@ const ProcessSection = () => {
         <Reveal>
           <div className="max-w-[760px] mx-auto">
             {roadmap.map((r, i) => (
-              <div key={i} className="grid grid-cols-[120px_1fr] gap-6 lg:gap-10 py-7 border-t border-border items-center">
-                <span className="text-[15px] font-display font-semibold text-primary tracking-[0.05em]">{r.period}</span>
-                <p className="text-[17px] text-foreground leading-[1.7] tracking-[-0.01em]">{r.d}</p>
+              <div key={i} className="grid grid-cols-[120px_1fr] gap-6 lg:gap-10 py-7 border-t border-[#e5e7eb] items-center">
+                <span className="text-[15px] font-semibold text-blue-500 tracking-[0.05em]">{r.period}</span>
+                <p className="text-[18px] text-foreground leading-[1.85] tracking-[-0.01em]">{r.d}</p>
               </div>
             ))}
           </div>
@@ -404,20 +404,20 @@ const ProcessSection = () => {
    Section 08 · CTA
    ============================================================ */
 const CtaSection = () => (
-  <section className="py-28 lg:py-36 bg-background text-center">
-    <div className="max-w-[1240px] mx-auto px-6">
+  <section className="py-28 lg:py-36 bg-[#0a0f1e] text-center">
+    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal>
-        <h2 className="font-serif break-keep text-[clamp(32px,4.5vw,56px)] font-semibold text-foreground leading-[1.35] tracking-[-0.01em] mb-5">
+        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em] mb-5">
           채널 방향,<br />무료로 먼저 잡아드립니다
         </h2>
-        <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[520px] mx-auto mt-4 mb-12">
+        <p className="text-[19px] text-white/50 leading-[1.9] max-w-[520px] mx-auto mt-4 mb-12">
           지금 유튜브 현황을 보내주시면<br />어디서 막혀있는지 바로 짚어드립니다.
         </p>
         <div className="flex items-center justify-center gap-4 flex-wrap">
-          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-primary text-primary-foreground text-[16px] font-medium tracking-[0.02em] hover:bg-gold-light transition-all rounded-md">
+          <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-white text-[#0a0f1e] text-[16px] font-medium tracking-[0.02em] hover:bg-white/90 transition-all rounded-xl">
             무료 상담 신청하기 <ArrowRight className="w-4 h-4" />
           </Link>
-          <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-8 py-4 border border-border text-[16px] text-muted-foreground hover:text-foreground hover:border-foreground/30 transition-colors rounded-md">
+          <a href="https://pf.kakao.com/_Hptyb/chat" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 px-8 py-4 border border-white/20 text-[16px] text-white/50 hover:text-white hover:border-white/40 transition-colors rounded-xl">
             <MessageCircle className="w-4 h-4" /> 카카오톡으로 바로 문의
           </a>
         </div>

@@ -74,23 +74,23 @@ const ConsultClient = () => {
   if (submitted) {
     return (
       <div>
-        <section className="min-h-screen flex items-center pt-32 pb-20 bg-background">
+        <section className="min-h-screen flex items-center pt-32 pb-20 bg-[#fbfbfb]">
           <div className="max-w-[1240px] mx-auto px-6 lg:px-12 w-full text-center">
             <Reveal>
-              <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-8">
-                <Check className="w-8 h-8 text-primary" />
+              <div className="w-16 h-16 rounded-full bg-blue-500/10 flex items-center justify-center mx-auto mb-8">
+                <Check className="w-8 h-8 text-blue-500" />
               </div>
-              <h1 className="font-serif break-keep text-[clamp(32px,5vw,56px)] font-medium text-foreground leading-[1.15] tracking-[-0.02em] mb-6">
+              <h1 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-6">
                 신청이 완료되었습니다.
               </h1>
-              <p className="text-[17px] text-muted-foreground leading-[1.85] max-w-[460px] mx-auto mb-10">
+              <p className="text-[18px] text-muted-foreground leading-[1.85] max-w-[460px] mx-auto mb-10">
                 보통 24시간 이내에 담당자가 연락드립니다.<br />
                 빠른 상담이 필요하시면 아래 이메일로 직접 문의해 주세요.
               </p>
-              <a href="mailto:contact@pixelpage.co.kr" className="block font-serif text-[20px] text-foreground hover:text-primary transition-colors mb-10">
+              <a href="mailto:contact@pixelpage.co.kr" className="block text-[20px] text-foreground hover:text-blue-500 transition-colors mb-10">
                 contact@pixelpage.co.kr
               </a>
-              <Link href="/" className="inline-flex items-center gap-2 text-[14px] font-medium text-primary hover:translate-x-[-2px] transition-transform">
+              <Link href="/" className="inline-flex items-center gap-2 text-[14px] font-medium text-blue-500 hover:translate-x-[-2px] transition-transform">
                 <ArrowLeft className="w-4 h-4" /> 홈으로 돌아가기
               </Link>
             </Reveal>
@@ -103,17 +103,17 @@ const ConsultClient = () => {
   return (
     <div>
       {/* Hero */}
-      <section className="pt-32 pb-24 lg:pb-32 bg-dark text-cream">
+      <section className="pt-32 pb-24 lg:pb-32 bg-[#0a0f1e] text-white">
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-cream/50 hover:text-primary transition-colors mb-10">
+          <Link href="/" className="inline-flex items-center gap-1.5 text-[12px] text-white/50 hover:text-blue-500 transition-colors mb-10">
             <ArrowLeft className="w-3 h-3" /> 홈으로
           </Link>
           <Reveal>
-            <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">Free Consultation</p>
-            <h1 className="font-serif break-keep text-[clamp(36px,5vw,64px)] font-medium text-cream leading-[1.15] tracking-[-0.02em] mb-6">
+            <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">Free Consultation</p>
+            <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold text-white leading-[1.12] tracking-[-0.03em] mb-6">
               무료 상담 신청
             </h1>
-            <p className="text-[17px] text-cream/70 leading-[1.85] max-w-[520px]">
+            <p className="text-[18px] text-white/50 leading-[1.85] max-w-[520px]">
               지금 당장 계약이 목표가 아닙니다.<br />
               브랜드를 함께 진단하고, 어떻게 팔 수 있는지<br />
               생각해 보는 것부터 시작합니다.
@@ -123,7 +123,7 @@ const ConsultClient = () => {
       </section>
 
       {/* Form */}
-      <section className="py-24 lg:py-32 bg-background">
+      <section className="py-28 lg:py-36 bg-white">
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-20">
 
@@ -131,7 +131,7 @@ const ConsultClient = () => {
             <form onSubmit={handleSubmit}>
               {/* 기본 정보 */}
               <Reveal>
-                <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">01 · 기본 정보</p>
+                <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">01 · 기본 정보</p>
                 <div className="space-y-5">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
@@ -141,7 +141,7 @@ const ConsultClient = () => {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="홍길동"
-                        className="h-12 border-border bg-background text-[15px] placeholder:text-muted-foreground/50"
+                        className="h-12 border-[#e5e7eb] bg-white text-[15px] placeholder:text-muted-foreground/50"
                       />
                     </div>
                     <div>
@@ -151,7 +151,7 @@ const ConsultClient = () => {
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
                         placeholder="픽셀페이지"
-                        className="h-12 border-border bg-background text-[15px] placeholder:text-muted-foreground/50"
+                        className="h-12 border-[#e5e7eb] bg-white text-[15px] placeholder:text-muted-foreground/50"
                       />
                     </div>
                   </div>
@@ -164,7 +164,7 @@ const ConsultClient = () => {
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
                         placeholder="010-0000-0000"
-                        className="h-12 border-border bg-background text-[15px] placeholder:text-muted-foreground/50"
+                        className="h-12 border-[#e5e7eb] bg-white text-[15px] placeholder:text-muted-foreground/50"
                       />
                     </div>
                     <div>
@@ -175,7 +175,7 @@ const ConsultClient = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="email@example.com"
-                        className="h-12 border-border bg-background text-[15px] placeholder:text-muted-foreground/50"
+                        className="h-12 border-[#e5e7eb] bg-white text-[15px] placeholder:text-muted-foreground/50"
                       />
                     </div>
                   </div>
@@ -184,12 +184,12 @@ const ConsultClient = () => {
 
               {/* 브랜드 정보 */}
               <Reveal className="mt-16">
-                <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">02 · 브랜드 정보</p>
+                <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">02 · 브랜드 정보</p>
                 <div className="space-y-5">
                   <div>
                     <label className="block text-[13px] font-medium text-foreground mb-2">업종 / 카테고리 *</label>
                     <Select required onValueChange={setCategory}>
-                      <SelectTrigger className="h-12 border-border bg-background text-[15px]">
+                      <SelectTrigger className="h-12 border-[#e5e7eb] bg-white text-[15px]">
                         <SelectValue placeholder="선택해주세요" />
                       </SelectTrigger>
                       <SelectContent>
@@ -205,7 +205,7 @@ const ConsultClient = () => {
                   <div>
                     <label className="block text-[13px] font-medium text-foreground mb-2">현재 마케팅 상황</label>
                     <Select onValueChange={setMarketingStatus}>
-                      <SelectTrigger className="h-12 border-border bg-background text-[15px]">
+                      <SelectTrigger className="h-12 border-[#e5e7eb] bg-white text-[15px]">
                         <SelectValue placeholder="선택해주세요" />
                       </SelectTrigger>
                       <SelectContent>
@@ -219,7 +219,7 @@ const ConsultClient = () => {
                   <div>
                     <label className="block text-[13px] font-medium text-foreground mb-2">월 예상 마케팅 예산</label>
                     <Select onValueChange={setBudget}>
-                      <SelectTrigger className="h-12 border-border bg-background text-[15px]">
+                      <SelectTrigger className="h-12 border-[#e5e7eb] bg-white text-[15px]">
                         <SelectValue placeholder="선택해주세요" />
                       </SelectTrigger>
                       <SelectContent>
@@ -237,7 +237,7 @@ const ConsultClient = () => {
 
               {/* 관심 서비스 */}
               <Reveal className="mt-16">
-                <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">03 · 관심 서비스</p>
+                <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">03 · 관심 서비스</p>
                 <p className="text-[14px] text-muted-foreground mb-5">관심 있는 서비스를 모두 선택해주세요. (복수 선택 가능)</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {services.map((s) => (
@@ -247,14 +247,14 @@ const ConsultClient = () => {
                       onClick={() => toggleService(s.id)}
                       className={`flex items-center gap-3 px-5 py-4 border rounded-lg text-left transition-all ${
                         selectedServices.includes(s.id)
-                          ? "border-primary bg-primary/5 text-foreground"
-                          : "border-border bg-background text-muted-foreground hover:border-foreground/30"
+                          ? "border-blue-500 bg-blue-500/5 text-foreground"
+                          : "border-[#e5e7eb] bg-white text-muted-foreground hover:border-foreground/30"
                       }`}
                     >
                       <div className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                        selectedServices.includes(s.id) ? "border-primary bg-primary" : "border-foreground/20"
+                        selectedServices.includes(s.id) ? "border-blue-500 bg-blue-500" : "border-foreground/20"
                       }`}>
-                        {selectedServices.includes(s.id) && <Check className="w-3 h-3 text-primary-foreground" />}
+                        {selectedServices.includes(s.id) && <Check className="w-3 h-3 text-white" />}
                       </div>
                       <span className="text-[14px] font-medium">{s.label}</span>
                     </button>
@@ -264,7 +264,7 @@ const ConsultClient = () => {
 
               {/* 추가 메시지 */}
               <Reveal className="mt-16">
-                <p className="font-display text-[13px] tracking-[0.25em] uppercase text-primary mb-6">04 · 추가 메시지</p>
+                <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">04 · 추가 메시지</p>
                 <div>
                   <label className="block text-[13px] font-medium text-foreground mb-2">
                     브랜드 소개, 고민, 원하시는 방향 등 자유롭게 적어주세요.
@@ -273,7 +273,7 @@ const ConsultClient = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="예: 온라인 교육 브랜드를 운영 중인데, 광고를 해본 적이 없어서 어디서부터 시작해야 할지 모르겠습니다."
-                    className="min-h-[160px] border-border bg-background text-[15px] placeholder:text-muted-foreground/50 leading-[1.8]"
+                    className="min-h-[160px] border-[#e5e7eb] bg-white text-[15px] placeholder:text-muted-foreground/50 leading-[1.8]"
                   />
                 </div>
               </Reveal>
@@ -283,7 +283,7 @@ const ConsultClient = () => {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 px-10 py-4 bg-primary text-primary-foreground text-[14px] font-bold tracking-[0.05em] hover:bg-gold-light transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
+                  className="inline-flex items-center gap-2 px-10 py-4 bg-[#0a0f1e] text-white rounded-xl text-[14px] font-bold tracking-[0.05em] hover:bg-[#0a0f1e]/90 transition-all hover:-translate-y-0.5 disabled:opacity-50 disabled:pointer-events-none"
                 >
                   {submitting ? "전송 중..." : "상담 신청하기"} {!submitting && <ArrowRight className="w-4 h-4" />}
                 </button>
@@ -297,8 +297,8 @@ const ConsultClient = () => {
             <div className="hidden lg:block">
               <Reveal>
                 <div className="sticky top-32 space-y-8">
-                  <div className="border border-border rounded-lg p-8">
-                    <h3 className="font-serif text-[20px] font-normal text-foreground mb-4">상담은 이렇게 진행됩니다</h3>
+                  <div className="border border-[#e5e7eb] rounded-lg p-8">
+                    <h3 className="text-[20px] font-bold text-foreground mb-4">상담은 이렇게 진행됩니다</h3>
                     <div className="space-y-5">
                       {[
                         { s: "01", t: "신청서 확인", d: "작성해 주신 내용을 바탕으로 브랜드를 사전 분석합니다." },
@@ -307,7 +307,7 @@ const ConsultClient = () => {
                         { s: "04", t: "전략 제안", d: "최적의 서비스 조합과 예산안을 제안드립니다." },
                       ].map((step) => (
                         <div key={step.s} className="flex gap-4">
-                          <span className="text-[12px] font-display text-primary tracking-[0.1em] mt-0.5 flex-shrink-0">{step.s}</span>
+                          <span className="text-[12px] text-blue-500 tracking-[0.1em] mt-0.5 flex-shrink-0">{step.s}</span>
                           <div>
                             <h4 className="text-[14px] font-medium text-foreground mb-1">{step.t}</h4>
                             <p className="text-[13px] text-muted-foreground leading-[1.8]">{step.d}</p>
@@ -317,12 +317,12 @@ const ConsultClient = () => {
                     </div>
                   </div>
 
-                  <div className="border border-border rounded-lg p-8">
-                    <h3 className="font-serif text-[20px] font-normal text-foreground mb-3">직접 연락하기</h3>
+                  <div className="border border-[#e5e7eb] rounded-lg p-8">
+                    <h3 className="text-[20px] font-bold text-foreground mb-3">직접 연락하기</h3>
                     <p className="text-[14px] text-muted-foreground leading-[1.8] mb-4">
                       폼 대신 이메일로 바로 문의하셔도 됩니다.
                     </p>
-                    <a href="mailto:contact@pixelpage.co.kr" className="text-[15px] font-medium text-primary hover:underline">
+                    <a href="mailto:contact@pixelpage.co.kr" className="text-[15px] font-medium text-blue-500 hover:underline">
                       contact@pixelpage.co.kr
                     </a>
                   </div>
