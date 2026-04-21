@@ -21,18 +21,17 @@ const HeroSection = () => (
       strategy="afterInteractive"
     />
 
-    {/* Spline 3D — 하단 1/3 잘림 */}
-    <div className="absolute bottom-0 left-0 right-0 h-[60vh] overflow-hidden pointer-events-none z-0">
+    {/* Spline 3D — 하단 1/3 섹션 밖으로 잘림 */}
+    <div className="absolute bottom-[-20vh] left-0 right-0 h-[70vh] pointer-events-none z-0">
       <div
-        className="w-full"
-        style={{ height: "150%", marginTop: "-10%" }}
+        className="w-full h-full"
         dangerouslySetInnerHTML={{
           __html: `<spline-viewer url="https://prod.spline.design/uNdY6wxxuIMYs9ih/scene.splinecode" style="width:100%;height:100%;display:block;"></spline-viewer>`,
         }}
       />
     </div>
 
-    <div className="relative z-10 text-center px-6 pt-32 pb-8 -mt-20">
+    <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-32">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
         지식 마케팅의<br />새로운 기준
       </h1>
