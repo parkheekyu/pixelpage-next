@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import logoWhite from "@/assets/logo-white.png";
 
-const darkHeroPages = ["/", "/consult", "/cases", "/products/glue", "/columns", "/services/performance", "/services/branded"];
+const darkHeroPages = ["/", "/consult", "/cases", "/products/glue", "/columns", "/services/performance", "/services/branded", "/services/crm", "/services/seo", "/services/webbuild"];
 
 const navItems: {
   label: string;
@@ -55,7 +55,7 @@ const Navbar = () => {
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-      scrolled ? "bg-background/96 backdrop-blur-lg shadow-subtle" : ""
+      scrolled ? "bg-white/96 backdrop-blur-lg shadow-sm" : ""
     }`}>
       <div className="max-w-[1240px] mx-auto h-[72px] flex items-center px-6 lg:px-12">
         <Link href="/" className="mr-auto">
@@ -70,12 +70,12 @@ const Navbar = () => {
               </Link>
               {item.dropdown && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200">
-                  <div className="bg-card shadow-card-hover border border-border w-[280px] p-1.5 rounded-lg">
+                  <div className="bg-white shadow-md border border-[#e5e7eb] w-[280px] p-1.5 rounded-lg">
                     {item.dropdown.map((d) => (
-                      <Link key={d.href} href={d.href} className="block px-3.5 py-2.5 rounded-md hover:bg-background transition-colors">
+                      <Link key={d.href} href={d.href} className="block px-3.5 py-2.5 rounded-md hover:bg-[#fbfbfb] transition-colors">
                         <span className="flex items-center gap-2 text-[14px] font-medium text-foreground">
                           {d.title}
-                          {d.isNew && <span className="text-[10px] font-bold tracking-[0.05em] text-primary bg-primary/10 px-1.5 py-0.5 rounded">NEW</span>}
+                          {d.isNew && <span className="text-[10px] font-bold tracking-[0.05em] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">NEW</span>}
                         </span>
                         <span className="block text-[11px] text-muted-foreground mt-0.5">{d.sub}</span>
                       </Link>
@@ -100,7 +100,7 @@ const Navbar = () => {
       </div>
 
       {mobileOpen && (
-        <div className="lg:hidden bg-card border-t border-border">
+        <div className="lg:hidden bg-white border-t border-[#e5e7eb]">
           <div className="max-w-[1200px] mx-auto px-6 py-4 flex flex-col gap-1">
             {navItems.map((item) => (
               <div key={item.label}>
