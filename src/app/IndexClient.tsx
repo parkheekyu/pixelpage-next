@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Script from "next/script";
 import { ArrowRight, FileText } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import ServicesTabSection from "@/components/ServicesTabSection";
@@ -15,20 +14,11 @@ import iconTrophy from "@/assets/icon-trophy.svg";
 /* ─── 1. Hero ─── */
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-    <Script
-      src="https://unpkg.com/@splinetool/viewer@1.12.86/build/spline-viewer.js"
-      type="module"
-      strategy="afterInteractive"
-    />
-
-    {/* Spline 3D — 하단 1/3 섹션 밖으로 잘림 */}
+{/* 히어로 배경 영상 — 하단 1/3 잘림 */}
     <div className="absolute bottom-[-20vh] left-0 right-0 h-[70vh] pointer-events-none z-0">
-      <div
-        className="w-full h-full"
-        dangerouslySetInnerHTML={{
-          __html: `<spline-viewer url="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode" style="width:100%;height:100%;display:block;"></spline-viewer>`,
-        }}
-      />
+      <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+        <source src="/hero-bg.mp4" type="video/mp4" />
+      </video>
     </div>
 
     <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-32">
