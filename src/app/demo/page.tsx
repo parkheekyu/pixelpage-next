@@ -1,11 +1,11 @@
 import { Metadata } from "next";
-import DemoClient from "./DemoClient";
+import StyleGuideClient from "./StyleGuideClient";
 
 export const metadata: Metadata = {
-  title: "데모 | 픽셀페이지",
-  description: "PIXELPAGE 웹 빌드 샘플 페이지입니다.",
+  title: "스타일 가이드 | 픽셀페이지",
+  description: "PIXELPAGE 디자인 시스템 스타일 가이드",
 };
 
 export default function Page() {
-  return <DemoClient />;
+  return <StyleGuideClient />;
 }
