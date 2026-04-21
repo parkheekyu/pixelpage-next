@@ -14,9 +14,9 @@ import iconTrophy from "@/assets/icon-trophy.svg";
 /* ─── 1. Hero ─── */
 const HeroSection = () => (
   <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-black">
-{/* 히어로 배경 영상 — 하단 1/3 잘림 */}
-    <div className="absolute bottom-[-20vh] left-0 right-0 h-[70vh] pointer-events-none z-0">
-      <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+    {/* 히어로 배경 영상 */}
+    <div className="absolute bottom-0 left-0 right-0 pointer-events-none z-0 flex justify-center">
+      <video autoPlay muted loop playsInline className="w-full max-w-[700px] object-contain">
         <source src="/hero-bg.mp4" type="video/mp4" />
       </video>
     </div>
