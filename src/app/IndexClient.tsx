@@ -26,13 +26,13 @@ const HeroSection = () => (
       <div
         className="w-full h-full"
         dangerouslySetInnerHTML={{
-          __html: `<spline-viewer url="https://prod.spline.design/uNdY6wxxuIMYs9ih/scene.splinecode" style="width:100%;height:100%;display:block;"></spline-viewer>`,
+          __html: `<spline-viewer url="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode" style="width:100%;height:100%;display:block;"></spline-viewer>`,
         }}
       />
     </div>
 
     <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-32">
-      <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-1">
+      <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] mb-7 opacity-0 animate-fade-up stagger-1 bg-gradient-to-r from-[#a8b8e0] via-[#c4b5d4] to-[#c084bc] bg-clip-text text-transparent">
         지식 마케팅의<br />새로운 기준
       </h1>
       <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
