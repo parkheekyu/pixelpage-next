@@ -27,7 +27,7 @@ const HeroSection = () => (
         className="w-full"
         style={{ height: "150%", marginTop: "-10%" }}
         dangerouslySetInnerHTML={{
-          __html: `<spline-viewer url="https://prod.spline.design/N3o-dk8eaY2Vzl-i/scene.splinecode" style="width:100%;height:100%;display:block;"></spline-viewer>`,
+          __html: `<spline-viewer url="https://prod.spline.design/uNdY6wxxuIMYs9ih/scene.splinecode" style="width:100%;height:100%;display:block;"></spline-viewer>`,
         }}
       />
     </div>
