@@ -27,7 +27,7 @@ const HeroSection = () => (
       </h1>
       <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
         교육 마케팅은 달라야 합니다.<br />
-        픽셀페이지가 수강생을 데려옵니다.
+        픽셀페이지가 모집부터 전환까지 설계합니다.
       </p>
       <div className="opacity-0 animate-fade-up stagger-3">
         <Link
