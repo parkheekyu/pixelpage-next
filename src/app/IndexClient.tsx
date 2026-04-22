@@ -184,7 +184,6 @@ const IndexClient = () => (
       icon={iconCloud.src}
       iconAlt=""
     />
-    <LeadMagnetSection />
     <CtaSection />
   </div>
 );
