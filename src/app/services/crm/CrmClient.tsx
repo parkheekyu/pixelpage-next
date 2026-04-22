@@ -85,11 +85,11 @@ const CrmClient = () => (
     </section>
 
     {/* Channels */}
-    <section className="py-28 lg:py-36 bg-[#0a0f1e]">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
-          <p className="text-[12px] tracking-[0.1em] uppercase text-white/50 mb-6">Channels & Tools</p>
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em]">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-muted-foreground mb-6">Channels & Tools</p>
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             어떤 채널과 도구를 사용하나요?
           </h2>
         </Reveal>
@@ -102,9 +102,9 @@ const CrmClient = () => (
             { t: "리드 대시보드", d: "리드 상태, 채널별 전환율, 시퀀스별 성과를 한눈에 볼 수 있습니다." },
             { t: "A/B 테스트 자동화", d: "메시지 문구, 발송 타이밍, CTA를 자동으로 테스트하고 승자 버전을 채택합니다." },
           ].map(f => (
-            <div key={f.t} className="border border-white/10 rounded-2xl p-6 hover:bg-white/5 transition-colors">
-              <h4 className="text-[15px] font-medium text-white mb-2">{f.t}</h4>
-              <p className="text-[14px] text-white/50 leading-[1.85]">{f.d}</p>
+            <div key={f.t} className="border border-[#e5e7eb] rounded-2xl p-6 hover:bg-[#fbfbfb] transition-colors">
+              <h4 className="text-[15px] font-medium text-foreground mb-2">{f.t}</h4>
+              <p className="text-[14px] text-muted-foreground leading-[1.85]">{f.d}</p>
             </div>
           ))}
         </Reveal>
@@ -112,7 +112,7 @@ const CrmClient = () => (
     </section>
 
     {/* Use cases */}
-    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[12px] tracking-[0.1em] uppercase text-muted-foreground mb-6">Use Cases</p>

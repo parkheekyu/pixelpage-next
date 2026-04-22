@@ -58,7 +58,7 @@ const GlueClient = () => (
     </section>
 
     {/* KPI */}
-    <section className="py-16 bg-[#0a0f1e] border-t border-white/10">
+    <section className="py-16 border-t border-[#e5e7eb]" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="flex flex-wrap justify-between gap-8">
           {[
@@ -68,8 +68,8 @@ const GlueClient = () => (
             { n: "24/7", u: "", l: "자동 메시지 발송" },
           ].map(k => (
             <div key={k.l} className="text-center">
-              <span className="text-[36px] font-normal text-white tracking-[-0.02em]">{k.n}<span className="text-[16px] text-white/40 ml-0.5">{k.u}</span></span>
-              <span className="block text-[11px] text-white/30 tracking-[0.08em] uppercase mt-1">{k.l}</span>
+              <span className="text-[36px] font-normal text-foreground tracking-[-0.02em]">{k.n}<span className="text-[16px] text-muted-foreground ml-0.5">{k.u}</span></span>
+              <span className="block text-[11px] text-muted-foreground tracking-[0.08em] uppercase mt-1">{k.l}</span>
             </div>
           ))}
         </Reveal>
@@ -77,7 +77,7 @@ const GlueClient = () => (
     </section>
 
     {/* Why */}
-    <section className="py-28 lg:py-36 bg-white">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">왜 글루인가요?</p>
@@ -100,11 +100,11 @@ const GlueClient = () => (
     </section>
 
     {/* Core Features */}
-    <section className="py-28 lg:py-36 bg-[#0a0f1e] text-white">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">핵심 기능</p>
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em]">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             글루가 하는 일
           </h2>
         </Reveal>
@@ -117,12 +117,12 @@ const GlueClient = () => (
             { icon: Zap, t: "CRM 시나리오 자동화", d: "D+0, D+1, D+2 — 리드 등록일 기준으로 자동 시퀀스를 설계합니다. 리드가 수집되면 자동 등록되어 순차적으로 메시지가 발송됩니다." },
             { icon: BarChart3, t: "성과 분석 대시보드", d: "총 리드 수, 발송 메시지 수, 성공률, 시나리오 완료율을 실시간 추적합니다. 일별 발송 트렌드와 채널별 분포를 차트로 확인합니다." },
           ].map(f => (
-            <div key={f.t} className="border border-white/10 rounded-2xl p-7 hover:bg-white/5 transition-colors shadow-sm">
-              <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center mb-5">
+            <div key={f.t} className="border border-[#e5e7eb] rounded-2xl p-7 hover:shadow-md transition-shadow shadow-sm">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center mb-5">
                 <f.icon className="w-5 h-5 text-blue-500" />
               </div>
-              <h4 className="text-[15px] font-medium text-white mb-3">{f.t}</h4>
-              <p className="text-[14px] text-white/50 leading-[1.9]">{f.d}</p>
+              <h4 className="text-[15px] font-medium text-foreground mb-3">{f.t}</h4>
+              <p className="text-[14px] text-muted-foreground leading-[1.9]">{f.d}</p>
             </div>
           ))}
         </Reveal>
@@ -130,7 +130,7 @@ const GlueClient = () => (
     </section>
 
     {/* How it works */}
-    <section className="py-28 lg:py-36 bg-[#fbfbfb]">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">작동 방식</p>
@@ -156,11 +156,11 @@ const GlueClient = () => (
     </section>
 
     {/* Lead Collection Channels */}
-    <section className="py-28 lg:py-36 bg-[#0a0f1e] text-white">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">리드 수집</p>
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em]">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             리드가 들어오는 4가지 경로
           </h2>
         </Reveal>
@@ -171,14 +171,14 @@ const GlueClient = () => (
             { icon: Link2, name: "웹훅 연동", desc: "외부 서비스에서 웹훅 URL로 리드를 자동 전송합니다. 어떤 폼 빌더, 어떤 서비스와도 연결됩니다." },
             { icon: Globe, name: "글루 폼 빌더", desc: "직접 리드 수집 폼을 만들어 랜딩페이지에 연결합니다. 커스텀 필드, 이미지 업로드, 공개 URL까지 지원합니다." },
           ].map(p => (
-            <div key={p.name} className="border border-white/10 rounded-2xl p-7 hover:bg-white/5 transition-colors shadow-sm">
+            <div key={p.name} className="border border-[#e5e7eb] rounded-2xl p-7 hover:shadow-md transition-shadow shadow-sm">
               <div className="flex items-center gap-4 mb-4">
-                <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                   <p.icon className="w-5 h-5 text-blue-500" />
                 </div>
-                <span className="text-[16px] font-medium text-white">{p.name}</span>
+                <span className="text-[16px] font-medium text-foreground">{p.name}</span>
               </div>
-              <p className="text-[14px] text-white/50 leading-[1.9]">{p.desc}</p>
+              <p className="text-[14px] text-muted-foreground leading-[1.9]">{p.desc}</p>
             </div>
           ))}
         </Reveal>
@@ -186,7 +186,7 @@ const GlueClient = () => (
     </section>
 
     {/* Message Channels */}
-    <section className="py-28 lg:py-36 bg-white">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">메시지 채널</p>
@@ -217,11 +217,11 @@ const GlueClient = () => (
     </section>
 
     {/* Use cases */}
-    <section className="py-28 lg:py-36 bg-[#0a0f1e] text-white">
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">활용 사례</p>
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em]">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             이런 상황이라면, 글루
           </h2>
         </Reveal>
@@ -232,9 +232,9 @@ const GlueClient = () => (
             { t: "상담 후 후속 메시지를 까먹을 때", d: "D+1에 감사 메시지, D+3에 후기 요청, D+7에 프로모션 안내 — 시나리오를 한 번 만들면 글루가 자동으로 보냅니다." },
             { t: "발송 성과를 한눈에 보고 싶을 때", d: "문자, 알림톡, 친구톡, 이메일의 성공률과 시나리오 완료율을 대시보드 하나에서 실시간으로 확인합니다." },
           ].map(item => (
-            <div key={item.t} className="border border-white/10 rounded-2xl p-8 hover:bg-white/5 transition-colors shadow-sm">
-              <h4 className="text-[16px] font-medium text-white mb-3">{item.t}</h4>
-              <p className="text-[15px] text-white/50 leading-[1.9]">{item.d}</p>
+            <div key={item.t} className="border border-[#e5e7eb] rounded-2xl p-8 hover:shadow-md transition-shadow shadow-sm">
+              <h4 className="text-[16px] font-medium text-foreground mb-3">{item.t}</h4>
+              <p className="text-[15px] text-muted-foreground leading-[1.9]">{item.d}</p>
             </div>
           ))}
         </Reveal>
@@ -242,7 +242,7 @@ const GlueClient = () => (
     </section>
 
     {/* CTA */}
-    <section className="py-28 lg:py-36 bg-[#fbfbfb] text-center">
+    <section className="py-28 lg:py-36 text-center" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">도입 문의</p>

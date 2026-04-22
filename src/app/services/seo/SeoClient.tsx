@@ -103,11 +103,11 @@ const SeoClient = () => (
     </section>
 
     {/* Benefits */}
-    <section className="py-28 lg:py-36 bg-[#0a0f1e]">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
-          <p className="text-[12px] tracking-[0.1em] uppercase text-white/50 mb-6">Benefits</p>
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em]">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-muted-foreground mb-6">Benefits</p>
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             SEO가 만드는 장기적 가치
           </h2>
         </Reveal>
@@ -120,9 +120,9 @@ const SeoClient = () => (
             { t: "경쟁 우위 확보", d: "먼저 시작하면 경쟁사가 따라잡기 어렵습니다. 검색 1위를 점유하면 빼앗기 매우 어렵습니다." },
             { t: "다른 채널과의 시너지", d: "SEO 콘텐츠는 광고 랜딩, CRM 시퀀스, 유튜브 소재로 재활용됩니다." },
           ].map(f => (
-            <div key={f.t} className="border border-white/10 rounded-2xl p-6 hover:bg-white/5 transition-colors">
-              <h4 className="text-[15px] font-medium text-white mb-2">{f.t}</h4>
-              <p className="text-[14px] text-white/50 leading-[1.85]">{f.d}</p>
+            <div key={f.t} className="border border-[#e5e7eb] rounded-2xl p-6 hover:bg-[#fbfbfb] transition-colors">
+              <h4 className="text-[15px] font-medium text-foreground mb-2">{f.t}</h4>
+              <p className="text-[14px] text-muted-foreground leading-[1.85]">{f.d}</p>
             </div>
           ))}
         </Reveal>

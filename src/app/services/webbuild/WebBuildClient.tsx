@@ -101,11 +101,11 @@ const WebBuildClient = () => (
     </section>
 
     {/* Enterprise detail */}
-    <section className="py-28 lg:py-36 bg-[#0a0f1e]">
+    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
-          <p className="text-[12px] tracking-[0.1em] uppercase text-white/50 mb-6">Enterprise Grade</p>
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em]">
+          <p className="text-[12px] tracking-[0.1em] uppercase text-muted-foreground mb-6">Enterprise Grade</p>
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
             엔터프라이즈급 웹 빌드 상세
           </h2>
         </Reveal>
@@ -118,9 +118,9 @@ const WebBuildClient = () => (
             { t: "SEO 구조 설계", d: "메타 태그, 스키마 마크업, 사이트맵 등 SEO 기본 구조를 세팅합니다." },
             { t: "유지보수 · 확장", d: "런칭 후 업데이트, 신규 기능 추가, 보안 업데이트를 지원합니다." },
           ].map(f => (
-            <div key={f.t} className="border border-white/10 rounded-2xl p-6 hover:bg-white/5 transition-colors">
-              <h4 className="text-[15px] font-medium text-white mb-2">{f.t}</h4>
-              <p className="text-[14px] text-white/50 leading-[1.85]">{f.d}</p>
+            <div key={f.t} className="border border-[#e5e7eb] rounded-2xl p-6 hover:bg-[#fbfbfb] transition-colors">
+              <h4 className="text-[15px] font-medium text-foreground mb-2">{f.t}</h4>
+              <p className="text-[14px] text-muted-foreground leading-[1.85]">{f.d}</p>
             </div>
           ))}
         </Reveal>
@@ -128,7 +128,7 @@ const WebBuildClient = () => (
     </section>
 
     {/* What's included */}
-    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+    <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal>
           <p className="text-[12px] tracking-[0.1em] uppercase text-muted-foreground mb-6">모든 빌드에 포함</p>
