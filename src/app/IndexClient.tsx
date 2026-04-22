@@ -23,11 +23,11 @@ const HeroSection = () => (
 
     <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-48">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] mb-7 opacity-0 animate-fade-up stagger-1 text-white">
-        지식 마케팅의<br />새로운 기준
+        수강생 모집이<br />어려우신가요?
       </h1>
       <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
-        더 이상 광고비만 태우지 마세요.<br />
-        픽셀페이지가 유입부터 매출까지 설계합니다.
+        교육 마케팅은 달라야 합니다.<br />
+        픽셀페이지가 수강생을 데려옵니다.
       </p>
       <div className="opacity-0 animate-fade-up stagger-3">
         <Link
