@@ -49,7 +49,7 @@ const StyleGuideClient = () => (
           </div>
           <div>
             <p className="text-[11px] text-muted-foreground mb-3">H3 — Card Title · 22-26px · Bold</p>
-            <h3 className="text-[26px] font-bold text-foreground">디지털노마드 하이클래스</h3>
+            <h3 className="text-[26px] font-bold text-foreground">온라인 교육 브랜드 A</h3>
           </div>
           <div>
             <p className="text-[11px] text-muted-foreground mb-3">Body Large — 19px · leading 1.9</p>
@@ -161,7 +161,7 @@ const StyleGuideClient = () => (
           <p className="text-[11px] text-muted-foreground mb-4">Case Study Row</p>
           <div className="bg-white border border-[#e5e7eb] rounded-2xl p-6">
             <span className="text-[12px] text-muted-foreground tracking-[0.1em] uppercase">온라인 교육</span>
-            <h3 className="text-[22px] font-bold text-foreground mt-2">디지털노마드 하이클래스</h3>
+            <h3 className="text-[22px] font-bold text-foreground mt-2">온라인 교육 브랜드 A</h3>
             <span className="inline-block mt-2 text-[13px] font-semibold text-blue-500 bg-blue-50 px-3 py-1 rounded-full">ROAS 180% → 420%</span>
             <p className="text-[15px] text-foreground/80 leading-[1.85] mt-4">메시지 프레임워크를 재설계하고 크리에이티브를 교체한 결과, 6개월간 업계 평균 2배 이상의 효율을 유지.</p>
           </div>
