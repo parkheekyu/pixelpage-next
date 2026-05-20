@@ -20,7 +20,7 @@ const KnowledgeProductSection = () => (
           광고, 랜딩, CRM.<br />셋이 연결돼야 파이프라인이 됩니다.
         </h2>
         <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[520px] mx-auto">
-          픽셀페이지는 하나의 팀이 세 개를 같이 운영해요.
+          픽셀페이지는 하나의 팀이 세 개를 같이 운영합니다.
         </p>
       </Reveal>
     </div>
@@ -51,7 +51,7 @@ const KnowledgeProductSection = () => (
       <Reveal className="mt-14 text-center">
         <p className="text-[19px] text-foreground leading-[1.9] max-w-[520px] mx-auto">
           메시지가 일관되고, 데이터가 연결되고,<br />
-          <span className="font-bold">성과의 책임이 한 곳에 있어요.</span>
+          <span className="font-bold">성과의 책임이 한 곳에 있습니다.</span>
         </p>
       </Reveal>
     </div>

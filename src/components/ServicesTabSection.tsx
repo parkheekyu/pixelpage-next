@@ -359,7 +359,7 @@ const ServicesTabSection = () => {
         <Reveal className="text-center">
           <img src={iconFolder.src} alt="Services" className="w-10 h-10 mb-5 mx-auto" />
           <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-            파이프라인은<br />이렇게 만들어요.
+            파이프라인은<br />이렇게 만듭니다.
           </h2>
           <p className="text-[19px] text-muted-foreground mt-4 max-w-[480px] mx-auto leading-[1.9]">
             광고, 랜딩, CRM. 세 단계가 연결돼야 매출이 됩니다.

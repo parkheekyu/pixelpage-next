@@ -26,8 +26,8 @@ const HeroSection = () => (
         단순 광고가 아닌,<br />매출 파이프라인을 만듭니다.
       </h1>
       <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[520px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
-        광고만 잘 돌아가도 매출이 안 나오는 이유가 있어요.<br />
-        퍼널이 끊기기 때문이에요.
+        광고만 잘 돌아가도 매출이 안 나오는 이유가 있습니다.<br />
+        퍼널이 끊기기 때문입니다.
       </p>
       <div className="opacity-0 animate-fade-up stagger-3">
         <Link
@@ -48,10 +48,10 @@ const HeroSection = () => (
 /* ─── 2. Problem Agitation ─── */
 const ProblemSection = () => {
   const pains = [
-    { bold: "광고 대행사는 랜딩 탓, 랜딩 제작사는 광고 탓.", sub: "성과가 안 나와도 책임지는 곳이 없어요.", emoji: "/emojis/crying.svg" },
-    { bold: "이번 달도 광고비 수백만 원 나갔어요.", sub: "근데 상담 신청은 세 개예요.", emoji: "/emojis/worried.svg" },
-    { bold: "대행사 보고서엔 클릭률, 노출수가 가득해요.", sub: "매출은 왜 그대로일까요.", emoji: "/emojis/sad.svg" },
-    { bold: "상담 신청이 왔는데 후속 연락을 놓쳤어요.", sub: "그 리드, 다음 날 경쟁사로 갔습니다.", emoji: "/emojis/confused.svg" },
+    { bold: "광고 대행사는 랜딩 탓, 랜딩 제작사는 광고 탓.", sub: "성과가 안 나와도 책임지는 곳이 없습니다.", emoji: "/emojis/crying.svg" },
+    { bold: "이번 달도 광고비 수백만 원 나갔습니다.", sub: "근데 상담 신청은 세 개입니다.", emoji: "/emojis/worried.svg" },
+    { bold: "대행사 보고서엔 클릭률, 노출수가 가득합니다.", sub: "매출은 왜 그대로일까?", emoji: "/emojis/sad.svg" },
+    { bold: "상담 신청이 왔는데 후속 연락을 놓쳤습니다.", sub: "그 리드, 다음 날 경쟁사로 갔습니다.", emoji: "/emojis/confused.svg" },
   ];
   return (
     <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
@@ -99,7 +99,7 @@ const CasesSection = () => (
       <Reveal className="text-center mb-16">
         <img src={iconTrophy.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-          숫자로만 말할게요.
+          숫자로만 말합니다.
         </h2>
       </Reveal>
       <div className="space-y-0">
@@ -139,7 +139,7 @@ const LeadMagnetSection = () => (
           <FileText className="w-10 h-10 text-blue-500 mx-auto mb-5" />
           <h3 className="text-[20px] font-bold text-foreground mb-3">지식 상품 퍼널 진단 체크리스트</h3>
           <p className="text-[14px] text-muted-foreground mb-2">PDF, 12p</p>
-          <p className="text-[15px] text-muted-foreground leading-[1.8] mb-8">당신의 퍼널에서 매출이 새고 있는 7가지 지점을<br />스스로 점검해보세요.</p>
+          <p className="text-[15px] text-muted-foreground leading-[1.8] mb-8">당신의 퍼널에서 매출이 새고 있는 7가지 지점을<br />스스로 점검해봅니다.</p>
           <Link href="/consult" className="inline-flex items-center gap-2 px-8 py-4 bg-[#0a0f1e] text-white text-[15px] font-semibold rounded-xl hover:bg-[#0a0f1e]/90 transition-all">
             무료로 받기 <ArrowRight className="w-4 h-4" />
           </Link>
@@ -157,11 +157,11 @@ const CtaSection = () => (
       <Reveal>
         <img src={iconAt.src} alt="" className="w-10 h-10 mb-5" />
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
-          파이프라인,<br />어디서 새는지 찾아드려요.
+          파이프라인,<br />어디서 새는지 찾아드립니다.
         </h2>
         <p className="text-[19px] text-muted-foreground max-w-[520px] leading-[1.9] mb-10">
           무료 마케팅 진단 — 30분이면 됩니다.<br />
-          계약 없이도 괜찮아요.
+          계약 없이도 괜찮습니다.
           <br /><br />
           진단 후 대행이 필요하면 대행을,<br />
           방향만 필요하면 컨설팅을 제안드립니다.
