@@ -17,11 +17,10 @@ const KnowledgeProductSection = () => (
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-14 lg:mb-20">
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
-          지식 상품은<br />다르게 팔아야 합니다.
+          광고, 랜딩, CRM.<br />셋이 연결돼야 파이프라인이 됩니다.
         </h2>
         <p className="text-[19px] text-muted-foreground leading-[1.9] max-w-[520px] mx-auto">
-          클릭만 끌어내는 광고는 쉽습니다.<br />
-          하지만 한 번 실망한 고객은 다시 오지 않습니다.
+          픽셀페이지는 하나의 팀이 세 개를 같이 운영해요.
         </p>
       </Reveal>
     </div>
@@ -51,8 +50,8 @@ const KnowledgeProductSection = () => (
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="mt-14 text-center">
         <p className="text-[19px] text-foreground leading-[1.9] max-w-[520px] mx-auto">
-          저희는 <span className="font-bold">유입부터 매출까지, 전 과정을 이해하고</span> 만듭니다.<br />
-          억지 후킹 없이도 팔 수 있는 이유입니다.
+          메시지가 일관되고, 데이터가 연결되고,<br />
+          <span className="font-bold">성과의 책임이 한 곳에 있어요.</span>
         </p>
       </Reveal>
     </div>

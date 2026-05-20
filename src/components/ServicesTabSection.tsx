@@ -359,10 +359,10 @@ const ServicesTabSection = () => {
         <Reveal className="text-center">
           <img src={iconFolder.src} alt="Services" className="w-10 h-10 mb-5 mx-auto" />
           <h2 className="text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-            5가지 서비스,<br />하나의 마케팅 설계.
+            파이프라인은<br />이렇게 만들어요.
           </h2>
           <p className="text-[19px] text-muted-foreground mt-4 max-w-[480px] mx-auto leading-[1.9]">
-            각각 독립적으로 강하고, 함께할 때 가장 강력합니다.
+            광고, 랜딩, CRM. 세 단계가 연결돼야 매출이 됩니다.
           </p>
         </Reveal>
 

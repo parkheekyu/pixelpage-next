@@ -23,11 +23,11 @@ const HeroSection = () => (
 
     <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-48">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] mb-7 opacity-0 animate-fade-up stagger-1 text-white">
-        수강생 모집이<br />어려우신가요?
+        단순 광고가 아닌,<br />매출 파이프라인을 만듭니다.
       </h1>
-      <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[460px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
-        교육 마케팅은 달라야 합니다.<br />
-        픽셀페이지가 모집부터 전환까지 설계합니다.
+      <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[520px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
+        광고만 잘 돌아가도 매출이 안 나오는 이유가 있어요.<br />
+        퍼널이 끊기기 때문이에요.
       </p>
       <div className="opacity-0 animate-fade-up stagger-3">
         <Link
@@ -48,10 +48,10 @@ const HeroSection = () => (
 /* ─── 2. Problem Agitation ─── */
 const ProblemSection = () => {
   const pains = [
-    { text: "좋은 커리큘럼인데, 왜 경쟁사 후기가 더 많은지 모르겠어요", emoji: "/emojis/crying.svg" },
-    { text: "SNS 콘텐츠도 찍어봤지만, 어떤 게 먹히는지 감이 안 와요", emoji: "/emojis/worried.svg" },
-    { text: "대행사는 '노출·클릭은 좋아요'라고 하는데 매출은 그대로인 것 같아요", emoji: "/emojis/sad.svg" },
-    { text: "광고는 돌아가는데, 상담 신청 늘질 않아요", emoji: "/emojis/confused.svg" },
+    { bold: "광고 대행사는 랜딩 탓, 랜딩 제작사는 광고 탓.", sub: "성과가 안 나와도 책임지는 곳이 없어요.", emoji: "/emojis/crying.svg" },
+    { bold: "이번 달도 광고비 수백만 원 나갔어요.", sub: "근데 상담 신청은 세 개예요.", emoji: "/emojis/worried.svg" },
+    { bold: "대행사 보고서엔 클릭률, 노출수가 가득해요.", sub: "매출은 왜 그대로일까요.", emoji: "/emojis/sad.svg" },
+    { bold: "상담 신청이 왔는데 후속 연락을 놓쳤어요.", sub: "그 리드, 다음 날 경쟁사로 갔습니다.", emoji: "/emojis/confused.svg" },
   ];
   return (
     <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
@@ -72,7 +72,10 @@ const ProblemSection = () => {
                     <img src={p.emoji} alt="" className="w-10 h-10 md:w-12 md:h-12" />
                   </div>
                   <div className="flex-1 bg-white border border-[#e5e7eb] rounded-2xl px-6 py-5 md:px-7 md:py-6 shadow-sm">
-                    <p className="text-[15px] md:text-[16px] text-foreground leading-[1.7]">{p.text}</p>
+                    <p className="text-[15px] md:text-[16px] leading-[1.7]">
+                      <span className="font-bold text-foreground">{p.bold}</span>
+                      <span className="block text-muted-foreground mt-1">{p.sub}</span>
+                    </p>
                   </div>
                 </div>
               );
@@ -96,15 +99,15 @@ const CasesSection = () => (
       <Reveal className="text-center mb-16">
         <img src={iconTrophy.src} alt="" className="w-10 h-10 mb-5 mx-auto" />
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em]">
-          짧은 기간, 또렷한 결과.
+          숫자로만 말할게요.
         </h2>
       </Reveal>
       <div className="space-y-0">
         {[
-          { cat: "온라인 교육", name: "온라인 교육 브랜드 A", metric: "ROAS 180% → 420%", quote: "직접 운영했을 때 ROAS 180%에서 협업 후 ROAS 420%로. 메시지 프레임워크를 재설계하고 크리에이티브를 교체한 결과, 6개월간 꾸준히 업계 평균 2배 이상의 효율을 유지하고 있습니다." },
-          { cat: "B2B 지식 서비스", name: "B2B 지식 서비스 브랜드", metric: "ROAS 500%", quote: "4천만 원 예산으로 ROAS 500% 달성. 고단가 B2B 지식 상품은 못 판다는 게 업계 통념이었습니다. 정확한 메시지 설계 하나로 팔기 어려운 상품도 팔린다는 걸 증명했습니다." },
-          { cat: "오프라인 교육", name: "오프라인 교육 브랜드", metric: "매출 6.6배", quote: "1개 지점에서 5개 지점, 매출 6.6배 성장 (24개월). 지역별 타겟 세그먼트와 지점별 메시지 차별화로 신규 지점 4곳을 순차 오픈했습니다." },
-          { cat: "가맹 네트워크", name: "가맹 네트워크 브랜드", metric: "전국 7개 지점", quote: "브랜드 통일성은 유지하면서, 지역별로 다른 메시지를 설계했습니다. 전국 커버리지를 완성한 가맹 마케팅 사례입니다." },
+          { cat: "Case 01", name: "커머스 브랜드", metric: "ROAS 8.4×", quote: "광고비 한 푼당 8.4배 매출. 광고·랜딩·시퀀스를 하나의 메시지로 정렬해 만든 결과입니다." },
+          { cat: "Case 02", name: "서비스 브랜드", metric: "CPA −62%", quote: "전환 단가를 62% 줄였습니다. 타겟 정밀화와 퍼널 누수 차단을 동시에 진행한 결과입니다." },
+          { cat: "Case 03", name: "B2B SaaS", metric: "전환율 3.2×", quote: "기존 대비 3.2배 높은 전환율. 리드 퀄리티와 후속 시퀀스를 함께 설계해 만든 숫자입니다." },
+          { cat: "Case 04", name: "지식 상품", metric: "매출 6.6배", quote: "24개월 동안 매출 6.6배 성장. 광고-랜딩-CRM이 끊김 없이 연결된 파이프라인의 결과입니다." },
         ].map(c => (
           <Reveal key={c.name}>
             <div className="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-6 lg:gap-16 py-12 border-t border-[#e5e7eb] items-start">
@@ -154,10 +157,14 @@ const CtaSection = () => (
       <Reveal>
         <img src={iconAt.src} alt="" className="w-10 h-10 mb-5" />
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
-          한 번 얘기해봐요.
+          파이프라인,<br />어디서 새는지 찾아드려요.
         </h2>
         <p className="text-[19px] text-muted-foreground max-w-[520px] leading-[1.9] mb-10">
-          계약이 목표가 아닙니다. 지금 당신 브랜드의 퍼널 어디가 새고 있는지, 30분 안에 찾아드립니다. 필요한 것만 가져가세요.
+          무료 마케팅 진단 — 30분이면 됩니다.<br />
+          계약 없이도 괜찮아요.
+          <br /><br />
+          진단 후 대행이 필요하면 대행을,<br />
+          방향만 필요하면 컨설팅을 제안드립니다.
         </p>
         <a href="mailto:contact@pixelpage.co.kr" className="block text-[24px] font-bold text-foreground/80 hover:text-blue-500 transition-colors mb-2">
           contact@pixelpage.co.kr
