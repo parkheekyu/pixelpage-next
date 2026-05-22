@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus } from "lucide-react";
 import Reveal from "@/components/Reveal";
 
@@ -56,16 +57,27 @@ const FAQSection = () => {
                     {f.q}
                   </span>
                   <Plus
-                    className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+                    className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${open ? "rotate-45" : ""}`}
                   />
                 </button>
-                {open && (
-                  <div className="px-6 pb-5 lg:px-7 lg:pb-6 pt-0">
-                    <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.85]">
-                      {f.a}
-                    </p>
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {open && (
+                    <motion.div
+                      key="content"
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: "auto", opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ height: { duration: 0.32, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.22, ease: "easeInOut" } }}
+                      style={{ overflow: "hidden" }}
+                    >
+                      <div className="px-6 pb-5 lg:px-7 lg:pb-6 pt-0">
+                        <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.85]">
+                          {f.a}
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             );
           })}

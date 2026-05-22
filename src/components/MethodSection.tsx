@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Eye, BarChart3, Send, CheckCheck, MessageSquare, Users, MousePointerClick, ChevronsUpDown } from "lucide-react";
 import Reveal from "@/components/Reveal";
 import metaLogo from "@/assets/meta-logo.png";
@@ -344,14 +345,25 @@ const AccordionBlock = ({
               >
                 <span className="text-[15px] lg:text-[16px] font-bold text-foreground">{it.head}</span>
                 <Plus
-                  className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-200 ${open ? "rotate-45" : ""}`}
+                  className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${open ? "rotate-45" : ""}`}
                 />
               </button>
-              {open && (
-                <div className="px-5 pb-5 lg:px-6 lg:pb-6 pt-0">
-                  <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.85]">{it.body}</p>
-                </div>
-              )}
+              <AnimatePresence initial={false}>
+                {open && (
+                  <motion.div
+                    key="content"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ height: { duration: 0.32, ease: [0.22, 1, 0.36, 1] }, opacity: { duration: 0.22, ease: "easeInOut" } }}
+                    style={{ overflow: "hidden" }}
+                  >
+                    <div className="px-5 pb-5 lg:px-6 lg:pb-6 pt-0">
+                      <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.85]">{it.body}</p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           );
         })}
