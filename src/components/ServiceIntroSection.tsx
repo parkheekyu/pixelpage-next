@@ -29,6 +29,9 @@ const ServiceIntroSection = () => (
   <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-16 lg:mb-20">
+        <p className="text-[12px] font-semibold tracking-[0.18em] text-blue-500 mb-5">
+          서비스 소개
+        </p>
         <h2 className="break-keep text-[clamp(34px,4.5vw,56px)] font-bold text-foreground leading-[1.2] tracking-[-0.03em]">
           어떤 서비스가 필요하세요?
         </h2>
