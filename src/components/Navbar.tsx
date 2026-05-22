@@ -58,14 +58,22 @@ const Navbar = () => {
               </Link>
               {item.dropdown && (
                 <div className="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto transition-all duration-200">
-                  <div className="bg-white shadow-md border border-[#e5e7eb] w-[280px] p-1.5 rounded-lg">
+                  <div className="bg-white shadow-[0_20px_50px_-12px_rgba(10,15,30,0.18)] ring-1 ring-[#e5e7eb] w-[320px] p-2 rounded-2xl">
                     {item.dropdown.map((d) => (
-                      <Link key={d.href} href={d.href} className="block px-3.5 py-2.5 rounded-md hover:bg-[#fbfbfb] transition-colors">
-                        <span className="flex items-center gap-2 text-[14px] font-medium text-foreground">
+                      <Link
+                        key={d.href}
+                        href={d.href}
+                        className="group/item block px-4 py-3 rounded-xl hover:bg-blue-50 transition-colors"
+                      >
+                        <span className="flex items-center gap-2 text-[14px] font-bold text-foreground group-hover/item:text-blue-500 transition-colors">
                           {d.title}
-                          {d.isNew && <span className="text-[10px] font-bold tracking-[0.05em] text-blue-500 bg-blue-50 px-1.5 py-0.5 rounded">NEW</span>}
+                          {d.isNew && (
+                            <span className="text-[10px] font-bold tracking-[0.05em] text-blue-500 bg-blue-50 group-hover/item:bg-white px-1.5 py-0.5 rounded transition-colors">
+                              NEW
+                            </span>
+                          )}
                         </span>
-                        <span className="block text-[11px] text-muted-foreground mt-0.5">{d.sub}</span>
+                        <span className="block text-[12px] text-muted-foreground mt-1 leading-[1.5]">{d.sub}</span>
                       </Link>
                     ))}
                   </div>
@@ -89,18 +97,24 @@ const Navbar = () => {
 
       {mobileOpen && (
         <div className="lg:hidden bg-white border-t border-[#e5e7eb]">
-          <div className="max-w-[1200px] mx-auto px-6 py-4 flex flex-col gap-1">
+          <div className="max-w-[1200px] mx-auto px-6 py-5 flex flex-col gap-1">
             {navItems.map((item) => (
-              <div key={item.label}>
-                <Link href={item.href} className="block py-2 text-[14px] font-medium text-foreground">{item.label}</Link>
+              <div key={item.label} className="pb-1">
+                <Link href={item.href} className="block px-3 py-2.5 rounded-xl text-[14px] font-bold text-foreground hover:bg-blue-50 hover:text-blue-500 transition-colors">
+                  {item.label}
+                </Link>
                 {item.dropdown?.map((d) => (
-                  <Link key={d.href} href={d.href} className="block py-1.5 pl-4 text-[13px] text-muted-foreground hover:text-foreground transition-colors">
+                  <Link
+                    key={d.href}
+                    href={d.href}
+                    className="block px-3 py-2 ml-3 rounded-lg text-[13px] text-muted-foreground hover:bg-blue-50 hover:text-blue-500 transition-colors"
+                  >
                     {d.title}
                   </Link>
                 ))}
               </div>
             ))}
-            <Link href="/consult" className="mt-3 text-center text-[13px] font-bold px-5 py-2.5 bg-[#0a0f1e] text-white rounded-md hover:bg-[#0a0f1e]/80 transition-colors">
+            <Link href="/consult" className="mt-3 text-center text-[13px] font-bold px-5 py-3 bg-[#0a0f1e] text-white rounded-xl hover:bg-[#0a0f1e]/80 transition-colors">
               상담 신청
             </Link>
           </div>
