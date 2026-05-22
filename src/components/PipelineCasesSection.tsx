@@ -10,9 +10,9 @@ const stats = [
 ];
 
 const cardGradients = [
-  "linear-gradient(135deg, #1e2746 0%, #0c1124 100%)",
-  "linear-gradient(135deg, #2a1f4a 0%, #0c1124 100%)",
-  "linear-gradient(135deg, #0d2a3a 0%, #0c1124 100%)",
+  "linear-gradient(135deg, rgba(30,39,70,0.72) 0%, rgba(12,17,36,0.72) 100%)",
+  "linear-gradient(135deg, rgba(42,31,74,0.72) 0%, rgba(12,17,36,0.72) 100%)",
+  "linear-gradient(135deg, rgba(13,42,58,0.72) 0%, rgba(12,17,36,0.72) 100%)",
 ];
 
 const PipelineCasesSection = () => (
@@ -56,7 +56,7 @@ const PipelineCasesSection = () => (
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
-              className="rounded-xl border border-white/[0.07] overflow-hidden"
+              className="rounded-xl border border-white/[0.08] overflow-hidden backdrop-blur-sm"
               style={{ background: cardGradients[i] }}
             >
               {/* Top — metric showcase */}
