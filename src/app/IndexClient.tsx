@@ -60,10 +60,6 @@ const CtaSection = () => (
           진단 후 대행이 필요하면 대행을,<br />
           방향만 필요하면 컨설팅을 제안드립니다.
         </p>
-        <a href="mailto:contact@pixelpage.co.kr" className="block text-[24px] font-bold text-foreground/80 hover:text-blue-500 transition-colors mb-2">
-          contact@pixelpage.co.kr
-        </a>
-        <p className="text-[14px] text-muted-foreground mb-8">보통 24시간 이내 회신드립니다.</p>
         <Link href="/consult" className="inline-flex items-center gap-2 px-9 py-4 bg-[#0a0f1e] text-white text-[16px] font-semibold rounded-xl hover:bg-[#0a0f1e]/90 transition-all">
           무료 상담 신청 <ArrowRight className="w-4 h-4" />
         </Link>
