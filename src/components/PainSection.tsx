@@ -23,7 +23,7 @@ const PainSection = () => (
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-16">
         <p className="text-[12px] font-semibold tracking-[0.18em] text-blue-500 mb-5">
-          현실 진단
+          광고를 했지만
         </p>
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.18] tracking-[-0.03em] mb-6">
           왜 매출이 늘지 않을까요?

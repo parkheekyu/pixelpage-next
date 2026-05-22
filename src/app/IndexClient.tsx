@@ -50,9 +50,6 @@ const CtaSection = () => (
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal>
         <img src={iconAt.src} alt="" className="w-10 h-10 mb-5" />
-        <p className="text-[12px] font-semibold tracking-[0.18em] text-blue-500 mb-5">
-          무료 마케팅 진단
-        </p>
         <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.12] tracking-[-0.03em] mb-5">
           매출 파이프라인,<br />어디서 새는지 찾아드립니다.
         </h2>
