@@ -11,11 +11,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 const WEBHOOK_URL = "https://heekyu.app.n8n.cloud/webhook/fb10c3b0-a33e-4996-a25e-9f070184efb5";
 
 const services = [
-  { id: "performance", label: "퍼포먼스 마케팅" },
-  { id: "branded", label: "브랜디드 콘텐츠" },
-  { id: "seo", label: "검색엔진 최적화 (SEO)" },
-  { id: "crm", label: "CRM 마케팅" },
-  { id: "webbuild", label: "웹 빌드" },
+  { id: "agency", label: "마케팅 대행" },
+  { id: "consulting", label: "마케팅 컨설팅" },
   { id: "unsure", label: "아직 잘 모르겠어요" },
 ];
 
@@ -193,11 +190,16 @@ const ConsultClient = () => {
                         <SelectValue placeholder="선택해주세요" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="교육 (온·오프라인)">교육 (온·오프라인)</SelectItem>
-                        <SelectItem value="코칭 · 컨설팅">코칭 · 컨설팅</SelectItem>
-                        <SelectItem value="체험 · 문화 · 여행">체험 · 문화 · 여행</SelectItem>
-                        <SelectItem value="지식 서비스 · B2B">지식 서비스 · B2B</SelectItem>
-                        <SelectItem value="건강 · 뷰티 · 웰니스">건강 · 뷰티 · 웰니스</SelectItem>
+                        <SelectItem value="교육 (학원 · 온라인 강의 · 코칭)">교육 (학원 · 온라인 강의 · 코칭)</SelectItem>
+                        <SelectItem value="부동산">부동산</SelectItem>
+                        <SelectItem value="의료 · 병원">의료 · 병원</SelectItem>
+                        <SelectItem value="보험 · 금융">보험 · 금융</SelectItem>
+                        <SelectItem value="인테리어 · 리모델링">인테리어 · 리모델링</SelectItem>
+                        <SelectItem value="헬스 · 뷰티 · 웰니스">헬스 · 뷰티 · 웰니스</SelectItem>
+                        <SelectItem value="결혼 · 웨딩">결혼 · 웨딩</SelectItem>
+                        <SelectItem value="자동차">자동차</SelectItem>
+                        <SelectItem value="법률 · 세무 · 전문 서비스">법률 · 세무 · 전문 서비스</SelectItem>
+                        <SelectItem value="B2B · 지식 서비스">B2B · 지식 서비스</SelectItem>
                         <SelectItem value="기타">기타</SelectItem>
                       </SelectContent>
                     </Select>
@@ -239,7 +241,7 @@ const ConsultClient = () => {
               <Reveal className="mt-16">
                 <p className="text-[13px] tracking-[0.25em] uppercase text-blue-500 mb-6">03 · 관심 서비스</p>
                 <p className="text-[14px] text-muted-foreground mb-5">관심 있는 서비스를 모두 선택해주세요. (복수 선택 가능)</p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                   {services.map((s) => (
                     <button
                       key={s.id}
