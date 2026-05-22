@@ -11,7 +11,7 @@ const services = [
     title: "마케팅 대행",
     desc: "광고·랜딩·CRM 풀패키지 운영",
     href: "/services/performance",
-    image: "/services/agency.jpg",
+    image: "/services/agency.png",
     // Fallback gradient if image missing — visually similar dark tone
     fallback: "linear-gradient(135deg, #1a2540 0%, #0f1729 100%)",
   },
@@ -20,7 +20,7 @@ const services = [
     title: "마케팅 컨설팅",
     desc: "퍼널 진단 + 실행 플랜 제공",
     href: "/services/branded",
-    image: "/services/consulting.jpg",
+    image: "/services/consulting.png",
     fallback: "linear-gradient(135deg, #2a1f4a 0%, #150c2a 100%)",
   },
 ];
