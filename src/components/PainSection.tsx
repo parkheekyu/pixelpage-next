@@ -22,10 +22,13 @@ const PainSection = () => (
   <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-16">
-        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.18] tracking-[-0.03em]">
-          대행사와 함께해도 매출이 늘지 않았다면<br />
-          고객 여정에 구멍이 있기 때문입니다.
+        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.18] tracking-[-0.03em] mb-6">
+          왜 매출이 늘지 않을까요?
         </h2>
+        <p className="text-[17px] md:text-[18px] text-muted-foreground leading-[1.85] max-w-[560px] mx-auto">
+          대행사와 함께했음에도 매출이 늘지 않았다면<br />
+          고객 여정에 구멍이 있기 때문입니다.
+        </p>
       </Reveal>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         {pains.map((p, i) => (
