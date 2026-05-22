@@ -18,21 +18,10 @@ const navItems: {
     label: "서비스",
     href: "/services/performance",
     dropdown: [
-      { title: "퍼포먼스 마케팅", sub: "Meta · Google · 토스 · 당근 · TikTok", href: "/services/performance" },
-      { title: "브랜디드 콘텐츠", sub: "브랜디드 유튜브 · 숏폼", href: "/services/branded" },
-      { title: "검색엔진 최적화", sub: "네이버 SEO · 구글 SEO", href: "/services/seo" },
-      { title: "CRM 마케팅", sub: "퍼널 자동화 · 리텐션", href: "/services/crm" },
-      { title: "웹 빌드", sub: "랜딩 · 브랜드 사이트", href: "/services/webbuild" },
+      { title: "마케팅 대행", sub: "광고·랜딩·CRM 풀패키지 운영", href: "/services/performance" },
+      { title: "마케팅 컨설팅", sub: "퍼널 진단 + 실행 플랜", href: "/services/branded" },
     ],
   },
-  {
-    label: "제품",
-    href: "/products/glue",
-    dropdown: [
-      { title: "글루", sub: "리드 수집 · 메시지 자동화 SaaS", href: "/products/glue", isNew: true },
-    ],
-  },
-  { label: "성과", href: "/cases" },
   { label: "칼럼", href: "/columns" },
   { label: "데모", href: "/demo" },
 ];
