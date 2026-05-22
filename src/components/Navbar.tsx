@@ -23,7 +23,6 @@ const navItems: {
     ],
   },
   { label: "칼럼", href: "/columns" },
-  { label: "데모", href: "/demo" },
 ];
 
 const Navbar = () => {
