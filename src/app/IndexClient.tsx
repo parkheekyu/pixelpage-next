@@ -22,7 +22,7 @@ const HeroSection = () => (
 
     <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-48">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] mb-7 opacity-0 animate-fade-up stagger-1 text-white">
-        마케팅 대행의<br />새로운 혁신
+        DB 마케팅의<br />새로운 혁신
       </h1>
       <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[520px] mx-auto mb-10 opacity-0 animate-fade-up stagger-2">
         광고만 맡기던 시대는 끝났습니다.<br />
