@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Reveal from "@/components/Reveal";
 
 const pains = [
@@ -26,10 +27,14 @@ const PainSection = () => (
           고객 여정에 구멍이 있기 때문입니다.
         </h2>
       </Reveal>
-      <Reveal className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        {pains.map((p) => (
-          <div
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+        {pains.map((p, i) => (
+          <motion.div
             key={p.tag}
+            initial={{ opacity: 0, y: 28 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.55, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="bg-[#fbfbfb] border border-[#e5e7eb] rounded-2xl p-9 lg:p-10"
           >
             <span className="inline-block text-[12px] font-semibold tracking-[0.08em] text-blue-500 bg-blue-50 px-3 py-1 rounded-full mb-6">
@@ -38,9 +43,9 @@ const PainSection = () => (
             <p className="text-[15px] lg:text-[16px] text-foreground/80 leading-[1.85]">
               {p.body}
             </p>
-          </div>
+          </motion.div>
         ))}
-      </Reveal>
+      </div>
     </div>
   </section>
 );

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Eye, BarChart3, Send, CheckCheck, MessageSquare, Users, MousePointerClick, ChevronsUpDown } from "lucide-react";
 import Reveal from "@/components/Reveal";
@@ -26,63 +26,84 @@ const MacWindow = ({ title, children }: { title: string; children: React.ReactNo
 /* ─────────────────────────────────────────────────────────────
    1. Performance Mockup — Meta 광고 관리자
 ───────────────────────────────────────────────────────────── */
-const PerformanceMockup = () => (
-  <MacWindow title="Meta 광고 관리자 — pixelpage">
-    <div className="text-[10px] lg:text-[11px] bg-white flex">
-      <div className="w-8 bg-white border-r border-neutral-200 flex-col items-center py-2 gap-3 flex-shrink-0 hidden lg:flex">
-        <img src={metaLogo.src} alt="Meta" className="w-5 h-5 object-contain mb-1" />
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="w-4 h-4 rounded bg-neutral-100" />
-        ))}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="px-3 py-2 border-b border-neutral-200 flex items-center gap-2">
-          <span className="text-neutral-900 font-semibold text-[12px]">캠페인</span>
-          <span className="text-neutral-400 text-[9px]">&#x2295; 픽셀페이지</span>
-          <span className="bg-[#e8f5e9] text-emerald-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 font-medium">85</span>
-          <span className="text-neutral-400 text-[9px]">광고 최적화 지수</span>
+const campaigns = [
+  { name: "260412_브랜드_전환 - B", on: true, results: "122", cost: "₩7,816", spent: "₩953,551", imp: "16,897" },
+  { name: "260412_브랜드_전환", on: true, results: "570", cost: "₩4,415", spent: "₩2,516,573", imp: "55,096" },
+  { name: "브랜드_인지도_참여", on: true, results: "15,805", cost: "₩93", spent: "₩1,470,022", imp: "288,562" },
+  { name: "260405_리타겟", on: false, results: "598", cost: "₩6,689", spent: "₩4,000,000", imp: "80,157" },
+  { name: "260329_부트캠프 - B", on: false, results: "162", cost: "₩6,638", spent: "₩1,075,355", imp: "21,004" },
+  { name: "260329_부트캠프", on: false, results: "432", cost: "₩6,694", spent: "₩2,891,714", imp: "47,465" },
+  { name: "260322_숏폼_바이럴", on: false, results: "669", cost: "₩6,856", spent: "₩4,586,756", imp: "99,086" },
+];
+
+const PerformanceMockup = () => {
+  const [hi, setHi] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setHi((p) => (p + 1) % campaigns.length), 2200);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <MacWindow title="Meta 광고 관리자 — pixelpage">
+      <div className="text-[10px] lg:text-[11px] bg-white flex">
+        <div className="w-8 bg-white border-r border-neutral-200 flex-col items-center py-2 gap-3 flex-shrink-0 hidden lg:flex">
+          <img src={metaLogo.src} alt="Meta" className="w-5 h-5 object-contain mb-1" />
+          {[...Array(5)].map((_, i) => (
+            <div key={i} className="w-4 h-4 rounded bg-neutral-100" />
+          ))}
         </div>
-        <div className="flex items-center gap-0 px-3 border-b border-neutral-200 text-[10px]">
-          <span className="text-[#1877f2] font-medium px-2 py-1.5 border-b-2 border-[#1877f2]">모든 광고</span>
-          <span className="text-neutral-500 px-2 py-1.5">게재 중</span>
-          <span className="text-neutral-500 px-2 py-1.5">작업</span>
-          <span className="text-neutral-400 px-2 py-1.5">+ 더 보기</span>
-        </div>
-        <div className="grid grid-cols-[18px_1fr_52px_60px_72px_56px] gap-px px-3 py-1.5 bg-[#f5f6f7] border-b border-neutral-200 text-neutral-500 text-[9px] font-medium">
-          <span></span>
-          <span>캠페인</span>
-          <span>결과</span>
-          <span>결과당 비용</span>
-          <span>지출 금액</span>
-          <span>노출</span>
-        </div>
-        {[
-          { name: "260412_브랜드_전환 - B", on: true, results: "122", cost: "₩7,816", spent: "₩953,551", imp: "16,897", checked: true },
-          { name: "260412_브랜드_전환", on: true, results: "570", cost: "₩4,415", spent: "₩2,516,573", imp: "55,096", checked: false },
-          { name: "브랜드_인지도_참여", on: true, results: "15,805", cost: "₩93", spent: "₩1,470,022", imp: "288,562", checked: false },
-          { name: "260405_리타겟", on: false, results: "598", cost: "₩6,689", spent: "₩4,000,000", imp: "80,157", checked: false },
-          { name: "260329_부트캠프 - B", on: false, results: "162", cost: "₩6,638", spent: "₩1,075,355", imp: "21,004", checked: false },
-          { name: "260329_부트캠프", on: false, results: "432", cost: "₩6,694", spent: "₩2,891,714", imp: "47,465", checked: false },
-          { name: "260322_숏폼_바이럴", on: false, results: "669", cost: "₩6,856", spent: "₩4,586,756", imp: "99,086", checked: false },
-        ].map((c) => (
-          <div key={c.name} className={`grid grid-cols-[18px_1fr_52px_60px_72px_56px] gap-px px-3 py-[6px] border-b border-neutral-100 text-neutral-700 ${c.checked ? "bg-[#e7f3ff]" : ""}`}>
-            <span className="flex items-center">
-              <div className={`w-[18px] h-[10px] rounded-full flex-shrink-0 ${c.on ? "bg-[#1877f2]" : "bg-neutral-800"}`}>
-                <div className={`w-[8px] h-[8px] rounded-full bg-white mt-[1px] transition-all ${c.on ? "ml-[9px]" : "ml-[1px]"}`} />
-              </div>
+        <div className="flex-1 min-w-0">
+          <div className="px-3 py-2 border-b border-neutral-200 flex items-center gap-2">
+            <span className="text-neutral-900 font-semibold text-[12px]">캠페인</span>
+            <span className="text-neutral-400 text-[9px]">&#x2295; 픽셀페이지</span>
+            <span className="bg-[#e8f5e9] text-emerald-700 text-[9px] px-1.5 py-0.5 rounded-full ml-1 font-medium">85</span>
+            <span className="text-neutral-400 text-[9px]">광고 최적화 지수</span>
+            <span className="ml-auto flex items-center gap-1 text-[9px] text-emerald-600">
+              <span className="relative flex w-1.5 h-1.5">
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
+                <span className="relative w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              </span>
+              실시간
             </span>
-            <span className="text-[#0064d1] truncate font-medium">{c.name}</span>
-            <span className="text-neutral-900">{c.results}</span>
-            <span>{c.cost}</span>
-            <span>{c.spent}</span>
-            <span>{c.imp}</span>
           </div>
-        ))}
-        <div className="px-3 py-1.5 text-neutral-400 text-[9px]">캠페인 281개 결과</div>
+          <div className="flex items-center gap-0 px-3 border-b border-neutral-200 text-[10px]">
+            <span className="text-[#1877f2] font-medium px-2 py-1.5 border-b-2 border-[#1877f2]">모든 광고</span>
+            <span className="text-neutral-500 px-2 py-1.5">게재 중</span>
+            <span className="text-neutral-500 px-2 py-1.5">작업</span>
+            <span className="text-neutral-400 px-2 py-1.5">+ 더 보기</span>
+          </div>
+          <div className="grid grid-cols-[18px_1fr_52px_60px_72px_56px] gap-px px-3 py-1.5 bg-[#f5f6f7] border-b border-neutral-200 text-neutral-500 text-[9px] font-medium">
+            <span></span>
+            <span>캠페인</span>
+            <span>결과</span>
+            <span>결과당 비용</span>
+            <span>지출 금액</span>
+            <span>노출</span>
+          </div>
+          {campaigns.map((c, i) => (
+            <motion.div
+              key={c.name}
+              animate={{ backgroundColor: hi === i ? "rgb(231, 243, 255)" : "rgb(255, 255, 255)" }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="grid grid-cols-[18px_1fr_52px_60px_72px_56px] gap-px px-3 py-[6px] border-b border-neutral-100 text-neutral-700"
+            >
+              <span className="flex items-center">
+                <div className={`w-[18px] h-[10px] rounded-full flex-shrink-0 ${c.on ? "bg-[#1877f2]" : "bg-neutral-800"}`}>
+                  <div className={`w-[8px] h-[8px] rounded-full bg-white mt-[1px] transition-all ${c.on ? "ml-[9px]" : "ml-[1px]"}`} />
+                </div>
+              </span>
+              <span className="text-[#0064d1] truncate font-medium">{c.name}</span>
+              <span className="text-neutral-900">{c.results}</span>
+              <span>{c.cost}</span>
+              <span>{c.spent}</span>
+              <span>{c.imp}</span>
+            </motion.div>
+          ))}
+          <div className="px-3 py-1.5 text-neutral-400 text-[9px]">캠페인 281개 결과</div>
+        </div>
       </div>
-    </div>
-  </MacWindow>
-);
+    </MacWindow>
+  );
+};
 
 /* ─────────────────────────────────────────────────────────────
    2. Landing Analytics Mockup — Clarity 스타일 분석 대시보드
@@ -118,8 +139,9 @@ const LandingAnalyticsMockup = () => (
             <span className="text-[9px] text-neutral-400">모든 사용자</span>
           </div>
           <div className="bg-[#f4f6fb] rounded p-2 mb-1.5 flex items-center gap-2">
-            <div className="w-6 h-6 rounded bg-emerald-100 flex items-center justify-center">
-              <span className="text-[9px] text-emerald-600">●</span>
+            <div className="w-6 h-6 rounded bg-emerald-100 flex items-center justify-center relative">
+              <span className="absolute w-2 h-2 rounded-full bg-emerald-500 animate-ping opacity-70" />
+              <span className="relative w-1.5 h-1.5 rounded-full bg-emerald-500" />
             </div>
             <div className="flex-1">
               <div className="text-[13px] font-bold text-[#1a1f36] leading-none">1</div>
@@ -135,9 +157,21 @@ const LandingAnalyticsMockup = () => (
               <div className="text-[9px] text-neutral-500">고유 사용자</div>
             </div>
           </div>
-          <div className="flex h-1.5 rounded-full overflow-hidden mb-2">
-            <div className="bg-[#e879f9]" style={{ width: "86.37%" }} />
-            <div className="bg-[#818cf8]" style={{ width: "13.63%" }} />
+          <div className="flex h-1.5 rounded-full overflow-hidden mb-2 bg-neutral-100">
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: "86.37%" }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 1.4, ease: "easeOut" }}
+              className="bg-[#e879f9]"
+            />
+            <motion.div
+              initial={{ width: 0 }}
+              whileInView={{ width: "13.63%" }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 1.4, ease: "easeOut", delay: 0.2 }}
+              className="bg-[#818cf8]"
+            />
           </div>
           <div className="space-y-1">
             <div className="flex items-center justify-between text-[9px] lg:text-[10px]">
@@ -190,59 +224,91 @@ const LandingAnalyticsMockup = () => (
 /* ─────────────────────────────────────────────────────────────
    3. CRM Mockup — 자동화 시퀀스
 ───────────────────────────────────────────────────────────── */
-const CrmMockup = () => (
-  <MacWindow title="crm-automation.pixelpage.io">
-    <div className="p-5 lg:p-6 text-[13px] bg-white">
-      <div className="grid grid-cols-4 gap-2.5 mb-4">
-        {[
-          { label: "활성 시퀀스", value: "4", icon: Send, color: "text-[#1877f2]" },
-          { label: "발송 완료", value: "12,840", icon: CheckCheck, color: "text-emerald-600" },
-          { label: "오픈율", value: "68.2%", icon: Eye, color: "text-amber-600" },
-          { label: "전환율", value: "4.8%", icon: BarChart3, color: "text-violet-600" },
-        ].map((m) => (
-          <div key={m.label} className="bg-[#f5f7fa] rounded-lg p-2.5 border border-neutral-100">
-            <div className="flex items-center gap-1 text-neutral-500 text-[10px] mb-0.5">
-              <m.icon className="w-3 h-3" />{m.label}
-            </div>
-            <div className={`font-semibold text-[16px] ${m.color}`}>{m.value}</div>
-          </div>
-        ))}
-      </div>
-      <div className="bg-[#f5f7fa] rounded-lg p-3.5 border border-neutral-100">
-        <div className="text-neutral-500 text-[10px] uppercase tracking-wider mb-2.5 font-medium">자동화 퍼널 · 온보딩</div>
-        <div className="space-y-0">
+const crmSteps = [
+  { step: "1", channel: "카카오", msg: "환영합니다! 무료 체험 안내", delay: "즉시", sent: "3,210", rate: "92%", chColor: "bg-[#fee500] text-neutral-800" },
+  { step: "2", channel: "이메일", msg: "다른 분들의 후기를 확인하세요", delay: "48시간 후", sent: "3,048", rate: "71%", chColor: "bg-blue-50 text-blue-700" },
+  { step: "3", channel: "문자", msg: "지금 등록하면 20% 할인", delay: "7일 후", sent: "2,890", rate: "58%", chColor: "bg-emerald-50 text-emerald-700" },
+  { step: "4", channel: "이메일", msg: "마지막 기회 — 내일 마감", delay: "14일 후", sent: "2,692", rate: "44%", chColor: "bg-blue-50 text-blue-700" },
+];
+
+const CrmMockup = () => {
+  const [activeStep, setActiveStep] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => setActiveStep((p) => (p + 1) % crmSteps.length), 2400);
+    return () => clearInterval(id);
+  }, []);
+  return (
+    <MacWindow title="crm-automation.pixelpage.io">
+      <div className="p-5 lg:p-6 text-[13px] bg-white">
+        <div className="grid grid-cols-4 gap-2.5 mb-4">
           {[
-            { step: "1", channel: "카카오", msg: "환영합니다! 무료 체험 안내", delay: "즉시", sent: "3,210", rate: "92%", chColor: "bg-[#fee500] text-neutral-800" },
-            { step: "2", channel: "이메일", msg: "다른 분들의 후기를 확인하세요", delay: "48시간 후", sent: "3,048", rate: "71%", chColor: "bg-blue-50 text-blue-700" },
-            { step: "3", channel: "문자", msg: "지금 등록하면 20% 할인", delay: "7일 후", sent: "2,890", rate: "58%", chColor: "bg-emerald-50 text-emerald-700" },
-            { step: "4", channel: "이메일", msg: "마지막 기회 — 내일 마감", delay: "14일 후", sent: "2,692", rate: "44%", chColor: "bg-blue-50 text-blue-700" },
-          ].map((s, i) => (
-            <div key={s.step} className="flex items-start gap-2.5 py-2.5 border-b border-neutral-100 last:border-0">
-              <div className="flex flex-col items-center">
-                <div className="w-6 h-6 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center text-[11px] font-bold">{s.step}</div>
-                {i < 3 && <div className="w-[1px] h-5 bg-neutral-200 mt-1" />}
+            { label: "활성 시퀀스", value: "4", icon: Send, color: "text-[#1877f2]" },
+            { label: "발송 완료", value: "12,840", icon: CheckCheck, color: "text-emerald-600" },
+            { label: "오픈율", value: "68.2%", icon: Eye, color: "text-amber-600" },
+            { label: "전환율", value: "4.8%", icon: BarChart3, color: "text-violet-600" },
+          ].map((m) => (
+            <div key={m.label} className="bg-[#f5f7fa] rounded-lg p-2.5 border border-neutral-100">
+              <div className="flex items-center gap-1 text-neutral-500 text-[10px] mb-0.5">
+                <m.icon className="w-3 h-3" />{m.label}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <span className={`text-[10px] ${s.chColor} px-2 py-0.5 rounded font-medium`}>{s.channel}</span>
-                  <span className="text-[10px] text-neutral-400">{s.delay}</span>
-                </div>
-                <div className="text-neutral-800 text-[12px] mt-1 flex items-center gap-1.5">
-                  <MessageSquare className="w-3 h-3 text-neutral-400 flex-shrink-0" />
-                  <span className="truncate">{s.msg}</span>
-                </div>
-              </div>
-              <div className="text-right text-[10px] flex-shrink-0">
-                <div className="text-neutral-500">{s.sent}</div>
-                <div className="text-emerald-600 font-medium">{s.rate}</div>
-              </div>
+              <div className={`font-semibold text-[16px] ${m.color}`}>{m.value}</div>
             </div>
           ))}
         </div>
+        <div className="bg-[#f5f7fa] rounded-lg p-3.5 border border-neutral-100">
+          <div className="flex items-center justify-between mb-2.5">
+            <div className="text-neutral-500 text-[10px] uppercase tracking-wider font-medium">자동화 퍼널 · 온보딩</div>
+            <span className="flex items-center gap-1 text-[10px] text-emerald-600">
+              <span className="relative flex w-1.5 h-1.5">
+                <span className="absolute inset-0 rounded-full bg-emerald-500 animate-ping opacity-75" />
+                <span className="relative w-1.5 h-1.5 rounded-full bg-emerald-500" />
+              </span>
+              발송 중
+            </span>
+          </div>
+          <div className="space-y-0">
+            {crmSteps.map((s, i) => {
+              const isActive = activeStep === i;
+              return (
+                <motion.div
+                  key={s.step}
+                  animate={{ backgroundColor: isActive ? "rgb(239, 246, 255)" : "rgba(255,255,255,0)" }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
+                  className="flex items-start gap-2.5 py-2.5 px-1.5 -mx-1.5 rounded border-b border-neutral-100 last:border-0"
+                >
+                  <div className="flex flex-col items-center">
+                    <motion.div
+                      animate={isActive ? { scale: [1, 1.12, 1] } : { scale: 1 }}
+                      transition={{ duration: 1.2, repeat: isActive ? Infinity : 0, ease: "easeInOut" }}
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold ${isActive ? "bg-[#1877f2] text-white shadow-[0_0_0_3px_rgba(24,119,242,0.18)]" : "bg-blue-500/10 text-blue-500"}`}
+                    >
+                      {s.step}
+                    </motion.div>
+                    {i < 3 && <div className="w-[1px] h-5 bg-neutral-200 mt-1" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`text-[10px] ${s.chColor} px-2 py-0.5 rounded font-medium`}>{s.channel}</span>
+                      <span className="text-[10px] text-neutral-400">{s.delay}</span>
+                    </div>
+                    <div className="text-neutral-800 text-[12px] mt-1 flex items-center gap-1.5">
+                      <MessageSquare className="w-3 h-3 text-neutral-400 flex-shrink-0" />
+                      <span className="truncate">{s.msg}</span>
+                    </div>
+                  </div>
+                  <div className="text-right text-[10px] flex-shrink-0">
+                    <div className="text-neutral-500">{s.sent}</div>
+                    <div className="text-emerald-600 font-medium">{s.rate}</div>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
       </div>
-    </div>
-  </MacWindow>
-);
+    </MacWindow>
+  );
+};
 
 /* ─────────────────────────────────────────────────────────────
    Service blocks data

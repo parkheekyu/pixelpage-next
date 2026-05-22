@@ -1,5 +1,6 @@
 "use client";
 
+import { motion } from "framer-motion";
 import Reveal from "@/components/Reveal";
 
 const stats = [
@@ -47,10 +48,14 @@ const PipelineCasesSection = () => (
           </h2>
         </Reveal>
 
-        <Reveal className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 mb-12 lg:mb-16">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-5 mb-12 lg:mb-16">
           {stats.map((s, i) => (
-            <div
+            <motion.div
               key={s.idx}
+              initial={{ opacity: 0, y: 32 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               className="rounded-xl border border-white/[0.07] overflow-hidden"
               style={{ background: cardGradients[i] }}
             >
@@ -66,9 +71,15 @@ const PipelineCasesSection = () => (
                 <span className="absolute top-4 left-5 text-[10px] font-semibold tracking-[0.2em] uppercase text-white/40">
                   Case {s.idx}
                 </span>
-                <p className="relative text-[clamp(32px,4vw,52px)] font-bold text-white tracking-[-0.035em] leading-none">
+                <motion.p
+                  initial={{ opacity: 0, scale: 0.85 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true, margin: "-80px" }}
+                  transition={{ duration: 0.7, delay: 0.3 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative text-[clamp(32px,4vw,52px)] font-bold text-white tracking-[-0.035em] leading-none"
+                >
                   {s.metric}
-                </p>
+                </motion.p>
               </div>
               {/* Bottom — label */}
               <div className="px-5 py-4 lg:px-6 lg:py-5 border-t border-white/[0.06]">
@@ -76,9 +87,9 @@ const PipelineCasesSection = () => (
                   {s.label}
                 </p>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </Reveal>
+        </div>
 
         <Reveal className="text-center">
           <p className="text-[16px] lg:text-[18px] text-white font-medium leading-[1.65]">

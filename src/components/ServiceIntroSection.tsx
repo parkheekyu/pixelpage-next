@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { motion } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import Reveal from "@/components/Reveal";
 
@@ -38,33 +39,46 @@ const ServiceIntroSection = () => (
         </p>
       </Reveal>
 
-      <Reveal className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_minmax(200px,240px)] gap-5 lg:gap-6 items-stretch">
-        {services.map((s) => (
-          <Link
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-[1fr_1fr_minmax(200px,240px)] gap-5 lg:gap-6 items-stretch">
+        {services.map((s, i) => (
+          <motion.div
             key={s.title}
-            href={s.href}
-            className="group relative overflow-hidden rounded-3xl aspect-[4/5] lg:aspect-auto lg:min-h-[560px] flex flex-col justify-between p-8 lg:p-9 transition-transform duration-300 hover:-translate-y-1"
-            style={{ background: s.bg }}
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.6, delay: i * 0.12, ease: [0.22, 1, 0.36, 1] }}
           >
-            <div className="absolute inset-0 pointer-events-none" style={{ background: s.pattern }} />
-            <div className="relative">
-              <span className="text-[12px] font-semibold tracking-[0.14em] uppercase text-white/85">
-                {s.label}
-              </span>
-            </div>
-            <div className="relative">
-              <h3 className="break-keep text-[clamp(22px,2.5vw,32px)] font-bold text-white leading-[1.25] tracking-[-0.02em] mb-2.5">
-                {s.title}
-              </h3>
-              <p className="text-[13px] lg:text-[14px] text-white/80 leading-[1.6]">
-                {s.desc}
-              </p>
-            </div>
-          </Link>
+            <Link
+              href={s.href}
+              className="group relative overflow-hidden rounded-3xl aspect-[4/5] lg:aspect-auto lg:min-h-[560px] flex flex-col justify-between p-8 lg:p-9 transition-transform duration-300 hover:-translate-y-1"
+              style={{ background: s.bg }}
+            >
+              <div className="absolute inset-0 pointer-events-none" style={{ background: s.pattern }} />
+              <div className="relative">
+                <span className="text-[12px] font-semibold tracking-[0.14em] uppercase text-white/85">
+                  {s.label}
+                </span>
+              </div>
+              <div className="relative">
+                <h3 className="break-keep text-[clamp(22px,2.5vw,32px)] font-bold text-white leading-[1.25] tracking-[-0.02em] mb-2.5">
+                  {s.title}
+                </h3>
+                <p className="text-[13px] lg:text-[14px] text-white/80 leading-[1.6]">
+                  {s.desc}
+                </p>
+              </div>
+            </Link>
+          </motion.div>
         ))}
 
         {/* CTA block */}
-        <div className="lg:min-h-[560px] flex flex-col justify-center items-start gap-6 px-2 lg:px-4 py-4">
+        <motion.div
+          initial={{ opacity: 0, y: 32 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+          className="lg:min-h-[560px] flex flex-col justify-center items-start gap-6 px-2 lg:px-4 py-4"
+        >
           <p className="break-keep text-[clamp(18px,1.8vw,22px)] font-bold text-foreground leading-[1.4] tracking-[-0.01em]">
             지금 바로<br />
             진단을 시작해 보세요!
@@ -76,8 +90,8 @@ const ServiceIntroSection = () => (
           >
             <ArrowRight className="w-4 h-4 lg:w-5 lg:h-5 text-white" />
           </Link>
-        </div>
-      </Reveal>
+        </motion.div>
+      </div>
     </div>
   </section>
 );
