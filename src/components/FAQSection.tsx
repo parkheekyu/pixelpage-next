@@ -38,7 +38,7 @@ const FAQSection = () => {
             자주 묻는 질문
           </p>
           <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.18] tracking-[-0.03em]">
-            궁금한 게 있으신가요.
+            궁금한 게 있으신가요?
           </h2>
         </Reveal>
         <Reveal className="space-y-3">
