@@ -51,7 +51,7 @@ const HeroSection = () => (
     <div className="absolute top-[25%] right-[12%] w-[420px] h-[420px] rounded-full bg-blue-500/[0.08] blur-[160px] pointer-events-none z-0" />
 
     <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12 h-full">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 h-full items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 h-full lg:grid-rows-1">
         {/* 좌측 — 텍스트 */}
         <div className="pt-24 lg:pt-28 pb-12 lg:pb-16 flex flex-col justify-center">
           <Link
@@ -81,9 +81,9 @@ const HeroSection = () => (
           </div>
         </div>
 
-        {/* 우측 — 영상 컬럼 마퀴 (lg 이상). grid stretch로 텍스트 컬럼 높이 따라옴 + mask-image로 상하 자연 페이드 */}
+        {/* 우측 — 영상 컬럼 마퀴 (lg 이상). grid row가 섹션 풀 높이 채움 + mask-image로 상하 자연 페이드 */}
         <div
-          className="hidden lg:block relative"
+          className="hidden lg:block relative overflow-hidden min-h-0"
           style={{
             WebkitMaskImage:
               "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
