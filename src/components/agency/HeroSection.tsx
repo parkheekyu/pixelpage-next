@@ -48,7 +48,23 @@ const HeroSection = () => (
     />
     <div className="absolute top-[25%] right-[12%] w-[420px] h-[420px] rounded-full bg-blue-500/[0.08] blur-[160px] pointer-events-none z-0" />
 
-    {/* 우측 영상 컬럼 — 절대 위치, 1.25배 키우고 우측으로 (lg 이상) */}
+    {/* 모바일 영상 — 섹션 풀 폭, 텍스트 뒤에 깔림 (lg 미만) */}
+    <div
+      className="lg:hidden absolute inset-0 z-[3] overflow-hidden px-4"
+      style={{
+        WebkitMaskImage:
+          "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+        maskImage:
+          "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
+      }}
+    >
+      <div className="flex gap-3 h-full">
+        <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
+        <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
+      </div>
+    </div>
+
+    {/* 데스크톱 영상 — 절대 위치, 1.25배 키우고 우측으로 (lg 이상) */}
     <div
       className="hidden lg:block absolute z-[5] overflow-hidden"
       style={{
@@ -69,12 +85,12 @@ const HeroSection = () => (
       </div>
     </div>
 
-    {/* 전체 다크 오버레이 — 영상·배경을 더 어둡게, 텍스트는 z-10이라 영향 X */}
-    <div className="absolute inset-0 z-[7] pointer-events-none bg-black/45" />
+    {/* 전체 다크 오버레이 — 모바일은 더 강하게(영상이 배경 역할) */}
+    <div className="absolute inset-0 z-[7] pointer-events-none bg-black/65 lg:bg-black/45" />
 
-    {/* 좌측 텍스트 — 좌측 영역 안에서 수평 중앙 + 수직 중앙 */}
+    {/* 텍스트 — 모바일 가운데 정렬, 데스크톱 좌측 영역 수평 중앙 */}
     <div className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 lg:pl-12 lg:pr-[760px]">
-      <div className="w-full max-w-[560px] pt-20 pb-12 lg:pt-0 lg:pb-0">
+      <div className="w-full max-w-[560px] pt-20 pb-12 lg:pt-0 lg:pb-0 text-center lg:text-left">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-10 opacity-0 animate-fade-up stagger-1"

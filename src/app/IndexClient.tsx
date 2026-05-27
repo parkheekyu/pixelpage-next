@@ -20,6 +20,9 @@ const HeroSection = () => (
       </video>
     </div>
 
+    {/* 다크 오버레이 — 모바일에서 영상 더 어둡게 */}
+    <div className="absolute inset-0 z-[5] pointer-events-none bg-black/55 md:bg-black/35" />
+
     <div className="relative z-10 text-center px-6 pt-24 pb-8 -mt-48">
       <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] mb-7 opacity-0 animate-fade-up stagger-1 text-white">
         DB 마케팅의<br />새로운 혁신
