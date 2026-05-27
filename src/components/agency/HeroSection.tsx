@@ -37,7 +37,7 @@ const ReelColumn = ({
 const HeroSection = () => (
   <section
     className="relative overflow-hidden"
-    style={{ height: "100vh", maxHeight: "880px", minHeight: "640px" }}
+    style={{ height: "720px" }}
   >
     {/* 다크 가로 그라데이션 배경 */}
     <div
