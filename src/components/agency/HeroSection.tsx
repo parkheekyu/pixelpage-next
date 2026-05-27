@@ -38,7 +38,7 @@ const ReelColumn = ({
 );
 
 const HeroSection = () => (
-  <section className="relative min-h-screen overflow-hidden pt-20 lg:pt-[88px]">
+  <section className="relative overflow-hidden pt-24 lg:pt-28 pb-12 lg:pb-16">
     {/* 다크 + 가로 그라데이션 (좌 어둡 → 우 밝게) */}
     <div
       className="absolute inset-0 z-0"
@@ -48,22 +48,22 @@ const HeroSection = () => (
       }}
     />
     {/* 우측 블루 글로우 */}
-    <div className="absolute top-[20%] right-[10%] w-[520px] h-[520px] rounded-full bg-blue-500/[0.10] blur-[160px] pointer-events-none z-0" />
+    <div className="absolute top-[20%] right-[10%] w-[480px] h-[480px] rounded-full bg-blue-500/[0.10] blur-[160px] pointer-events-none z-0" />
 
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12 min-h-[calc(100vh-88px)] flex items-stretch">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(440px,680px)] gap-12 lg:gap-16 w-full items-stretch">
-        {/* 좌측 — 텍스트 (수직 중앙) */}
-        <div className="flex flex-col justify-center py-10 lg:py-12">
+    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 items-center">
+        {/* 좌측 — 텍스트 */}
+        <div>
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-12 opacity-0 animate-fade-up stagger-1 w-fit"
+            className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-10 opacity-0 animate-fade-up stagger-1 w-fit"
           >
             <ArrowLeft className="w-3 h-3" /> 홈으로
           </Link>
-          <p className="text-[12px] font-semibold tracking-[0.2em] uppercase text-blue-400 mb-7 opacity-0 animate-fade-up stagger-1">
+          <p className="text-[12px] font-semibold tracking-[0.2em] uppercase text-blue-400 mb-6 opacity-0 animate-fade-up stagger-1">
             Marketing Agency
           </p>
-          <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2">
+          <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-6 opacity-0 animate-fade-up stagger-2">
             광고비는 줄이고<br />
             매출은 폭발시키세요
           </h1>
@@ -81,25 +81,26 @@ const HeroSection = () => (
           </div>
         </div>
 
-        {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만), 전체 높이 채움 */}
-        <div className="hidden md:block relative self-stretch min-h-[640px]">
-          <div className="grid grid-cols-2 gap-5 lg:gap-6 h-full">
-            <ReelColumn items={[reels[0], reels[2], reels[4], reels[7], reels[9]]} direction="up" />
-            <ReelColumn items={[reels[1], reels[3], reels[5], reels[6], reels[8]]} direction="down" />
+        {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만) */}
+        <div className="hidden md:block relative h-[520px] lg:h-[600px]">
+          <div className="grid grid-cols-3 gap-3 lg:gap-4 h-full">
+            <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
+            <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
+            <ReelColumn items={[reels[2], reels[9], reels[0], reels[3]]} direction="up" />
           </div>
-          {/* 상하 페이드 마스크 — 길고 부드럽게 (3-stop) */}
+          {/* 상하 페이드 마스크 — 부드럽게 (3-stop) */}
           <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-44 lg:h-60 z-10"
+            className="pointer-events-none absolute inset-x-0 top-0 h-28 lg:h-36 z-10"
             style={{
               background:
-                "linear-gradient(to bottom, rgba(10,15,30,1) 0%, rgba(10,15,30,0.75) 35%, rgba(10,15,30,0.4) 65%, rgba(10,15,30,0) 100%)",
+                "linear-gradient(to bottom, rgba(10,15,30,1) 0%, rgba(10,15,30,0.7) 40%, rgba(10,15,30,0.3) 70%, rgba(10,15,30,0) 100%)",
             }}
           />
           <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-44 lg:h-60 z-10"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 lg:h-36 z-10"
             style={{
               background:
-                "linear-gradient(to top, rgba(10,15,30,1) 0%, rgba(10,15,30,0.75) 35%, rgba(10,15,30,0.4) 65%, rgba(10,15,30,0) 100%)",
+                "linear-gradient(to top, rgba(10,15,30,1) 0%, rgba(10,15,30,0.7) 40%, rgba(10,15,30,0.3) 70%, rgba(10,15,30,0) 100%)",
             }}
           />
         </div>
