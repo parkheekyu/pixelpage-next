@@ -17,15 +17,17 @@ const ReelColumn = ({
     <div className={direction === "up" ? "animate-marquee-up" : "animate-marquee-down"}>
       {/* 두 번 반복해 seamless loop */}
       {[...items, ...items].map((src, i) => (
-        <div key={`${src}-${i}`} className="mb-3 lg:mb-4">
+        <div key={`${src}-${i}`} className="mb-3 lg:mb-4 relative rounded-xl overflow-hidden">
           <video
             src={src}
             autoPlay
             muted
             loop
             playsInline
-            className="w-full aspect-[9/16] object-cover rounded-xl bg-black"
+            className="w-full aspect-[9/16] object-cover bg-black"
           />
+          {/* 다크 그라데이션 오버레이 */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/35 via-black/15 to-black/55" />
         </div>
       ))}
     </div>
