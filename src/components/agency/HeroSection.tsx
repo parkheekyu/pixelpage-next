@@ -38,7 +38,7 @@ const ReelColumn = ({
 );
 
 const HeroSection = () => (
-  <section className="relative overflow-hidden pt-24 lg:pt-28 pb-12 lg:pb-16">
+  <section className="relative overflow-hidden min-h-[640px] lg:h-[760px]">
     {/* 다크 + 가로 그라데이션 (좌 어둡 → 우 살짝 밝게) */}
     <div
       className="absolute inset-0 z-0"
@@ -50,10 +50,10 @@ const HeroSection = () => (
     {/* 우측 블루 글로우 */}
     <div className="absolute top-[25%] right-[12%] w-[420px] h-[420px] rounded-full bg-blue-500/[0.08] blur-[160px] pointer-events-none z-0" />
 
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 items-center">
-        {/* 좌측 — 텍스트 */}
-        <div>
+    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12 lg:h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 lg:h-full lg:items-stretch">
+        {/* 좌측 — 텍스트 (자체 패딩으로 네비 클리어런스, 수직 중앙) */}
+        <div className="pt-24 pb-12 lg:pt-28 lg:pb-16 lg:flex lg:flex-col lg:justify-center">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-10 opacity-0 animate-fade-up stagger-1 w-fit"
@@ -81,15 +81,14 @@ const HeroSection = () => (
           </div>
         </div>
 
-        {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만)
-            mask-image로 상하가 배경에 자연 페이드 — 어떤 배경색이든 자연스럽게 사라짐 */}
+        {/* 우측 — 영상 컬럼 마퀴 (lg 이상). 섹션 풀 높이에 mask-image로 상하 자연 페이드 */}
         <div
-          className="hidden md:block relative h-[520px] lg:h-[600px]"
+          className="hidden lg:block relative lg:h-full"
           style={{
             WebkitMaskImage:
-              "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+              "linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)",
             maskImage:
-              "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+              "linear-gradient(to bottom, transparent 0%, black 14%, black 86%, transparent 100%)",
           }}
         >
           <div className="grid grid-cols-3 gap-3 lg:gap-4 h-full">
