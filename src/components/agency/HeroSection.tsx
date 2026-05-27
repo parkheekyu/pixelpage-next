@@ -69,6 +69,9 @@ const HeroSection = () => (
       </div>
     </div>
 
+    {/* 전체 다크 오버레이 — 영상·배경을 더 어둡게, 텍스트는 z-10이라 영향 X */}
+    <div className="absolute inset-0 z-[7] pointer-events-none bg-black/45" />
+
     {/* 좌측 텍스트 — 좌측 영역 안에서 수평 중앙 + 수직 중앙 */}
     <div className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 lg:pl-12 lg:pr-[760px]">
       <div className="w-full max-w-[560px] pt-20 pb-12 lg:pt-0 lg:pb-0">
