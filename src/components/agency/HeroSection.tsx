@@ -3,7 +3,10 @@
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
-const reels = ["/reels/1.mp4", "/reels/2.mp4", "/reels/3.mp4", "/reels/4.mp4", "/reels/5.mp4", "/reels/6.mp4", "/reels/7.mp4"];
+const reels = [
+  "/reels/1.mp4", "/reels/2.mp4", "/reels/3.mp4", "/reels/4.mp4", "/reels/5.mp4",
+  "/reels/6.mp4", "/reels/7.mp4", "/reels/8.mp4", "/reels/9.mp4", "/reels/10.mp4",
+];
 
 /* 한 컬럼에 비디오 쌓고 위/아래 무한 스크롤 */
 const ReelColumn = ({
@@ -81,9 +84,9 @@ const HeroSection = () => (
         {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만) */}
         <div className="hidden md:block h-[640px] lg:h-[720px] relative">
           <div className="grid grid-cols-3 gap-3 lg:gap-4 h-full">
-            <ReelColumn items={[reels[0], reels[1], reels[2], reels[3]]} direction="up" />
-            <ReelColumn items={[reels[4], reels[5], reels[6], reels[0]]} direction="down" />
-            <ReelColumn items={[reels[2], reels[3], reels[4], reels[5]]} direction="up" />
+            <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
+            <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
+            <ReelColumn items={[reels[2], reels[9], reels[0], reels[3]]} direction="up" />
           </div>
           {/* 상하 페이드 마스크 */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#0a0f1e] to-transparent" />
