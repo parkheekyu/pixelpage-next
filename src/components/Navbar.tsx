@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import logoWhite from "@/assets/logo-white.png";
 
-const darkHeroPages = ["/", "/consult", "/cases", "/products/glue", "/columns", "/services/performance", "/services/branded", "/services/crm", "/services/seo", "/services/webbuild"];
+const darkHeroPages = ["/", "/consult", "/cases", "/products/glue", "/columns", "/services/agency", "/services/performance", "/services/branded", "/services/crm", "/services/seo", "/services/webbuild"];
 
 const navItems: {
   label: string;
@@ -16,9 +16,9 @@ const navItems: {
 }[] = [
   {
     label: "서비스",
-    href: "/services/performance",
+    href: "/services/agency",
     dropdown: [
-      { title: "마케팅 대행", sub: "광고·랜딩·CRM 풀패키지 운영", href: "/services/performance" },
+      { title: "마케팅 대행", sub: "광고·랜딩·CRM 풀패키지 운영", href: "/services/agency" },
       { title: "마케팅 컨설팅", sub: "퍼널 진단 + 실행 플랜", href: "/services/branded" },
     ],
   },

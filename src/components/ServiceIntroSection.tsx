@@ -10,7 +10,7 @@ const services = [
     label: "Agency",
     title: "마케팅 대행",
     desc: "광고·랜딩·CRM 풀패키지 운영",
-    href: "/services/performance",
+    href: "/services/agency",
     image: "/services/agency.png",
     // Fallback gradient if image missing — visually similar dark tone
     fallback: "linear-gradient(135deg, #1a2540 0%, #0f1729 100%)",
