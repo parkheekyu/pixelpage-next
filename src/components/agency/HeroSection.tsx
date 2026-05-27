@@ -38,7 +38,7 @@ const ReelColumn = ({
 );
 
 const HeroSection = () => (
-  <section className="relative min-h-screen overflow-hidden">
+  <section className="relative overflow-hidden h-[700px] lg:h-[800px]">
     {/* 다크 + 가로 그라데이션 (좌 어둡 → 우 살짝 밝게) */}
     <div
       className="absolute inset-0 z-0"
@@ -50,10 +50,10 @@ const HeroSection = () => (
     {/* 우측 블루 글로우 */}
     <div className="absolute top-[25%] right-[12%] w-[420px] h-[420px] rounded-full bg-blue-500/[0.08] blur-[160px] pointer-events-none z-0" />
 
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12 min-h-screen flex items-stretch">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 w-full items-stretch">
-        {/* 좌측 — 텍스트 (메인 hero와 동일한 pt-32 pb-20) */}
-        <div className="pt-32 pb-20 flex flex-col justify-center">
+    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12 h-full">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 h-full items-stretch">
+        {/* 좌측 — 텍스트 */}
+        <div className="pt-24 lg:pt-28 pb-12 lg:pb-16 flex flex-col justify-center">
           <Link
             href="/"
             className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-10 opacity-0 animate-fade-up stagger-1 w-fit"
