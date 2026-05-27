@@ -16,7 +16,7 @@ const ReelColumn = ({
   items: string[];
   direction: "up" | "down";
 }) => (
-  <div className="relative h-full overflow-hidden">
+  <div className="relative overflow-hidden flex-1 min-h-0">
     <div className={direction === "up" ? "animate-marquee-up" : "animate-marquee-down"}>
       {/* 두 번 반복해 seamless loop */}
       {[...items, ...items].map((src, i) => (
@@ -91,7 +91,7 @@ const HeroSection = () => (
               "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
           }}
         >
-          <div className="grid grid-cols-3 gap-3 lg:gap-4 h-full">
+          <div className="flex gap-3 lg:gap-4 h-full">
             <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
             <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
             <ReelColumn items={[reels[2], reels[9], reels[0], reels[3]]} direction="up" />
