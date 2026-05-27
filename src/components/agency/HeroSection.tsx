@@ -39,16 +39,16 @@ const ReelColumn = ({
 
 const HeroSection = () => (
   <section className="relative overflow-hidden pt-24 lg:pt-28 pb-12 lg:pb-16">
-    {/* 다크 + 가로 그라데이션 (좌 어둡 → 우 밝게) */}
+    {/* 다크 + 가로 그라데이션 (좌 어둡 → 우 살짝 밝게) */}
     <div
       className="absolute inset-0 z-0"
       style={{
         background:
-          "linear-gradient(105deg, #05070d 0%, #0a0f1e 35%, #131b34 60%, #1d2a55 85%, #2c3d7a 100%)",
+          "linear-gradient(105deg, #05070d 0%, #0a0f1e 40%, #101830 70%, #182245 100%)",
       }}
     />
     {/* 우측 블루 글로우 */}
-    <div className="absolute top-[20%] right-[10%] w-[480px] h-[480px] rounded-full bg-blue-500/[0.10] blur-[160px] pointer-events-none z-0" />
+    <div className="absolute top-[25%] right-[12%] w-[420px] h-[420px] rounded-full bg-blue-500/[0.08] blur-[160px] pointer-events-none z-0" />
 
     <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 items-center">
@@ -81,28 +81,22 @@ const HeroSection = () => (
           </div>
         </div>
 
-        {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만) */}
-        <div className="hidden md:block relative h-[520px] lg:h-[600px]">
+        {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만)
+            mask-image로 상하가 배경에 자연 페이드 — 어떤 배경색이든 자연스럽게 사라짐 */}
+        <div
+          className="hidden md:block relative h-[520px] lg:h-[600px]"
+          style={{
+            WebkitMaskImage:
+              "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to bottom, transparent 0%, black 18%, black 82%, transparent 100%)",
+          }}
+        >
           <div className="grid grid-cols-3 gap-3 lg:gap-4 h-full">
             <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
             <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
             <ReelColumn items={[reels[2], reels[9], reels[0], reels[3]]} direction="up" />
           </div>
-          {/* 상하 페이드 마스크 — 부드럽게 (3-stop) */}
-          <div
-            className="pointer-events-none absolute inset-x-0 top-0 h-28 lg:h-36 z-10"
-            style={{
-              background:
-                "linear-gradient(to bottom, rgba(10,15,30,1) 0%, rgba(10,15,30,0.7) 40%, rgba(10,15,30,0.3) 70%, rgba(10,15,30,0) 100%)",
-            }}
-          />
-          <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-28 lg:h-36 z-10"
-            style={{
-              background:
-                "linear-gradient(to top, rgba(10,15,30,1) 0%, rgba(10,15,30,0.7) 40%, rgba(10,15,30,0.3) 70%, rgba(10,15,30,0) 100%)",
-            }}
-          />
         </div>
       </div>
     </div>
