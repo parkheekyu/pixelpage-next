@@ -38,7 +38,7 @@ const ReelColumn = ({
 );
 
 const HeroSection = () => (
-  <section className="relative min-h-screen overflow-hidden">
+  <section className="relative overflow-hidden">
     {/* 다크 + 가로 그라데이션 (좌 어둡 → 우 살짝 밝게) */}
     <div
       className="absolute inset-0 z-0"
@@ -50,9 +50,9 @@ const HeroSection = () => (
     {/* 우측 블루 글로우 */}
     <div className="absolute top-[25%] right-[12%] w-[420px] h-[420px] rounded-full bg-blue-500/[0.08] blur-[160px] pointer-events-none z-0" />
 
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12 min-h-screen">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 min-h-screen lg:items-stretch">
-        {/* 좌측 — 텍스트 (메인 hero와 동일한 pt-32 pb-20 + 수직 중앙) */}
+    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(400px,560px)] gap-12 lg:gap-16 items-stretch">
+        {/* 좌측 — 텍스트 (메인 hero와 동일한 pt-32 pb-20) */}
         <div className="pt-32 pb-20 flex flex-col justify-center">
           <Link
             href="/"
@@ -81,7 +81,7 @@ const HeroSection = () => (
           </div>
         </div>
 
-        {/* 우측 — 영상 컬럼 마퀴 (lg 이상). 섹션 풀 높이에 mask-image로 상하 자연 페이드 */}
+        {/* 우측 — 영상 컬럼 마퀴 (lg 이상). grid stretch로 텍스트 컬럼 높이 따라옴 + mask-image로 상하 자연 페이드 */}
         <div
           className="hidden lg:block relative"
           style={{
