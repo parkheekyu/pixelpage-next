@@ -20,17 +20,17 @@ const ReelColumn = ({
     <div className={direction === "up" ? "animate-marquee-up" : "animate-marquee-down"}>
       {/* 두 번 반복해 seamless loop */}
       {[...items, ...items].map((src, i) => (
-        <div key={`${src}-${i}`} className="mb-3 lg:mb-4 relative rounded-xl overflow-hidden">
+        <div key={`${src}-${i}`} className="mb-4 lg:mb-5 relative rounded-2xl overflow-hidden">
           <video
             src={src}
             autoPlay
             muted
             loop
             playsInline
-            className="w-full aspect-[9/16] object-cover bg-black"
+            className="w-full aspect-[2/3] object-cover bg-black"
           />
-          {/* 다크 그라데이션 오버레이 */}
-          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/35 via-black/15 to-black/55" />
+          {/* 다크 그라데이션 오버레이 — 부드럽게 */}
+          <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/15 via-transparent to-black/35" />
         </div>
       ))}
     </div>
@@ -83,14 +83,25 @@ const HeroSection = () => (
 
         {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만), 전체 높이 채움 */}
         <div className="hidden md:block relative self-stretch min-h-[640px]">
-          <div className="grid grid-cols-3 gap-4 lg:gap-5 h-full">
-            <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
-            <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
-            <ReelColumn items={[reels[2], reels[9], reels[0], reels[3]]} direction="up" />
+          <div className="grid grid-cols-2 gap-5 lg:gap-6 h-full">
+            <ReelColumn items={[reels[0], reels[2], reels[4], reels[7], reels[9]]} direction="up" />
+            <ReelColumn items={[reels[1], reels[3], reels[5], reels[6], reels[8]]} direction="down" />
           </div>
-          {/* 상하 페이드 마스크 */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#0a0f1e] to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0a0f1e] to-transparent" />
+          {/* 상하 페이드 마스크 — 길고 부드럽게 (3-stop) */}
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-44 lg:h-60 z-10"
+            style={{
+              background:
+                "linear-gradient(to bottom, rgba(10,15,30,1) 0%, rgba(10,15,30,0.75) 35%, rgba(10,15,30,0.4) 65%, rgba(10,15,30,0) 100%)",
+            }}
+          />
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-44 lg:h-60 z-10"
+            style={{
+              background:
+                "linear-gradient(to top, rgba(10,15,30,1) 0%, rgba(10,15,30,0.75) 35%, rgba(10,15,30,0.4) 65%, rgba(10,15,30,0) 100%)",
+            }}
+          />
         </div>
       </div>
     </div>
