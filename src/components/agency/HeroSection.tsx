@@ -48,30 +48,30 @@ const HeroSection = () => (
     />
     <div className="absolute top-[25%] right-[12%] w-[420px] h-[420px] rounded-full bg-blue-500/[0.08] blur-[160px] pointer-events-none z-0" />
 
-    {/* 우측 영상 컬럼 — 절대 위치, 섹션 풀 높이 (lg 이상) */}
+    {/* 우측 영상 컬럼 — 절대 위치, 1.25배 키우고 우측으로 (lg 이상) */}
     <div
       className="hidden lg:block absolute z-[5] overflow-hidden"
       style={{
         top: 0,
         bottom: 0,
-        right: "max(48px, calc((100vw - 1192px) / 2 + 48px))",
-        width: "560px",
+        right: "24px",
+        width: "700px",
         WebkitMaskImage:
           "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
         maskImage:
           "linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%)",
       }}
     >
-      <div className="flex gap-3 lg:gap-4 h-full">
+      <div className="flex gap-4 lg:gap-5 h-full">
         <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
         <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
         <ReelColumn items={[reels[2], reels[9], reels[0], reels[3]]} direction="up" />
       </div>
     </div>
 
-    {/* 좌측 텍스트 — 일반 흐름, 수직 중앙 */}
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full h-full px-6 lg:px-12 flex items-center">
-      <div className="lg:max-w-[560px] pt-20 pb-12 lg:pt-0 lg:pb-0">
+    {/* 좌측 텍스트 — 좌측 영역 안에서 수평 중앙 + 수직 중앙 */}
+    <div className="relative z-10 w-full min-h-screen flex items-center justify-center px-6 lg:pl-12 lg:pr-[760px]">
+      <div className="w-full max-w-[560px] pt-20 pb-12 lg:pt-0 lg:pb-0">
         <Link
           href="/"
           className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-10 opacity-0 animate-fade-up stagger-1"
