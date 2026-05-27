@@ -38,7 +38,7 @@ const ReelColumn = ({
 );
 
 const HeroSection = () => (
-  <section className="relative min-h-screen flex items-center pt-32 pb-20 overflow-hidden">
+  <section className="relative min-h-screen overflow-hidden pt-20 lg:pt-[88px]">
     {/* 다크 + 가로 그라데이션 (좌 어둡 → 우 밝게) */}
     <div
       className="absolute inset-0 z-0"
@@ -48,15 +48,15 @@ const HeroSection = () => (
       }}
     />
     {/* 우측 블루 글로우 */}
-    <div className="absolute top-[20%] right-[10%] w-[480px] h-[480px] rounded-full bg-blue-500/[0.10] blur-[160px] pointer-events-none z-0" />
+    <div className="absolute top-[20%] right-[10%] w-[520px] h-[520px] rounded-full bg-blue-500/[0.10] blur-[160px] pointer-events-none z-0" />
 
-    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(360px,540px)] gap-12 lg:gap-20 items-center">
-        {/* 좌측 — 텍스트 */}
-        <div>
+    <div className="relative z-10 max-w-[1240px] mx-auto w-full px-6 lg:px-12 min-h-[calc(100vh-88px)] flex items-stretch">
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_minmax(440px,680px)] gap-12 lg:gap-16 w-full items-stretch">
+        {/* 좌측 — 텍스트 (수직 중앙) */}
+        <div className="flex flex-col justify-center py-10 lg:py-12">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-12 opacity-0 animate-fade-up stagger-1"
+            className="inline-flex items-center gap-1.5 text-[12px] text-white/35 hover:text-blue-400 transition-colors mb-12 opacity-0 animate-fade-up stagger-1 w-fit"
           >
             <ArrowLeft className="w-3 h-3" /> 홈으로
           </Link>
@@ -81,16 +81,16 @@ const HeroSection = () => (
           </div>
         </div>
 
-        {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만) */}
-        <div className="hidden md:block h-[640px] lg:h-[720px] relative">
-          <div className="grid grid-cols-3 gap-3 lg:gap-4 h-full">
+        {/* 우측 — 영상 컬럼 마퀴 (md 이상에서만), 전체 높이 채움 */}
+        <div className="hidden md:block relative self-stretch min-h-[640px]">
+          <div className="grid grid-cols-3 gap-4 lg:gap-5 h-full">
             <ReelColumn items={[reels[0], reels[3], reels[7], reels[5]]} direction="up" />
             <ReelColumn items={[reels[1], reels[4], reels[8], reels[6]]} direction="down" />
             <ReelColumn items={[reels[2], reels[9], reels[0], reels[3]]} direction="up" />
           </div>
           {/* 상하 페이드 마스크 */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[#0a0f1e] to-transparent" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#0a0f1e] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-28 bg-gradient-to-b from-[#0a0f1e] to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#0a0f1e] to-transparent" />
         </div>
       </div>
     </div>
