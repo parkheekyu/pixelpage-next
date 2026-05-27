@@ -53,7 +53,7 @@ const ComparisonSection = () => (
                 <div className="w-6 h-6 lg:w-7 lg:h-7 rounded-full bg-neutral-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <X className="w-3.5 h-3.5 text-neutral-400" strokeWidth={2.5} />
                 </div>
-                <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.7]">
+                <p className="text-[15px] lg:text-[16px] text-muted-foreground leading-[1.7]">
                   {r.ord}
                 </p>
               </div>
@@ -61,7 +61,7 @@ const ComparisonSection = () => (
                 <div className="w-6 h-6 lg:w-7 lg:h-7 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Check className="w-3.5 h-3.5 text-blue-500" strokeWidth={2.5} />
                 </div>
-                <p className="text-[14px] lg:text-[15px] font-semibold text-foreground leading-[1.7]">
+                <p className="text-[15px] lg:text-[16px] font-semibold text-foreground leading-[1.7]">
                   {r.pp}
                 </p>
               </div>

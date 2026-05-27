@@ -68,7 +68,7 @@ const ProcessSection = () => (
               <h3 className="text-[17px] lg:text-[18px] font-bold text-foreground leading-[1.35] mb-3 px-2">
                 {s.title}
               </h3>
-              <p className="text-[13px] lg:text-[14px] text-muted-foreground leading-[1.8] px-2">
+              <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.8] px-2">
                 {s.body}
               </p>
             </motion.div>
@@ -102,7 +102,7 @@ const ProcessSection = () => (
                 <h3 className="text-[17px] font-bold text-foreground leading-[1.35] mb-2">
                   {s.title}
                 </h3>
-                <p className="text-[14px] text-muted-foreground leading-[1.8]">{s.body}</p>
+                <p className="text-[15px] text-muted-foreground leading-[1.8]">{s.body}</p>
               </div>
             </motion.div>
           ))}

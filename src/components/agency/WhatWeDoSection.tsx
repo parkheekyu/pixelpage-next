@@ -198,10 +198,10 @@ const ServiceTextBlock = ({
     <ul className="space-y-4">
       {s.items.map((it) => (
         <li key={it.head}>
-          <p className="text-[14px] lg:text-[15px] font-bold text-foreground leading-[1.5] mb-1">
+          <p className="text-[15px] lg:text-[16px] font-bold text-foreground leading-[1.5] mb-1">
             • {it.head}
           </p>
-          <p className="text-[13px] lg:text-[14px] text-muted-foreground leading-[1.75] pl-3">
+          <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.8] pl-3">
             {it.body}
           </p>
         </li>

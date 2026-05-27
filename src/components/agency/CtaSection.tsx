@@ -18,10 +18,10 @@ const CtaSection = () => (
     <div className="relative z-10 py-28 lg:py-40">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12 text-center">
         <Reveal>
-          <h2 className="break-keep text-[clamp(34px,5vw,64px)] font-bold text-white leading-[1.18] tracking-[-0.03em] mb-7">
+          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-white leading-[1.12] tracking-[-0.03em] mb-5">
             지금 광고 계정,<br />무료로 진단해드립니다.
           </h2>
-          <p className="text-[16px] lg:text-[19px] text-white/65 leading-[1.85] max-w-[600px] mx-auto mb-10">
+          <p className="text-[19px] text-white/65 leading-[1.9] max-w-[560px] mx-auto mb-10">
             어디서 예산이 새고 있는지, 퍼널 어디가 끊겼는지 — 30분 안에 짚어드려요.<br />
             계약 없이도 괜찮아요.
           </p>

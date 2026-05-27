@@ -60,14 +60,14 @@ const HeroSection = () => (
           >
             <ArrowLeft className="w-3 h-3" /> 홈으로
           </Link>
-          <p className="text-[12px] font-semibold tracking-[0.2em] uppercase text-blue-400 mb-6 opacity-0 animate-fade-up stagger-1">
+          <p className="text-[12px] font-semibold tracking-[0.18em] uppercase text-blue-400 mb-6 opacity-0 animate-fade-up stagger-1">
             Marketing Agency
           </p>
-          <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-6 opacity-0 animate-fade-up stagger-2">
+          <h1 className="break-keep text-[clamp(36px,6vw,72px)] font-bold leading-[1.12] tracking-[-0.03em] text-white mb-7 opacity-0 animate-fade-up stagger-2">
             광고비는 줄이고<br />
             매출은 폭발시키세요
           </h1>
-          <p className="text-[16px] md:text-[18px] text-white/55 leading-[1.85] max-w-[460px] mb-10 opacity-0 animate-fade-up stagger-3">
+          <p className="text-[16px] md:text-[18px] text-white/50 leading-[1.85] max-w-[520px] mb-10 opacity-0 animate-fade-up stagger-3">
             감이 아니라 숫자로 판단합니다.<br />
             광고비 어디서 새는지, 데이터로 바로 보여드려요.
           </p>
