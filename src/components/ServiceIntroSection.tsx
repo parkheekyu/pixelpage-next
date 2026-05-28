@@ -19,7 +19,7 @@ const services = [
     label: "Consulting",
     title: "마케팅 컨설팅",
     desc: "퍼널 진단 + 실행 플랜 제공",
-    href: "/services/branded",
+    href: "/services/consulting",
     image: "/services/consulting.png",
     fallback: "linear-gradient(135deg, #2a1f4a 0%, #150c2a 100%)",
   },
