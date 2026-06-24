@@ -40,10 +40,6 @@ const HeroSection = () => (
         </Link>
       </div>
     </div>
-
-    <div className="absolute bottom-8 left-0 right-0 z-10 flex justify-center">
-      <img src="/meta-partner-badge.png" alt="Meta Business Partners" className="h-8" />
-    </div>
   </section>
 );
 

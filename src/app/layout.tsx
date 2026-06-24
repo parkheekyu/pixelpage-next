@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Noto_Serif_KR, Noto_Sans_KR, Cormorant_Garamond, Playfair_Display } from "next/font/google";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+import FooterGate from "@/components/FooterGate";
 import "./globals.css";
 
 const notoSerifKr = Noto_Serif_KR({
@@ -35,23 +35,23 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "픽셀페이지 — 무형의 가치를 파는 브랜드 전담 에이전시",
-  description: "교육·지식·경험·문화 — 만질 수 없는 가치를 파는 브랜드의 전담 마케팅 파트너. 퍼포먼스 광고, 브랜디드 콘텐츠, SEO, CRM 자동화, 웹 빌드까지.",
+  title: "픽셀페이지 — AI 시대 한 걸음 앞서가세요",
+  description: "AI 시대, 한 걸음 앞서가는 브랜드를 위한 전담 마케팅 파트너. 퍼포먼스 광고, 브랜디드 콘텐츠, SEO, CRM 자동화, 웹 빌드까지.",
   authors: [{ name: "픽셀페이지" }],
   keywords: "픽셀페이지, 퍼포먼스마케팅, 교육마케팅, 코칭마케팅, 무형서비스마케팅, 메타광고, 구글광고, 브랜디드콘텐츠, CRM자동화, SEO, 학원마케팅, 온라인교육광고, 글루, CRM SaaS",
   openGraph: {
     type: "website",
     url: "https://pixelpage.co.kr/",
     siteName: "픽셀페이지",
-    title: "픽셀페이지 — 무형의 가치를 파는 브랜드 전담 에이전시",
-    description: "교육·지식·경험·문화 — 만질 수 없는 가치를 파는 브랜드의 전담 마케팅 파트너. 퍼포먼스 광고, 브랜디드 콘텐츠, SEO, CRM 자동화, 웹 빌드까지.",
+    title: "픽셀페이지 — AI 시대 한 걸음 앞서가세요",
+    description: "AI 시대, 한 걸음 앞서가는 브랜드를 위한 전담 마케팅 파트너. 퍼포먼스 광고, 브랜디드 콘텐츠, SEO, CRM 자동화, 웹 빌드까지.",
     images: "https://pixelpage.co.kr/og-image.png",
     locale: "ko_KR",
   },
   twitter: {
     card: "summary_large_image",
-    title: "픽셀페이지 — 무형의 가치를 파는 브랜드 전담 에이전시",
-    description: "교육·지식·경험·문화 — 만질 수 없는 가치를 파는 브랜드의 전담 마케팅 파트너.",
+    title: "픽셀페이지 — AI 시대 한 걸음 앞서가세요",
+    description: "AI 시대, 한 걸음 앞서가는 브랜드를 위한 전담 마케팅 파트너.",
     images: "https://pixelpage.co.kr/og-image.png",
   },
   verification: {
@@ -84,7 +84,7 @@ export default function RootLayout({
       <body className="font-sans" style={{ fontFamily: "'Pretendard', var(--font-noto-sans-kr), -apple-system, BlinkMacSystemFont, sans-serif" }}>
         <Navbar />
         <main>{children}</main>
-        <Footer />
+        <FooterGate />
       </body>
     </html>
   );
