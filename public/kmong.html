@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=860">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>픽셀페이지 · 마케팅 대행 서비스</title>
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css" />
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  html, body {
+    font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+    color: #0a0f1e;
+    background: #ffffff;
+    letter-spacing: -0.02em;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  .stage { width: 860px; margin: 0 auto; background: #fff; }
+
+  /* ─── Hero (모바일 스타일, CTA 없음) ─── */
+  .hero {
+    position: relative;
+    height: 720px;
+    overflow: hidden;
+    background: linear-gradient(180deg, #05070d 0%, #0a0f1e 40%, #101830 70%, #182245 100%);
+  }
+  .hero-glow {
+    position: absolute;
+    top: 20%; right: 10%;
+    width: 340px; height: 340px;
+    border-radius: 999px;
+    background: rgba(59,130,246,0.12);
+    filter: blur(120px);
+    z-index: 0;
+    pointer-events: none;
+  }
+  .hero-reels {
+    position: absolute; inset: 0;
+    padding: 0 24px;
+    display: flex; gap: 14px;
+    z-index: 3;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, black 12%, black 88%, transparent 100%);
+    overflow: hidden;
+  }
+  .hero-reel-col {
+    flex: 1;
+    display: flex; flex-direction: column;
+    gap: 14px;
+  }
+  .hero-reel-col.up { animation: marqueeUp 40s linear infinite; }
+  .hero-reel-col.down { animation: marqueeDown 40s linear infinite; }
+  .hero-reel-item {
+    aspect-ratio: 2/3;
+    border-radius: 18px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;
+  }
+  .hero-reel-item img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .hero-reel-item::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0.15) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.35) 100%);
+  }
+  @keyframes marqueeUp {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+  }
+  @keyframes marqueeDown {
+    0% { transform: translateY(-50%); }
+    100% { transform: translateY(0); }
+  }
+  .hero-overlay {
+    position: absolute; inset: 0;
+    background: rgba(0,0,0,0.65);
+    z-index: 5;
+    pointer-events: none;
+  }
+  .hero-content {
+    position: relative;
+    z-index: 10;
+    height: 100%;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center;
+    padding: 0 40px;
+  }
+  .hero-eyebrow {
+    font-size: 14px; font-weight: 700;
+    letter-spacing: 0.24em;
+    color: #60a5fa;
+    text-transform: uppercase;
+    margin-bottom: 22px;
+  }
+  .hero-title {
+    font-size: 56px; font-weight: 800;
+    line-height: 1.15; letter-spacing: -0.035em;
+    color: #fff; margin-bottom: 26px;
+    word-break: keep-all;
+  }
+  .hero-sub {
+    font-size: 19px; line-height: 1.85;
+    color: rgba(255,255,255,0.6);
+    word-break: keep-all;
+  }
+
+  .section { padding: 100px 72px; position: relative; word-break: keep-all; }
+  .section-tint { background: #f6f8fb; }
+  .section-dark { background: #0f1729; color: #fff; }
+  .section-dark .eyebrow-blue { color: #93c5fd; }
+  .section-dark h2.title { color: #fff; }
+  .section-dark .lead { color: rgba(255,255,255,0.65); }
+  .center { text-align: center; }
+
+  .eyebrow-blue {
+    font-size: 15px; font-weight: 700;
+    color: #2563eb; letter-spacing: 0.02em;
+    margin-bottom: 18px;
+  }
+  h2.title {
+    font-size: 40px; font-weight: 800; line-height: 1.28;
+    letter-spacing: -0.035em; margin-bottom: 24px;
+  }
+  .lead {
+    font-size: 19px; line-height: 1.85; color: #4b5563;
+    max-width: 640px; margin: 0 auto;
+  }
+
+  /* ─── Pain (agency style) ─── */
+  .pain-list { max-width: 720px; margin: 60px auto 0; display: flex; flex-direction: column; gap: 26px; }
+  .pain-row { display: flex; align-items: center; gap: 22px; }
+  .pain-row.right { flex-direction: row-reverse; }
+  .pain-emoji {
+    flex-shrink: 0; width: 108px; height: 108px;
+    border-radius: 999px; background: #fff;
+    border: 1px solid #e5e7eb;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 4px 12px -6px rgba(15,23,41,0.08);
+    overflow: hidden;
+  }
+  .pain-emoji img {
+    width: 62px; height: 62px; object-fit: contain;
+  }
+  .pain-card {
+    flex: 1; background: #fff;
+    border: 1px solid #e5e7eb; border-radius: 20px;
+    padding: 24px 28px;
+    box-shadow: 0 4px 12px -6px rgba(15,23,41,0.06);
+  }
+  .pain-tag {
+    display: inline-block; font-size: 12px; font-weight: 700;
+    color: #2563eb; background: #dbeafe;
+    padding: 5px 12px; border-radius: 999px;
+    margin-bottom: 12px;
+  }
+  .pain-bold {
+    font-size: 22px; font-weight: 700;
+    color: #0a0f1e; line-height: 1.45;
+    margin-bottom: 10px;
+    letter-spacing: -0.02em;
+  }
+  .pain-body {
+    font-size: 17px; color: #6b7280;
+    line-height: 1.8;
+  }
+
+  /* ─── Comparison ─── */
+  .compare-box {
+    max-width: 720px; margin: 60px auto 0;
+    border: 1px solid #e5e7eb; border-radius: 22px;
+    overflow: hidden; background: #fff;
+    box-shadow: 0 20px 40px -20px rgba(15,23,41,0.1);
+  }
+  .compare-header {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .compare-header .left {
+    padding: 22px 28px;
+    background: #f5f6f7;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+    color: #9ca3af;
+  }
+  .compare-header .right {
+    padding: 22px 28px;
+    background: #2563eb; color: #fff;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .compare-row {
+    display: grid; grid-template-columns: 1fr 1fr;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .compare-row:last-child { border-bottom: none; }
+  .compare-cell {
+    padding: 24px 26px;
+    display: flex; gap: 12px;
+    align-items: flex-start;
+    font-size: 18px; line-height: 1.65;
+  }
+  .compare-cell.ordinary {
+    border-right: 1px solid #e5e7eb;
+    color: #6b7280;
+  }
+  .compare-cell.pp {
+    color: #0a0f1e;
+    font-weight: 600;
+  }
+  .compare-icon {
+    width: 24px; height: 24px; border-radius: 999px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: 13px; font-weight: 800;
+  }
+  .compare-icon.x { background: #f3f4f6; color: #9ca3af; }
+  .compare-icon.o { background: #dbeafe; color: #2563eb; }
+
+  /* ─── What We Do (services) ─── */
+  .whatwedo-list {
+    max-width: 680px; margin: 60px auto 0;
+    display: flex; flex-direction: column; gap: 44px;
+  }
+  .whatwedo-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 22px;
+    overflow: hidden;
+    box-shadow: 0 6px 20px -12px rgba(15,23,41,0.08);
+  }
+  .whatwedo-mock {
+    padding: 32px 36px 8px;
+  }
+  .whatwedo-inner { padding: 24px 36px 34px; }
+
+  /* ─── Mockup cards (Ads / Landing / CRM) ─── */
+  .mock-frame {
+    max-width: 320px; margin: 0 auto;
+    border: 1px solid #e5e7eb; border-radius: 16px;
+    padding: 22px 24px; background: #fff;
+    box-shadow: 0 4px 12px -6px rgba(15,23,41,0.06);
+  }
+  .mock-frame.dark {
+    background: #0f1729; border-color: #1e2746; color: #fff;
+  }
+  .mock-label {
+    text-align: center; font-size: 15px; font-weight: 700;
+    color: #0a0f1e; margin-bottom: 16px;
+    letter-spacing: -0.01em;
+  }
+  .mock-frame.dark .mock-label { color: #fff; }
+
+  /* Ads: 3 logos */
+  .ads-logos { display: flex; justify-content: center; gap: 12px; }
+  .ads-logo {
+    width: 52px; height: 52px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 800; font-size: 20px;
+    background: #fbfbfb; border: 1px solid #e5e7eb;
+  }
+  .ads-logo.google {
+    background: linear-gradient(135deg, #4285f4, #ea4335 40%, #fbbc04);
+    -webkit-background-clip: text; background-clip: text;
+    color: transparent;
+    background-color: #fbfbfb;
+    -webkit-text-fill-color: transparent;
+  }
+  .ads-logo.meta { color: #0866ff; font-size: 22px; }
+  .ads-logo.linkedin {
+    background: #0a66c2; color: #fff;
+    border-color: #0a66c2; font-size: 17px;
+  }
+
+  /* Landing mockup */
+  .landing-window {
+    border: 1px solid #e5e7eb; border-radius: 10px;
+    overflow: hidden; background: #fbfbfb;
+  }
+  .landing-bar {
+    display: flex; gap: 4px; padding: 7px 10px;
+    background: #fff; border-bottom: 1px solid #e5e7eb;
+  }
+  .landing-bar span {
+    width: 6px; height: 6px; border-radius: 999px; background: #e5e7eb;
+  }
+  .landing-body { padding: 12px; }
+  .landing-hero {
+    aspect-ratio: 16/8; border-radius: 6px;
+    background: linear-gradient(135deg, #bfdbfe, #93c5fd 50%, #2563eb);
+    margin-bottom: 10px;
+  }
+  .landing-lines { margin-bottom: 12px; }
+  .landing-line {
+    height: 6px; background: #e5e7eb; border-radius: 3px;
+    margin-bottom: 6px;
+  }
+  .landing-line.short { width: 80%; }
+  .landing-btn {
+    background: #2563eb; color: #fff;
+    font-size: 11px; font-weight: 700;
+    text-align: center; padding: 8px 0;
+    border-radius: 5px;
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+  }
+
+  /* CRM mockup */
+  .crm-list { display: flex; flex-direction: column; gap: 6px; }
+  .crm-row {
+    display: flex; align-items: center; gap: 8px;
+    background: #1a2540; border-radius: 8px;
+    padding: 8px 10px;
+  }
+  .crm-avatar {
+    width: 22px; height: 22px; border-radius: 999px;
+    background: rgba(59,130,246,0.35); flex-shrink: 0;
+  }
+  .crm-line {
+    flex: 1; height: 6px; border-radius: 3px;
+    background: rgba(255,255,255,0.15);
+  }
+  .crm-dot {
+    width: 6px; height: 6px; border-radius: 999px; background: #34d399;
+  }
+  .crm-actions {
+    display: flex; justify-content: center; gap: 12px;
+    padding-top: 12px;
+  }
+  .crm-action {
+    width: 30px; height: 30px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: #fff;
+  }
+  .crm-action.mail { background: #2563eb; }
+  .crm-action.msg  { background: #10b981; }
+  .crm-action.chk  { background: #10b981; }
+  .whatwedo-tag {
+    display: inline-block;
+    font-size: 12px; font-weight: 700;
+    color: #2563eb; background: #dbeafe;
+    padding: 5px 12px; border-radius: 999px;
+    margin-bottom: 14px; letter-spacing: 0.06em;
+  }
+  .whatwedo-name {
+    font-size: 28px; font-weight: 800;
+    color: #0a0f1e; letter-spacing: -0.03em;
+    margin-bottom: 8px;
+    line-height: 1.25;
+  }
+  .whatwedo-tagline {
+    font-size: 17px; color: #6b7280;
+    margin-bottom: 22px;
+  }
+  .whatwedo-items { list-style: none; }
+  .whatwedo-items li {
+    padding: 16px 0;
+    border-top: 1px solid #e5e7eb;
+  }
+  .whatwedo-items li:first-child { border-top: none; padding-top: 4px; }
+  .whatwedo-head {
+    font-size: 18px; font-weight: 700; color: #0a0f1e;
+    margin-bottom: 6px; line-height: 1.5;
+  }
+  .whatwedo-body {
+    font-size: 17px; color: #6b7280; line-height: 1.8;
+  }
+  .outcome-card {
+    max-width: 680px; margin: 32px auto 0;
+    padding: 30px 34px;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 18px;
+    text-align: center;
+  }
+  .outcome-tag {
+    font-size: 12px; letter-spacing: 0.1em;
+    text-transform: uppercase; color: #2563eb;
+    font-weight: 700; margin-bottom: 10px;
+  }
+  .outcome-body {
+    font-size: 21px; font-weight: 700;
+    color: #0a0f1e; line-height: 1.5;
+    letter-spacing: -0.02em;
+  }
+
+  /* ─── Process steps ─── */
+  .process-list {
+    max-width: 640px; margin: 60px auto 0;
+    position: relative;
+  }
+  .process-list::before {
+    content: ""; position: absolute;
+    left: 28px; top: 28px; bottom: 28px;
+    width: 2px; background: #e5e7eb;
+  }
+  .process-item {
+    display: flex; gap: 22px;
+    padding: 20px 0;
+    position: relative;
+  }
+  .process-num {
+    width: 58px; height: 58px; border-radius: 999px;
+    flex-shrink: 0; position: relative; z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; font-weight: 800;
+    background: #fff; border: 1px solid #e5e7eb;
+    color: #0a0f1e;
+  }
+  .process-item.accent .process-num {
+    background: #2563eb; color: #fff;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 6px rgba(37,99,235,0.14);
+  }
+  .process-body { padding-top: 8px; }
+  .process-title {
+    font-size: 22px; font-weight: 700;
+    color: #0a0f1e; letter-spacing: -0.02em;
+    margin-bottom: 10px; line-height: 1.4;
+  }
+  .process-desc {
+    font-size: 17px; color: #4b5563;
+    line-height: 1.8;
+  }
+
+  /* ─── Story ─── */
+  .story-body {
+    max-width: 640px; margin: 40px auto 0;
+    font-size: 20px; line-height: 1.9;
+    color: #374151;
+  }
+  .story-body p + p { margin-top: 20px; }
+  .story-body strong { color: #0a0f1e; font-weight: 700; }
+  .story-highlight {
+    margin: 32px 0;
+    padding: 32px 34px;
+    background: #eef2ff;
+    border-left: 4px solid #2563eb;
+    border-radius: 0 16px 16px 0;
+    font-size: 21px; line-height: 1.65;
+    color: #0a0f1e; font-weight: 500;
+    letter-spacing: -0.015em;
+  }
+  .story-highlight strong { color: #2563eb; font-weight: 800; }
+
+  /* ─── For Whom check ─── */
+  .check-list {
+    max-width: 520px; margin: 44px auto 0;
+    display: flex; flex-direction: column; gap: 18px;
+  }
+  .check-item {
+    display: flex; align-items: center; gap: 14px;
+    font-size: 19px; color: #1f2937;
+    line-height: 1.6; letter-spacing: -0.015em;
+  }
+  .check-icon {
+    width: 28px; height: 28px; border-radius: 999px;
+    background: #2563eb; color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800;
+    flex-shrink: 0;
+  }
+  .check-note {
+    max-width: 520px; margin: 40px auto 0;
+    text-align: center;
+    background: #fff8e1; color: #92400e;
+    padding: 22px 28px; border-radius: 14px;
+    font-size: 17px; line-height: 1.75;
+    font-weight: 600;
+    border: 1px solid #fde68a;
+  }
+
+  /* ─── Products ─── */
+  .product-card {
+    max-width: 680px; margin: 32px auto 0;
+    background: #fff; border: 1px solid #e5e7eb;
+    border-radius: 24px; overflow: hidden;
+    box-shadow: 0 12px 30px -14px rgba(15,23,41,0.12);
+  }
+  .product-card.premium {
+    background: #0f1729; border-color: #1e2746; color: #fff;
+  }
+  .product-head {
+    padding: 38px 36px 28px;
+    display: flex; align-items: baseline; justify-content: space-between;
+    flex-wrap: wrap; gap: 18px;
+    border-bottom: 1px solid #e5e7eb;
+  }
+  .product-card.premium .product-head { border-bottom-color: rgba(255,255,255,0.1); }
+  .product-tier {
+    font-size: 12px; font-weight: 800;
+    letter-spacing: 0.22em; text-transform: uppercase;
+    color: #2563eb; margin-bottom: 8px;
+  }
+  .product-card.premium .product-tier { color: #93c5fd; }
+  .product-name {
+    font-size: 26px; font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.25;
+    color: #0a0f1e;
+  }
+  .product-card.premium .product-name { color: #fff; }
+  .product-price {
+    font-size: 28px; font-weight: 800;
+    color: #0a0f1e; letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+  .product-card.premium .product-price { color: #fff; }
+  .product-price small {
+    font-size: 14px; color: #6b7280; font-weight: 500; margin-left: 4px;
+  }
+  .product-card.premium .product-price small { color: rgba(255,255,255,0.55); }
+
+  .product-body {
+    padding: 30px 36px;
+    font-size: 17px; line-height: 1.85;
+    color: #4b5563;
+  }
+  .product-card.premium .product-body { color: rgba(255,255,255,0.75); }
+  .product-body p + p { margin-top: 12px; }
+  .product-body strong { color: #0a0f1e; font-weight: 700; }
+  .product-card.premium .product-body strong { color: #fff; }
+
+  .premium-story-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 12px; padding: 0 36px 30px;
+  }
+  .premium-story-card {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px; padding: 20px 22px;
+  }
+  .premium-story-title {
+    font-size: 16px; font-weight: 700; color: #fff;
+    letter-spacing: -0.02em; margin-bottom: 8px;
+  }
+  .premium-story-desc {
+    font-size: 14px; line-height: 1.7;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .includes-block { padding: 6px 36px 38px; }
+  .includes-title {
+    font-size: 12px; font-weight: 700; letter-spacing: 0.18em;
+    color: #2563eb; text-transform: uppercase; margin-bottom: 18px;
+  }
+  .product-card.premium .includes-title { color: #93c5fd; }
+  .include-item {
+    display: grid; grid-template-columns: 26px 1fr;
+    gap: 12px; padding: 14px 0;
+    align-items: baseline;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 16px;
+  }
+  .product-card.premium .include-item {
+    border-bottom-color: rgba(255,255,255,0.08);
+  }
+  .include-item .check {
+    color: #2563eb; font-weight: 800; font-size: 17px;
+  }
+  .product-card.premium .include-item .check { color: #93c5fd; }
+  .include-item .text {
+    color: #1f2937; line-height: 1.6;
+  }
+  .product-card.premium .include-item .text { color: rgba(255,255,255,0.85); }
+
+  /* ─── Reels gallery ─── */
+  .reels-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr);
+    gap: 10px; margin-top: 44px;
+  }
+  .reel {
+    aspect-ratio: 9/16; border-radius: 12px; overflow: hidden;
+    position: relative; background: #111;
+    border: 1px solid rgba(255,255,255,0.08);
+  }
+  .reel img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .reel-tag {
+    position: absolute; top: 8px; left: 8px;
+    font-size: 11px; background: rgba(0,0,0,0.65); color: #fff;
+    padding: 3px 8px; border-radius: 6px; letter-spacing: 0.05em; font-weight: 700;
+  }
+
+  .brand-footer {
+    text-align: center;
+    padding: 40px 60px;
+    font-size: 13px;
+    letter-spacing: 0.2em;
+    color: #9ca3af;
+    font-weight: 600;
+    background: #f9fafb;
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+
+  <!-- ── Hero (모바일 스타일) ── -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="hero-reels">
+      <div class="hero-reel-col up">
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/1.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/4.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/8.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/6.jpg" alt=""></div>
+        <!-- duplicate for seamless loop -->
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/1.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/4.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/8.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/6.jpg" alt=""></div>
+      </div>
+      <div class="hero-reel-col down">
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/2.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/5.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/9.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/7.jpg" alt=""></div>
+        <!-- duplicate for seamless loop -->
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/2.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/5.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/9.jpg" alt=""></div>
+        <div class="hero-reel-item"><img src="/kmong-assets/reels/7.jpg" alt=""></div>
+      </div>
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-eyebrow">Marketing Agency</div>
+      <h1 class="hero-title">광고비는 줄이고<br />매출은 폭발시키세요</h1>
+      <p class="hero-sub">감이 아니라 숫자로 판단해요.<br />광고비 어디서 새는지,<br />데이터로 바로 보여드려요.</p>
+    </div>
+  </section>
+
+  <!-- ── 1. Pain (from agency page) ── -->
+  <section class="section">
+    <div class="center">
+      <div class="eyebrow-blue">이런 경험 있으신가요</div>
+      <h2 class="title">대행사를 써봤는데<br />또 실망했다면?</h2>
+      <p class="lead">대행사에 대한 불신,<br />이유가 있어요.</p>
+    </div>
+
+    <div class="pain-list">
+      <div class="pain-row">
+        <div class="pain-emoji"><img src="/emojis/confused.svg" alt=""></div>
+        <div class="pain-card">
+          <span class="pain-tag">소통 부재</span>
+          <div class="pain-bold">담당자가 우리 사업을<br />잘 몰라요.</div>
+          <p class="pain-body">물어봐도 기계적인 답변만 반복해요.<br />전문적인 제언이 없고, 광고주 의도와 다른 방향으로 캠페인이 흘러가요.</p>
+        </div>
+      </div>
+      <div class="pain-row right">
+        <div class="pain-emoji"><img src="/emojis/sad.svg" alt=""></div>
+        <div class="pain-card">
+          <span class="pain-tag">영업 집중</span>
+          <div class="pain-bold">계약하고 나면<br />연락이 끊겨요.</div>
+          <p class="pain-body">영업할 때랑 계약 후가 달라요.<br />실행 담당자는 처음 듣는 사람이고, 약속한 내용은 어느새 흐지부지돼요.</p>
+        </div>
+      </div>
+      <div class="pain-row">
+        <div class="pain-emoji"><img src="/emojis/worried.svg" alt=""></div>
+        <div class="pain-card">
+          <span class="pain-tag">허영 지표</span>
+          <div class="pain-bold">보고서엔 클릭률,<br />노출수가 가득해요.</div>
+          <p class="pain-body">숫자는 화려한데 매출은 그대로예요.<br />뭐가 문제인지 설명해주는 대행사가 없어요.</p>
+        </div>
+      </div>
+      <div class="pain-row right">
+        <div class="pain-emoji"><img src="/emojis/crying.svg" alt=""></div>
+        <div class="pain-card">
+          <span class="pain-tag">DB 방치</span>
+          <div class="pain-bold">리드는 쌓이는데<br />전환이 안 돼요.</div>
+          <p class="pain-body">광고로 신청은 받아놓고 후속 관리가 없어요.<br />어렵게 모은 리드가 그냥 묻혀요.</p>
+        </div>
+      </div>
+      <div class="pain-row">
+        <div class="pain-emoji"><img src="/emojis/shocked.svg" alt=""></div>
+        <div class="pain-card">
+          <span class="pain-tag">파편화</span>
+          <div class="pain-bold">광고, 랜딩, CRM이<br />따로 놀아요.</div>
+          <p class="pain-body">광고 대행사는 랜딩 탓, 랜딩 제작사는 광고 탓.<br />어느 쪽도 퍼널 전체를 보지 않아요.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 2. Comparison ── -->
+  <section class="section section-tint">
+    <div class="center">
+      <div class="eyebrow-blue">픽셀페이지는 달라요</div>
+      <h2 class="title">다른 대행사와<br />무엇이 다른가요?</h2>
+    </div>
+
+    <div class="compare-box">
+      <div class="compare-header">
+        <div class="left">일반 대행사</div>
+        <div class="right">PIXELPAGE</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell ordinary"><span class="compare-icon x">✕</span>광고만 집행해요</div>
+        <div class="compare-cell pp"><span class="compare-icon o">✓</span>광고, 랜딩, CRM을<br />하나의 구조로 봐요</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell ordinary"><span class="compare-icon x">✕</span>클릭률, 노출수 보고서</div>
+        <div class="compare-cell pp"><span class="compare-icon o">✓</span>CPA · 전환율 · 매출로<br />증명해요</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell ordinary"><span class="compare-icon x">✕</span>영업 담당 따로,<br />실행 담당 따로</div>
+        <div class="compare-cell pp"><span class="compare-icon o">✓</span>처음부터 끝까지<br />같은 팀이에요</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell ordinary"><span class="compare-icon x">✕</span>광고 집행 후 DB 방치</div>
+        <div class="compare-cell pp"><span class="compare-icon o">✓</span>CRM 자동화로<br />전환까지 연결해요</div>
+      </div>
+      <div class="compare-row">
+        <div class="compare-cell ordinary"><span class="compare-icon x">✕</span>계약 후 연락이 끊겨요</div>
+        <div class="compare-cell pp"><span class="compare-icon o">✓</span>주간 최적화 + 월간 성과<br />보고로 계속 소통해요</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 3. What We Do ── -->
+  <section class="section">
+    <div class="center">
+      <div class="eyebrow-blue">무엇을 해드리나요</div>
+      <h2 class="title">광고부터 전환까지<br />끊기지 않게 연결해요.</h2>
+      <p class="lead">세 개를 따로 굴리면 반드시<br />어딘가 끊겨요.<br />픽셀페이지는 하나의 팀이<br />설계하고, 분석하고, 개선해요.</p>
+    </div>
+
+    <div class="whatwedo-list">
+      <div class="whatwedo-card">
+        <div class="whatwedo-mock">
+          <div class="mock-frame">
+            <div class="mock-label">Ads</div>
+            <div class="ads-logos">
+              <div class="ads-logo google">G</div>
+              <div class="ads-logo meta">∞</div>
+              <div class="ads-logo linkedin">in</div>
+            </div>
+          </div>
+        </div>
+        <div class="whatwedo-inner">
+          <span class="whatwedo-tag">01</span>
+          <div class="whatwedo-name">퍼포먼스 마케팅</div>
+          <p class="whatwedo-tagline">상담 신청을 만드는 광고</p>
+          <ul class="whatwedo-items">
+            <li>
+              <div class="whatwedo-head">• 구조 기반 캠페인 설계</div>
+              <p class="whatwedo-body">오디언스 오버랩 제거, 3단 구조 재설계.<br />감이 아닌 데이터로 판단해요.</p>
+            </li>
+            <li>
+              <div class="whatwedo-head">• 소재 기획·제작·교체</div>
+              <p class="whatwedo-body">소재 생애주기를 관리해요.<br />죽기 전에 다음 판을 준비해요.</p>
+            </li>
+            <li>
+              <div class="whatwedo-head">• 스케일링 & 예산 확장</div>
+              <p class="whatwedo-body">테스트 → 검증 → 확장.<br />예산을 10배 키워도 무너지지 않는 구조를 만들어요.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="whatwedo-card">
+        <div class="whatwedo-mock">
+          <div class="mock-frame">
+            <div class="mock-label">Landing</div>
+            <div class="landing-window">
+              <div class="landing-bar"><span></span><span></span><span></span></div>
+              <div class="landing-body">
+                <div class="landing-hero"></div>
+                <div class="landing-lines">
+                  <div class="landing-line"></div>
+                  <div class="landing-line short"></div>
+                </div>
+                <div class="landing-btn">Get Started →</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="whatwedo-inner">
+          <span class="whatwedo-tag">02</span>
+          <div class="whatwedo-name">랜딩페이지</div>
+          <p class="whatwedo-tagline">이탈을 막는 페이지</p>
+          <ul class="whatwedo-items">
+            <li>
+              <div class="whatwedo-head">• 광고 메시지 연계 설계</div>
+              <p class="whatwedo-body">광고로 들어온 사람이 이탈하지 않도록<br />메시지를 일치시켜요.</p>
+            </li>
+            <li>
+              <div class="whatwedo-head">• 전환 UI/UX 최적화</div>
+              <p class="whatwedo-body">스크롤·클릭·체류시간을 모니터링하며<br />신청 버튼을 누르게 만들어요.</p>
+            </li>
+            <li>
+              <div class="whatwedo-head">• DB 수집 시스템 점검</div>
+              <p class="whatwedo-body">고객이 몰려왔을 때 준비가 됐는지<br />먼저 확인해요.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="whatwedo-card">
+        <div class="whatwedo-mock">
+          <div class="mock-frame dark">
+            <div class="mock-label">CRM</div>
+            <div class="crm-list">
+              <div class="crm-row"><div class="crm-avatar"></div><div class="crm-line"></div><div class="crm-dot"></div></div>
+              <div class="crm-row"><div class="crm-avatar"></div><div class="crm-line"></div><div class="crm-dot"></div></div>
+              <div class="crm-row"><div class="crm-avatar"></div><div class="crm-line"></div><div class="crm-dot"></div></div>
+            </div>
+            <div class="crm-actions">
+              <div class="crm-action mail">✉</div>
+              <div class="crm-action msg">💬</div>
+              <div class="crm-action chk">✓</div>
+            </div>
+          </div>
+        </div>
+        <div class="whatwedo-inner">
+          <span class="whatwedo-tag">03</span>
+          <div class="whatwedo-name">CRM 자동화</div>
+          <p class="whatwedo-tagline">신청을 매출로 바꾸는 시퀀스</p>
+          <ul class="whatwedo-items">
+            <li>
+              <div class="whatwedo-head">• 행동 기반 자동화 퍼널 설계</div>
+              <p class="whatwedo-body">카카오 알림톡·이메일·문자,<br />각 리드에게 맞는 흐름으로 자동 분기해요.</p>
+            </li>
+            <li>
+              <div class="whatwedo-head">• 육성 시퀀스 구축</div>
+              <p class="whatwedo-body">지금 당장 구매 안 한 리드도<br />타이밍 맞춰 다시 연결돼요.</p>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="outcome-card">
+      <div class="outcome-tag">Outcome</div>
+      <div class="outcome-body">이 모든 흐름이<br />매출로 연결돼요.</div>
+    </div>
+  </section>
+
+  <!-- ── 4. Process ── -->
+  <section class="section section-tint">
+    <div class="center">
+      <div class="eyebrow-blue">진행 방식</div>
+      <h2 class="title">처음 만나는 순간부터<br />투명하게 진행해요.</h2>
+    </div>
+
+    <div class="process-list">
+      <div class="process-item">
+        <div class="process-num">01</div>
+        <div class="process-body">
+          <div class="process-title">무료 마케팅 진단</div>
+          <p class="process-desc">현재 광고 계정·랜딩 전환율·CRM 구조 분석.<br />계약 전에 공개해요. 진단만 받고 가셔도 괜찮아요.</p>
+        </div>
+      </div>
+      <div class="process-item">
+        <div class="process-num">02</div>
+        <div class="process-body">
+          <div class="process-title">파이프라인 구조 설계</div>
+          <p class="process-desc">광고 캠페인 구조·랜딩 메시지·CRM 시퀀스를<br />한 번에 설계해요. 방향이 맞아야 집행도 의미 있어요.</p>
+        </div>
+      </div>
+      <div class="process-item accent">
+        <div class="process-num">03</div>
+        <div class="process-body">
+          <div class="process-title">실전 집행 & 주간 최적화</div>
+          <p class="process-desc">CTR·CPA 기반으로 매주 판단해요.<br />살릴지, 끌지, 교체할지 — 숫자로 결정하고 공유해요.</p>
+        </div>
+      </div>
+      <div class="process-item accent">
+        <div class="process-num">04</div>
+        <div class="process-body">
+          <div class="process-title">스케일링 & 월간 성과 보고</div>
+          <p class="process-desc">이긴 구조를 복제하고<br />예산을 단계적으로 확장해요.<br />허영 지표 없이 매출로 증명해요.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── 4b. Ad Creatives Gallery ── -->
+  <section class="section section-dark">
+    <div class="center">
+      <div class="eyebrow-blue">광고 소재 포트폴리오</div>
+      <h2 class="title">멈춰서 보게 되는<br />숏폼·릴스 소재.</h2>
+      <p class="lead">메타·인스타·틱톡에서 실제 운영 중인<br />브랜디드 콘텐츠예요.<br />자체 기획·촬영·편집으로 제작해요.</p>
+    </div>
+    <div class="reels-grid">
+      <div class="reel"><span class="reel-tag">01</span><img src="/kmong-assets/reels/1.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">02</span><img src="/kmong-assets/reels/2.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">03</span><img src="/kmong-assets/reels/3.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">04</span><img src="/kmong-assets/reels/4.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">05</span><img src="/kmong-assets/reels/5.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">06</span><img src="/kmong-assets/reels/6.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">07</span><img src="/kmong-assets/reels/7.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">08</span><img src="/kmong-assets/reels/8.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">09</span><img src="/kmong-assets/reels/9.jpg" alt=""></div>
+      <div class="reel"><span class="reel-tag">10</span><img src="/kmong-assets/reels/10.jpg" alt=""></div>
+    </div>
+  </section>
+
+  <!-- ── 5. Story ── -->
+  <section class="section">
+    <div class="center">
+      <div class="eyebrow-blue">Founder's Story</div>
+      <h2 class="title">저 역시도,<br />막대한 손실을 겪었어요.</h2>
+    </div>
+
+    <div class="story-body">
+      <p>교육 상품을 판매하며 수강생을 모집하기 위해<br />블로그, SEO, 유튜브 등 <strong>안 해본 게 없는 것 같아요.</strong><br />그러다 메타 광고가 효율이 좋다는 소문을 듣고<br />무작정 시도해 봤어요.</p>
+      <p>주변 업체가 DB 광고로 수십 억대 회사로 성장한 것을 봤고<br />그 업체의 전략도 봤어요. 어렵게 조언을 얻고<br /><strong>4시간 500만 원의 컨설팅</strong>까지 받으며 광고를 돌렸어요.</p>
+      <p>결과는? <strong>대참패였어요.</strong><br />성과도 안 나왔을 뿐더러 계정까지 정지되어 크게 좌절했어요.<br />광고 예산을 다 잃고 나서야 이러면 안 되겠다 싶었어요.</p>
+      <p>그 이후 해외 마케터들의 모든 전략을 수소문해 공부했고,<br />퍼포먼스 마케팅 관련 교육이 나오는 족족<br />고가의 강의를 들으며 광고 전략을 개선해 왔어요.</p>
+
+      <div class="story-highlight">
+        이 서비스를 통해 여러분의<br /><strong>시간만큼은 확실히 아껴 드릴 수 있어요.</strong><br />
+        혼자, 또는 여러 대행사를 거치며 성과를 못 내고<br />날릴 시간을 이 서비스 하나로 끝낼 수 있어요.
+      </div>
+
+      <p>물론 다양한 마케팅을 해야 해요.<br />유튜브, 블로그, 가능하면 다 해보세요.<br />그러나 콘텐츠는 결과 예측이 어렵고 성과는 들쭉날쭉해요.<br /><strong>안정적인 비즈니스는 반드시 지속 가능하고<br />예측 가능한 Paid 마케팅이 병행되어야 해요.</strong></p>
+    </div>
+  </section>
+
+  <!-- ── 6. For Whom (누구에게 맞나) ── -->
+  <section class="section section-tint">
+    <div class="center">
+      <div class="eyebrow-blue">이런 분께 맞아요</div>
+      <h2 class="title">해당되시나요?</h2>
+    </div>
+
+    <div class="check-list">
+      <div class="check-item"><div class="check-icon">✓</div>메타 광고를 처음 시작하시는 사장님</div>
+      <div class="check-item"><div class="check-icon">✓</div>광고는 돌리고 있는데 리드 관리가 안 되고 있는 분</div>
+      <div class="check-item"><div class="check-icon">✓</div>여러 대행사를 거쳤지만 성과를 못 낸 분</div>
+      <div class="check-item"><div class="check-icon">✓</div>세일즈 콜 팀이 있고 진짜 살 사람만<br />걸러내고 싶은 분</div>
+      <div class="check-item"><div class="check-icon">✓</div>평생 가져갈 마케팅 자산을 만들고 싶은 분</div>
+    </div>
+
+    <div class="check-note">
+      광고 능력 자체를 기르고자 하시는 분께는<br />이 서비스가 맞지 않아요.<br />
+      결과를 원하시는 분들만 남아 주세요.
+    </div>
+  </section>
+
+  <!-- ── 7. Products ── -->
+  <section class="section">
+    <div class="center">
+      <div class="eyebrow-blue">Products</div>
+      <h2 class="title">두 가지 패키지로<br />준비했어요.</h2>
+      <p class="lead">시작 단계라면 <strong style="color:#0a0f1e;">DELUXE</strong>.<br />세일즈 팀이 있고 광고 예산이 어느 정도 되신다면<br /><strong style="color:#0a0f1e;">PREMIUM</strong>을 추천드려요.</p>
+    </div>
+
+    <!-- DELUXE -->
+    <div class="product-card">
+      <div class="product-head">
+        <div>
+          <div class="product-tier">Deluxe</div>
+          <div class="product-name">DB 수집 시스템 구축</div>
+        </div>
+        <div class="product-price">490,000<small>원</small></div>
+      </div>
+      <div class="product-body">
+        <p>메타 광고로 DB를 모으고 싶은데 어디서부터 해야 할지<br />모르시겠다면, 또는 광고는 돌리고 있는데<br />리드 관리가 안 되고 있다면 <strong>이 패키지 하나로 끝낼 수 있어요.</strong></p>
+        <p>캠페인 세팅부터 리드가 들어오는 순간 알림, 시트 저장,<br />30일간 직접 운영·최적화까지 전부 포함돼요.<br /><strong>사장님은 광고비만 넣고 전화만 받으시면 돼요.</strong></p>
+      </div>
+      <div class="includes-block">
+        <div class="includes-title">진행 내용</div>
+        <div class="include-item"><span class="check">✓</span><span class="text">메타 리드폼 캠페인 세팅 (타깃·예산 구조 설계)</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">픽셀 + 전환 API (CAPI) 설치</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">DB 발생 시 구글시트 저장</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">카카*톡·문자·슬랙 실시간 알림 (1채널)</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">예산에 따른 이미지 소재 제작</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">30일 광고 운영·최적화</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">최종 데이터 리포트 전달</span></div>
+      </div>
+    </div>
+
+    <!-- PREMIUM -->
+    <div class="product-card premium">
+      <div class="product-head">
+        <div>
+          <div class="product-tier">Premium</div>
+          <div class="product-name">풀퍼널 구축</div>
+        </div>
+        <div class="product-price">1,900,000<small>원</small></div>
+      </div>
+      <div class="product-body">
+        <p>DELUXE로도 DB 수집은 시작할 수 있어요.<br />다만 세일즈 콜 팀이 있거나 광고 예산이 어느 정도 되신다면<br />처음부터 <strong>한 단계 위의 구조</strong>가 효율적이에요.</p>
+        <p>이 패키지는 광고 단계부터 <strong>구매 의사가 높은 잠재고객만<br />걸러내고, 리드가 식기 전에 상담으로 이어지는 구조</strong>를<br />만들어 드려요.</p>
+      </div>
+
+      <div class="premium-story-grid">
+        <div class="premium-story-card">
+          <div class="premium-story-title">영상 소재로 관심도 상승</div>
+          <p class="premium-story-desc">이미지를 슥 넘기는 사람과<br />영상을 끝까지 보고 신청하는 사람의<br />온도는 달라요.</p>
+        </div>
+        <div class="premium-story-card">
+          <div class="premium-story-title">전용 랜딩으로 진짜만</div>
+          <p class="premium-story-desc">리드폼은 2초면 제출돼요.<br />랜딩은 읽고, 이해하고, 그래도<br />신청하는 사람만 들어와요.</p>
+        </div>
+        <div class="premium-story-card">
+          <div class="premium-story-title">CRM 분류·시퀀스 발송</div>
+          <p class="premium-story-desc">관심 항목별로 자동 분류해요.<br />상담 타이밍을 놓쳐 식어버리는<br />고객을 최소화해요.</p>
+        </div>
+        <div class="premium-story-card">
+          <div class="premium-story-title">광고비가 매출로<br />바뀌는 구조</div>
+          <p class="premium-story-desc">같은 광고비로 전화할 가치가<br />있는 리드만, 식기 전에<br />상담으로 이어져요.</p>
+        </div>
+      </div>
+
+      <div class="includes-block">
+        <div class="includes-title">진행 내용 (DELUXE 전체 포함 +)</div>
+        <div class="include-item"><span class="check">✓</span><span class="text">전용 DB 수집 랜딩페이지 1종 (반응형·전환 최적화)</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">영상 소재 제작 (기획·촬영·편집)</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">CRM 분류·태깅·저장 (시트/노션/에어테이블)</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">리타겟팅 광고</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">30일 광고 운영·최적화</span></div>
+        <div class="include-item"><span class="check">✓</span><span class="text">최종 리포트 (CPL·소재별 성과·응대율·전환 분석)</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="brand-footer">© PIXELPAGE · pixelpage.co.kr</div>
+
+</div>
+
+</body>
+</html>

@@ -1,5 +1,7 @@
 User-agent: *
 Allow: /
 Disallow: /info
+Disallow: /kmong.html
+Disallow: /kmong-assets/
 
 Sitemap: https://pixelpage.co.kr/sitemap.xml
