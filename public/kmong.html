@@ -58,10 +58,12 @@
     flex-shrink: 0;
     position: relative;
   }
-  .hero-reel-item img {
+  .hero-reel-item img,
+  .hero-reel-item video {
     width: 100%; height: 100%;
     object-fit: cover;
     display: block;
+    background: #000;
   }
   .hero-reel-item::after {
     content: ""; position: absolute; inset: 0;
@@ -567,9 +569,17 @@
 
   /* ─── Reels gallery ─── */
   .reels-grid {
-    display: grid; grid-template-columns: repeat(5, 1fr);
-    gap: 10px; margin-top: 44px;
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    gap: 12px; margin-top: 44px;
   }
+  .reels-note {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 14px;
+    color: rgba(255,255,255,0.55);
+    letter-spacing: -0.01em;
+  }
+  .reels-note strong { color: #93c5fd; font-weight: 700; }
   .reel {
     aspect-ratio: 9/16; border-radius: 12px; overflow: hidden;
     position: relative; background: #111;
@@ -602,26 +612,37 @@
     <div class="hero-glow"></div>
     <div class="hero-reels">
       <div class="hero-reel-col up">
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/1.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/4.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/8.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/6.jpg" alt=""></div>
+        <div class="hero-reel-item"><video src="/reels/1.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/4.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/8.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/6.mp4" autoplay muted loop playsinline></video></div>
         <!-- duplicate for seamless loop -->
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/1.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/4.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/8.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/6.jpg" alt=""></div>
+        <div class="hero-reel-item"><video src="/reels/1.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/4.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/8.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/6.mp4" autoplay muted loop playsinline></video></div>
       </div>
       <div class="hero-reel-col down">
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/2.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/5.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/9.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/7.jpg" alt=""></div>
+        <div class="hero-reel-item"><video src="/reels/2.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/5.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/9.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/7.mp4" autoplay muted loop playsinline></video></div>
         <!-- duplicate for seamless loop -->
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/2.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/5.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/9.jpg" alt=""></div>
-        <div class="hero-reel-item"><img src="/kmong-assets/reels/7.jpg" alt=""></div>
+        <div class="hero-reel-item"><video src="/reels/2.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/5.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/9.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/7.mp4" autoplay muted loop playsinline></video></div>
+      </div>
+      <div class="hero-reel-col up">
+        <div class="hero-reel-item"><video src="/reels/3.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/10.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/1.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/6.mp4" autoplay muted loop playsinline></video></div>
+        <!-- duplicate for seamless loop -->
+        <div class="hero-reel-item"><video src="/reels/3.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/10.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/1.mp4" autoplay muted loop playsinline></video></div>
+        <div class="hero-reel-item"><video src="/reels/6.mp4" autoplay muted loop playsinline></video></div>
       </div>
     </div>
     <div class="hero-overlay"></div>
@@ -881,7 +902,7 @@
   <section class="section section-dark">
     <div class="center">
       <div class="eyebrow-blue">광고 소재 포트폴리오</div>
-      <h2 class="title">멈춰서 보게 되는<br />숏폼·릴스 소재.</h2>
+      <h2 class="title">멈춰서 보게 되는<br />광고 소재.</h2>
       <p class="lead">메타·인스타·틱톡에서 실제 운영 중인<br />브랜디드 콘텐츠예요.<br />자체 기획·촬영·편집으로 제작해요.</p>
     </div>
     <div class="reels-grid">
@@ -893,9 +914,8 @@
       <div class="reel"><span class="reel-tag">06</span><img src="/kmong-assets/reels/6.jpg" alt=""></div>
       <div class="reel"><span class="reel-tag">07</span><img src="/kmong-assets/reels/7.jpg" alt=""></div>
       <div class="reel"><span class="reel-tag">08</span><img src="/kmong-assets/reels/8.jpg" alt=""></div>
-      <div class="reel"><span class="reel-tag">09</span><img src="/kmong-assets/reels/9.jpg" alt=""></div>
-      <div class="reel"><span class="reel-tag">10</span><img src="/kmong-assets/reels/10.jpg" alt=""></div>
     </div>
+    <p class="reels-note">※ <strong>영상 소재는 PREMIUM 패키지에 포함</strong>돼요.</p>
   </section>
 
   <!-- ── 5. Story ── -->
