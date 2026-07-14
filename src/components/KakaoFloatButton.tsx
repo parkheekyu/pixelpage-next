@@ -21,14 +21,30 @@ const KakaoFloatButton = () => {
         className="relative w-14 h-14 md:w-16 md:h-16 rounded-full flex items-center justify-center shadow-[0_10px_28px_-6px_rgba(0,0,0,0.28)] transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:shadow-[0_14px_32px_-6px_rgba(0,0,0,0.35)]"
         style={{ background: "#FEE500" }}
       >
-        {/* KakaoTalk 스타일 말풍선 SVG */}
+        {/* KakaoTalk 로고 — 노란 말풍선 + 검정 TALK */}
         <svg
-          viewBox="0 0 24 24"
-          className="w-7 h-7 md:w-8 md:h-8"
-          fill="#181600"
+          viewBox="0 0 40 40"
+          className="w-8 h-8 md:w-9 md:h-9"
           aria-hidden="true"
         >
-          <path d="M12 3C6.48 3 2 6.48 2 10.77c0 2.73 1.83 5.13 4.6 6.5-.2.7-.72 2.54-.83 2.94-.13.5.18.5.38.36.16-.1 2.53-1.72 3.56-2.42.75.11 1.52.17 2.29.17 5.52 0 10-3.48 10-7.55C22 6.48 17.52 3 12 3z" />
+          {/* 말풍선 (검정) */}
+          <path
+            fill="#181600"
+            d="M20 6C11.2 6 4 11.6 4 18.5c0 4.5 3.1 8.4 7.7 10.6l-1.5 5.5c-.2.7.5 1.2 1.1.9l6.6-4.4c.7.1 1.4.1 2.1.1 8.8 0 16-5.6 16-12.7C36 11.6 28.8 6 20 6z"
+          />
+          {/* TALK 텍스트 (노란색으로 뚫음) */}
+          <text
+            x="20"
+            y="22.5"
+            textAnchor="middle"
+            fontSize="8.5"
+            fontWeight="900"
+            fontFamily="Arial Black, sans-serif"
+            fill="#FEE500"
+            letterSpacing="-0.5"
+          >
+            TALK
+          </text>
         </svg>
 
         {/* 은은한 펄스 링 */}
