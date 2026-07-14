@@ -82,7 +82,7 @@ export async function getArticleBySlug(
       filter: {
         and: [
           { property: "Slug", rich_text: { equals: slug } },
-          { property: "Status", select: { equals: "Published" } },
+          { property: "Status", status: { equals: "Published" } },
         ],
       },
     });
