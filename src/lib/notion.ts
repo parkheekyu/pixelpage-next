@@ -36,6 +36,15 @@ function extractCover(property: { type: string; files?: { file?: { url: string }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
+function extractPageCover(page: any): string | null {
+  const cover = page?.cover;
+  if (!cover) return null;
+  if (cover.type === "external" && cover.external?.url) return cover.external.url;
+  if (cover.type === "file" && cover.file?.url) return cover.file.url;
+  return null;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function pageToArticle(page: any): Article {
   const props = page.properties;
   return {
@@ -47,7 +56,7 @@ function pageToArticle(page: any): Article {
       : "",
     category: props.Category?.select?.name || props.Category?.multi_select?.[0]?.name || "",
     date: props.Date?.date?.start || "",
-    coverImage: props.Cover ? extractCover(props.Cover) : null,
+    coverImage: (props.Cover ? extractCover(props.Cover) : null) || extractPageCover(page),
   };
 }
 
