@@ -31,7 +31,10 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
-  const isDarkHero = darkHeroPages.includes(pathname);
+  const isDarkHero =
+    darkHeroPages.includes(pathname) ||
+    pathname.startsWith("/columns/") ||
+    pathname.startsWith("/services/");
   const useLight = isDarkHero && !scrolled;
 
   useEffect(() => {
