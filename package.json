@@ -61,6 +61,7 @@
     "react-p5": "^1.4.1",
     "react-resizable-panels": "^4.9.0",
     "recharts": "^3.8.1",
+    "rehype-raw": "^7.0.0",
     "remark-gfm": "^4.0.1",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.5.0",

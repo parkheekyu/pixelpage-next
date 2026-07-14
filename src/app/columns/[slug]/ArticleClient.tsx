@@ -5,6 +5,7 @@ import { ArrowLeft, ArrowRight, BarChart2, MoreVertical, Link2, Check } from "lu
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import rehypeRaw from "rehype-raw";
 import Reveal from "@/components/Reveal";
 import type { Article } from "@/lib/notion";
 
@@ -12,6 +13,11 @@ function formatDate(dateStr: string): string {
   if (!dateStr) return "";
   const d = new Date(dateStr);
   return `${d.getFullYear()}. ${d.getMonth() + 1}. ${d.getDate()}.`;
+}
+
+// ReactMarkdown이 한글 사이 `**볼드**` 파싱을 놓치는 이슈 우회
+function preprocessMarkdown(md: string): string {
+  return md.replace(/\*\*([^*\n]+?)\*\*/g, "<strong>$1</strong>");
 }
 
 interface Props {
@@ -116,8 +122,11 @@ const ArticleClient = ({ article, content }: Props) => {
 
           {/* 본문 */}
           <div className="article-content mt-10">
-            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-              {content}
+            <ReactMarkdown
+              remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeRaw]}
+            >
+              {preprocessMarkdown(content)}
             </ReactMarkdown>
           </div>
 
