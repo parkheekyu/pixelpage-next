@@ -7,11 +7,14 @@
 import sys
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
-from publish_column import h2, h3, p, quote, bul, num, divider
+from publish_column import h2, h3, p, quote, bul, divider, img
 
 TITLE = "랜딩페이지제작, 이 3가지 빠지면 광고비 다 날립니다"
 SLUG = "landing-page-3-essentials-for-lead-conversion"
 DESCRIPTION = "랜딩페이지제작할 때 이 3가지가 빠지면 아무리 좋은 광고도 소용없습니다. 픽셀페이지가 직접 만들며 검증한 전환율 최적화 3원칙을 정리해 드립니다."
+COVER_URL = "https://pixelpage.co.kr/columns/landing/cover.png"
+IMG_PRINCIPLES = "https://pixelpage.co.kr/columns/landing/principles.png"
+IMG_FUNNEL = "https://pixelpage.co.kr/columns/landing/funnel.png"
 
 BLOCKS = [
     # ── 프리훅 ──
@@ -26,6 +29,9 @@ BLOCKS = [
     p("솔직하게 말씀드리겠습니다. 대부분의 <b>랜딩페이지제작</b> 업체가 놓치는 3가지가 있습니다. 이 3가지가 빠지면 아무리 화려한 디자인도, 아무리 예산을 태워도 문의로 이어지지 않습니다."),
     p("오늘 픽셀페이지가 직접 만들며 검증한 <b>'랜딩페이지제작 3원칙'</b>을 깔끔하게 정리해 드리겠습니다. 이 글 하나로 랜딩 견적 낭비 몇백만 원을 세이브하실 수 있습니다."),
 
+    # ── 인트로 다이어그램 ──
+    img(IMG_FUNNEL, "광고 → 랜딩페이지 → 상담 문의 흐름"),
+
     # ── 문제 제기 ──
     h2("왜 광고비만 태우고 문의는 안 늘까요?"),
     p("한 지방 인테리어 업체 대표님의 실제 사례입니다."),
@@ -37,6 +43,7 @@ BLOCKS = [
 
     # ── 본론 3원칙 ──
     h2("랜딩페이지제작 3원칙 — 이거 하나만 지켜도 결과가 달라집니다"),
+    img(IMG_PRINCIPLES, "랜딩페이지제작 3원칙 개요 — 원칙 01, 02, 03"),
     p("<b>랜딩페이지제작</b>을 맡기실 때, 견적서에 아래 3가지가 명확하게 들어 있는지 반드시 확인해 보시기 바랍니다. 없다면 그 견적은 거르셔도 됩니다."),
 
     h3("원칙 1. 광고 메시지와 랜딩 메시지의 '온도 일치'"),
@@ -87,4 +94,5 @@ column = {
     "description": DESCRIPTION,
     "blocks": BLOCKS,
     "category": "칼럼",
+    "cover_url": COVER_URL,
 }

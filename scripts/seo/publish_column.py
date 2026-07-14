@@ -50,8 +50,8 @@ def h3(text: str) -> dict:
     return {"type": "heading_3", "heading_3": {"rich_text": _rt(text)}}
 
 
-def p(text: str, annotations: dict | None = None) -> dict:
-    return {"type": "paragraph", "paragraph": {"rich_text": _rt(text, annotations)}}
+def p(text: str) -> dict:
+    return {"type": "paragraph", "paragraph": {"rich_text": _rt(text)}}
 
 
 def quote(text: str) -> dict:
@@ -70,7 +70,21 @@ def divider() -> dict:
     return {"type": "divider", "divider": {}}
 
 
-def _rt(text: str, annotations: dict | None = None) -> list[dict]:
+def img(url: str, caption: str = "") -> dict:
+    """외부 URL 이미지 블록."""
+    block = {
+        "type": "image",
+        "image": {
+            "type": "external",
+            "external": {"url": url},
+        },
+    }
+    if caption:
+        block["image"]["caption"] = _rt(caption)
+    return block
+
+
+def _rt(text: str) -> list[dict]:
     """rich_text with optional inline bold via <b>...</b> markers."""
     # 아주 단순한 <b> 볼드 파서
     parts: list[dict] = []
@@ -96,6 +110,33 @@ def _rt(text: str, annotations: dict | None = None) -> list[dict]:
     return parts
 
 
+def archive_by_slug(slug: str) -> int:
+    """해당 slug의 페이지를 archived=true 로 만듦. 개수 반환."""
+    if not API_KEY or not DB_ID:
+        raise RuntimeError("NOTION_API_KEY 또는 NOTION_DATABASE_ID 환경변수 없음")
+    q = Request(
+        f"{NOTION_API}/databases/{DB_ID}/query",
+        data=json.dumps({
+            "filter": {"property": "Slug", "rich_text": {"equals": slug}},
+        }).encode(),
+        headers=_headers(),
+        method="POST",
+    )
+    with urlopen(q) as r:
+        pages = json.loads(r.read()).get("results", [])
+    count = 0
+    for pg in pages:
+        req = Request(
+            f"{NOTION_API}/pages/{pg['id']}",
+            data=json.dumps({"archived": True}).encode(),
+            headers=_headers(),
+            method="PATCH",
+        )
+        with urlopen(req) as _:
+            count += 1
+    return count
+
+
 def publish(
     *,
     title: str,
@@ -105,13 +146,20 @@ def publish(
     category: str = "칼럼",
     pub_date: str | None = None,
     status: str = "Published",
+    cover_url: str | None = None,
+    replace_existing: bool = True,
 ) -> dict:
     if not API_KEY or not DB_ID:
         raise RuntimeError("NOTION_API_KEY 또는 NOTION_DATABASE_ID 환경변수 없음")
 
     pub_date = pub_date or date.today().isoformat()
 
-    body = {
+    if replace_existing:
+        archived = archive_by_slug(slug)
+        if archived:
+            print(f"기존 슬러그 '{slug}' 페이지 {archived}개 archive 완료")
+
+    body: dict = {
         "parent": {"database_id": DB_ID},
         "properties": {
             "이름": {"title": _rt(title)},
@@ -123,6 +171,8 @@ def publish(
         },
         "children": blocks[:100],  # Notion 초기 100 블록 제한
     }
+    if cover_url:
+        body["cover"] = {"type": "external", "external": {"url": cover_url}}
 
     req = Request(
         f"{NOTION_API}/pages",
