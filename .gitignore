@@ -33,6 +33,19 @@ yarn-error.log*
 # env files (can opt-in for committing if needed)
 .env*
 
+# credentials & secrets
+.credentials/
+client_secret*.json
+token.json
+*.credential.json
+
+# SEO 파이프라인 데이터 (매일 재생성)
+scripts/seo/data/
+
+# Python
+__pycache__/
+*.py[cod]
+
 # vercel
 .vercel
 
