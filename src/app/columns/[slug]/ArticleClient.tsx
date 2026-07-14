@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ArrowRight, BarChart2, MoreVertical, Link2, Check } from "lucide-react";
+import { ArrowLeft, ArrowRight, MoreVertical, Link2, Check } from "lucide-react";
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import Reveal from "@/components/Reveal";
+import logoDark from "@/assets/logo-dark.png";
 import type { Article } from "@/lib/notion";
 
 function formatDate(dateStr: string): string {
@@ -23,9 +24,10 @@ function preprocessMarkdown(md: string): string {
 interface Props {
   article: Article;
   content: string;
+  recentArticles?: Article[];
 }
 
-const ArticleClient = ({ article, content }: Props) => {
+const ArticleClient = ({ article, content, recentArticles = [] }: Props) => {
   const [copied, setCopied] = useState(false);
 
   const copyUrl = async () => {
@@ -76,8 +78,9 @@ const ArticleClient = ({ article, content }: Props) => {
 
           {/* 작성자 행 */}
           <div className="flex items-center gap-3 pb-5 border-b border-[#e5e7eb]">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 flex-shrink-0 flex items-center justify-center text-white text-[13px] font-bold">
-              픽
+            <div className="w-10 h-10 rounded-full bg-white border border-[#e5e7eb] flex-shrink-0 flex items-center justify-center overflow-hidden p-1.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={logoDark.src} alt="픽셀페이지" className="w-full h-auto object-contain" />
             </div>
             <div className="flex-1 min-w-0 flex items-center gap-2 text-[13px] text-[#1c1f23]">
               <span className="font-semibold">픽셀페이지</span>
@@ -92,13 +95,6 @@ const ArticleClient = ({ article, content }: Props) => {
               >
                 {copied ? <Check className="w-3.5 h-3.5 text-blue-600" /> : <Link2 className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{copied ? "복사됨" : "URL 복사"}</span>
-              </button>
-              <button
-                type="button"
-                className="hidden sm:inline-flex items-center gap-1 text-[12px] px-2.5 py-1.5 rounded border border-[#e5e7eb] hover:bg-[#f3f4f6] transition-colors"
-                aria-label="통계"
-              >
-                <BarChart2 className="w-3.5 h-3.5" /> 통계
               </button>
               <button
                 type="button"
@@ -145,6 +141,38 @@ const ArticleClient = ({ article, content }: Props) => {
               무료 상담 신청 <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
+
+          {/* 최근 칼럼 5개 */}
+          {recentArticles.length > 0 && (
+            <div className="mt-16">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[15px] font-bold text-[#1c1f23]">이 블로그의 최근 글</h3>
+                <Link
+                  href="/columns"
+                  className="text-[12px] text-[#8b95a1] hover:text-blue-600 transition-colors"
+                >
+                  전체보기 →
+                </Link>
+              </div>
+              <ul className="border-t border-[#e5e7eb]">
+                {recentArticles.map((a) => (
+                  <li key={a.id} className="border-b border-[#f0f2f5]">
+                    <Link
+                      href={`/columns/${a.slug}`}
+                      className="group grid grid-cols-[1fr_100px] gap-4 py-3.5 items-center hover:bg-[#fafbfc] px-2 -mx-2 rounded transition-colors"
+                    >
+                      <span className="text-[14px] text-[#1c1f23] group-hover:text-blue-600 transition-colors truncate">
+                        {a.title}
+                      </span>
+                      <span className="text-right text-[12px] text-[#8b95a1] font-mono tabular-nums">
+                        {formatDate(a.date)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </article>
       </section>
 

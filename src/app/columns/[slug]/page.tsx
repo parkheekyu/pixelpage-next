@@ -45,7 +45,14 @@ export default async function Page({
     notFound();
   }
 
-  const content = await getArticleContent(article.id);
+  const [content, allArticles] = await Promise.all([
+    getArticleContent(article.id),
+    getPublishedArticles(),
+  ]);
 
-  return <ArticleClient article={article} content={content} />;
+  const recentArticles = allArticles
+    .filter((a) => a.slug && a.slug !== slug)
+    .slice(0, 5);
+
+  return <ArticleClient article={article} content={content} recentArticles={recentArticles} />;
 }
