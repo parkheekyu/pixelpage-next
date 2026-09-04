@@ -3,5 +3,6 @@ Allow: /
 Disallow: /info
 Disallow: /kmong.html
 Disallow: /kmong-assets/
+Disallow: /lp
 
 Sitemap: https://pixelpage.co.kr/sitemap.xml
