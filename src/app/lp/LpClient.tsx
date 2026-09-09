@@ -312,12 +312,13 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               t: "무한 A/B 테스트로 광고 소재를 굴립니다",
               d: "감이 아닌 데이터로 소재를 판단합니다. 매주 이긴 소재에 예산을 집중합니다.",
               bullets: ["메타·구글·틱톡 전 채널 운영", "매주 A/B 테스트 결과 리뷰", "자체 기획·촬영·편집"],
-              reel: "2.mp4",
+              visual: "marquee" as const,
             },
             {
               t: "전환율 중심의 랜딩페이지 설계",
               d: "광고 카피와 랜딩 상단이 하나의 흐름으로 붙습니다. 방문자가 3초 안에 이탈하지 않도록.",
               bullets: ["광고 ↔ 랜딩 메시지 연계", "전환 UI/UX 최적화", "DB 수집 시스템 점검"],
+              visual: "single" as const,
               reel: "5.mp4",
             },
           ].map((s, i) => (
@@ -346,11 +347,47 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   Learn More <ArrowRight className="w-3.5 h-3.5" />
                 </a>
               </div>
-              <div className="rounded-2xl overflow-hidden aspect-video bg-black">
-                <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-                  <source src={`/reels/${s.reel}`} type="video/mp4" />
-                </video>
-              </div>
+              {s.visual === "marquee" ? (
+                <div
+                  className="relative rounded-2xl overflow-hidden bg-black h-[420px] md:h-[440px] flex gap-3"
+                  style={{
+                    WebkitMaskImage:
+                      "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+                    maskImage:
+                      "linear-gradient(to bottom, transparent 0%, black 10%, black 90%, transparent 100%)",
+                  }}
+                >
+                  {[
+                    { items: ["/reels/1.mp4", "/reels/4.mp4", "/reels/7.mp4", "/reels/2.mp4"], dir: "animate-marquee-up" },
+                    { items: ["/reels/3.mp4", "/reels/6.mp4", "/reels/9.mp4", "/reels/5.mp4"], dir: "animate-marquee-down" },
+                    { items: ["/reels/8.mp4", "/reels/10.mp4", "/reels/2.mp4", "/reels/6.mp4"], dir: "animate-marquee-up" },
+                  ].map((col, ci) => (
+                    <div key={ci} className="flex-1 overflow-hidden">
+                      <div className={col.dir}>
+                        {[...col.items, ...col.items].map((src, j) => (
+                          <div key={`${src}-${j}`} className="mb-3 relative rounded-xl overflow-hidden">
+                            <video
+                              src={src}
+                              autoPlay
+                              muted
+                              loop
+                              playsInline
+                              className="w-full aspect-[2/3] object-cover bg-black"
+                            />
+                            <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/10 via-transparent to-black/40" />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="rounded-2xl overflow-hidden aspect-video bg-black">
+                  <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+                    <source src={`/reels/${s.reel}`} type="video/mp4" />
+                  </video>
+                </div>
+              )}
             </div>
           ))}
         </div>
