@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import LpClient from "./LpClient";
+import { getPublishedArticles } from "@/lib/notion";
 
 export const metadata: Metadata = {
   title: "픽셀페이지 · DB 마케팅 전담 파트너 | 광고비 줄이고 매출 폭발",
@@ -8,6 +9,10 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false, nocache: true },
 };
 
-export default function Page() {
-  return <LpClient />;
+export const revalidate = 3600;
+
+export default async function Page() {
+  const articles = await getPublishedArticles();
+  const recentArticles = articles.filter((a) => a.slug).slice(0, 3);
+  return <LpClient articles={recentArticles} />;
 }
