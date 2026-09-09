@@ -34,7 +34,7 @@ const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
 const PillLabel = ({ children, color }: { children: React.ReactNode; color: string }) => (
   <span
-    className="inline-flex items-center px-4 py-1.5 rounded-full text-[11px] font-semibold border"
+    className="inline-flex items-center px-4 py-1.5 rounded-full text-[13px] font-semibold border"
     style={{ borderColor: `${color}55`, color, backgroundColor: `${color}0f` }}
   >
     {children}
@@ -112,7 +112,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 ))}
               </div>
             </div>
-            <p className="text-[11.5px] text-white/45 mb-10">Rated on Google by various clients</p>
+            <p className="text-[13px] text-white/45 mb-10">Rated on Google by various clients</p>
 
             {/* 큰 하이브리드 타이틀 */}
             <h1 className="break-keep text-[clamp(44px,7.5vw,96px)] leading-[1.05] tracking-[-0.045em]">
@@ -149,7 +149,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 2. 함께하는 파트너사 ── */}
       <section className="py-14 border-y border-white/[0.06] overflow-hidden">
         <div className="max-w-[1240px] mx-auto px-6 lg:px-8">
-          <p className="text-center text-[11px] tracking-[0.28em] font-semibold text-white/40 mb-8 uppercase">
+          <p className="text-center text-[13px] tracking-[0.28em] font-semibold text-white/40 mb-8 uppercase">
             함께하는 파트너사
           </p>
         </div>
@@ -181,13 +181,13 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 {[...partners, ...partners].map((p, i) => (
                   <div
                     key={`${p.alt}-${i}`}
-                    className="h-16 flex items-center justify-center shrink-0"
+                    className="h-20 flex items-center justify-center shrink-0"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={p.src}
                       alt={p.alt}
-                      className="h-12 md:h-14 w-auto object-contain opacity-90"
+                      className="h-16 md:h-[72px] w-auto object-contain opacity-90"
                     />
                   </div>
                 ))}
@@ -285,7 +285,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500/25 to-sky-500/10 border border-sky-400/25 flex items-center justify-center">
                     <s.icon className="w-5 h-5 text-sky-300" />
                   </div>
-                  <span className="text-[11px] text-sky-300/60 font-mono font-bold">{s.tag}</span>
+                  <span className="text-[13px] text-sky-300/60 font-mono font-bold">{s.tag}</span>
                 </div>
                 <h3 className="text-[20px] font-bold mb-3 tracking-[-0.02em]">{s.title}</h3>
                 <p className="text-[13.5px] text-white/60 leading-[1.85]">{s.body}</p>
@@ -463,7 +463,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <p className="text-[15px] font-bold">{c.co}</p>
-                    <p className="text-[11.5px] text-white/45 mt-0.5">{c.industry}</p>
+                    <p className="text-[13px] text-white/45 mt-0.5">{c.industry}</p>
                   </div>
                   <ArrowUpRight className="w-4 h-4 text-sky-300/60" />
                 </div>
@@ -710,7 +710,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     >
                       무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
                     </button>
-                    <p className="text-center text-[11px] text-white/40 pt-1">
+                    <p className="text-center text-[13px] text-white/40 pt-1">
                       평균 회신 3시간 이내 · 계약 강요 없음
                     </p>
                   </form>
@@ -768,10 +768,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <a href="/" className="flex items-center gap-2">
             <Image src={logoWhite} alt="PixelPage" width={90} height={18} className="h-4 w-auto opacity-70" />
           </a>
-          <p className="text-[11.5px] text-white/35 text-center">
+          <p className="text-[13px] text-white/35 text-center">
             © PIXELPAGE · pixelpage.co.kr · contact@pixelpage.co.kr
           </p>
-          <div className="flex items-center gap-3 text-[11.5px] text-white/35">
+          <div className="flex items-center gap-3 text-[13px] text-white/35">
             <a href="/columns" className="hover:text-white/60">칼럼</a>
             <span className="text-white/15">·</span>
             <a href="/consult" className="hover:text-white/60">상담</a>
