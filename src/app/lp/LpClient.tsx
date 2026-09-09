@@ -143,17 +143,6 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             </div>
           </div>
 
-          {/* 업종 태그 */}
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
-            {["교육", "코칭", "학원", "병원", "성형과", "인테리어", "태양광", "부동산", "법률", "프랜차이즈", "지식 SaaS"].map((t) => (
-              <span
-                key={t}
-                className="px-3.5 py-1.5 rounded-full text-[12px] border border-white/[0.08] text-white/55 bg-white/[0.02]"
-              >
-                {t}
-              </span>
-            ))}
-          </div>
         </div>
       </section>
 
