@@ -256,8 +256,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         id="solution"
         className="py-24 lg:py-32 relative overflow-hidden"
         style={{
-          background:
-            "radial-gradient(ellipse 800px 500px at 50% 0%, rgba(99,102,241,0.18) 0%, transparent 70%)",
+          background: [
+            "radial-gradient(ellipse 1100px 700px at 18% 92%, rgba(59,130,246,0.55) 0%, rgba(59,130,246,0.18) 35%, transparent 65%)",
+            "radial-gradient(ellipse 900px 600px at 8% 105%, rgba(14,165,233,0.45) 0%, transparent 55%)",
+            "radial-gradient(ellipse 800px 500px at 90% 10%, rgba(30,64,175,0.20) 0%, transparent 60%)",
+            "linear-gradient(180deg, #05080f 0%, #060b1a 50%, #04070e 100%)",
+          ].join(", "),
         }}
       >
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
