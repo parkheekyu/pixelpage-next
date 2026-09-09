@@ -307,10 +307,11 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
           <div className="mb-14">
             <PillLabel color="#facc15">Services</PillLabel>
-            <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] max-w-[720px]">
-              <span className="font-normal text-white/40">브랜드를 확장하기 위한</span><br />
-              <span className="font-extrabold">Solution</span>
-              <span className="font-normal text-white/40">을 설계합니다.</span>
+            <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] max-w-[820px]">
+              <span className="font-normal text-white/40">광고소재부터 랜딩페이지, CRM</span><br />
+              <span className="font-normal text-white/40">터질 때까지 </span>
+              <span className="font-extrabold text-sky-300">무한 테스트</span>
+              <span className="font-normal text-white/40">합니다.</span>
             </h2>
           </div>
 
