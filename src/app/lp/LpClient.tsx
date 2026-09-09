@@ -57,7 +57,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   };
 
   return (
-    <div className="bg-[#08080d] text-white min-h-screen selection:bg-blue-500/30">
+    <div className="bg-[#08080d] text-white min-h-screen selection:bg-sky-500/30">
       {/* ── Floating Pill Navbar ── */}
       <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[min(1120px,calc(100%-24px))]">
         <div className="rounded-full bg-[#0e0e18]/85 backdrop-blur-xl border border-white/[0.08] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.7)] px-5 py-2.5 flex items-center gap-2">
@@ -73,10 +73,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           </nav>
           <a
             href="#cta"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-blue-400/40 text-white text-[13px] font-medium"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/40 text-white text-[13px] font-medium"
           >
-            <span className="w-6 h-6 rounded-full bg-blue-500/25 flex items-center justify-center">
-              <MessageSquare className="w-3 h-3 text-blue-300" />
+            <span className="w-6 h-6 rounded-full bg-sky-500/25 flex items-center justify-center">
+              <MessageSquare className="w-3 h-3 text-sky-300" />
             </span>
             무료 상담 신청
           </a>
@@ -124,7 +124,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             </h1>
 
             {/* 스플릿 CTA */}
-            <div className="mt-14 inline-flex items-center gap-1 p-1 rounded-full bg-blue-500">
+            <div className="mt-14 inline-flex items-center gap-1 p-1 rounded-full bg-sky-500">
               <span className="px-5 py-3 text-white text-[13px] font-semibold whitespace-nowrap">
                 무료 상담부터 시작해 보세요
               </span>
@@ -136,7 +136,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
                   <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
                 </span>
-                <span className="w-6 h-6 rounded-full bg-blue-500 flex items-center justify-center">
+                <span className="w-6 h-6 rounded-full bg-sky-500 flex items-center justify-center">
                   <Phone className="w-3 h-3 text-white" />
                 </span>
               </a>
@@ -192,13 +192,13 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 {[...partners, ...partners].map((p, i) => (
                   <div
                     key={`${p.alt}-${i}`}
-                    className="h-14 flex items-center justify-center shrink-0"
+                    className="h-16 flex items-center justify-center shrink-0"
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={p.src}
                       alt={p.alt}
-                      className="h-10 md:h-12 w-auto object-contain opacity-90"
+                      className="h-12 md:h-14 w-auto object-contain opacity-90"
                     />
                   </div>
                 ))}
@@ -273,10 +273,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       >
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
           <div className="mb-16">
-            <PillLabel color="#60a5fa">Solution</PillLabel>
+            <PillLabel color="#38bdf8">Solution</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-normal text-white/40">그래서 픽셀페이지는</span><br />
-              <span className="font-extrabold text-blue-300">파트너형 DB 마케팅</span>
+              <span className="font-extrabold text-sky-300">파트너형 DB 마케팅</span>
               <span className="font-normal text-white/40">을 고집합니다.</span>
             </h2>
           </div>
@@ -290,13 +290,13 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             ].map((s) => (
               <div
                 key={s.tag}
-                className="rounded-3xl bg-[#0c0c14]/80 border border-blue-400/15 p-8 backdrop-blur-sm"
+                className="rounded-3xl bg-[#0c0c14]/80 border border-sky-400/15 p-8 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-between mb-6">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-blue-500/25 to-blue-500/10 border border-blue-400/25 flex items-center justify-center">
-                    <s.icon className="w-5 h-5 text-blue-300" />
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500/25 to-sky-500/10 border border-sky-400/25 flex items-center justify-center">
+                    <s.icon className="w-5 h-5 text-sky-300" />
                   </div>
-                  <span className="text-[11px] text-blue-300/60 font-mono font-bold">{s.tag}</span>
+                  <span className="text-[11px] text-sky-300/60 font-mono font-bold">{s.tag}</span>
                 </div>
                 <h3 className="text-[20px] font-bold mb-3 tracking-[-0.02em]">{s.title}</h3>
                 <p className="text-[13.5px] text-white/60 leading-[1.85]">{s.body}</p>
@@ -306,7 +306,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
           <div className="mt-16 text-center max-w-[640px] mx-auto">
             <p className="text-[19px] md:text-[22px] text-white leading-[1.55] font-semibold tracking-[-0.02em]">
-              들쑥날쑥한 <span className="text-blue-300">DB 품질 문제</span>,<br />
+              들쑥날쑥한 <span className="text-sky-300">DB 품질 문제</span>,<br />
               <span className="text-white/70 font-medium">구조를 만드는 방법으로 해결해 보세요.</span>
             </p>
           </div>
@@ -353,7 +353,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <ul className="space-y-3 mb-8">
                   {s.bullets.map((b) => (
                     <li key={b} className="flex items-center gap-3 text-[13.5px] text-white/70">
-                      <Check className="w-4 h-4 text-blue-400" strokeWidth={2.5} />
+                      <Check className="w-4 h-4 text-sky-400" strokeWidth={2.5} />
                       {b}
                     </li>
                   ))}
@@ -468,20 +468,20 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             ].map((c) => (
               <div
                 key={c.co}
-                className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-7 hover:border-blue-400/25 transition-colors"
+                className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-7 hover:border-sky-400/25 transition-colors"
               >
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <p className="text-[15px] font-bold">{c.co}</p>
                     <p className="text-[11.5px] text-white/45 mt-0.5">{c.industry}</p>
                   </div>
-                  <ArrowUpRight className="w-4 h-4 text-blue-300/60" />
+                  <ArrowUpRight className="w-4 h-4 text-sky-300/60" />
                 </div>
                 <div className="space-y-3.5">
                   {c.stats.map((s) => (
                     <div key={s.k} className="flex items-baseline justify-between">
                       <span className="text-[12.5px] text-white/50">{s.k}</span>
-                      <span className="text-[19px] font-extrabold text-blue-300 tabular-nums tracking-[-0.02em]">
+                      <span className="text-[19px] font-extrabold text-sky-300 tabular-nums tracking-[-0.02em]">
                         {s.v}
                       </span>
                     </div>
@@ -494,7 +494,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <div className="mt-10 text-center">
             <a
               href="#cta"
-              className="inline-flex items-center gap-1.5 text-[13px] text-blue-300 hover:text-blue-200 font-semibold border border-white/10 hover:border-white/25 px-5 py-2.5 rounded-full transition-colors"
+              className="inline-flex items-center gap-1.5 text-[13px] text-sky-300 hover:text-sky-200 font-semibold border border-white/10 hover:border-white/25 px-5 py-2.5 rounded-full transition-colors"
             >
               더 보기 <ArrowRight className="w-3.5 h-3.5" />
             </a>
@@ -585,7 +585,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     <h3 className="text-[22px] font-bold leading-[1.3]">
                       최근<br />인사이트?
                     </h3>
-                    <span className="w-11 h-11 rounded-full bg-blue-500 flex items-center justify-center">
+                    <span className="w-11 h-11 rounded-full bg-sky-500 flex items-center justify-center">
                       <ArrowUpRight className="w-4 h-4" />
                     </span>
                   </div>
@@ -597,11 +597,11 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <div className="mt-8 rounded-3xl bg-[#0f0f1a] border border-white/[0.05] px-8 py-10 flex items-center justify-between gap-6">
               <p className="text-[clamp(20px,2.6vw,32px)] font-bold leading-[1.25] tracking-[-0.02em]">
                 <span className="font-extrabold">We turn</span>
-                <span className="font-normal text-blue-400"> Ideas into </span>
+                <span className="font-normal text-sky-400"> Ideas into </span>
                 <span className="font-extrabold">successful</span>
                 <span className="font-normal text-white/50"> products. </span>
                 <span className="font-extrabold">Get</span>
-                <span className="font-normal text-blue-400"> to Know </span>
+                <span className="font-normal text-sky-400"> to Know </span>
                 <span className="font-extrabold">more.</span>
               </p>
               <Image
@@ -667,7 +667,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                         placeholder="박희규"
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-blue-400"
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
                       />
                     </div>
                     <div>
@@ -676,7 +676,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         value={form.company}
                         onChange={(e) => setForm({ ...form, company: e.target.value })}
                         placeholder="픽셀페이지"
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-blue-400"
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
                       />
                     </div>
                     <div>
@@ -686,7 +686,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         value={form.phone}
                         onChange={(e) => setForm({ ...form, phone: e.target.value })}
                         placeholder="010-0000-0000"
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-blue-400"
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
                       />
                     </div>
                     <div>
@@ -695,7 +695,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         required
                         value={form.budget}
                         onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-blue-400"
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-sky-400"
                       >
                         <option value="" className="bg-[#0a0a13]">선택하세요</option>
                         <option className="bg-[#0a0a13]">500만 원 미만</option>
@@ -716,7 +716,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     </label>
                     <button
                       type="submit"
-                      className="w-full mt-2 px-6 py-4 rounded-full bg-blue-500 hover:bg-blue-400 text-white text-[15px] font-bold transition-colors flex items-center justify-center gap-2"
+                      className="w-full mt-2 px-6 py-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white text-[15px] font-bold transition-colors flex items-center justify-center gap-2"
                     >
                       무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
                     </button>
@@ -730,10 +730,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               {/* Right — 카피 + 캐릭터 마스코트 */}
               <div className="flex flex-col justify-between">
                 <div>
-                  <PillLabel color="#60a5fa">Free Consultation</PillLabel>
+                  <PillLabel color="#38bdf8">Free Consultation</PillLabel>
                   <h2 className="mt-6 break-keep text-white text-[clamp(28px,4.2vw,48px)] font-extrabold leading-[1.15] tracking-[-0.035em] mb-6">
                     DB를 <span className="text-white/40 line-through decoration-[3px]">사지</span> 마세요.<br />
-                    <span className="text-blue-300">나오는 구조</span>를<br />만드세요.
+                    <span className="text-sky-300">나오는 구조</span>를<br />만드세요.
                   </h2>
                   <p className="text-[14px] text-white/60 leading-[1.85] mb-8">
                     광고 계정·랜딩·CRM을 함께 열어보고<br />
@@ -746,7 +746,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       "NDA 즉시 서명 가능",
                     ].map((v) => (
                       <li key={v} className="flex items-center gap-3 text-[14px] text-white/75">
-                        <Check className="w-4 h-4 text-blue-400" strokeWidth={2.5} />
+                        <Check className="w-4 h-4 text-sky-400" strokeWidth={2.5} />
                         {v}
                       </li>
                     ))}
@@ -755,13 +755,13 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
                 {/* 캐릭터 마스코트 카드 */}
                 <div className="flex items-center gap-5">
-                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-blue-500/40 to-blue-800/20 border border-blue-400/20 overflow-hidden flex items-end justify-center">
+                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-sky-500/40 to-sky-800/20 border border-sky-400/20 overflow-hidden flex items-end justify-center">
                     <Image src={charMale} alt="" width={96} height={96} className="w-full h-auto object-contain" />
                   </div>
                   <div>
                     <p className="text-[16px] font-bold">박희규</p>
                     <p className="text-[12px] text-white/50 mb-3">Founder, PixelPage</p>
-                    <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[12.5px] text-blue-300 hover:text-blue-200">
+                    <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[12.5px] text-sky-300 hover:text-sky-200">
                       <MessageSquare className="w-3.5 h-3.5" /> 카카오톡으로 바로 문의
                     </a>
                   </div>
