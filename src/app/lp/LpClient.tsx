@@ -17,6 +17,7 @@ import {
 import WhatWeDoSection from "@/components/agency/WhatWeDoSection";
 import ProcessSection from "@/components/agency/ProcessSection";
 import AgencyFAQSection from "@/components/agency/AgencyFAQSection";
+import MethodSection from "@/components/MethodSection";
 
 const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
@@ -247,42 +248,10 @@ const LpClient = () => {
         </div>
       </section>
 
-      {/* ── 5. One Team ── */}
-      <section className="py-24 lg:py-32 bg-[#0a0f1e]">
-        <div className="max-w-[1080px] mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-14 items-center">
-          <div>
-            <Eyebrow>One Team</Eyebrow>
-            <H2>
-              하나의 팀이<br />
-              처음부터 끝까지.
-            </H2>
-            <p className="mt-6 text-[16px] text-white/60 leading-[1.85]">
-              브랜드 맞춤 기획부터 <span className="text-white/85 font-semibold">디자인과 개발까지</span>,<br />
-              빠르게 제작하고 테스트합니다.
-            </p>
-          </div>
-          <div className="grid grid-cols-3 gap-3">
-            {[
-              { name: "기획", desc: "브랜드·타겟 진단" },
-              { name: "디자인", desc: "소재·랜딩 제작" },
-              { name: "개발", desc: "전환 트래킹·CRM" },
-            ].map((r) => (
-              <div
-                key={r.name}
-                className="rounded-2xl bg-[#0f1425] border border-white/[0.08] p-6 text-center"
-              >
-                <p className="text-[16px] font-bold mb-1.5 tracking-[-0.02em]">{r.name}</p>
-                <p className="text-[11.5px] text-white/50">{r.desc}</p>
-              </div>
-            ))}
-            <div className="col-span-3 rounded-2xl bg-gradient-to-br from-blue-500/10 to-blue-500/[0.02] border border-blue-400/15 p-5 text-center">
-              <span className="text-[11px] tracking-[0.28em] font-bold text-blue-300 uppercase">
-                ▶ ONE TEAM · 걸림 없는 리소스
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── 5. 하나의 팀이 처음부터 끝까지 (메인 MethodSection 재사용, 다크) ── */}
+      <div className="border-t border-white/[0.04]">
+        <MethodSection variant="dark" />
+      </div>
 
       {/* ── 6. Portfolio ── */}
       <section id="portfolio" className="py-24 lg:py-32 bg-[#0a0f1e] border-t border-white/[0.04]">

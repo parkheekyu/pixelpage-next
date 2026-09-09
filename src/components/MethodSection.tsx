@@ -383,35 +383,40 @@ const AccordionBlock = ({
   tag,
   title,
   items,
+  isDark = false,
 }: {
   tag: string;
   title: string;
   items: { head: string; body: string }[];
+  isDark?: boolean;
 }) => {
   const [openIdx, setOpenIdx] = useState<number>(0);
   return (
     <div>
-      <span className="inline-block text-[12px] font-semibold tracking-[0.08em] text-blue-500 bg-blue-50 px-3.5 py-1.5 rounded-full mb-5">
+      <span className={`inline-block text-[12px] font-semibold tracking-[0.08em] px-3.5 py-1.5 rounded-full mb-5 ${isDark ? "text-blue-300 bg-blue-500/15" : "text-blue-500 bg-blue-50"}`}>
         {tag}
       </span>
-      <h3 className="break-keep text-[clamp(26px,3vw,40px)] font-bold text-foreground leading-[1.18] tracking-[-0.025em] mb-8">
+      <h3 className={`break-keep text-[clamp(26px,3vw,40px)] font-bold leading-[1.18] tracking-[-0.025em] mb-8 ${isDark ? "text-white" : "text-foreground"}`}>
         {title}
       </h3>
       <div className="space-y-2">
         {items.map((it, i) => {
           const open = openIdx === i;
+          const borderCls = isDark
+            ? open ? "border-white/20 bg-[#0f1425]" : "border-white/[0.08] bg-[#0f1425]"
+            : open ? "border-foreground/20 bg-[#fbfbfb]" : "border-[#e5e7eb] bg-white";
           return (
             <div
               key={i}
-              className={`rounded-xl border transition-colors ${open ? "border-foreground/20 bg-[#fbfbfb]" : "border-[#e5e7eb] bg-white"}`}
+              className={`rounded-xl border transition-colors ${borderCls}`}
             >
               <button
                 onClick={() => setOpenIdx(open ? -1 : i)}
                 className="w-full px-5 py-4 lg:px-6 lg:py-5 flex items-center justify-between gap-4 text-left"
               >
-                <span className="text-[15px] lg:text-[16px] font-bold text-foreground">{it.head}</span>
+                <span className={`text-[15px] lg:text-[16px] font-bold ${isDark ? "text-white" : "text-foreground"}`}>{it.head}</span>
                 <Plus
-                  className={`w-4 h-4 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${open ? "rotate-45" : ""}`}
+                  className={`w-4 h-4 flex-shrink-0 transition-transform duration-300 ${isDark ? "text-white/40" : "text-muted-foreground"} ${open ? "rotate-45" : ""}`}
                 />
               </button>
               <AnimatePresence initial={false}>
@@ -425,7 +430,7 @@ const AccordionBlock = ({
                     style={{ overflow: "hidden" }}
                   >
                     <div className="px-5 pb-5 lg:px-6 lg:pb-6 pt-0">
-                      <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.85]">{it.body}</p>
+                      <p className={`text-[14px] lg:text-[15px] leading-[1.85] ${isDark ? "text-white/55" : "text-muted-foreground"}`}>{it.body}</p>
                     </div>
                   </motion.div>
                 )}
@@ -441,17 +446,21 @@ const AccordionBlock = ({
 /* ─────────────────────────────────────────────────────────────
    Main Section
 ───────────────────────────────────────────────────────────── */
-const MethodSection = () => (
-  <section className="py-28 lg:py-36" style={{ background: "#fbfbfb" }}>
+type Variant = "light" | "dark";
+
+const MethodSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
+  const isDark = variant === "dark";
+  return (
+  <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#fbfbfb" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-20 lg:mb-28">
-        <p className="text-[12px] font-semibold tracking-[0.18em] text-blue-500 mb-5">
+        <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
           픽셀페이지의 방식
         </p>
-        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.18] tracking-[-0.03em] mb-6">
+        <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] mb-6 ${isDark ? "text-white" : "text-foreground"}`}>
           하나의 팀이<br />처음부터 끝까지
         </h2>
-        <p className="text-[17px] md:text-[18px] text-muted-foreground leading-[1.85] max-w-[520px] mx-auto">
+        <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[520px] mx-auto ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
           광고, 랜딩, CRM을 분산하지 않아도 돼요.<br />
           픽셀페이지가 설계하고, 분석하고, 개선해요.
         </p>
@@ -468,7 +477,7 @@ const MethodSection = () => (
                   reverse ? "lg:[&>*:first-child]:order-2" : ""
                 }`}
               >
-                <AccordionBlock tag={b.tag} title={b.title} items={b.items} />
+                <AccordionBlock tag={b.tag} title={b.title} items={b.items} isDark={isDark} />
                 <div>
                   <Mockup />
                 </div>
@@ -479,6 +488,7 @@ const MethodSection = () => (
       </div>
     </div>
   </section>
-);
+  );
+};
 
 export default MethodSection;
