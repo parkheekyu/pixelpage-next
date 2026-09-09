@@ -265,7 +265,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <PillLabel color="#38bdf8">Solution</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-normal text-white/40">그래서 픽셀페이지는</span><br />
-              <span className="font-extrabold text-sky-300">파트너형 DB 마케팅</span>
+              <span className="font-extrabold text-white">파트너형 DB 마케팅</span>
               <span className="font-normal text-white/40">을 고집합니다.</span>
             </h2>
           </div>
@@ -310,7 +310,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] max-w-[820px]">
               <span className="font-normal text-white/40">광고소재부터 랜딩페이지, CRM</span><br />
               <span className="font-normal text-white/40">터질 때까지 </span>
-              <span className="font-extrabold text-sky-300">무한 테스트</span>
+              <span className="font-extrabold text-white">무한 테스트</span>
               <span className="font-normal text-white/40">합니다.</span>
             </h2>
           </div>
