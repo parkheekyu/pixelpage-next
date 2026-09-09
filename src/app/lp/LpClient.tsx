@@ -125,12 +125,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
             {/* 스플릿 CTA */}
             <div className="mt-14 inline-flex items-center gap-1 p-1 rounded-full bg-sky-500">
-              <span className="px-5 py-3 text-white text-[13px] font-semibold whitespace-nowrap">
-                무료 상담부터 시작해 보세요
+              <span className="px-6 py-3 text-white text-[15px] font-semibold whitespace-nowrap">
+                파트너형 DB 마케팅 도입 문의
               </span>
               <a
                 href="#cta"
-                className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[12px] font-bold uppercase tracking-[0.1em]"
+                className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[13px] font-bold uppercase tracking-[0.1em]"
               >
                 무료 상담
                 <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
