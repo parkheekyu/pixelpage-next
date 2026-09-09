@@ -193,11 +193,11 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 3. 문제 제기 ── */}
       <section id="problem" className="py-24 lg:py-32">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="mb-16">
             <PillLabel color="#f87171">Problem</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-normal text-white/40">기존의 DB 마케팅 방식으로는</span><br />
-              <span className="font-extrabold">매출 규모를 키우기 어렵습니다</span>
+              <span className="font-extrabold">매출 규모를 키우기 어렵습니다.</span>
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-[980px] mx-auto">
@@ -254,12 +254,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         }}
       >
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="text-center mb-16">
+          <div className="mb-16">
             <PillLabel color="#818cf8">Solution</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-normal text-white/40">그래서 픽셀페이지는</span><br />
               <span className="font-extrabold text-indigo-300">파트너형 DB 마케팅</span>
-              <span className="font-normal text-white/40">을 고집합니다</span>
+              <span className="font-normal text-white/40">을 고집합니다.</span>
             </h2>
           </div>
 
@@ -295,19 +295,80 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </section>
 
-      {/* ── 5. 하나의 팀이 처음부터 끝까지 (MethodSection 재사용) ── */}
+      {/* ── 5. Services (좌측 정렬) ── */}
+      <section id="service" className="py-24 lg:py-32 border-t border-white/[0.04]">
+        <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
+          <div className="mb-14">
+            <PillLabel color="#facc15">Services</PillLabel>
+            <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] max-w-[720px]">
+              <span className="font-normal text-white/40">브랜드를 확장하기 위한</span><br />
+              <span className="font-extrabold">Solution</span>
+              <span className="font-normal text-white/40">을 설계합니다.</span>
+            </h2>
+          </div>
+
+          {[
+            {
+              t: "무한 A/B 테스트로 광고 소재를 굴립니다",
+              d: "감이 아닌 데이터로 소재를 판단합니다. 매주 이긴 소재에 예산을 집중합니다.",
+              bullets: ["메타·구글·틱톡 전 채널 운영", "매주 A/B 테스트 결과 리뷰", "자체 기획·촬영·편집"],
+              reel: "2.mp4",
+            },
+            {
+              t: "전환율 중심의 랜딩페이지 설계",
+              d: "광고 카피와 랜딩 상단이 하나의 흐름으로 붙습니다. 방문자가 3초 안에 이탈하지 않도록.",
+              bullets: ["광고 ↔ 랜딩 메시지 연계", "전환 UI/UX 최적화", "DB 수집 시스템 점검"],
+              reel: "5.mp4",
+            },
+          ].map((s, i) => (
+            <div
+              key={s.t}
+              className={`rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-6 md:p-10 grid grid-cols-1 md:grid-cols-[1fr_1.15fr] gap-8 items-center mb-4 ${i % 2 === 1 ? "md:[&>*:first-child]:order-2" : ""}`}
+            >
+              <div>
+                <h3 className="text-[22px] md:text-[26px] font-bold mb-2 tracking-[-0.025em] leading-[1.35]">
+                  {s.t}
+                </h3>
+                <div className="w-16 h-px bg-white/15 my-5" />
+                <p className="text-[14px] text-white/55 leading-[1.85] mb-6">{s.d}</p>
+                <ul className="space-y-3 mb-8">
+                  {s.bullets.map((b) => (
+                    <li key={b} className="flex items-center gap-3 text-[13.5px] text-white/70">
+                      <Check className="w-4 h-4 text-indigo-400" strokeWidth={2.5} />
+                      {b}
+                    </li>
+                  ))}
+                </ul>
+                <a
+                  href="#cta"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/15 text-[12.5px] font-semibold hover:bg-white/[0.04]"
+                >
+                  Learn More <ArrowRight className="w-3.5 h-3.5" />
+                </a>
+              </div>
+              <div className="rounded-2xl overflow-hidden aspect-video bg-black">
+                <video autoPlay muted loop playsInline className="w-full h-full object-cover">
+                  <source src={`/reels/${s.reel}`} type="video/mp4" />
+                </video>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── 6. 하나의 팀이 처음부터 끝까지 (MethodSection 재사용) ── */}
       <div className="border-t border-white/[0.04]">
         <MethodSection variant="dark" />
       </div>
 
-      {/* ── 6. 포트폴리오 ── */}
+      {/* ── 7. 포트폴리오 ── */}
       <section id="portfolio" className="py-24 lg:py-32">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="text-center mb-14">
+          <div className="mb-14">
             <PillLabel color="#fb923c">Portfolio</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-extrabold">파트너사는 이만큼</span><br />
-              <span className="font-normal text-white/40">성장했습니다</span>
+              <span className="font-normal text-white/40">성장했습니다.</span>
             </h2>
           </div>
 
@@ -386,8 +447,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </section>
 
-      {/* ── 7. WhatWeDo (marketing agency 재사용, 다크) ── */}
-      <div id="service" className="border-t border-white/[0.04]">
+      {/* ── 8. WhatWeDo (marketing agency 재사용, 다크) ── */}
+      <div className="border-t border-white/[0.04]">
         <WhatWeDoSection variant="dark" />
       </div>
 
@@ -396,7 +457,111 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         <ProcessSection variant="dark" />
       </div>
 
-      {/* ── 9. FAQ (agency 재사용, 다크) ── */}
+      {/* ── 10. News & blogs (좌측 정렬, Notion 최근 칼럼) ── */}
+      {articles.length > 0 && (
+        <section id="blog" className="py-24 lg:py-32 border-t border-white/[0.04]">
+          <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
+            <div className="mb-14">
+              <PillLabel color="#fb923c">News & blogs</PillLabel>
+              <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
+                <span className="font-extrabold">Newest</span>
+                <span className="font-normal text-white/40"> Trend and</span><br />
+                <span className="font-normal text-white/40">Insights</span>
+                <span className="font-extrabold"> from our Team</span>
+              </h2>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {articles.slice(0, 2).map((a, i) => (
+                <a
+                  key={a.id}
+                  href={`/columns/${a.slug}`}
+                  className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-6 min-h-[380px] flex flex-col hover:border-white/15 transition-colors"
+                >
+                  <div className="w-11 h-11 rounded-xl overflow-hidden mb-6">
+                    <Image
+                      src={i === 0 ? charFemale : charMale}
+                      alt=""
+                      width={44}
+                      height={44}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="mt-auto">
+                    <p className="text-[12px] text-white/45 mb-3">
+                      {a.date
+                        ? new Date(a.date).toLocaleDateString("en-US", {
+                            day: "numeric",
+                            month: "short",
+                            year: "numeric",
+                          })
+                        : ""}
+                    </p>
+                    <h3 className="text-[17px] font-bold leading-[1.4] mb-3 line-clamp-2">
+                      {a.title}
+                    </h3>
+                    <p className="text-[13px] text-white/55 leading-[1.75] line-clamp-3">
+                      {a.description ||
+                        "픽셀페이지가 실제 광고비를 굴리며 검증한 인사이트입니다."}
+                    </p>
+                  </div>
+                </a>
+              ))}
+              {/* Featured card */}
+              <a
+                href={articles[0] ? `/columns/${articles[0].slug}` : "/columns"}
+                className="rounded-3xl overflow-hidden relative min-h-[380px] group"
+              >
+                <video
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="absolute inset-0 w-full h-full object-cover"
+                >
+                  <source src="/reels/7.mp4" type="video/mp4" />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/85" />
+                <div className="relative h-full p-6 flex flex-col justify-between text-white">
+                  <div className="flex items-center gap-1.5">
+                    <Image src={logoWhite} alt="" width={80} height={16} className="h-4 w-auto" />
+                  </div>
+                  <div className="flex items-end justify-between">
+                    <h3 className="text-[22px] font-bold leading-[1.3]">
+                      최근<br />인사이트?
+                    </h3>
+                    <span className="w-11 h-11 rounded-full bg-indigo-500 flex items-center justify-center">
+                      <ArrowUpRight className="w-4 h-4" />
+                    </span>
+                  </div>
+                </div>
+              </a>
+            </div>
+
+            {/* Bottom accent bar */}
+            <div className="mt-8 rounded-3xl bg-[#0f0f1a] border border-white/[0.05] px-8 py-10 flex items-center justify-between gap-6">
+              <p className="text-[clamp(20px,2.6vw,32px)] font-bold leading-[1.25] tracking-[-0.02em]">
+                <span className="font-extrabold">We turn</span>
+                <span className="font-normal text-indigo-400"> Ideas into </span>
+                <span className="font-extrabold">successful</span>
+                <span className="font-normal text-white/50"> products. </span>
+                <span className="font-extrabold">Get</span>
+                <span className="font-normal text-indigo-400"> to Know </span>
+                <span className="font-extrabold">more.</span>
+              </p>
+              <Image
+                src={logoWhite}
+                alt=""
+                width={80}
+                height={16}
+                className="h-5 w-auto opacity-40 hidden md:block flex-shrink-0"
+              />
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── 11. FAQ (agency 재사용, 다크) ── */}
       <div id="faq" className="border-t border-white/[0.04]">
         <AgencyFAQSection variant="dark" />
       </div>
