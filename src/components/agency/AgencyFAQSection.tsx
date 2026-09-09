@@ -24,36 +24,42 @@ const faqs = [
   },
 ];
 
-const AgencyFAQSection = () => {
+type Variant = "light" | "dark";
+
+const AgencyFAQSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
   const [openIdx, setOpenIdx] = useState<number>(0);
+  const isDark = variant === "dark";
   return (
-    <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
+    <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#ffffff" }}>
       <div className="max-w-[840px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-14">
-          <p className="text-[12px] font-semibold tracking-[0.18em] text-blue-500 mb-5">
+          <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
             자주 묻는 질문
           </p>
-          <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.18] tracking-[-0.03em]">
+          <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] ${isDark ? "text-white" : "text-foreground"}`}>
             궁금한 게 있으신가요?
           </h2>
         </Reveal>
         <Reveal className="space-y-3">
           {faqs.map((f, i) => {
             const open = openIdx === i;
+            const borderCls = isDark
+              ? open ? "border-white/20 bg-[#0f1425]" : "border-white/[0.08] bg-[#0f1425]"
+              : open ? "border-foreground/20 bg-white" : "border-[#e5e7eb] bg-white";
             return (
               <div
                 key={i}
-                className={`rounded-2xl border transition-colors ${open ? "border-foreground/20 bg-white" : "border-[#e5e7eb] bg-white"}`}
+                className={`rounded-2xl border transition-colors ${borderCls}`}
               >
                 <button
                   onClick={() => setOpenIdx(open ? -1 : i)}
                   className="w-full px-6 py-5 lg:px-7 lg:py-6 flex items-center justify-between gap-6 text-left"
                 >
-                  <span className="text-[16px] lg:text-[17px] font-semibold text-foreground">
+                  <span className={`text-[16px] lg:text-[17px] font-semibold ${isDark ? "text-white" : "text-foreground"}`}>
                     {f.q}
                   </span>
                   <Plus
-                    className={`w-5 h-5 text-muted-foreground flex-shrink-0 transition-transform duration-300 ${open ? "rotate-45" : ""}`}
+                    className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${isDark ? "text-white/40" : "text-muted-foreground"} ${open ? "rotate-45" : ""}`}
                   />
                 </button>
                 <AnimatePresence initial={false}>
@@ -67,7 +73,7 @@ const AgencyFAQSection = () => {
                       style={{ overflow: "hidden" }}
                     >
                       <div className="px-6 pb-5 lg:px-7 lg:pb-6 pt-0">
-                        <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.85]">
+                        <p className={`text-[14px] lg:text-[15px] leading-[1.85] ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
                           {f.a}
                         </p>
                       </div>

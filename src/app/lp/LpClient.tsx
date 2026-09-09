@@ -3,7 +3,6 @@
 import { useState } from "react";
 import {
   ArrowRight,
-  Check,
   MessageSquare,
   Search,
   Users,
@@ -13,9 +12,11 @@ import {
   Infinity as InfinityIcon,
   Target,
   Eye,
-  ChevronDown,
   ArrowUpRight,
 } from "lucide-react";
+import WhatWeDoSection from "@/components/agency/WhatWeDoSection";
+import ProcessSection from "@/components/agency/ProcessSection";
+import AgencyFAQSection from "@/components/agency/AgencyFAQSection";
 
 const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
@@ -367,167 +368,20 @@ const LpClient = () => {
         </div>
       </section>
 
-      {/* ── 7. What We Do ── */}
-      <section className="py-24 lg:py-32 bg-[#0a0f1e] border-t border-white/[0.04]">
-        <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
-          <div className="text-center mb-14">
-            <Eyebrow>What We Do</Eyebrow>
-            <H2>
-              광고부터 전환까지<br />
-              끊기지 않게 연결해요.
-            </H2>
-            <p className="mt-5 text-[14px] text-white/55 max-w-[520px] mx-auto leading-[1.85]">
-              세 개를 따로 굴리면 반드시 어딘가 끊깁니다.<br />
-              하나의 팀이 설계·분석·개선합니다.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-[1080px] mx-auto">
-            {[
-              {
-                tag: "01",
-                name: "퍼포먼스 마케팅",
-                sub: "상담 신청을 만드는 광고",
-                items: [
-                  "구조 기반 캠페인 설계",
-                  "소재 기획·제작·교체",
-                  "스케일링 & 예산 확장",
-                ],
-              },
-              {
-                tag: "02",
-                name: "랜딩페이지",
-                sub: "이탈을 막는 페이지",
-                items: [
-                  "광고 메시지 연계 설계",
-                  "전환 UI/UX 최적화",
-                  "DB 수집 시스템 점검",
-                ],
-              },
-              {
-                tag: "03",
-                name: "CRM 자동화",
-                sub: "신청을 매출로 바꾸는 시퀀스",
-                items: [
-                  "행동 기반 자동화 퍼널",
-                  "카톡·문자·이메일 분기",
-                  "육성 시퀀스 구축",
-                ],
-              },
-            ].map((s) => (
-              <div key={s.tag} className="rounded-2xl bg-[#0f1425] border border-white/[0.08] p-7">
-                <span className="inline-block text-[11px] font-bold tracking-[0.1em] text-blue-300 bg-blue-500/12 px-2.5 py-1 rounded-full mb-4">
-                  {s.tag}
-                </span>
-                <h3 className="text-[19px] font-bold mb-1 tracking-[-0.02em]">{s.name}</h3>
-                <p className="text-[13px] text-white/50 mb-5">{s.sub}</p>
-                <ul className="space-y-2.5">
-                  {s.items.map((it) => (
-                    <li
-                      key={it}
-                      className="flex items-start gap-2.5 text-[13.5px] text-white/70 leading-[1.65]"
-                    >
-                      <Check className="w-3.5 h-3.5 text-blue-400 mt-1 flex-shrink-0" strokeWidth={2.5} />
-                      <span>{it}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
-          <div className="mt-8 max-w-[1080px] mx-auto">
-            <div className="rounded-2xl bg-gradient-to-br from-blue-500/10 to-transparent border border-blue-400/15 px-7 py-6 text-center">
-              <p className="text-[11px] font-bold tracking-[0.28em] uppercase text-blue-300 mb-2">
-                Outcome
-              </p>
-              <p className="text-[18px] font-bold tracking-[-0.02em]">
-                이 모든 흐름이 <span className="text-blue-300">매출로 연결됩니다.</span>
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── 7. What We Do (agency 원본 컴포넌트, 다크) ── */}
+      <div id="service" className="border-t border-white/[0.04]">
+        <WhatWeDoSection variant="dark" />
+      </div>
 
-      {/* ── 8. Process ── */}
-      <section id="process" className="py-24 lg:py-32 bg-[#0a0f1e] border-t border-white/[0.04]">
-        <div className="max-w-[1080px] mx-auto px-6 lg:px-10">
-          <div className="text-center mb-14">
-            <Eyebrow>Process</Eyebrow>
-            <H2>
-              처음 만나는 순간부터<br />
-              투명하게 진행해요.
-            </H2>
-          </div>
-          <div className="relative">
-            <div className="hidden md:block absolute top-6 left-[12%] right-[12%] h-px bg-white/10" />
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 relative">
-              {[
-                { n: "01", t: "무료 마케팅 진단", d: "광고·랜딩·CRM 진단. 계약 없이 진단만 받으셔도 됩니다.", accent: false },
-                { n: "02", t: "파이프라인 구조 설계", d: "채널·소재·랜딩·시퀀스를 한 번에 설계합니다.", accent: false },
-                { n: "03", t: "실전 집행 & 주간 최적화", d: "매주 CPA·전환 기준으로 살릴지·끌지·교체할지 결정합니다.", accent: true },
-                { n: "04", t: "스케일링 & 성과 보고", d: "이긴 구조를 복제하고 예산을 단계적으로 확장합니다.", accent: true },
-              ].map((s) => (
-                <div key={s.n} className="text-center">
-                  <div
-                    className={`relative z-10 w-12 h-12 rounded-full mx-auto mb-5 flex items-center justify-center text-[13px] font-bold ${
-                      s.accent
-                        ? "bg-blue-500 text-white shadow-[0_0_0_6px_rgba(37,99,235,0.16)]"
-                        : "bg-[#0a0f1e] border border-white/15 text-white"
-                    }`}
-                  >
-                    {s.n}
-                  </div>
-                  <h3 className="text-[15px] font-bold mb-2 tracking-[-0.02em]">{s.t}</h3>
-                  <p className="text-[12.5px] text-white/50 leading-[1.75] px-1">{s.d}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* ── 8. Process (agency 원본 컴포넌트, 다크) ── */}
+      <div id="process" className="border-t border-white/[0.04]">
+        <ProcessSection variant="dark" />
+      </div>
 
-      {/* ── 9. FAQ ── */}
-      <section id="faq" className="py-24 lg:py-32 bg-[#0a0f1e] border-t border-white/[0.04]">
-        <div className="max-w-[820px] mx-auto px-6 lg:px-10">
-          <div className="text-center mb-12">
-            <Eyebrow>FAQ</Eyebrow>
-            <H2>궁금한 게 있으신가요?</H2>
-          </div>
-          <div className="divide-y divide-white/[0.06]">
-            {[
-              {
-                q: "일반 광고 대행사랑 뭐가 다른가요?",
-                a: "광고만 하지 않습니다. 광고·랜딩·CRM을 하나의 팀이 설계·분석·개선합니다. 퍼널 전체를 보기 때문에 어디가 문제인지 즉시 파악합니다.",
-              },
-              {
-                q: "월 광고비가 크지 않아도 가능한가요?",
-                a: "가능합니다. 다만 최소 3주 학습 예산은 확보하셔야 정확한 판단이 가능합니다. 무료 진단에서 예산 규모에 맞는 구조를 함께 잡아드립니다.",
-              },
-              {
-                q: "계약 기간은 어떻게 되나요?",
-                a: "월 단위 또는 프로젝트 단위로 유연하게 진행합니다. 진단 후 브랜드 상황에 맞는 구조를 함께 설계합니다.",
-              },
-              {
-                q: "무료 진단은 정말 무료인가요?",
-                a: "네. 계약 전에 광고 계정·랜딩 전환율·CRM 구조를 무료로 분석해 드립니다. 진단만 받고 안 하셔도 괜찮습니다.",
-              },
-              {
-                q: "우리 업종은 안 되던데 가능할까요?",
-                a: "B2C 상담이 필요한 업종이라면 대부분 가능합니다. 교육·코칭·의료·인테리어·태양광·법률 등 다양한 업종에서 성과를 만들었습니다.",
-              },
-            ].map((f, i) => (
-              <details key={i} className="group py-5">
-                <summary className="flex items-center justify-between cursor-pointer list-none">
-                  <span className="text-[15px] md:text-[16px] font-semibold text-white tracking-[-0.015em]">
-                    {f.q}
-                  </span>
-                  <ChevronDown className="w-5 h-5 text-white/40 transition-transform group-open:rotate-180 flex-shrink-0" />
-                </summary>
-                <p className="mt-4 text-[13.5px] text-white/55 leading-[1.85]">{f.a}</p>
-              </details>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* ── 9. FAQ (agency 원본 컴포넌트, 다크) ── */}
+      <div id="faq" className="border-t border-white/[0.04]">
+        <AgencyFAQSection variant="dark" />
+      </div>
 
       {/* ── 10. Final CTA ── */}
       <section

@@ -178,9 +178,11 @@ const services = [
 const ServiceTextBlock = ({
   s,
   i,
+  isDark = false,
 }: {
   s: (typeof services)[number];
   i: number;
+  isDark?: boolean;
 }) => (
   <motion.div
     initial={{ opacity: 0, x: 24 }}
@@ -188,20 +190,20 @@ const ServiceTextBlock = ({
     viewport={{ once: true, margin: "-60px" }}
     transition={{ duration: 0.55, delay: i * 0.1, ease: [0.22, 1, 0.36, 1] }}
   >
-    <span className="inline-block text-[11px] font-semibold tracking-[0.1em] uppercase text-blue-500 bg-blue-50 px-3 py-1 rounded-full mb-3">
+    <span className={`inline-block text-[11px] font-semibold tracking-[0.1em] uppercase px-3 py-1 rounded-full mb-3 ${isDark ? "text-blue-300 bg-blue-500/15" : "text-blue-500 bg-blue-50"}`}>
       {`0${i + 1}`}
     </span>
-    <h3 className="text-[22px] lg:text-[26px] font-bold text-foreground leading-[1.25] mb-1.5 tracking-[-0.02em]">
+    <h3 className={`text-[22px] lg:text-[26px] font-bold leading-[1.25] mb-1.5 tracking-[-0.02em] ${isDark ? "text-white" : "text-foreground"}`}>
       {s.name}
     </h3>
-    <p className="text-[15px] text-muted-foreground mb-6">{s.tagline}</p>
+    <p className={`text-[15px] mb-6 ${isDark ? "text-white/50" : "text-muted-foreground"}`}>{s.tagline}</p>
     <ul className="space-y-4">
       {s.items.map((it) => (
         <li key={it.head}>
-          <p className="text-[15px] lg:text-[16px] font-bold text-foreground leading-[1.5] mb-1">
+          <p className={`text-[15px] lg:text-[16px] font-bold leading-[1.5] mb-1 ${isDark ? "text-white" : "text-foreground"}`}>
             • {it.head}
           </p>
-          <p className="text-[14px] lg:text-[15px] text-muted-foreground leading-[1.8] pl-3">
+          <p className={`text-[14px] lg:text-[15px] leading-[1.8] pl-3 ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
             {it.body}
           </p>
         </li>
@@ -213,51 +215,56 @@ const ServiceTextBlock = ({
 /* ─────────────────────────────────────────────────────────────
    Main Section
 ───────────────────────────────────────────────────────────── */
-const WhatWeDoSection = () => (
-  <section className="py-28 lg:py-36" style={{ background: "#ffffff" }}>
-    <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <Reveal className="text-center mb-16 lg:mb-24">
-        <p className="text-[12px] font-semibold tracking-[0.18em] text-blue-500 mb-5">
-          무엇을 해드리나요
-        </p>
-        <h2 className="break-keep text-[clamp(32px,4.5vw,56px)] font-bold text-foreground leading-[1.18] tracking-[-0.03em] mb-6">
-          광고부터 전환까지<br />끊기지 않게 연결해요.
-        </h2>
-        <p className="text-[17px] md:text-[18px] text-muted-foreground leading-[1.85] max-w-[560px] mx-auto">
-          세 개를 따로 굴리면 반드시 어딘가 끊겨요.<br />
-          픽셀페이지는 하나의 팀이 설계하고, 분석하고, 개선해요.
-        </p>
-      </Reveal>
+type Variant = "light" | "dark";
 
-      <div className="grid grid-cols-1 lg:grid-cols-[minmax(280px,360px)_1fr] gap-12 lg:gap-20 items-start">
-        {/* 좌측 — 파이프라인 일러스트 */}
-        <div className="lg:sticky lg:top-32 flex justify-center">
-          <PipelineIllustration />
-        </div>
-        {/* 우측 — 서비스 텍스트 3블록 + 마무리 */}
-        <div className="space-y-14 lg:space-y-20">
-          {services.map((s, i) => (
-            <ServiceTextBlock key={s.name} s={s} i={i} />
-          ))}
-          {/* 마무리 카피 — Sales 카드 옆 */}
-          <motion.div
-            initial={{ opacity: 0, x: 24 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.55, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-2xl border border-blue-100 bg-blue-50/50 p-7 lg:p-8"
-          >
-            <p className="text-[11px] font-semibold tracking-[0.1em] uppercase text-blue-500 mb-3">
-              Outcome
-            </p>
-            <p className="text-[17px] lg:text-[20px] font-bold text-foreground leading-[1.5] tracking-[-0.015em]">
-              이 모든 흐름이<br />매출로 연결돼요.
-            </p>
-          </motion.div>
+const WhatWeDoSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
+  const isDark = variant === "dark";
+  return (
+    <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#ffffff" }}>
+      <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
+        <Reveal className="text-center mb-16 lg:mb-24">
+          <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
+            무엇을 해드리나요
+          </p>
+          <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] mb-6 ${isDark ? "text-white" : "text-foreground"}`}>
+            광고부터 전환까지<br />끊기지 않게 연결해요.
+          </h2>
+          <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[560px] mx-auto ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
+            세 개를 따로 굴리면 반드시 어딘가 끊겨요.<br />
+            픽셀페이지는 하나의 팀이 설계하고, 분석하고, 개선해요.
+          </p>
+        </Reveal>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(280px,360px)_1fr] gap-12 lg:gap-20 items-start">
+          {/* 좌측 — 파이프라인 일러스트 */}
+          <div className="lg:sticky lg:top-32 flex justify-center">
+            <PipelineIllustration />
+          </div>
+          {/* 우측 — 서비스 텍스트 3블록 + 마무리 */}
+          <div className="space-y-14 lg:space-y-20">
+            {services.map((s, i) => (
+              <ServiceTextBlock key={s.name} s={s} i={i} isDark={isDark} />
+            ))}
+            {/* 마무리 카피 — Sales 카드 옆 */}
+            <motion.div
+              initial={{ opacity: 0, x: 24 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.55, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+              className={`rounded-2xl border p-7 lg:p-8 ${isDark ? "border-blue-400/20 bg-blue-500/[0.06]" : "border-blue-100 bg-blue-50/50"}`}
+            >
+              <p className={`text-[11px] font-semibold tracking-[0.1em] uppercase mb-3 ${isDark ? "text-blue-300" : "text-blue-500"}`}>
+                Outcome
+              </p>
+              <p className={`text-[17px] lg:text-[20px] font-bold leading-[1.5] tracking-[-0.015em] ${isDark ? "text-white" : "text-foreground"}`}>
+                이 모든 흐름이<br />매출로 연결돼요.
+              </p>
+            </motion.div>
+          </div>
         </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 export default WhatWeDoSection;
