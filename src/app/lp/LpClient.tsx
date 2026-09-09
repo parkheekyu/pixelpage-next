@@ -158,40 +158,55 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       </section>
 
       {/* ── 2. 함께하는 파트너사 ── */}
-      <section className="py-14 border-y border-white/[0.06]">
+      <section className="py-14 border-y border-white/[0.06] overflow-hidden">
         <div className="max-w-[1240px] mx-auto px-6 lg:px-8">
           <p className="text-center text-[11px] tracking-[0.28em] font-semibold text-white/40 mb-8 uppercase">
             함께하는 파트너사
           </p>
-          <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-x-6 gap-y-4">
-            {[
-              { src: "/lp-partners/1.png", alt: "DIHABOOKS" },
-              { src: "/lp-partners/2.png", alt: "안부스쿨" },
-              { src: "/lp-partners/3.png", alt: "플러스스피치" },
-              { src: "/lp-partners/4.png", alt: "GIM COMPANY" },
-              { src: "/lp-partners/5.png", alt: "B:forest" },
-              { src: "/lp-partners/6.png", alt: "빌리언 캠퍼스" },
-              { src: "/lp-partners/7.png", alt: "BOOTSTRAPPER" },
-              { src: "/lp-partners/8.png", alt: "디지털 노마드" },
-              { src: "/lp-partners/9.png", alt: "RUNMOA" },
-              { src: "/lp-partners/10.png", alt: "funnelmoa" },
-              { src: "/lp-partners/11.png", alt: "Cosmosfarm" },
-            ].map((p) => (
-              <div
-                key={p.alt}
-                className="h-14 flex items-center justify-center opacity-60 hover:opacity-90 transition-opacity"
-              >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={p.src}
-                  alt={p.alt}
-                  className="max-h-full max-w-full object-contain"
-                  style={{ filter: "brightness(0) invert(1) opacity(0.75)" }}
-                />
-              </div>
-            ))}
-          </div>
         </div>
+        {(() => {
+          const partners = [
+            { src: "/lp-partners/1.png", alt: "DIHABOOKS" },
+            { src: "/lp-partners/2.png", alt: "안부스쿨" },
+            { src: "/lp-partners/3.png", alt: "플러스스피치" },
+            { src: "/lp-partners/4.png", alt: "GIM COMPANY" },
+            { src: "/lp-partners/5.png", alt: "B:forest" },
+            { src: "/lp-partners/6.png", alt: "빌리언 캠퍼스" },
+            { src: "/lp-partners/7.png", alt: "BOOTSTRAPPER" },
+            { src: "/lp-partners/8.png", alt: "디지털 노마드" },
+            { src: "/lp-partners/9.png", alt: "RUNMOA" },
+            { src: "/lp-partners/10.png", alt: "funnelmoa" },
+            { src: "/lp-partners/11.png", alt: "Cosmosfarm" },
+          ];
+          return (
+            <div
+              className="relative"
+              style={{
+                maskImage:
+                  "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+                WebkitMaskImage:
+                  "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+              }}
+            >
+              <div className="flex w-max animate-marquee gap-14">
+                {[...partners, ...partners].map((p, i) => (
+                  <div
+                    key={`${p.alt}-${i}`}
+                    className="h-14 flex items-center justify-center shrink-0"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={p.src}
+                      alt={p.alt}
+                      className="h-10 md:h-12 w-auto object-contain"
+                      style={{ filter: "brightness(0) invert(1) opacity(0.7)" }}
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
       </section>
 
       {/* ── 3. 문제 제기 ── */}
