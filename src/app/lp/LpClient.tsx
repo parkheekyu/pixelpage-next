@@ -5,6 +5,9 @@ import { useState } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
+  Check,
+  Phone,
+  Star,
   Search,
   Users,
   TrendingDown,
@@ -15,7 +18,10 @@ import {
   Eye,
   MessageSquare,
 } from "lucide-react";
-import logoPixelpage from "@/assets/logo-pixelpage.png";
+import charMale from "@/assets/char-male.png";
+import charFemale from "@/assets/char-female.png";
+import charCurly from "@/assets/char-curly.png";
+import logoWhite from "@/assets/logo-white.png";
 import WhatWeDoSection from "@/components/agency/WhatWeDoSection";
 import ProcessSection from "@/components/agency/ProcessSection";
 import AgencyFAQSection from "@/components/agency/AgencyFAQSection";
@@ -33,15 +39,6 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
   >
     {children}
   </span>
-);
-
-const PurpleBtn = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a
-    href={href}
-    className="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white text-[15px] font-semibold transition-colors shadow-[0_18px_40px_-12px_rgba(99,102,241,0.55)]"
-  >
-    {children}
-  </a>
 );
 
 /* ─────────────────────── Main ─────────────────────── */
@@ -63,41 +60,40 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
     <div className="bg-[#08080d] text-white min-h-screen selection:bg-indigo-500/30">
       {/* ── Floating Pill Navbar ── */}
       <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[min(1120px,calc(100%-24px))]">
-        <div className="rounded-full bg-[#0e0e18]/85 backdrop-blur-xl border border-white/[0.08] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.7)] px-4 py-2 flex items-center gap-2">
-          <a href="/" className="flex items-center gap-2 pl-2 pr-3">
-            <Image src={logoPixelpage} alt="PixelPage" width={26} height={26} className="h-6 w-6" />
-            <span className="text-white font-bold text-[15px] tracking-[-0.02em]" style={{ fontFamily: "'Playfair Display', var(--font-playfair), serif" }}>
-              PixelPage
-            </span>
+        <div className="rounded-full bg-[#0e0e18]/85 backdrop-blur-xl border border-white/[0.08] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.7)] px-5 py-2.5 flex items-center gap-2">
+          <a href="/" className="flex items-center gap-2 pl-1 pr-3">
+            <Image src={logoWhite} alt="PixelPage" width={100} height={20} className="h-5 w-auto" />
           </a>
           <nav className="hidden md:flex items-center gap-1 flex-1 justify-center text-[13px]">
-            <a href="#problem" className="px-4 py-2 rounded-full text-white/60 hover:text-white">문제</a>
-            <a href="#solution" className="px-4 py-2 rounded-full text-white/60 hover:text-white">해결</a>
-            <a href="#portfolio" className="px-4 py-2 rounded-full text-white/60 hover:text-white">성과</a>
-            <a href="#process" className="px-4 py-2 rounded-full text-white/60 hover:text-white">진행 방식</a>
-            <a href="#faq" className="px-4 py-2 rounded-full text-white/60 hover:text-white">FAQ</a>
+            <a href="#problem" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">문제</a>
+            <a href="#solution" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">해결</a>
+            <a href="#portfolio" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">성과</a>
+            <a href="#process" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">진행 방식</a>
+            <a href="#faq" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">FAQ</a>
           </nav>
           <a
             href="#cta"
-            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white text-[13px] font-semibold transition-colors"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-indigo-400/40 text-white text-[13px] font-medium"
           >
-            무료 상담
-            <ArrowRight className="w-3.5 h-3.5" />
+            <span className="w-6 h-6 rounded-full bg-indigo-500/25 flex items-center justify-center">
+              <MessageSquare className="w-3 h-3 text-indigo-300" />
+            </span>
+            무료 상담 신청
           </a>
         </div>
       </header>
 
-      {/* ── 1. Hero (와이드) ── */}
+      {/* ── 1. 히어로 (와이드, WeTechPro DNA) ── */}
       <section
-        className="relative pt-[160px] pb-24 lg:pt-[180px] lg:pb-40 overflow-hidden"
+        className="relative pt-[120px] pb-24 lg:pt-[140px] lg:pb-32 overflow-hidden"
         style={{
           background:
-            "radial-gradient(ellipse 1400px 720px at 50% 30%, rgba(99,102,241,0.32) 0%, rgba(99,102,241,0.08) 40%, transparent 70%), linear-gradient(180deg, #0b0b16 0%, #08080d 100%)",
+            "radial-gradient(ellipse 1400px 720px at 50% 30%, rgba(99,102,241,0.30) 0%, rgba(99,102,241,0.07) 45%, transparent 70%), linear-gradient(180deg, #0b0b16 0%, #08080d 100%)",
         }}
       >
-        {/* 은은한 그리드/노이즈 패턴 */}
+        {/* 은은한 그리드 패턴 */}
         <div
-          className="absolute inset-0 opacity-[0.06] pointer-events-none"
+          className="absolute inset-0 opacity-[0.05] pointer-events-none"
           style={{
             backgroundImage:
               "linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)",
@@ -106,8 +102,35 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         />
 
         <div className="relative max-w-[1240px] mx-auto px-6 lg:px-8 text-center">
-          <PillLabel color="#818cf8">Partner DB Marketing</PillLabel>
-          <h1 className="mt-8 break-keep text-white text-[clamp(42px,7vw,90px)] font-extrabold leading-[1.08] tracking-[-0.04em]">
+          {/* Google 리뷰 아바타 스택 */}
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <div className="flex -space-x-2">
+              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] overflow-hidden bg-orange-200">
+                <Image src={charMale} alt="" width={32} height={32} className="w-full h-full object-cover" />
+              </div>
+              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] bg-pink-100 flex items-center justify-center overflow-hidden">
+                <Image src={charFemale} alt="" width={32} height={32} className="w-full h-full object-cover" />
+              </div>
+              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] bg-white flex items-center justify-center text-[13px] font-bold text-blue-600">
+                G
+              </div>
+              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] overflow-hidden">
+                <Image src={charCurly} alt="" width={32} height={32} className="w-full h-full object-cover" />
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-1.5 mb-1.5">
+            <span className="text-[14px] font-bold">4.9</span>
+            <div className="flex gap-0.5">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+              ))}
+            </div>
+          </div>
+          <p className="text-[11.5px] text-white/45 mb-10">Rated on Google by various clients</p>
+
+          {/* 큰 하이브리드 타이틀 */}
+          <h1 className="break-keep text-white text-[clamp(44px,7.5vw,96px)] font-extrabold leading-[1.05] tracking-[-0.045em]">
             <span className="block">폭발적인 매출 향상</span>
             <span className="block bg-gradient-to-r from-indigo-300 via-indigo-400 to-indigo-300 bg-clip-text text-transparent">
               파트너형 DB 마케팅
@@ -117,10 +140,37 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             광고 소재부터 랜딩페이지, CRM 마케팅을<br />
             <span className="text-white/85 font-semibold">터질 때까지 무한 테스트</span>합니다.
           </p>
-          <div className="mt-12">
-            <PurpleBtn href="#cta">무료 상담 신청하기 <ArrowRight className="w-4 h-4" /></PurpleBtn>
+
+          {/* WeTechPro 스플릿 CTA */}
+          <div className="mt-12 inline-flex items-center gap-1 p-1 rounded-full bg-indigo-500">
+            <span className="px-5 py-3 text-white text-[13px] font-semibold whitespace-nowrap">
+              무료 상담부터 시작하세요
+            </span>
+            <a
+              href="#cta"
+              className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[12px] font-bold uppercase tracking-[0.1em]"
+            >
+              무료 상담
+              <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
+                <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
+              </span>
+              <span className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center">
+                <Phone className="w-3 h-3 text-white" />
+              </span>
+            </a>
           </div>
-          <p className="mt-6 text-[12.5px] text-white/40">평균 회신 3시간 이내 · 계약 강요 없음</p>
+
+          {/* 업종 태그 스크롤 */}
+          <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+            {["교육", "코칭", "학원", "병원", "성형과", "인테리어", "태양광", "부동산", "법률", "프랜차이즈", "지식 SaaS"].map((t) => (
+              <span
+                key={t}
+                className="px-3.5 py-1.5 rounded-full text-[12px] border border-white/[0.08] text-white/55 bg-white/[0.02]"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
         </div>
       </section>
 
@@ -175,7 +225,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             ].map((p) => (
               <div
                 key={p.tag}
-                className="rounded-3xl border border-white/[0.06] bg-[#0c0c14] p-8 hover:border-red-400/20 transition-colors"
+                className="rounded-3xl border border-white/[0.06] bg-[#0c0c14] p-8 hover:border-red-400/25 transition-colors"
               >
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 rounded-xl bg-red-500/10 border border-red-400/20 flex items-center justify-center flex-shrink-0">
@@ -336,7 +386,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </section>
 
-      {/* ── 7. What We Do (marketing agency 재사용, 다크) ── */}
+      {/* ── 7. WhatWeDo (marketing agency 재사용, 다크) ── */}
       <div id="service" className="border-t border-white/[0.04]">
         <WhatWeDoSection variant="dark" />
       </div>
@@ -351,7 +401,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         <AgencyFAQSection variant="dark" />
       </div>
 
-      {/* ── 10. CTA ── */}
+      {/* ── 10. CTA (WeTechPro DNA — 좌 폼 + 우 캐릭터 마스코트) ── */}
       <section
         id="cta"
         className="py-24 lg:py-32 relative overflow-hidden border-t border-white/[0.06]"
@@ -360,100 +410,144 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             "radial-gradient(ellipse 900px 500px at 50% 100%, rgba(99,102,241,0.28) 0%, transparent 70%), linear-gradient(180deg, #08080d 0%, #0b0b16 100%)",
         }}
       >
-        <div className="max-w-[720px] mx-auto px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <PillLabel color="#818cf8">Free Consultation</PillLabel>
-            <h2 className="mt-6 break-keep text-white text-[clamp(30px,4.5vw,54px)] font-extrabold leading-[1.15] tracking-[-0.035em]">
-              DB를 <span className="text-white/40 line-through decoration-[3px]">사지</span> 마세요.<br />
-              <span className="text-indigo-300">나오는 구조</span>를 만드세요.
-            </h2>
-            <p className="mt-6 text-[15px] text-white/60 leading-[1.85]">
-              광고 계정·랜딩·CRM을 함께 열어보고 어디가 새는지 찾아드립니다.<br />
-              계약 없이도 괜찮습니다.
-            </p>
-          </div>
+        <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
+          <div className="rounded-3xl border border-white/[0.06] bg-[#0c0c14]/80 backdrop-blur-sm p-6 md:p-10 lg:p-14 relative overflow-hidden">
+            {/* 파도 라인 패턴 */}
+            <div
+              className="absolute inset-0 opacity-25 pointer-events-none"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(115deg, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 42px)",
+              }}
+            />
 
-          {submitted ? (
-            <div className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-10 text-center">
-              <p className="text-[18px] font-semibold mb-3">신청이 접수되었습니다.</p>
-              <p className="text-[13px] text-white/55 mb-6">평균 3시간 이내 담당자가 연락드립니다.</p>
-              <a
-                href={KAKAO_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#FEE500] text-[#181600] text-[14px] font-bold hover:bg-[#ffe95c] transition-colors"
-              >
-                <MessageSquare className="w-4 h-4" /> 카카오톡으로 바로 문의
-              </a>
-            </div>
-          ) : (
-            <form onSubmit={submit} className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-7 md:p-9 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <input
-                  required
-                  value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  placeholder="성함"
-                  className="w-full px-4 py-3.5 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-indigo-400"
-                />
-                <input
-                  value={form.company}
-                  onChange={(e) => setForm({ ...form, company: e.target.value })}
-                  placeholder="회사·브랜드명"
-                  className="w-full px-4 py-3.5 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-indigo-400"
-                />
+            <div className="relative grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-10">
+              {/* Left — form */}
+              <div className="rounded-3xl bg-[#0a0a13] border border-white/[0.06] p-7 md:p-8">
+                <p className="text-[13px] font-semibold mb-6">지금 상담부터 시작하세요</p>
+                {submitted ? (
+                  <div className="py-12 text-center">
+                    <p className="text-[16px] font-semibold mb-3">신청이 접수되었습니다.</p>
+                    <p className="text-[13px] text-white/55 mb-6">평균 3시간 이내 회신드립니다.</p>
+                    <a
+                      href={KAKAO_URL}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FEE500] text-[#181600] text-[13px] font-bold"
+                    >
+                      <MessageSquare className="w-4 h-4" /> 카카오톡으로 바로 문의
+                    </a>
+                  </div>
+                ) : (
+                  <form onSubmit={submit} className="space-y-4">
+                    <div>
+                      <label className="text-[12px] text-white/55 mb-1.5 block">성함 *</label>
+                      <input
+                        required
+                        value={form.name}
+                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        placeholder="박희규"
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-indigo-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] text-white/55 mb-1.5 block">회사·브랜드명</label>
+                      <input
+                        value={form.company}
+                        onChange={(e) => setForm({ ...form, company: e.target.value })}
+                        placeholder="픽셀페이지"
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-indigo-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] text-white/55 mb-1.5 block">연락처 *</label>
+                      <input
+                        required
+                        value={form.phone}
+                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                        placeholder="010-0000-0000"
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-indigo-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-[12px] text-white/55 mb-1.5 block">월 광고 예산 *</label>
+                      <select
+                        required
+                        value={form.budget}
+                        onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-indigo-400"
+                      >
+                        <option value="" className="bg-[#0a0a13]">선택하세요</option>
+                        <option className="bg-[#0a0a13]">500만 원 미만</option>
+                        <option className="bg-[#0a0a13]">500 ~ 1,000만 원</option>
+                        <option className="bg-[#0a0a13]">1,000 ~ 3,000만 원</option>
+                        <option className="bg-[#0a0a13]">3,000만 원 이상</option>
+                      </select>
+                    </div>
+                    <label className="flex items-start gap-2.5 text-[12px] text-white/50 cursor-pointer pt-1">
+                      <input
+                        type="checkbox"
+                        checked={form.agree}
+                        onChange={(e) => setForm({ ...form, agree: e.target.checked })}
+                        className="mt-0.5"
+                        required
+                      />
+                      <span>개인정보 수집·이용에 동의합니다.</span>
+                    </label>
+                    <button
+                      type="submit"
+                      className="w-full mt-2 px-6 py-4 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white text-[15px] font-bold transition-colors flex items-center justify-center gap-2"
+                    >
+                      무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
+                    </button>
+                    <p className="text-center text-[11px] text-white/40 pt-1">
+                      평균 회신 3시간 이내 · 계약 강요 없음
+                    </p>
+                  </form>
+                )}
               </div>
-              <input
-                required
-                value={form.phone}
-                onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                placeholder="연락처"
-                className="w-full px-4 py-3.5 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-indigo-400"
-              />
-              <select
-                required
-                value={form.budget}
-                onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                className="w-full px-4 py-3.5 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-indigo-400"
-              >
-                <option value="" className="bg-[#0c0c14]">월 광고 예산 선택</option>
-                <option className="bg-[#0c0c14]">500만 원 미만</option>
-                <option className="bg-[#0c0c14]">500 ~ 1,000만 원</option>
-                <option className="bg-[#0c0c14]">1,000 ~ 3,000만 원</option>
-                <option className="bg-[#0c0c14]">3,000만 원 이상</option>
-              </select>
-              <label className="flex items-start gap-2.5 text-[12.5px] text-white/50 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={form.agree}
-                  onChange={(e) => setForm({ ...form, agree: e.target.checked })}
-                  className="mt-0.5"
-                  required
-                />
-                <span>개인정보 수집·이용에 동의합니다. (상담 목적 외 사용하지 않습니다)</span>
-              </label>
-              <button
-                type="submit"
-                className="w-full mt-2 px-6 py-4 rounded-full bg-indigo-500 hover:bg-indigo-400 text-white text-[15px] font-bold shadow-[0_18px_40px_-14px_rgba(99,102,241,0.55)] transition-colors"
-              >
-                무료 상담 신청하기 →
-              </button>
-              <p className="text-center text-[11.5px] text-white/40 pt-1">
-                평균 회신 3시간 이내 · 계약 강요 없음
-              </p>
-            </form>
-          )}
 
-          <div className="mt-8 text-center text-[12.5px] text-white/40">
-            바로 대화가 편하신가요? &nbsp;
-            <a
-              href={KAKAO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#FEE500] font-semibold hover:underline"
-            >
-              카카오톡 채널로 문의 →
-            </a>
+              {/* Right — 카피 + 캐릭터 마스코트 */}
+              <div className="flex flex-col justify-between">
+                <div>
+                  <PillLabel color="#818cf8">Free Consultation</PillLabel>
+                  <h2 className="mt-6 break-keep text-white text-[clamp(28px,4.2vw,48px)] font-extrabold leading-[1.15] tracking-[-0.035em] mb-6">
+                    DB를 <span className="text-white/40 line-through decoration-[3px]">사지</span> 마세요.<br />
+                    <span className="text-indigo-300">나오는 구조</span>를<br />만드세요.
+                  </h2>
+                  <p className="text-[14px] text-white/60 leading-[1.85] mb-8">
+                    광고 계정·랜딩·CRM을 함께 열어보고<br />
+                    어디가 새는지 찾아드립니다. 계약 없이도 괜찮습니다.
+                  </p>
+                  <ul className="space-y-3.5 mb-10">
+                    {[
+                      "평균 회신 3시간 이내",
+                      "브랜드 전담 담당자 배정",
+                      "NDA 즉시 서명 가능",
+                    ].map((v) => (
+                      <li key={v} className="flex items-center gap-3 text-[14px] text-white/75">
+                        <Check className="w-4 h-4 text-indigo-400" strokeWidth={2.5} />
+                        {v}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* 캐릭터 마스코트 카드 */}
+                <div className="flex items-center gap-5">
+                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-indigo-500/40 to-indigo-800/20 border border-indigo-400/20 overflow-hidden flex items-end justify-center">
+                    <Image src={charMale} alt="" width={96} height={96} className="w-full h-auto object-contain" />
+                  </div>
+                  <div>
+                    <p className="text-[16px] font-bold">박희규</p>
+                    <p className="text-[12px] text-white/50 mb-3">Founder, PixelPage</p>
+                    <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[12.5px] text-indigo-300 hover:text-indigo-200">
+                      <MessageSquare className="w-3.5 h-3.5" /> 카카오톡으로 바로 문의
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -462,10 +556,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       <footer className="py-12 bg-[#06060a] border-t border-white/[0.05]">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <a href="/" className="flex items-center gap-2">
-            <Image src={logoPixelpage} alt="PixelPage" width={22} height={22} className="h-5 w-5 opacity-70" />
-            <span className="text-white/60 font-bold text-[14px] tracking-[-0.02em]" style={{ fontFamily: "'Playfair Display', var(--font-playfair), serif" }}>
-              PixelPage
-            </span>
+            <Image src={logoWhite} alt="PixelPage" width={90} height={18} className="h-4 w-auto opacity-70" />
           </a>
           <p className="text-[11.5px] text-white/35 text-center">
             © PIXELPAGE · pixelpage.co.kr · contact@pixelpage.co.kr
