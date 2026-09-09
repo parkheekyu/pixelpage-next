@@ -83,85 +83,68 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </header>
 
-      {/* ── 1. 히어로 (와이드, WeTechPro DNA) ── */}
-      <section
-        className="relative pt-[120px] pb-24 lg:pt-[140px] lg:pb-32 overflow-hidden"
-        style={{
-          background:
-            "radial-gradient(ellipse 1400px 720px at 50% 30%, rgba(99,102,241,0.30) 0%, rgba(99,102,241,0.07) 45%, transparent 70%), linear-gradient(180deg, #0b0b16 0%, #08080d 100%)",
-        }}
-      >
-        {/* 은은한 그리드 패턴 */}
-        <div
-          className="absolute inset-0 opacity-[0.05] pointer-events-none"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.7) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.7) 1px, transparent 1px)",
-            backgroundSize: "80px 80px",
-          }}
-        />
-
-        <div className="relative max-w-[1240px] mx-auto px-6 lg:px-8 text-center">
-          {/* Google 리뷰 아바타 스택 */}
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <div className="flex -space-x-2">
-              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] overflow-hidden bg-orange-200">
-                <Image src={charMale} alt="" width={32} height={32} className="w-full h-full object-cover" />
-              </div>
-              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] bg-pink-100 flex items-center justify-center overflow-hidden">
-                <Image src={charFemale} alt="" width={32} height={32} className="w-full h-full object-cover" />
-              </div>
-              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] bg-white flex items-center justify-center text-[13px] font-bold text-blue-600">
-                G
-              </div>
-              <div className="w-8 h-8 rounded-full border-2 border-[#0b0b16] overflow-hidden">
-                <Image src={charCurly} alt="" width={32} height={32} className="w-full h-full object-cover" />
+      {/* ── 1. 히어로 (검정 배경 + 라운드 카드 안에 원래 WeTechPro 스타일) ── */}
+      <section className="pt-[110px] pb-16 lg:pt-[130px] lg:pb-24 bg-black">
+        <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
+          <div className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-8 md:p-16 lg:p-24 text-center">
+            {/* Google 리뷰 아바타 스택 */}
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="flex -space-x-2">
+                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] overflow-hidden bg-orange-200">
+                  <Image src={charMale} alt="" width={32} height={32} className="w-full h-full object-cover" />
+                </div>
+                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] bg-pink-100 flex items-center justify-center overflow-hidden">
+                  <Image src={charFemale} alt="" width={32} height={32} className="w-full h-full object-cover" />
+                </div>
+                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] bg-white flex items-center justify-center text-[13px] font-bold text-blue-600">
+                  G
+                </div>
+                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] overflow-hidden">
+                  <Image src={charCurly} alt="" width={32} height={32} className="w-full h-full object-cover" />
+                </div>
               </div>
             </div>
-          </div>
-          <div className="flex items-center justify-center gap-1.5 mb-1.5">
-            <span className="text-[14px] font-bold">4.9</span>
-            <div className="flex gap-0.5">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
-              ))}
+            <div className="flex items-center justify-center gap-1.5 mb-1.5">
+              <span className="text-[14px] font-bold">4.9</span>
+              <div className="flex gap-0.5">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
+                ))}
+              </div>
+            </div>
+            <p className="text-[11.5px] text-white/45 mb-10">Rated on Google by various clients</p>
+
+            {/* 큰 하이브리드 타이틀 */}
+            <h1 className="break-keep text-[clamp(44px,7.5vw,96px)] leading-[1.05] tracking-[-0.045em]">
+              <span className="block font-extrabold text-white">폭발적인 매출을</span>
+              <span className="block">
+                <span className="font-normal text-white/40">향해서 </span>
+                <span className="font-extrabold text-white">달립니다.</span>
+              </span>
+            </h1>
+
+            {/* 스플릿 CTA */}
+            <div className="mt-14 inline-flex items-center gap-1 p-1 rounded-full bg-indigo-500">
+              <span className="px-5 py-3 text-white text-[13px] font-semibold whitespace-nowrap">
+                무료 상담부터 시작해 보세요
+              </span>
+              <a
+                href="#cta"
+                className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[12px] font-bold uppercase tracking-[0.1em]"
+              >
+                무료 상담
+                <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
+                  <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
+                </span>
+                <span className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center">
+                  <Phone className="w-3 h-3 text-white" />
+                </span>
+              </a>
             </div>
           </div>
-          <p className="text-[11.5px] text-white/45 mb-10">Rated on Google by various clients</p>
 
-          {/* 큰 하이브리드 타이틀 */}
-          <h1 className="break-keep text-white text-[clamp(44px,7.5vw,96px)] font-extrabold leading-[1.05] tracking-[-0.045em]">
-            <span className="block">폭발적인 매출 향상</span>
-            <span className="block bg-gradient-to-r from-indigo-300 via-indigo-400 to-indigo-300 bg-clip-text text-transparent">
-              파트너형 DB 마케팅
-            </span>
-          </h1>
-          <p className="mt-10 text-[17px] md:text-[19px] text-white/60 leading-[1.85] max-w-[560px] mx-auto">
-            광고 소재부터 랜딩페이지, CRM 마케팅을<br />
-            <span className="text-white/85 font-semibold">터질 때까지 무한 테스트</span>합니다.
-          </p>
-
-          {/* WeTechPro 스플릿 CTA */}
-          <div className="mt-12 inline-flex items-center gap-1 p-1 rounded-full bg-indigo-500">
-            <span className="px-5 py-3 text-white text-[13px] font-semibold whitespace-nowrap">
-              무료 상담부터 시작하세요
-            </span>
-            <a
-              href="#cta"
-              className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[12px] font-bold uppercase tracking-[0.1em]"
-            >
-              무료 상담
-              <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
-                <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
-              </span>
-              <span className="w-6 h-6 rounded-full bg-indigo-500 flex items-center justify-center">
-                <Phone className="w-3 h-3 text-white" />
-              </span>
-            </a>
-          </div>
-
-          {/* 업종 태그 스크롤 */}
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
+          {/* 업종 태그 */}
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2">
             {["교육", "코칭", "학원", "병원", "성형과", "인테리어", "태양광", "부동산", "법률", "프랜차이즈", "지식 SaaS"].map((t) => (
               <span
                 key={t}
