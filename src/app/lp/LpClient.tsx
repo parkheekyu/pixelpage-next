@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   ArrowRight,
+  Check,
   MessageSquare,
   Search,
   Users,
@@ -12,7 +13,6 @@ import {
   Infinity as InfinityIcon,
   Target,
   Eye,
-  ArrowUpRight,
 } from "lucide-react";
 import WhatWeDoSection from "@/components/agency/WhatWeDoSection";
 import ProcessSection from "@/components/agency/ProcessSection";
@@ -81,29 +81,98 @@ const LpClient = () => {
         </div>
       </header>
 
-      {/* ── 1. Hero ── */}
+      {/* ── 1. Hero (좌측 카피 + 우측 실시간 대시보드 목업) ── */}
       <section
-        className="relative pt-[150px] pb-28 lg:pb-36 overflow-hidden text-center"
+        className="relative pt-[130px] pb-24 lg:pb-32 overflow-hidden"
         style={{
           background:
-            "radial-gradient(ellipse 900px 600px at 50% 20%, rgba(37,99,235,0.35) 0%, rgba(37,99,235,0.08) 40%, transparent 70%), linear-gradient(180deg, #0a0f1e 0%, #06090f 100%)",
+            "radial-gradient(ellipse 900px 700px at 78% 45%, rgba(37,99,235,0.55) 0%, rgba(37,99,235,0.2) 40%, transparent 70%), linear-gradient(180deg, #0a0f1e 0%, #06090f 100%)",
         }}
       >
-        <div className="max-w-[880px] mx-auto px-6 lg:px-10 relative">
-          <p className="inline-flex items-center gap-2 text-[12px] font-semibold tracking-[0.22em] uppercase text-blue-300 bg-white/[0.04] border border-white/[0.08] px-4 py-2 rounded-full mb-10">
-            <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
-            Partner DB Marketing
-          </p>
-          <h1 className="break-keep text-white text-[clamp(38px,5.8vw,68px)] font-extrabold leading-[1.15] tracking-[-0.035em] mb-8">
-            폭발적인 매출 향상<br />
-            <span className="text-blue-400">파트너형 DB 마케팅</span>
-          </h1>
-          <p className="text-[17px] md:text-[19px] text-white/60 leading-[1.75] max-w-[560px] mx-auto mb-12">
-            광고 소재부터 랜딩페이지, CRM 마케팅을<br />
-            <span className="text-white/85 font-semibold">터질 때까지 무한 테스트</span>합니다.
-          </p>
-          <PrimaryBtn href="#cta">무료 상담 신청하기 <ArrowRight className="w-4 h-4" /></PrimaryBtn>
-          <p className="mt-6 text-[12.5px] text-white/40">평균 회신 3시간 이내 · 계약 강요 없음</p>
+        <div className="max-w-[1240px] mx-auto px-6 lg:px-10 grid grid-cols-1 lg:grid-cols-[1.05fr_1fr] gap-12 items-center">
+          {/* Left — copy */}
+          <div>
+            <p className="inline-flex items-center gap-2 text-[12px] font-semibold tracking-[0.22em] uppercase text-blue-300 bg-white/[0.04] border border-white/[0.08] px-4 py-2 rounded-full mb-8">
+              <span className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-pulse" />
+              Partner DB Marketing
+            </p>
+            <h1 className="break-keep text-white text-[clamp(38px,5.5vw,60px)] font-extrabold leading-[1.14] tracking-[-0.035em] mb-7">
+              폭발적인 매출 향상<br />
+              <span className="text-blue-400">파트너형 DB 마케팅</span>
+            </h1>
+            <p className="text-[16px] md:text-[18px] text-white/60 leading-[1.8] max-w-[520px] mb-10">
+              광고 소재부터 랜딩페이지, CRM 마케팅을<br />
+              <span className="text-white/85 font-semibold">터질 때까지 무한 테스트</span>합니다.
+            </p>
+            <PrimaryBtn href="#cta">무료 상담 신청하기 <ArrowRight className="w-4 h-4" /></PrimaryBtn>
+            <p className="mt-5 text-[12.5px] text-white/40">평균 회신 3시간 이내 · 계약 강요 없음</p>
+          </div>
+
+          {/* Right — floating dashboard mockups */}
+          <div className="relative h-[440px] hidden lg:block">
+            {/* 카톡 알림 카드 (상단) */}
+            <div className="absolute top-0 right-0 w-[340px] rounded-2xl bg-[#0f1729]/85 backdrop-blur-md border border-white/10 shadow-[0_25px_60px_-20px_rgba(0,0,0,0.6)] p-5">
+              <div className="flex items-center justify-between text-[11px] mb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-white/70 font-semibold">신규 DB 인입</span>
+                </div>
+                <span className="text-emerald-300 font-mono">● 실시간</span>
+              </div>
+              <div className="space-y-2.5">
+                {[
+                  { name: "김OO 님 상담 신청", tag: "메타", time: "14:02" },
+                  { name: "이OO 님 견적 요청", tag: "검색", time: "13:48" },
+                  { name: "박OO 님 문의", tag: "GDN", time: "12:57" },
+                ].map((r, i) => (
+                  <div key={i} className="flex items-center gap-3 rounded-lg bg-white/[0.03] px-3 py-2.5">
+                    <span className="text-[13px]">📩</span>
+                    <span className="flex-1 text-[12px] text-white/85 truncate">{r.name}</span>
+                    <span className="text-[10px] text-blue-300 bg-blue-500/15 px-1.5 py-0.5 rounded font-semibold">{r.tag}</span>
+                    <span className="text-[10px] text-white/40 font-mono">{r.time}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* DB 전환율 카드 (하단) */}
+            <div className="absolute bottom-0 left-0 w-[360px] rounded-2xl bg-[#0f1729]/85 backdrop-blur-md border border-white/10 shadow-[0_25px_60px_-20px_rgba(0,0,0,0.6)] p-5">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <p className="text-[11px] text-white/50 font-semibold">DB 전환율</p>
+                  <p className="text-[9px] text-white/35">최근 30일 · 파트너사 평균</p>
+                </div>
+                <span className="text-[10px] font-bold text-emerald-300 bg-emerald-500/12 px-2 py-1 rounded">▲ +38%</span>
+              </div>
+              <div className="space-y-2.5 mb-4">
+                {[
+                  { label: "랜딩 접속", value: "12,480", pct: 90 },
+                  { label: "DB 폼 진입", value: "4,120", pct: 55 },
+                  { label: "최종 제출", value: "1,864", pct: 26 },
+                ].map((b) => (
+                  <div key={b.label}>
+                    <div className="flex items-center justify-between text-[11px] mb-1">
+                      <span className="text-white/60">{b.label}</span>
+                      <span className="text-white/85 font-mono tabular-nums">{b.value}</span>
+                    </div>
+                    <div className="h-1.5 rounded-full bg-white/5 overflow-hidden">
+                      <div className="h-full rounded-full bg-gradient-to-r from-blue-500 to-blue-300" style={{ width: `${b.pct}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="flex items-center justify-between pt-3 border-t border-white/5 text-[11px]">
+                <span className="text-white/50">폼 전환율</span>
+                <div className="flex items-baseline gap-3">
+                  <span className="text-blue-300 text-[26px] font-bold tracking-tight">14.9%</span>
+                  <div className="text-right">
+                    <div className="text-white/40 text-[9px]">DB 단가</div>
+                    <div className="text-white font-semibold tabular-nums">12,400원</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -248,91 +317,128 @@ const LpClient = () => {
         </div>
       </section>
 
+      {/* ── ⚡ POINT 1: 큰 임팩트 숫자 ── */}
+      <section className="py-20 lg:py-28 bg-[#06090f] border-y border-white/[0.06]">
+        <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-12 md:gap-6">
+            {[
+              { label: "2025년 광고 취급액", n: "10억", plus: "+" },
+              { label: "누적 상담 DB", n: "10만", plus: "+" },
+              { label: "누적 컨설팅", n: "500명", plus: "+" },
+            ].map((m) => (
+              <div key={m.n} className="text-center md:text-left">
+                <p className="text-[11px] tracking-[0.24em] font-semibold text-white/45 mb-4 uppercase">{m.label}</p>
+                <p className="text-[clamp(48px,6vw,72px)] font-extrabold tracking-[-0.045em] leading-none">
+                  <span className="text-blue-400">{m.n}</span>
+                  <span className="text-blue-400/60">{m.plus}</span>
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── 5. 하나의 팀이 처음부터 끝까지 (메인 MethodSection 재사용, 다크) ── */}
       <div className="border-t border-white/[0.04]">
         <MethodSection variant="dark" />
       </div>
 
-      {/* ── 6. Portfolio ── */}
-      <section id="portfolio" className="py-24 lg:py-32 bg-[#0a0f1e] border-t border-white/[0.04]">
-        <div className="max-w-[1240px] mx-auto px-6 lg:px-10">
+      {/* ── ⚡ POINT 2: 브라이트 블루 성과 섹션 (Portfolio) ── */}
+      <section
+        id="portfolio"
+        className="relative py-24 lg:py-32 overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(180deg, #06090f 0%, #0f2570 12%, #1e40af 45%, #1e3fa8 65%, #0f2570 88%, #06090f 100%)",
+        }}
+      >
+        {/* 블루 스캔 라인 효과 */}
+        <div
+          className="absolute inset-0 opacity-30 pointer-events-none"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(90deg, transparent 0, transparent 3px, rgba(255,255,255,0.02) 3px, rgba(255,255,255,0.02) 4px)",
+          }}
+        />
+        <div className="relative max-w-[1240px] mx-auto px-6 lg:px-10">
           <div className="text-center mb-14">
-            <Eyebrow>Portfolio</Eyebrow>
-            <H2>
-              파트너사는<br />
-              이만큼 성장했습니다.
-            </H2>
+            <p className="text-[11px] font-bold tracking-[0.28em] uppercase text-blue-200 mb-4">Project Result</p>
+            <h2 className="break-keep text-white text-[clamp(30px,4.2vw,48px)] font-bold leading-[1.2] tracking-[-0.035em]">
+              함께한 파트너사,<br />
+              모두 성장했습니다.
+            </h2>
+            <p className="mt-5 text-[15px] text-white/70">데이터 기반 전략으로 실질적인 성과를 만들었습니다.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+          {/* 큰 카드 3장 (흰 배경) */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               {
-                co: "성인 D교육",
-                industry: "지식 콘텐츠",
-                stats: [
-                  { k: "DB 단가", v: "-42%", positive: true },
-                  { k: "DB 수", v: "3.1배", positive: true },
-                  { k: "매출", v: "10배", positive: true },
-                ],
+                mult: "10x",
+                year: "2025년 매출 100억",
+                co: "D사",
+                sub: "성인 교육 · 지식 콘텐츠",
+                bullets: ["DB 매체 채널 최적화로 광고비 가성비 확보", "리드폼 → 세일즈 콜 자동화 안착", "픽셀 도입 후 유저 액션 수치화"],
               },
               {
-                co: "강남 P학원",
-                industry: "학원 프랜차이즈",
-                stats: [
-                  { k: "DB 단가", v: "-58%", positive: true },
-                  { k: "월 상담", v: "2.4배", positive: true },
-                  { k: "매출", v: "2배", positive: true },
-                ],
+                mult: "2.4x",
+                year: "2025년 매출 24억",
+                co: "P사",
+                sub: "학원 프랜차이즈 로컬",
+                bullets: ["지역 특성 맞춤 타깃·소재 세팅", "상세 랜딩·소재 A/B 테스트", "고관여 타깃 전환율 개선"],
               },
               {
-                co: "태양광 G",
-                industry: "시공 서비스",
-                stats: [
-                  { k: "일 문의", v: "20배", positive: true },
-                  { k: "전환율", v: "2배", positive: true },
-                  { k: "매출", v: "3배", positive: true },
-                ],
-              },
-              {
-                co: "코칭 M",
-                industry: "1:1 코칭",
-                stats: [
-                  { k: "DB 단가", v: "-35%", positive: true },
-                  { k: "상담 예약", v: "3.8배", positive: true },
-                  { k: "매출", v: "4배", positive: true },
-                ],
+                mult: "3.0x",
+                year: "2025년 매출 6억",
+                co: "G사",
+                sub: "태양광 시공 서비스",
+                bullets: ["카톡 알림·검색광고 그룹 세분화", "광고소재·랜딩 예산 500만 확대", "신규 KPI·캠페인 라이브"],
               },
             ].map((c) => (
               <div
                 key={c.co}
-                className="rounded-2xl bg-[#0f1425] border border-white/[0.08] p-6 hover:border-blue-400/25 transition-colors"
+                className="rounded-2xl bg-white p-7 lg:p-8 shadow-[0_20px_50px_-20px_rgba(0,0,0,0.4)] transition-transform hover:-translate-y-1"
               >
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <p className="text-[15px] font-bold">{c.co}</p>
-                    <p className="text-[11px] text-white/45 mt-0.5">{c.industry}</p>
-                  </div>
-                  <ArrowUpRight className="w-4 h-4 text-blue-300/60" />
-                </div>
-                <div className="space-y-3">
-                  {c.stats.map((s) => (
-                    <div key={s.k} className="flex items-baseline justify-between">
-                      <span className="text-[12px] text-white/50">{s.k}</span>
-                      <span className="text-[18px] font-extrabold text-blue-300 tabular-nums">
-                        {s.v}
-                      </span>
-                    </div>
-                  ))}
+                <p className="text-[clamp(32px,3.8vw,42px)] font-extrabold text-[#0a0f1e] tracking-[-0.04em] leading-none">
+                  {c.mult} <span className="text-[16px] font-bold text-blue-600 align-middle">성장</span>
+                </p>
+                <p className="mt-2 text-[12px] text-[#8b95a1]">{c.year}</p>
+                <div className="mt-5 pt-5 border-t border-[#eef0f4]">
+                  <p className="text-[15px] font-bold text-blue-600 mb-1">{c.co}</p>
+                  <p className="text-[12px] text-[#6b7280] mb-4">{c.sub}</p>
+                  <ul className="space-y-2.5">
+                    {c.bullets.map((b, i) => (
+                      <li key={i} className="flex items-start gap-2 text-[12.5px] text-[#374151] leading-[1.65]">
+                        <Check className="w-3.5 h-3.5 text-blue-500 mt-0.5 flex-shrink-0" strokeWidth={2.5} />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-10 text-center">
-            <a
-              href="#cta"
-              className="inline-flex items-center gap-1.5 text-[13px] text-blue-300 hover:text-blue-200 font-semibold border border-white/10 hover:border-white/25 px-5 py-2.5 rounded-full transition-colors"
-            >
-              더 보기 <ArrowRight className="w-3.5 h-3.5" />
-            </a>
+
+          {/* Case Index — 반투명 테이블 */}
+          <div className="mt-10 rounded-2xl bg-white/[0.08] backdrop-blur-md border border-white/15 overflow-hidden">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
+              <p className="text-[11px] font-bold tracking-[0.22em] text-white/75 uppercase">Case Index</p>
+              <p className="text-[11px] text-white/50">업종이 달라도 실행 사이클은 같습니다</p>
+            </div>
+            {[
+              { co: "D사", biz: "성인 교육", db: "-42%", cnt: "3.1배", mult: "10x" },
+              { co: "P사", biz: "학원 프랜차이즈", db: "-58%", cnt: "2.4배", mult: "2.4x" },
+              { co: "G사", biz: "태양광 시공", db: "-30%", cnt: "20배", mult: "3x" },
+              { co: "M사", biz: "1:1 코칭", db: "-35%", cnt: "3.8배", mult: "4x" },
+            ].map((r) => (
+              <div key={r.co} className="grid grid-cols-[70px_1fr_90px_90px_70px] gap-4 items-center px-6 py-4 border-b border-white/5 last:border-b-0 text-[13px]">
+                <span className="text-white font-bold">{r.co}</span>
+                <span className="text-white/70">{r.biz}</span>
+                <span className="text-blue-200 font-mono tabular-nums text-right">DB {r.db}</span>
+                <span className="text-blue-200 font-mono tabular-nums text-right">{r.cnt}</span>
+                <span className="text-white font-bold text-right">{r.mult}</span>
+              </div>
+            ))}
           </div>
         </div>
       </section>
