@@ -198,8 +198,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     <img
                       src={p.src}
                       alt={p.alt}
-                      className="h-10 md:h-12 w-auto object-contain"
-                      style={{ filter: "brightness(0) invert(1) opacity(0.7)" }}
+                      className="h-10 md:h-12 w-auto object-contain opacity-90"
                     />
                   </div>
                 ))}
