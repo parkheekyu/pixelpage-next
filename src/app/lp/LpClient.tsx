@@ -69,11 +69,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <Image src={logoWhite} alt="PixelPage" width={100} height={20} className="h-5 w-auto" />
           </a>
           <nav className="hidden md:flex items-center gap-1 flex-1 justify-center text-[16px]">
-            <a href="#problem" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">문제</a>
-            <a href="#solution" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">해결</a>
-            <a href="#portfolio" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">성과</a>
+            <a href="#solution" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">소개</a>
             <a href="#process" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">진행 방식</a>
             <a href="#faq" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">FAQ</a>
+            <a href="/columns" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">무료 칼럼</a>
           </nav>
           <a
             href="#cta"
@@ -82,7 +81,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <span className="w-6 h-6 rounded-full bg-sky-500/25 flex items-center justify-center">
               <MessageSquare className="w-3 h-3 text-sky-300" />
             </span>
-            무료 상담 신청
+            파트너형 DB 도입
           </a>
         </div>
       </header>
@@ -557,7 +556,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         <section id="blog" className="py-16 md:py-24 lg:py-32 border-t border-white/[0.04]">
           <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
             <div className="mb-14 text-center">
-              <PillLabel color="#fb923c">News & blogs</PillLabel>
+              <PillLabel color="#fb923c">최근 인사이트</PillLabel>
               <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
                 <span className="font-normal text-white/40">꼭 저희가 아니어도 좋습니다</span><br />
                 <span className="font-extrabold">칼럼 먼저 읽어보세요.</span>
