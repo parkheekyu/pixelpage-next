@@ -400,26 +400,34 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   ))}
                 </div>
               ) : (
-                <div className="relative rounded-2xl overflow-hidden bg-black h-[420px] md:h-[440px]">
-                  {["/lp-landings/landing1.png", "/lp-landings/landing2.png", "/lp-landings/landing3.png"].map((src, li) => (
-                    <img
-                      key={src}
-                      src={src}
-                      alt=""
-                      className="absolute inset-x-0 top-0 w-full select-none pointer-events-none"
-                      style={{
-                        animation: `landing-cycle 30s linear ${li * 10}s infinite`,
-                        willChange: "transform, opacity",
-                      }}
-                    />
+                <div
+                  className="relative rounded-2xl overflow-hidden bg-black h-[420px] md:h-[440px] flex gap-3 p-3"
+                  style={{
+                    WebkitMaskImage:
+                      "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+                    maskImage:
+                      "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+                  }}
+                >
+                  {[
+                    { src: "/lp-landings/landing1.png", dir: "animate-marquee-up" },
+                    { src: "/lp-landings/landing2.png", dir: "animate-marquee-down" },
+                    { src: "/lp-landings/landing3.png", dir: "animate-marquee-up" },
+                  ].map((col, ci) => (
+                    <div key={ci} className="flex-1 overflow-hidden rounded-xl">
+                      <div className={col.dir} style={{ animationDuration: "50s" }}>
+                        {[0, 1].map((k) => (
+                          /* eslint-disable-next-line @next/next/no-img-element */
+                          <img
+                            key={k}
+                            src={col.src}
+                            alt=""
+                            className="w-full block select-none pointer-events-none"
+                          />
+                        ))}
+                      </div>
+                    </div>
                   ))}
-                  <div
-                    className="absolute inset-0 pointer-events-none"
-                    style={{
-                      background:
-                        "linear-gradient(to bottom, rgba(12,12,20,0.5) 0%, transparent 6%, transparent 94%, rgba(12,12,20,0.5) 100%)",
-                    }}
-                  />
                 </div>
               )}
             </div>
