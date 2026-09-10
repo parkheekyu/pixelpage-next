@@ -9,7 +9,7 @@ import logoWhite from "@/assets/logo-white.png";
 
 const darkHeroPages = ["/", "/consult", "/cases", "/products/glue", "/columns", "/services/agency", "/services/consulting", "/services/performance", "/services/branded", "/services/crm", "/services/seo", "/services/webbuild"];
 
-const hiddenChromePages = ["/info", "/lp"];
+const hiddenChromePages = ["/", "/info", "/thank-you"];
 
 const navItems: {
   label: string;

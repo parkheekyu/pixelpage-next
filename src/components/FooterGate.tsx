@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Footer from "./Footer";
 
-const hiddenChromePages = ["/info", "/lp"];
+const hiddenChromePages = ["/", "/info", "/thank-you"];
 
 const FooterGate = () => {
   const pathname = usePathname();

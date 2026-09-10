@@ -2,7 +2,7 @@
 
 import { usePathname } from "next/navigation";
 
-const HIDDEN_PATHS = ["/info", "/lp"];
+const HIDDEN_PATHS = ["/", "/info", "/thank-you"];
 const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
 const KakaoFloatButton = () => {
