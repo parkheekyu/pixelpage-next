@@ -520,10 +520,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <div className="mb-14">
               <PillLabel color="#fb923c">News & blogs</PillLabel>
               <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
-                <span className="font-extrabold">Newest</span>
-                <span className="font-normal text-white/40"> Trend and</span><br />
-                <span className="font-normal text-white/40">Insights</span>
-                <span className="font-extrabold"> from our Team</span>
+                <span className="font-normal text-white/40">꼭 저희가 아니어도 좋습니다</span><br />
+                <span className="font-extrabold">칼럼 먼저 읽어보세요.</span>
               </h2>
             </div>
 
