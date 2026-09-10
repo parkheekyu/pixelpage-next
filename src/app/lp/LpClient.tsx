@@ -79,26 +79,30 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </header>
 
-      {/* ── 1. 히어로 (검정 배경 + 라운드 카드 안에 원래 WeTechPro 스타일) ── */}
-      <section className="pt-[110px] pb-16 lg:pt-[130px] lg:pb-24 bg-black">
-        <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="relative rounded-3xl border border-white/[0.06] p-8 md:p-16 lg:p-24 text-center overflow-hidden">
-            {/* 배경 동영상 */}
-            <video
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="metadata"
-              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
-              aria-hidden="true"
-            >
-              <source src="/lp-hero/hero.mp4" type="video/mp4" />
-            </video>
-            {/* 어두운 오버레이 */}
-            <div className="absolute inset-0 bg-[#0c0c14]/78 pointer-events-none" />
-            {/* 콘텐츠 */}
-            <div className="relative">
+      {/* ── 1. 히어로 (섹션 전체 영상 배경 + 짙은 오버레이) ── */}
+      <section className="relative pt-[130px] pb-24 lg:pt-[170px] lg:pb-32 bg-black overflow-hidden">
+        {/* 배경 동영상 */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+          aria-hidden="true"
+        >
+          <source src="/lp-hero/hero.mp4" type="video/mp4" />
+        </video>
+        {/* 짙은 오버레이 */}
+        <div className="absolute inset-0 bg-black/82 pointer-events-none" />
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 90% 60% at 50% 55%, transparent 0%, rgba(0,0,0,0.55) 100%)",
+          }}
+        />
+        <div className="relative max-w-[1120px] mx-auto px-6 lg:px-8 text-center">
             {/* Google 리뷰 아바타 스택 */}
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="flex -space-x-2">
@@ -153,9 +157,6 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 </span>
               </a>
             </div>
-            </div>
-          </div>
-
         </div>
       </section>
 
