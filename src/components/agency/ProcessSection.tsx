@@ -51,7 +51,7 @@ const ProcessSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
         </span>
         <h2 className={`break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] ${isDark ? "text-white" : "text-foreground"}`}>
           <span className={`font-normal ${isDark ? "text-white/40" : "text-foreground/40"}`}>처음 만나는 순간부터</span><br />
-          <span className="font-extrabold">투명하게 진행해요.</span>
+          <span className="font-extrabold">투명하게 진행합니다.</span>
         </h2>
       </Reveal>
 
