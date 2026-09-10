@@ -264,11 +264,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         className="py-24 lg:py-32 relative overflow-hidden"
         style={{
           backgroundColor: "#040814",
-          backgroundImage: [
-            "radial-gradient(ellipse 1200px 800px at 15% 100%, rgba(37,99,235,0.85) 0%, rgba(37,99,235,0.35) 30%, transparent 65%)",
-            "radial-gradient(ellipse 900px 700px at 5% 110%, rgba(56,189,248,0.6) 0%, transparent 55%)",
-            "radial-gradient(ellipse 700px 500px at 95% 5%, rgba(29,78,216,0.35) 0%, transparent 60%)",
-          ].join(", "),
+          backgroundImage: "url(/lp-solution-bg.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       >
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
