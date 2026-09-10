@@ -556,7 +556,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         <section id="blog" className="py-16 md:py-24 lg:py-32 border-t border-white/[0.04]">
           <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
             <div className="mb-14 text-center">
-              <PillLabel color="#fb923c">최근 인사이트</PillLabel>
+              <PillLabel color="#fb923c">INSIGHT</PillLabel>
               <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
                 <span className="font-normal text-white/40">꼭 저희가 아니어도 좋습니다</span><br />
                 <span className="font-extrabold">칼럼 먼저 읽어보세요.</span>
@@ -614,7 +614,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   </div>
                   <div className="flex items-end justify-between">
                     <h3 className="text-[22px] font-bold leading-[1.3]">
-                      최근<br />인사이트?
+                      Recent<br />Insights?
                     </h3>
                     <span className="w-11 h-11 rounded-full bg-sky-500 flex items-center justify-center">
                       <ArrowUpRight className="w-4 h-4" />
