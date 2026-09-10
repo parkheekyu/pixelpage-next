@@ -752,7 +752,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   <PillLabel color="#38bdf8">Free Consultation</PillLabel>
                   <h2 className="mt-6 break-keep text-white text-[clamp(28px,4.2vw,48px)] font-extrabold leading-[1.15] tracking-[-0.035em] mb-6">
                     DB를 <span className="text-white/40 line-through decoration-[3px]">사지</span> 마세요.<br />
-                    <span className="text-sky-300">나오는 구조</span>를<br />만드세요.
+                    <span className="text-sky-300">함께 성장</span>합시다.
                   </h2>
                   <p className="text-[14px] text-white/60 leading-[1.85] mb-8">
                     광고 계정·랜딩·CRM을 함께 열어보고<br />
