@@ -94,12 +94,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <source src="/lp-hero/hero.mp4" type="video/mp4" />
         </video>
         {/* 짙은 오버레이 */}
-        <div className="absolute inset-0 bg-black/90 pointer-events-none" />
+        <div className="absolute inset-0 bg-black/80 pointer-events-none" />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 85% 60% at 50% 55%, transparent 0%, rgba(0,0,0,0.7) 100%)",
+              "radial-gradient(ellipse 85% 60% at 50% 55%, transparent 0%, rgba(0,0,0,0.55) 100%)",
           }}
         />
         <div className="relative max-w-[1120px] mx-auto px-6 lg:px-8 text-center">
