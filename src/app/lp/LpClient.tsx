@@ -655,7 +655,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 10. CTA (WeTechPro DNA — 좌 폼 + 우 캐릭터 마스코트) ── */}
       <section
         id="cta"
-        className="py-16 md:py-24 lg:py-32 relative overflow-hidden border-t border-white/[0.06]"
+        className="py-6 md:py-24 lg:py-32 relative overflow-hidden border-t border-white/[0.06]"
         style={{
           backgroundColor: "#040814",
           backgroundImage: "url(/lp-cta-bg.png)",
