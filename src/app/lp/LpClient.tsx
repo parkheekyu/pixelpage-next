@@ -96,6 +96,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           loop
           playsInline
           preload="metadata"
+          poster="/lp-hero/hero-poster.webp"
           className="absolute inset-0 w-full h-full object-cover pointer-events-none"
           aria-hidden="true"
         >
@@ -180,17 +181,17 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
         {(() => {
           const partners = [
-            { src: "/lp-partners/1.png", alt: "DIHABOOKS" },
-            { src: "/lp-partners/2.png", alt: "안부스쿨" },
-            { src: "/lp-partners/3.png", alt: "플러스스피치" },
-            { src: "/lp-partners/4.png", alt: "GIM COMPANY" },
-            { src: "/lp-partners/5.png", alt: "B:forest" },
-            { src: "/lp-partners/6.png", alt: "빌리언 캠퍼스" },
-            { src: "/lp-partners/7.png", alt: "BOOTSTRAPPER" },
-            { src: "/lp-partners/8.png", alt: "디지털 노마드" },
-            { src: "/lp-partners/9.png", alt: "RUNMOA" },
-            { src: "/lp-partners/10.png", alt: "funnelmoa" },
-            { src: "/lp-partners/11.png", alt: "Cosmosfarm" },
+            { src: "/lp-partners/1.webp", alt: "DIHABOOKS" },
+            { src: "/lp-partners/2.webp", alt: "안부스쿨" },
+            { src: "/lp-partners/3.webp", alt: "플러스스피치" },
+            { src: "/lp-partners/4.webp", alt: "GIM COMPANY" },
+            { src: "/lp-partners/5.webp", alt: "B:forest" },
+            { src: "/lp-partners/6.webp", alt: "빌리언 캠퍼스" },
+            { src: "/lp-partners/7.webp", alt: "BOOTSTRAPPER" },
+            { src: "/lp-partners/8.webp", alt: "디지털 노마드" },
+            { src: "/lp-partners/9.webp", alt: "RUNMOA" },
+            { src: "/lp-partners/10.webp", alt: "funnelmoa" },
+            { src: "/lp-partners/11.webp", alt: "Cosmosfarm" },
           ];
           return (
             <div
@@ -212,6 +213,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     <img
                       src={p.src}
                       alt={p.alt}
+                      loading="lazy"
+                      decoding="async"
                       className="h-16 md:h-[72px] w-auto object-contain opacity-90"
                     />
                   </div>
@@ -263,7 +266,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         className="py-16 md:py-24 lg:py-32 relative overflow-hidden"
         style={{
           backgroundColor: "#040814",
-          backgroundImage: "url(/lp-solution-bg.png)",
+          backgroundImage: "url(/lp-solution-bg.webp)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
@@ -413,9 +416,9 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   }}
                 >
                   {[
-                    { src: "/lp-landings/landing1.png", dir: "animate-marquee-up" },
-                    { src: "/lp-landings/landing2.png", dir: "animate-marquee-down" },
-                    { src: "/lp-landings/landing3.png", dir: "animate-marquee-up" },
+                    { src: "/lp-landings/landing1.webp", dir: "animate-marquee-up" },
+                    { src: "/lp-landings/landing2.webp", dir: "animate-marquee-down" },
+                    { src: "/lp-landings/landing3.webp", dir: "animate-marquee-up" },
                   ].map((col, ci) => (
                     <div key={ci} className="flex-1 overflow-hidden">
                       <div className={col.dir} style={{ animationDuration: "70s" }}>
@@ -425,6 +428,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                             key={k}
                             src={col.src}
                             alt=""
+                            loading="lazy"
+                            decoding="async"
                             className="w-full block select-none pointer-events-none"
                           />
                         ))}
@@ -657,7 +662,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         className="py-6 md:py-24 lg:py-32 relative overflow-hidden border-t border-white/[0.06]"
         style={{
           backgroundColor: "#040814",
-          backgroundImage: "url(/lp-cta-bg.png)",
+          backgroundImage: "url(/lp-cta-bg.webp)",
           backgroundSize: "cover",
           backgroundPosition: "center",
           backgroundRepeat: "no-repeat",
