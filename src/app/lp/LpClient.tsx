@@ -618,13 +618,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             {/* Bottom accent bar */}
             <div className="mt-8 rounded-3xl bg-[#0f0f1a] border border-white/[0.05] px-8 py-10 flex items-center justify-between gap-6">
               <p className="text-[clamp(20px,2.6vw,32px)] font-bold leading-[1.25] tracking-[-0.02em]">
-                <span className="font-extrabold">We turn</span>
-                <span className="font-normal text-sky-400"> Ideas into </span>
-                <span className="font-extrabold">successful</span>
-                <span className="font-normal text-white/50"> products. </span>
-                <span className="font-extrabold">Get</span>
-                <span className="font-normal text-sky-400"> to Know </span>
-                <span className="font-extrabold">more.</span>
+                <span className="font-normal text-white/50">고객이 </span>
+                <span className="font-extrabold">성장하지 못하는</span>
+                <span className="font-normal text-white/50"> 마케팅은 </span>
+                <span className="font-extrabold">하지 않습니다.</span>
               </p>
               <Image
                 src={logoWhite}
