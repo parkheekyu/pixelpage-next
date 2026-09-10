@@ -16,7 +16,6 @@ import {
 } from "lucide-react";
 import charMale from "@/assets/char-male.png";
 import charFemale from "@/assets/char-female.png";
-import charCurly from "@/assets/char-curly.png";
 import logoWhite from "@/assets/logo-white.png";
 import WhatWeDoSection from "@/components/agency/WhatWeDoSection";
 import ProcessSection from "@/components/agency/ProcessSection";
@@ -98,21 +97,23 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           }}
         />
         <div className="relative max-w-[1120px] mx-auto px-6 lg:px-8 text-center">
-            {/* Google 리뷰 아바타 스택 */}
+            {/* 파트너사 로고 아바타 스택 */}
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="flex -space-x-2">
-                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] overflow-hidden bg-orange-200">
-                  <Image src={charMale} alt="" width={32} height={32} className="w-full h-full object-cover" />
-                </div>
-                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] bg-pink-100 flex items-center justify-center overflow-hidden">
-                  <Image src={charFemale} alt="" width={32} height={32} className="w-full h-full object-cover" />
-                </div>
-                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] bg-white flex items-center justify-center text-[16px] font-bold text-blue-600">
-                  G
-                </div>
-                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] overflow-hidden">
-                  <Image src={charCurly} alt="" width={32} height={32} className="w-full h-full object-cover" />
-                </div>
+                {[
+                  { src: "/lp-hero-logos/1.webp", alt: "GIM COMPANY" },
+                  { src: "/lp-hero-logos/2.webp", alt: "MEGATEACH" },
+                  { src: "/lp-hero-logos/3.webp", alt: "B:forest" },
+                  { src: "/lp-hero-logos/4.webp", alt: "안부스쿨" },
+                ].map((logo) => (
+                  <div
+                    key={logo.src}
+                    className="w-9 h-9 rounded-full border-2 border-[#0c0c14] overflow-hidden bg-white flex items-center justify-center"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={logo.src} alt={logo.alt} className="w-full h-full object-cover" />
+                  </div>
+                ))}
               </div>
             </div>
             <div className="flex items-center justify-center gap-1.5 mb-1.5">
@@ -311,9 +312,9 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <div className="mb-14 text-center">
             <PillLabel color="#facc15">Services</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] max-w-[820px] mx-auto">
-              <span className="font-normal text-white/40">매출이 터질 때까지</span><br />
               <span className="font-extrabold text-white">무한 테스트</span>
-              <span className="font-normal text-white/40">합니다.</span>
+              <span className="font-normal text-white/40">합니다.</span><br />
+              <span className="font-normal text-white/40">매출이 터질 때까지.</span>
             </h2>
           </div>
 
