@@ -400,10 +400,26 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   ))}
                 </div>
               ) : (
-                <div className="rounded-2xl overflow-hidden aspect-video bg-black">
-                  <video autoPlay muted loop playsInline className="w-full h-full object-cover">
-                    <source src={`/reels/${s.reel}`} type="video/mp4" />
-                  </video>
+                <div className="relative rounded-2xl overflow-hidden bg-black h-[420px] md:h-[440px]">
+                  {["/lp-landings/landing1.png", "/lp-landings/landing2.png", "/lp-landings/landing3.png"].map((src, li) => (
+                    <img
+                      key={src}
+                      src={src}
+                      alt=""
+                      className="absolute inset-x-0 top-0 w-full select-none pointer-events-none"
+                      style={{
+                        animation: `landing-cycle 30s linear ${li * 10}s infinite`,
+                        willChange: "transform, opacity",
+                      }}
+                    />
+                  ))}
+                  <div
+                    className="absolute inset-0 pointer-events-none"
+                    style={{
+                      background:
+                        "linear-gradient(to bottom, rgba(12,12,20,0.5) 0%, transparent 6%, transparent 94%, rgba(12,12,20,0.5) 100%)",
+                    }}
+                  />
                 </div>
               )}
             </div>

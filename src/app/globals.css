@@ -127,6 +127,13 @@
   0% { background-position: 0 0; }
   100% { background-position: 0 -40px; }
 }
+@keyframes landing-cycle {
+  0%   { opacity: 0; transform: translateY(0); }
+  3%   { opacity: 1; }
+  30%  { opacity: 1; transform: translateY(-82%); }
+  33%  { opacity: 0; transform: translateY(-82%); }
+  100% { opacity: 0; transform: translateY(-82%); }
+}
 
 .animate-float { animation: float-gentle 6s ease-in-out infinite; }
 .animate-fade-up { animation: fade-up 0.7s ease forwards; }
