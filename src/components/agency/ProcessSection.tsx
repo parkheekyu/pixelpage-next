@@ -39,7 +39,7 @@ const ProcessSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
   return (
   <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#fbfbfb" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-      <Reveal className="text-center mb-16 lg:mb-20">
+      <Reveal className="mb-16 lg:mb-20">
         <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
           진행 방식
         </p>
