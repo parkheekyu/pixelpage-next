@@ -14,8 +14,6 @@ import {
   Zap,
   ShieldCheck,
   Infinity as InfinityIcon,
-  Target,
-  Eye,
   MessageSquare,
 } from "lucide-react";
 import charMale from "@/assets/char-male.png";
@@ -282,14 +280,34 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-[1080px] mx-auto">
             {[
-              { icon: ShieldCheck, tag: "01", title: "전용", body: "소재도 랜딩도 귀사 것만. 공유 DB 0건." },
-              { icon: InfinityIcon, tag: "02", title: "무한 테스트", body: "터지는 조합을 찾을 때까지 다시 만듭니다." },
-              { icon: Target, tag: "03", title: "전환까지", body: "DB에서 끝내지 않고 매출까지 함께 봅니다." },
-              { icon: Eye, tag: "04", title: "투명 공개", body: "성과 데이터를 전부 오픈합니다." },
+              {
+                icon: Users,
+                tag: "01",
+                title: "대표가 직접 합니다",
+                body: "하청식 DB 수집을 하지 않습니다.\n매출 성장을 위한 마케팅 설계를 합니다.",
+              },
+              {
+                icon: TrendingDown,
+                tag: "02",
+                title: "DB 단가를 부풀리지 않습니다",
+                body: "효율이 나면 고객도 이득이면 좋겠습니다.\nWin-Win하며 성장하는 방식을 추구합니다.",
+              },
+              {
+                icon: ShieldCheck,
+                tag: "03",
+                title: "저품질 DB는 저희도 손해입니다",
+                body: "고객에게 도움이 되지 않으면\n저희도 성장할 수 없습니다.",
+              },
+              {
+                icon: InfinityIcon,
+                tag: "04",
+                title: "터질 때까지 합니다",
+                body: "분명히 매출이 터지는 지점은 있습니다.\n그 목표를 향해 무한 테스트합니다.",
+              },
             ].map((s) => (
               <div
                 key={s.tag}
-                className="rounded-3xl bg-[#0c0c14]/80 border border-sky-400/15 p-8 backdrop-blur-sm"
+                className="rounded-3xl bg-[#0c0c14]/80 border border-sky-400/15 p-7 backdrop-blur-sm"
               >
                 <div className="flex items-center justify-between mb-6">
                   <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500/25 to-sky-500/10 border border-sky-400/25 flex items-center justify-center">
@@ -297,8 +315,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   </div>
                   <span className="text-[13px] text-sky-300/60 font-mono font-bold">{s.tag}</span>
                 </div>
-                <h3 className="text-[20px] font-bold mb-3 tracking-[-0.02em]">{s.title}</h3>
-                <p className="text-[13.5px] text-white/60 leading-[1.85]">{s.body}</p>
+                <h3 className="text-[18px] md:text-[19px] font-bold mb-3 tracking-[-0.02em] leading-[1.3]">{s.title}</h3>
+                <p className="text-[13.5px] text-white/60 leading-[1.75] whitespace-pre-line">{s.body}</p>
               </div>
             ))}
           </div>
