@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -43,6 +43,14 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const [form, setForm] = useState({ name: "", company: "", phone: "", budget: "", agree: false });
   const [submitted, setSubmitted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 200);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -783,6 +791,26 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           </div>
         </div>
       </footer>
+
+      {/* 모바일 스크롤 시 하단 플로팅 CTA */}
+      <a
+        href="#cta"
+        aria-hidden={!scrolled}
+        className={`md:hidden fixed left-3 right-3 z-40 flex items-center justify-between gap-2 px-5 py-3.5 rounded-full shadow-[0_18px_40px_-14px_rgba(64,144,247,0.6)] text-white font-bold text-[14px] tracking-[-0.01em] transition-all duration-300 ${
+          scrolled
+            ? "bottom-4 opacity-100 translate-y-0 pointer-events-auto"
+            : "-bottom-4 opacity-0 translate-y-6 pointer-events-none"
+        }`}
+        style={{ backgroundColor: "#4090f7" }}
+      >
+        <span>파트너형 DB 도입 문의</span>
+        <span className="inline-flex items-center gap-1.5">
+          무료 상담
+          <span className="w-6 h-6 rounded-full bg-black/25 flex items-center justify-center">
+            <ArrowUpRight className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
+          </span>
+        </span>
+      </a>
     </div>
   );
 };
