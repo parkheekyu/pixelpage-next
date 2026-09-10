@@ -8,10 +8,10 @@ import {
   Check,
   Phone,
   Star,
+  Search,
   Users,
   TrendingDown,
-  ShieldCheck,
-  Infinity as InfinityIcon,
+  Zap,
   MessageSquare,
 } from "lucide-react";
 import charMale from "@/assets/char-male.png";
@@ -203,30 +203,25 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               <span className="font-extrabold">매출 규모를 키우기 어렵습니다.</span>
             </h2>
           </div>
-          <div className="flex flex-col gap-4 max-w-[980px] mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-[1080px] mx-auto">
             {[
-              { num: "01", tag: "늘리는 순간 무너집니다", body: "물량을 키우면 허수가 섞이고 단가는 뜁니다. 매출을 키우고 싶어도, 구조가 못 받쳐줍니다." },
-              { num: "02", tag: "출처를 모릅니다", body: "어떤 광고를 보고 온 고객인지 모르니, 상담 품질이 복불복입니다." },
-              { num: "03", tag: "나만의 DB가 아닙니다", body: "같은 DB가 여러 업체에 팔립니다. 전화하면 이미 경쟁사와 통화 중입니다." },
-              { num: "04", tag: "개선이 없습니다", body: "성과가 안 나와도 소재도 타겟도 그대로. 파는 쪽은 바꿀 이유가 없으니까요." },
+              { icon: TrendingDown, num: "01", tag: "늘리는 순간 무너집니다", body: "물량을 키우면 허수가 섞이고 단가는 뜁니다. 매출을 키우고 싶어도, 구조가 못 받쳐줍니다." },
+              { icon: Search, num: "02", tag: "출처를 모릅니다", body: "어떤 광고를 보고 온 고객인지 모르니, 상담 품질이 복불복입니다." },
+              { icon: Users, num: "03", tag: "나만의 DB가 아닙니다", body: "같은 DB가 여러 업체에 팔립니다. 전화하면 이미 경쟁사와 통화 중입니다." },
+              { icon: Zap, num: "04", tag: "개선이 없습니다", body: "성과가 안 나와도 소재도 타겟도 그대로. 파는 쪽은 바꿀 이유가 없으니까요." },
             ].map((p) => (
               <div
                 key={p.tag}
-                className="rounded-3xl border border-white/[0.06] bg-[#0c0c14] p-6 md:p-8 hover:border-sky-400/25 transition-colors"
+                className="rounded-3xl bg-[#0c0c14]/80 border border-red-400/15 p-7 backdrop-blur-sm"
               >
-                <div className="flex items-center gap-5 md:gap-7">
-                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-sky-400/50 flex items-center justify-center flex-shrink-0">
-                    <span className="text-[18px] md:text-[20px] font-mono font-extrabold text-sky-300 tabular-nums">
-                      {p.num}
-                    </span>
+                <div className="flex items-center justify-between mb-6">
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-red-500/25 to-red-500/10 border border-red-400/25 flex items-center justify-center">
+                    <p.icon className="w-5 h-5 text-red-300" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-[18px] md:text-[20px] font-bold text-white mb-1.5 tracking-[-0.02em]">
-                      {p.tag}
-                    </h3>
-                    <p className="text-[17px] text-white/55 leading-[1.7]">{p.body}</p>
-                  </div>
+                  <span className="text-[16px] text-red-300/60 font-mono font-bold">{p.num}</span>
                 </div>
+                <h3 className="text-[18px] md:text-[19px] font-bold mb-3 tracking-[-0.02em] leading-[1.3]">{p.tag}</h3>
+                <p className="text-[16.5px] text-white/60 leading-[1.75]">{p.body}</p>
               </div>
             ))}
           </div>
@@ -255,45 +250,30 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             </h2>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-[1080px] mx-auto">
+          <div className="flex flex-col gap-4 max-w-[980px] mx-auto">
             {[
-              {
-                icon: Users,
-                tag: "01",
-                title: "대표가 직접 합니다",
-                body: "하청식 DB 수집을 하지 않습니다.\n매출 성장을 위한 마케팅 설계를 합니다.",
-              },
-              {
-                icon: TrendingDown,
-                tag: "02",
-                title: "DB 단가를 부풀리지 않습니다",
-                body: "효율이 나면 고객도 이득이면 좋겠습니다.\nWin-Win하며 성장하는 방식을 추구합니다.",
-              },
-              {
-                icon: ShieldCheck,
-                tag: "03",
-                title: "저품질 DB는 저희도 손해입니다",
-                body: "고객에게 도움이 되지 않으면\n저희도 성장할 수 없습니다.",
-              },
-              {
-                icon: InfinityIcon,
-                tag: "04",
-                title: "터질 때까지 합니다",
-                body: "분명히 매출이 터지는 지점은 있습니다.\n그 목표를 향해 무한 테스트합니다.",
-              },
+              { num: "01", title: "대표가 직접 합니다", body: "하청식 DB 수집을 하지 않습니다. 매출 성장을 위한 마케팅 설계를 합니다." },
+              { num: "02", title: "DB 단가를 부풀리지 않습니다", body: "효율이 나면 고객도 이득이면 좋겠습니다. Win-Win하며 성장하는 방식을 추구합니다." },
+              { num: "03", title: "저품질 DB는 저희도 손해입니다", body: "고객에게 도움이 되지 않으면 저희도 성장할 수 없습니다." },
+              { num: "04", title: "터질 때까지 합니다", body: "분명히 매출이 터지는 지점은 있습니다. 그 목표를 향해 무한 테스트합니다." },
             ].map((s) => (
               <div
-                key={s.tag}
-                className="rounded-3xl bg-[#0c0c14]/80 border border-sky-400/15 p-7 backdrop-blur-sm"
+                key={s.num}
+                className="rounded-3xl border border-white/[0.06] bg-[#0c0c14]/70 backdrop-blur-sm p-6 md:p-8 hover:border-sky-400/25 transition-colors"
               >
-                <div className="flex items-center justify-between mb-6">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500/25 to-sky-500/10 border border-sky-400/25 flex items-center justify-center">
-                    <s.icon className="w-5 h-5 text-sky-300" />
+                <div className="flex items-center gap-5 md:gap-7">
+                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full border-2 border-sky-400/50 flex items-center justify-center flex-shrink-0">
+                    <span className="text-[18px] md:text-[20px] font-mono font-extrabold text-sky-300 tabular-nums">
+                      {s.num}
+                    </span>
                   </div>
-                  <span className="text-[16px] text-sky-300/60 font-mono font-bold">{s.tag}</span>
+                  <div className="flex-1 min-w-0">
+                    <h3 className="text-[18px] md:text-[20px] font-bold text-white mb-1.5 tracking-[-0.02em]">
+                      {s.title}
+                    </h3>
+                    <p className="text-[17px] text-white/60 leading-[1.7]">{s.body}</p>
+                  </div>
                 </div>
-                <h3 className="text-[18px] md:text-[19px] font-bold mb-3 tracking-[-0.02em] leading-[1.3]">{s.title}</h3>
-                <p className="text-[16.5px] text-white/60 leading-[1.75] whitespace-pre-line">{s.body}</p>
               </div>
             ))}
           </div>
