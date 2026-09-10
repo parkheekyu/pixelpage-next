@@ -42,8 +42,9 @@ const AgencyFAQSection = ({ variant = "light" }: { variant?: Variant } = {}) => 
           >
             FAQ
           </span>
-          <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] ${isDark ? "text-white" : "text-foreground"}`}>
-            궁금한 게 있으신가요?
+          <h2 className={`break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] ${isDark ? "text-white" : "text-foreground"}`}>
+            <span className={`font-normal ${isDark ? "text-white/40" : "text-foreground/40"}`}>궁금한 게</span><br />
+            <span className="font-extrabold">있으신가요?</span>
           </h2>
         </Reveal>
         <Reveal className="space-y-3">
