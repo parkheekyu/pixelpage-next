@@ -32,7 +32,7 @@ const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
 const PillLabel = ({ children, color }: { children: React.ReactNode; color: string }) => (
   <span
-    className="inline-flex items-center px-4 py-1.5 rounded-full text-[13px] font-semibold border"
+    className="inline-flex items-center px-4 py-1.5 rounded-full text-[14px] font-semibold border"
     style={{ borderColor: `${color}55`, color, backgroundColor: `${color}0f` }}
   >
     {children}
@@ -62,7 +62,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <a href="/" className="flex items-center gap-2 pl-1 pr-3">
             <Image src={logoWhite} alt="PixelPage" width={100} height={20} className="h-5 w-auto" />
           </a>
-          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center text-[13px]">
+          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center text-[14px]">
             <a href="#problem" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">문제</a>
             <a href="#solution" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">해결</a>
             <a href="#portfolio" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">성과</a>
@@ -71,7 +71,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           </nav>
           <a
             href="#cta"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/40 text-white text-[13px] font-medium"
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/40 text-white text-[14px] font-medium"
           >
             <span className="w-6 h-6 rounded-full bg-sky-500/25 flex items-center justify-center">
               <MessageSquare className="w-3 h-3 text-sky-300" />
@@ -94,7 +94,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] bg-pink-100 flex items-center justify-center overflow-hidden">
                   <Image src={charFemale} alt="" width={32} height={32} className="w-full h-full object-cover" />
                 </div>
-                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] bg-white flex items-center justify-center text-[13px] font-bold text-blue-600">
+                <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] bg-white flex items-center justify-center text-[14px] font-bold text-blue-600">
                   G
                 </div>
                 <div className="w-8 h-8 rounded-full border-2 border-[#0c0c14] overflow-hidden">
@@ -103,14 +103,14 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               </div>
             </div>
             <div className="flex items-center justify-center gap-1.5 mb-1.5">
-              <span className="text-[14px] font-bold">4.9</span>
+              <span className="text-[15px] font-bold">4.9</span>
               <div className="flex gap-0.5">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="w-3 h-3 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
             </div>
-            <p className="text-[13px] text-white/45 mb-10">파트너사 만족도</p>
+            <p className="text-[14px] text-white/45 mb-10">파트너사 만족도</p>
 
             {/* 큰 하이브리드 타이틀 */}
             <h1 className="break-keep text-[clamp(44px,7.5vw,96px)] leading-[1.05] tracking-[-0.045em]">
@@ -128,7 +128,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               </span>
               <a
                 href="#cta"
-                className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[13px] font-bold uppercase tracking-[0.1em]"
+                className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[14px] font-bold uppercase tracking-[0.1em]"
               >
                 무료 상담
                 <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
@@ -147,7 +147,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 2. 함께하는 파트너사 ── */}
       <section className="py-14 border-y border-white/[0.06] overflow-hidden">
         <div className="max-w-[1240px] mx-auto px-6 lg:px-8">
-          <p className="text-center text-[13px] tracking-[0.28em] font-semibold text-white/40 mb-8 uppercase">
+          <p className="text-center text-[14px] tracking-[0.28em] font-semibold text-white/40 mb-8 uppercase">
             함께하는 파트너사
           </p>
         </div>
@@ -247,7 +247,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     <h3 className="text-[18px] md:text-[20px] font-bold text-white mb-1.5 tracking-[-0.02em]">
                       {p.tag}
                     </h3>
-                    <p className="text-[14px] md:text-[15px] text-white/55 leading-[1.7]">{p.body}</p>
+                    <p className="text-[15px] md:text-[15px] text-white/55 leading-[1.7]">{p.body}</p>
                   </div>
                 </div>
               </div>
@@ -313,10 +313,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500/25 to-sky-500/10 border border-sky-400/25 flex items-center justify-center">
                     <s.icon className="w-5 h-5 text-sky-300" />
                   </div>
-                  <span className="text-[13px] text-sky-300/60 font-mono font-bold">{s.tag}</span>
+                  <span className="text-[14px] text-sky-300/60 font-mono font-bold">{s.tag}</span>
                 </div>
                 <h3 className="text-[18px] md:text-[19px] font-bold mb-3 tracking-[-0.02em] leading-[1.3]">{s.title}</h3>
-                <p className="text-[13.5px] text-white/60 leading-[1.75] whitespace-pre-line">{s.body}</p>
+                <p className="text-[14.5px] text-white/60 leading-[1.75] whitespace-pre-line">{s.body}</p>
               </div>
             ))}
           </div>
@@ -367,10 +367,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   {s.t}
                 </h3>
                 <div className="w-16 h-px bg-white/15 my-5" />
-                <p className="text-[14px] text-white/55 leading-[1.85] mb-6">{s.d}</p>
+                <p className="text-[15px] text-white/55 leading-[1.85] mb-6">{s.d}</p>
                 <ul className="space-y-3 mb-8">
                   {s.bullets.map((b) => (
-                    <li key={b} className="flex items-center gap-3 text-[13.5px] text-white/70">
+                    <li key={b} className="flex items-center gap-3 text-[14.5px] text-white/70">
                       <Check className="w-4 h-4 text-sky-400" strokeWidth={2.5} />
                       {b}
                     </li>
@@ -378,7 +378,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 </ul>
                 <a
                   href="#cta"
-                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/15 text-[12.5px] font-semibold hover:bg-white/[0.04]"
+                  className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full border border-white/15 text-[13.5px] font-semibold hover:bg-white/[0.04]"
                 >
                   Learn More <ArrowRight className="w-3.5 h-3.5" />
                 </a>
@@ -515,14 +515,14 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <p className="text-[15px] font-bold">{c.co}</p>
-                    <p className="text-[13px] text-white/45 mt-0.5">{c.industry}</p>
+                    <p className="text-[14px] text-white/45 mt-0.5">{c.industry}</p>
                   </div>
                   <ArrowUpRight className="w-4 h-4 text-sky-300/60" />
                 </div>
                 <div className="space-y-3.5">
                   {c.stats.map((s) => (
                     <div key={s.k} className="flex items-baseline justify-between">
-                      <span className="text-[12.5px] text-white/50">{s.k}</span>
+                      <span className="text-[13.5px] text-white/50">{s.k}</span>
                       <span className="text-[19px] font-extrabold text-sky-300 tabular-nums tracking-[-0.02em]">
                         {s.v}
                       </span>
@@ -536,7 +536,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <div className="mt-10 text-center">
             <a
               href="#cta"
-              className="inline-flex items-center gap-1.5 text-[13px] text-sky-300 hover:text-sky-200 font-semibold border border-white/10 hover:border-white/25 px-5 py-2.5 rounded-full transition-colors"
+              className="inline-flex items-center gap-1.5 text-[14px] text-sky-300 hover:text-sky-200 font-semibold border border-white/10 hover:border-white/25 px-5 py-2.5 rounded-full transition-colors"
             >
               더 보기 <ArrowRight className="w-3.5 h-3.5" />
             </a>
@@ -583,7 +583,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     />
                   </div>
                   <div className="mt-auto">
-                    <p className="text-[12px] text-white/45 mb-3">
+                    <p className="text-[13px] text-white/45 mb-3">
                       {a.date
                         ? new Date(a.date).toLocaleDateString("en-US", {
                             day: "numeric",
@@ -595,7 +595,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     <h3 className="text-[17px] font-bold leading-[1.4] mb-3 line-clamp-2">
                       {a.title}
                     </h3>
-                    <p className="text-[13px] text-white/55 leading-[1.75] line-clamp-3">
+                    <p className="text-[14px] text-white/55 leading-[1.75] line-clamp-3">
                       {a.description ||
                         "픽셀페이지가 실제 광고비를 굴리며 검증한 인사이트입니다."}
                     </p>
@@ -681,16 +681,16 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <div className="relative grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-10">
               {/* Left — form */}
               <div className="rounded-3xl bg-[#0a0a13] border border-white/[0.06] p-7 md:p-8">
-                <p className="text-[13px] font-semibold mb-6">지금 상담부터 시작하세요</p>
+                <p className="text-[14px] font-semibold mb-6">지금 상담부터 시작하세요</p>
                 {submitted ? (
                   <div className="py-12 text-center">
                     <p className="text-[16px] font-semibold mb-3">신청이 접수되었습니다.</p>
-                    <p className="text-[13px] text-white/55 mb-6">평균 3시간 이내 회신드립니다.</p>
+                    <p className="text-[14px] text-white/55 mb-6">평균 3시간 이내 회신드립니다.</p>
                     <a
                       href={KAKAO_URL}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FEE500] text-[#181600] text-[13px] font-bold"
+                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FEE500] text-[#181600] text-[14px] font-bold"
                     >
                       <MessageSquare className="w-4 h-4" /> 카카오톡으로 바로 문의
                     </a>
@@ -698,7 +698,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 ) : (
                   <form onSubmit={submit} className="space-y-4">
                     <div>
-                      <label className="text-[12px] text-white/55 mb-1.5 block">성함 *</label>
+                      <label className="text-[13px] text-white/55 mb-1.5 block">성함 *</label>
                       <input
                         required
                         value={form.name}
@@ -708,7 +708,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-white/55 mb-1.5 block">회사·브랜드명</label>
+                      <label className="text-[13px] text-white/55 mb-1.5 block">회사·브랜드명</label>
                       <input
                         value={form.company}
                         onChange={(e) => setForm({ ...form, company: e.target.value })}
@@ -717,7 +717,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-white/55 mb-1.5 block">연락처 *</label>
+                      <label className="text-[13px] text-white/55 mb-1.5 block">연락처 *</label>
                       <input
                         required
                         value={form.phone}
@@ -727,7 +727,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       />
                     </div>
                     <div>
-                      <label className="text-[12px] text-white/55 mb-1.5 block">월 광고 예산 *</label>
+                      <label className="text-[13px] text-white/55 mb-1.5 block">월 광고 예산 *</label>
                       <select
                         required
                         value={form.budget}
@@ -741,7 +741,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         <option className="bg-[#0a0a13]">3,000만 원 이상</option>
                       </select>
                     </div>
-                    <label className="flex items-start gap-2.5 text-[12px] text-white/50 cursor-pointer pt-1">
+                    <label className="flex items-start gap-2.5 text-[13px] text-white/50 cursor-pointer pt-1">
                       <input
                         type="checkbox"
                         checked={form.agree}
@@ -757,7 +757,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     >
                       무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
                     </button>
-                    <p className="text-center text-[13px] text-white/40 pt-1">
+                    <p className="text-center text-[14px] text-white/40 pt-1">
                       평균 회신 3시간 이내 · 계약 강요 없음
                     </p>
                   </form>
@@ -772,7 +772,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     DB를 <span className="text-white/40 line-through decoration-[3px]">사지</span> 마세요.<br />
                     <span className="text-sky-300">함께 성장</span>합시다.
                   </h2>
-                  <p className="text-[14px] text-white/60 leading-[1.85] mb-8">
+                  <p className="text-[15px] text-white/60 leading-[1.85] mb-8">
                     광고 계정·랜딩·CRM을 함께 열어보고<br />
                     어디가 새는지 찾아드립니다. 계약 없이도 괜찮습니다.
                   </p>
@@ -782,7 +782,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       "브랜드 전담 담당자 배정",
                       "NDA 즉시 서명 가능",
                     ].map((v) => (
-                      <li key={v} className="flex items-center gap-3 text-[14px] text-white/75">
+                      <li key={v} className="flex items-center gap-3 text-[15px] text-white/75">
                         <Check className="w-4 h-4 text-sky-400" strokeWidth={2.5} />
                         {v}
                       </li>
@@ -797,8 +797,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   </div>
                   <div>
                     <p className="text-[16px] font-bold">박희규</p>
-                    <p className="text-[12px] text-white/50 mb-3">Founder, PixelPage</p>
-                    <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[12.5px] text-sky-300 hover:text-sky-200">
+                    <p className="text-[13px] text-white/50 mb-3">Founder, PixelPage</p>
+                    <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[13.5px] text-sky-300 hover:text-sky-200">
                       <MessageSquare className="w-3.5 h-3.5" /> 카카오톡으로 바로 문의
                     </a>
                   </div>
@@ -815,10 +815,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <a href="/" className="flex items-center gap-2">
             <Image src={logoWhite} alt="PixelPage" width={90} height={18} className="h-4 w-auto opacity-70" />
           </a>
-          <p className="text-[13px] text-white/35 text-center">
+          <p className="text-[14px] text-white/35 text-center">
             © PIXELPAGE · pixelpage.co.kr · contact@pixelpage.co.kr
           </p>
-          <div className="flex items-center gap-3 text-[13px] text-white/35">
+          <div className="flex items-center gap-3 text-[14px] text-white/35">
             <a href="/columns" className="hover:text-white/60">칼럼</a>
             <span className="text-white/15">·</span>
             <a href="/consult" className="hover:text-white/60">상담</a>
