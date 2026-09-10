@@ -580,12 +580,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   href={`/columns/${a.slug}`}
                   className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-6 min-h-[380px] flex flex-col hover:border-white/15 transition-colors"
                 >
-                  <div className="w-11 h-11 rounded-xl overflow-hidden mb-6">
+                  <div className="w-14 h-14 rounded-full overflow-hidden mb-6">
                     <Image
                       src={i === 0 ? charFemale : charMale}
                       alt=""
-                      width={44}
-                      height={44}
+                      width={56}
+                      height={56}
                       className="w-full h-full object-cover"
                     />
                   </div>
