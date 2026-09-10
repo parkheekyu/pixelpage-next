@@ -101,10 +101,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="flex -space-x-2">
                 {[
-                  { src: "/lp-hero-logos/1.webp", alt: "GIM COMPANY" },
-                  { src: "/lp-hero-logos/2.webp", alt: "MEGATEACH" },
-                  { src: "/lp-hero-logos/3.webp", alt: "B:forest" },
                   { src: "/lp-hero-logos/4.webp", alt: "안부스쿨" },
+                  { src: "/lp-hero-logos/3.webp", alt: "B:forest" },
+                  { src: "/lp-hero-logos/2.webp", alt: "MEGATEACH" },
+                  { src: "/lp-hero-logos/1.webp", alt: "GIM COMPANY" },
                 ].map((logo) => (
                   <div
                     key={logo.src}
