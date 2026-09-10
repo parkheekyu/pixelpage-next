@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
-import LpClient from "./LpClient";
-import { getPublishedArticles } from "@/lib/notion";
+import IndexClient from "../IndexClient";
 
 export const metadata: Metadata = {
-  title: "픽셀페이지 · DB 마케팅 전담 파트너 | 광고비 줄이고 매출 폭발",
+  title: "픽셀페이지 — AI 시대 한 걸음 앞서가세요",
   description:
-    "교육·코칭·전문 서비스 브랜드 전담 DB 마케팅. 3개월 안에 문의량 3배, 광고비 대비 매출로만 증명합니다. 무료 진단 신청.",
-  robots: { index: false, follow: false, nocache: true },
+    "AI 시대, 한 걸음 앞서가는 브랜드를 위한 전담 마케팅 파트너. 퍼포먼스 광고, 브랜디드 콘텐츠, SEO, CRM 자동화, 웹 빌드.",
 };
 
-export const revalidate = 3600;
-
-export default async function Page() {
-  const articles = await getPublishedArticles();
-  const recentArticles = articles.filter((a) => a.slug).slice(0, 3);
-  return <LpClient articles={recentArticles} />;
+export default function Page() {
+  return <IndexClient />;
 }

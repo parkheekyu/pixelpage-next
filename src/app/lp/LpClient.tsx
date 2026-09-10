@@ -793,8 +793,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <Image src={logoWhite} alt="PixelPage" width={110} height={22} className="h-5 w-auto opacity-90" />
               </a>
               <p className="mt-5 text-[14px] text-white/50 leading-[1.85] max-w-[360px]">
-                파트너형 DB 마케팅으로 브랜드와 함께 성장합니다.
-                광고·랜딩·CRM을 하나의 팀이 설계·분석·개선해요.
+                매출 성장의 진짜 파트너가 되겠습니다.
               </p>
             </div>
 
@@ -816,8 +815,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               </p>
               <ul className="space-y-2 text-[14px]">
                 <li>
-                  <a href="mailto:brandbuilderb@gmail.com" className="hover:text-white">
-                    brandbuilderb@gmail.com
+                  <a href="mailto:contact@pixelpage.co.kr" className="hover:text-white">
+                    contact@pixelpage.co.kr
                   </a>
                 </li>
                 <li>
@@ -844,11 +843,6 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               </p>
               <p>
                 경기도 용인시 수지구 광교중앙로296번길 10, 207호-제24호 (상현동, 광교 리치안 오피스텔)
-              </p>
-              <p>
-                통신판매업 · 광고 대행업 · 전자상거래 소매업
-                <span className="mx-2 text-white/15">|</span>
-                개업일 2020.10.26
               </p>
             </div>
             <p className="text-white/30 whitespace-nowrap">© 2026 PIXELPAGE. All rights reserved.</p>
