@@ -124,7 +124,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             </h1>
 
             {/* 스플릿 CTA */}
-            <div className="mt-14 inline-flex items-center gap-1 p-1 rounded-full bg-sky-500">
+            <div className="mt-14 inline-flex items-center gap-1 p-1 rounded-full" style={{ backgroundColor: "#4090f7" }}>
               <span className="px-6 py-3 text-white text-[15px] font-semibold whitespace-nowrap">
                 파트너형 DB 마케팅 도입 문의
               </span>
@@ -136,7 +136,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
                   <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
                 </span>
-                <span className="w-6 h-6 rounded-full bg-sky-500 flex items-center justify-center">
+                <span className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#4090f7" }}>
                   <Phone className="w-3 h-3 text-white" />
                 </span>
               </a>
