@@ -33,8 +33,8 @@ const AgencyFAQSection = ({ variant = "light" }: { variant?: Variant } = {}) => 
     <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#ffffff" }}>
       <div className="max-w-[840px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-14">
-          <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
-            자주 묻는 질문
+          <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 uppercase ${isDark ? "text-blue-400" : "text-blue-500"}`}>
+            FAQ
           </p>
           <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] ${isDark ? "text-white" : "text-foreground"}`}>
             궁금한 게 있으신가요?
