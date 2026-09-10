@@ -306,7 +306,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
           <div className="mt-16 text-center max-w-[640px] mx-auto">
             <p className="text-[19px] md:text-[22px] text-white leading-[1.55] font-semibold tracking-[-0.02em]">
               들쑥날쑥한 <span className="text-sky-300">DB 품질 문제</span>,<br />
-              <span className="text-white/70 font-medium">구조를 만드는 방법으로 해결해 보세요.</span>
+              <span className="text-white/70 font-medium">파트너형 DB로 해결해 보세요.</span>
             </p>
           </div>
         </div>
