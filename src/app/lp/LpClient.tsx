@@ -82,7 +82,23 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 1. 히어로 (검정 배경 + 라운드 카드 안에 원래 WeTechPro 스타일) ── */}
       <section className="pt-[110px] pb-16 lg:pt-[130px] lg:pb-24 bg-black">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="rounded-3xl bg-[#0c0c14] border border-white/[0.06] p-8 md:p-16 lg:p-24 text-center">
+          <div className="relative rounded-3xl border border-white/[0.06] p-8 md:p-16 lg:p-24 text-center overflow-hidden">
+            {/* 배경 동영상 */}
+            <video
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+              aria-hidden="true"
+            >
+              <source src="/lp-hero/hero.mp4" type="video/mp4" />
+            </video>
+            {/* 어두운 오버레이 */}
+            <div className="absolute inset-0 bg-[#0c0c14]/78 pointer-events-none" />
+            {/* 콘텐츠 */}
+            <div className="relative">
             {/* Google 리뷰 아바타 스택 */}
             <div className="flex items-center justify-center gap-3 mb-4">
               <div className="flex -space-x-2">
@@ -136,6 +152,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   <Phone className="w-3 h-3 text-white" />
                 </span>
               </a>
+            </div>
             </div>
           </div>
 
