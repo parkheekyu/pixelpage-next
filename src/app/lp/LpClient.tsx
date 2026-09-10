@@ -112,7 +112,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 ))}
               </div>
             </div>
-            <p className="text-[13px] text-white/45 mb-10">터질 때까지 무한 테스트합니다.</p>
+            <p className="text-[13px] text-white/45 mb-10">파트너사 만족도</p>
 
             {/* 큰 하이브리드 타이틀 */}
             <h1 className="break-keep text-[clamp(44px,7.5vw,96px)] leading-[1.05] tracking-[-0.045em]">
