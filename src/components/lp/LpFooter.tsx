@@ -12,7 +12,7 @@ const anchor = (onLp: boolean, id: string) => (onLp ? `#${id}` : `/#${id}`);
 
 export default function LpFooter({ onLp = false }: Props) {
   return (
-    <footer className="pt-16 pb-24 md:pb-16 bg-[#06060a] border-t border-white/[0.05] text-white/45">
+    <footer className="pt-16 pb-16 bg-[#06060a] border-t border-white/[0.05] text-white/45">
       <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
         {/* Top: 로고 · 링크 */}
         <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr] gap-10 md:gap-12 pb-10 border-b border-white/[0.06]">

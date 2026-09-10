@@ -43,13 +43,25 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
   const [scrolled, setScrolled] = useState(false);
+  const [nearBottom, setNearBottom] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 200);
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 200);
+      // 하단 CTA 섹션에 도달하면 플로팅 바 숨김
+      const ctaEl = document.getElementById("cta");
+      if (ctaEl) {
+        const rect = ctaEl.getBoundingClientRect();
+        setNearBottom(rect.top < window.innerHeight);
+      }
+    };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  const showFloatingCta = scrolled && !nearBottom;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -758,12 +770,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
       <LpFooter onLp />
 
-      {/* 모바일 스크롤 시 하단 플로팅 CTA */}
+      {/* 모바일 스크롤 시 하단 플로팅 CTA (CTA 섹션 도달 시 숨김) */}
       <a
         href="#cta"
-        aria-hidden={!scrolled}
+        aria-hidden={!showFloatingCta}
         className={`md:hidden fixed left-3 right-3 z-40 flex items-center justify-between gap-2 px-5 py-3.5 rounded-full shadow-[0_18px_40px_-14px_rgba(64,144,247,0.6)] text-white font-bold text-[14px] tracking-[-0.01em] transition-all duration-300 ${
-          scrolled
+          showFloatingCta
             ? "bottom-4 opacity-100 translate-y-0 pointer-events-auto"
             : "-bottom-4 opacity-0 translate-y-6 pointer-events-none"
         }`}
