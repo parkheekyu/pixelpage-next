@@ -222,14 +222,14 @@ const WhatWeDoSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
   return (
     <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
-        <Reveal className="mb-16 lg:mb-24">
+        <Reveal className="text-center mb-16 lg:mb-24">
           <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
             무엇을 해드리나요
           </p>
           <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] mb-6 ${isDark ? "text-white" : "text-foreground"}`}>
             광고부터 전환까지<br />끊기지 않게 연결해요.
           </h2>
-          <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[560px] ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
+          <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[560px] mx-auto ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
             세 개를 따로 굴리면 반드시 어딘가 끊겨요.<br />
             픽셀페이지는 하나의 팀이 설계하고, 분석하고, 개선해요.
           </p>
