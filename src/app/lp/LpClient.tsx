@@ -401,12 +401,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 </div>
               ) : (
                 <div
-                  className="relative rounded-2xl overflow-hidden bg-black h-[420px] md:h-[440px] flex gap-3 p-3"
+                  className="relative rounded-2xl overflow-hidden bg-black h-[440px] md:h-[480px] flex"
                   style={{
                     WebkitMaskImage:
-                      "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+                      "linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%)",
                     maskImage:
-                      "linear-gradient(to bottom, transparent 0%, black 8%, black 92%, transparent 100%)",
+                      "linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%)",
                   }}
                 >
                   {[
@@ -414,8 +414,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                     { src: "/lp-landings/landing2.png", dir: "animate-marquee-down" },
                     { src: "/lp-landings/landing3.png", dir: "animate-marquee-up" },
                   ].map((col, ci) => (
-                    <div key={ci} className="flex-1 overflow-hidden rounded-xl">
-                      <div className={col.dir} style={{ animationDuration: "50s" }}>
+                    <div key={ci} className="flex-1 overflow-hidden">
+                      <div className={col.dir} style={{ animationDuration: "55s" }}>
                         {[0, 1].map((k) => (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img
