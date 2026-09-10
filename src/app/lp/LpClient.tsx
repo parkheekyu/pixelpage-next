@@ -603,17 +603,11 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               <a
                 href={articles[0] ? `/columns/${articles[0].slug}` : "/columns"}
                 className="rounded-3xl overflow-hidden relative min-h-[380px] group"
+                style={{
+                  background:
+                    "radial-gradient(ellipse 120% 90% at 20% 100%, rgba(56,189,248,0.55) 0%, transparent 55%), linear-gradient(160deg, #0e152a 0%, #060a15 100%)",
+                }}
               >
-                <video
-                  autoPlay
-                  muted
-                  loop
-                  playsInline
-                  className="absolute inset-0 w-full h-full object-cover"
-                >
-                  <source src="/reels/7.mp4" type="video/mp4" />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-b from-black/20 via-black/40 to-black/85" />
                 <div className="relative h-full p-6 flex flex-col justify-between text-white">
                   <div className="flex items-center gap-1.5">
                     <Image src={logoWhite} alt="" width={80} height={16} className="h-4 w-auto" />
