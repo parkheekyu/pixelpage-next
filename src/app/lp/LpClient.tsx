@@ -666,8 +666,17 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               }}
             />
 
-            <div className="relative grid grid-cols-1 md:grid-cols-[1fr_1fr] gap-10">
-              {/* Left — form */}
+            <div className="relative max-w-[720px] mx-auto">
+              {/* 헤드라인 (가운데) */}
+              <div className="text-center mb-12">
+                <PillLabel color="#38bdf8">Free Consultation</PillLabel>
+                <h2 className="mt-6 break-keep text-white text-[clamp(28px,4.2vw,48px)] font-extrabold leading-[1.15] tracking-[-0.035em]">
+                  DB를 <span className="text-white/40 line-through decoration-[3px]">사지</span> 마세요.<br />
+                  <span className="text-sky-300">함께 성장</span>합시다.
+                </h2>
+              </div>
+
+              {/* 폼 */}
               <div className="rounded-3xl bg-[#0a0a13] border border-white/[0.06] p-7 md:p-8">
                 <p className="text-[16px] font-semibold mb-6">지금 상담부터 시작하세요</p>
                 {submitted ? (
@@ -752,46 +761,6 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 )}
               </div>
 
-              {/* Right — 카피 + 캐릭터 마스코트 */}
-              <div className="flex flex-col justify-between">
-                <div>
-                  <PillLabel color="#38bdf8">Free Consultation</PillLabel>
-                  <h2 className="mt-6 break-keep text-white text-[clamp(28px,4.2vw,48px)] font-extrabold leading-[1.15] tracking-[-0.035em] mb-6">
-                    DB를 <span className="text-white/40 line-through decoration-[3px]">사지</span> 마세요.<br />
-                    <span className="text-sky-300">함께 성장</span>합시다.
-                  </h2>
-                  <p className="text-[17px] text-white/60 leading-[1.85] mb-8">
-                    광고 계정·랜딩·CRM을 함께 열어보고<br />
-                    어디가 새는지 찾아드립니다. 계약 없이도 괜찮습니다.
-                  </p>
-                  <ul className="space-y-3.5 mb-10">
-                    {[
-                      "평균 회신 3시간 이내",
-                      "브랜드 전담 담당자 배정",
-                      "NDA 즉시 서명 가능",
-                    ].map((v) => (
-                      <li key={v} className="flex items-center gap-3 text-[17px] text-white/75">
-                        <Check className="w-4 h-4 text-sky-400" strokeWidth={2.5} />
-                        {v}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                {/* 캐릭터 마스코트 카드 */}
-                <div className="flex items-center gap-5">
-                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-br from-sky-500/40 to-sky-800/20 border border-sky-400/20 overflow-hidden flex items-end justify-center">
-                    <Image src={charMale} alt="" width={96} height={96} className="w-full h-auto object-contain" />
-                  </div>
-                  <div>
-                    <p className="text-[16px] font-bold">박희규</p>
-                    <p className="text-[15px] text-white/50 mb-3">Founder, PixelPage</p>
-                    <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 text-[15.5px] text-sky-300 hover:text-sky-200">
-                      <MessageSquare className="w-3.5 h-3.5" /> 카카오톡으로 바로 문의
-                    </a>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
