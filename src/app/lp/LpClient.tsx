@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -41,8 +42,8 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
+  const router = useRouter();
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
-  const [submitted, setSubmitted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -56,8 +57,17 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
     e.preventDefault();
     if (!form.name || !form.phone || !form.agree) return;
     const body = `이름: ${form.name}%0A회사: ${form.company}%0A연락처: ${form.phone}%0A업종: ${form.industry}%0A월 광고 예산: ${form.budget}`;
-    window.location.href = `mailto:contact@pixelpage.co.kr?subject=%5B무료%20상담%20신청%5D%20${encodeURIComponent(form.company || form.name)}&body=${body}`;
-    setSubmitted(true);
+    const mailto = `mailto:contact@pixelpage.co.kr?subject=%5B무료%20상담%20신청%5D%20${encodeURIComponent(form.company || form.name)}&body=${body}`;
+    try {
+      const a = document.createElement("a");
+      a.href = mailto;
+      a.rel = "noopener";
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+    } catch {}
+    router.push("/thank-you");
   };
 
   return (
@@ -676,21 +686,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               {/* 폼 */}
               <div className="rounded-3xl bg-[#0a0a13] border border-white/[0.06] p-7 md:p-8">
                 <p className="text-[16px] font-semibold mb-6">지금 상담부터 시작하세요</p>
-                {submitted ? (
-                  <div className="py-12 text-center">
-                    <p className="text-[16px] font-semibold mb-3">신청이 접수되었습니다.</p>
-                    <p className="text-[16px] text-white/55 mb-6">평균 3시간 이내 회신드립니다.</p>
-                    <a
-                      href={KAKAO_URL}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#FEE500] text-[#181600] text-[16px] font-bold"
-                    >
-                      <MessageSquare className="w-4 h-4" /> 카카오톡으로 바로 문의
-                    </a>
-                  </div>
-                ) : (
-                  <form onSubmit={submit} className="space-y-4">
+                <form onSubmit={submit} className="space-y-4">
                     <div>
                       <label className="text-[15px] text-white/55 mb-1.5 block">성함 *</label>
                       <input
@@ -772,10 +768,9 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
                     </button>
                     <p className="text-center text-[16px] text-white/40 pt-1">
-                      평균 회신 3시간 이내 · 계약 강요 없음
+                      빠른 시일 내에 연락드리겠습니다.
                     </p>
                   </form>
-                )}
               </div>
 
             </div>

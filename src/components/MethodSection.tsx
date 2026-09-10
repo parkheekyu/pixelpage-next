@@ -468,8 +468,8 @@ const MethodSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
           <span className="font-extrabold">처음부터 끝까지</span>
         </h2>
         <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[520px] mx-auto ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
-          광고, 랜딩, CRM을 분산하지 않아도 돼요.<br />
-          픽셀페이지가 설계하고, 분석하고, 개선해요.
+          기획부터 디자인, 개발까지<br />
+          빠르게 제작하고 테스트합니다.
         </p>
       </Reveal>
 

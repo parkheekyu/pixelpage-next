@@ -237,8 +237,8 @@ const WhatWeDoSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
             <span className="font-extrabold">끊기지 않게 연결해요.</span>
           </h2>
           <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[560px] mx-auto ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
-            세 개를 따로 굴리면 반드시 어딘가 끊겨요.<br />
-            픽셀페이지는 하나의 팀이 설계하고, 분석하고, 개선해요.
+            고품질 DB를 만들기 위해<br />
+            쉬지 않고 연구합니다.
           </p>
         </Reveal>
 
