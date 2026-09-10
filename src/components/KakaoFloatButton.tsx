@@ -3,11 +3,12 @@
 import { usePathname } from "next/navigation";
 
 const HIDDEN_PATHS = ["/", "/info", "/thank-you"];
+const HIDDEN_PREFIXES = ["/columns"];
 const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
 const KakaoFloatButton = () => {
   const pathname = usePathname();
-  if (HIDDEN_PATHS.includes(pathname)) return null;
+  if (HIDDEN_PATHS.includes(pathname) || HIDDEN_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + "/"))) return null;
 
   return (
     <a

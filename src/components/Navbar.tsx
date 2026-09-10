@@ -10,6 +10,7 @@ import logoWhite from "@/assets/logo-white.png";
 const darkHeroPages = ["/", "/consult", "/cases", "/products/glue", "/columns", "/services/agency", "/services/consulting", "/services/performance", "/services/branded", "/services/crm", "/services/seo", "/services/webbuild"];
 
 const hiddenChromePages = ["/", "/info", "/thank-you"];
+const hiddenPrefixes = ["/columns"];
 
 const navItems: {
   label: string;
@@ -46,7 +47,7 @@ const Navbar = () => {
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
-  if (hiddenChromePages.includes(pathname)) return null;
+  if (hiddenChromePages.includes(pathname) || hiddenPrefixes.some((p) => pathname === p || pathname.startsWith(p + "/"))) return null;
 
   return (
     <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

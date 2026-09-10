@@ -7,6 +7,8 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeRaw from "rehype-raw";
 import Reveal from "@/components/Reveal";
+import LpNavbar from "@/components/lp/LpNavbar";
+import LpFooter from "@/components/lp/LpFooter";
 import logoDark from "@/assets/logo-dark.png";
 import type { Article } from "@/lib/notion";
 
@@ -40,8 +42,9 @@ const ArticleClient = ({ article, content, recentArticles = [] }: Props) => {
 
   return (
     <div className="bg-white">
+      <LpNavbar />
       {/* Hero — 무료 칼럼 (고정) */}
-      <section className="pt-32 pb-14 lg:pb-16 bg-[#0a0f1e] text-white">
+      <section className="pt-40 pb-14 lg:pb-16 bg-[#0a0f1e] text-white">
         <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
           <Link
             href="/columns"
@@ -195,6 +198,7 @@ const ArticleClient = ({ article, content, recentArticles = [] }: Props) => {
           </Reveal>
         </div>
       </section>
+      <LpFooter />
     </div>
   );
 };

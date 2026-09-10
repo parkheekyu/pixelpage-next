@@ -3,6 +3,8 @@
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import Reveal from "@/components/Reveal";
+import LpNavbar from "@/components/lp/LpNavbar";
+import LpFooter from "@/components/lp/LpFooter";
 import type { Article } from "@/lib/notion";
 
 function formatDate(dateStr: string): string {
@@ -13,8 +15,9 @@ function formatDate(dateStr: string): string {
 
 const ColumnsClient = ({ articles }: { articles: Article[] }) => (
   <div>
+    <LpNavbar />
     {/* Hero */}
-    <section className="pt-32 pb-20 lg:pb-28 bg-[#0a0f1e] text-white">
+    <section className="pt-40 pb-20 lg:pb-28 bg-[#0a0f1e] text-white">
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Link
           href="/"
@@ -113,6 +116,7 @@ const ColumnsClient = ({ articles }: { articles: Article[] }) => (
         )}
       </div>
     </section>
+    <LpFooter />
   </div>
 );
 

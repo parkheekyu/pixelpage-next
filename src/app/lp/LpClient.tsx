@@ -13,7 +13,6 @@ import {
   Users,
   TrendingDown,
   Zap,
-  MessageSquare,
 } from "lucide-react";
 import charMale from "@/assets/char-male.png";
 import charFemale from "@/assets/char-female.png";
@@ -23,9 +22,9 @@ import WhatWeDoSection from "@/components/agency/WhatWeDoSection";
 import ProcessSection from "@/components/agency/ProcessSection";
 import AgencyFAQSection from "@/components/agency/AgencyFAQSection";
 import MethodSection from "@/components/MethodSection";
+import LpNavbar from "@/components/lp/LpNavbar";
+import LpFooter from "@/components/lp/LpFooter";
 import type { Article } from "@/lib/notion";
-
-const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
 /* ─────────────────────── Reusable ─────────────────────── */
 
@@ -72,29 +71,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
   return (
     <div className="bg-[#08080d] text-white min-h-screen selection:bg-sky-500/30">
-      {/* ── Floating Pill Navbar ── */}
-      <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[min(1120px,calc(100%-24px))]">
-        <div className="rounded-full bg-[#0e0e18]/85 backdrop-blur-xl border border-white/[0.08] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.7)] px-5 py-2.5 flex items-center gap-2">
-          <a href="/" className="flex items-center gap-2 pl-1 pr-3">
-            <Image src={logoWhite} alt="PixelPage" width={100} height={20} className="h-5 w-auto" />
-          </a>
-          <nav className="hidden md:flex items-center gap-1 flex-1 justify-center text-[16px]">
-            <a href="#solution" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">소개</a>
-            <a href="#process" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">진행 방식</a>
-            <a href="#faq" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">FAQ</a>
-            <a href="/columns" className="px-3.5 py-2 rounded-full text-white/60 hover:text-white">무료 칼럼</a>
-          </nav>
-          <a
-            href="#cta"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/40 text-white text-[16px] font-medium"
-          >
-            <span className="w-6 h-6 rounded-full bg-sky-500/25 flex items-center justify-center">
-              <MessageSquare className="w-3 h-3 text-sky-300" />
-            </span>
-            파트너형 DB 도입
-          </a>
-        </div>
-      </header>
+      <LpNavbar onLp />
 
       {/* ── 1. 히어로 (섹션 전체 영상 배경 + 짙은 오버레이) ── */}
       <section className="relative pt-[130px] pb-24 md:pt-[180px] md:pb-40 lg:pt-[240px] lg:pb-56 bg-black overflow-hidden">
@@ -778,72 +755,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </section>
 
-      {/* ── 11. Footer ── */}
-      <footer className="pt-16 pb-24 md:pb-16 bg-[#06060a] border-t border-white/[0.05] text-white/45">
-        <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          {/* Top: 로고 · 소개 · 링크 */}
-          <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr] gap-10 md:gap-12 pb-10 border-b border-white/[0.06]">
-            <div>
-              <a href="/" className="inline-flex items-center gap-2">
-                <Image src={logoWhite} alt="PixelPage" width={110} height={22} className="h-5 w-auto opacity-90" />
-              </a>
-              <p className="mt-5 text-[14px] text-white/50 leading-[1.85] max-w-[360px]">
-                매출 성장의 진짜 파트너가 되겠습니다.
-              </p>
-            </div>
-
-            <div>
-              <p className="text-[12px] font-semibold tracking-[0.18em] uppercase text-white/60 mb-4">
-                Company
-              </p>
-              <ul className="space-y-2 text-[14px]">
-                <li><a href="#solution" className="hover:text-white">소개</a></li>
-                <li><a href="#process" className="hover:text-white">진행 방식</a></li>
-                <li><a href="#faq" className="hover:text-white">FAQ</a></li>
-                <li><a href="/columns" className="hover:text-white">무료 칼럼</a></li>
-              </ul>
-            </div>
-
-            <div>
-              <p className="text-[12px] font-semibold tracking-[0.18em] uppercase text-white/60 mb-4">
-                Contact
-              </p>
-              <ul className="space-y-2 text-[14px]">
-                <li>
-                  <a href="mailto:contact@pixelpage.co.kr" className="hover:text-white">
-                    contact@pixelpage.co.kr
-                  </a>
-                </li>
-                <li>
-                  <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                    카카오톡 상담
-                  </a>
-                </li>
-                <li>
-                  <a href="#cta" className="hover:text-white">파트너형 DB 도입 문의</a>
-                </li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Bottom: 사업자 정보 · 카피라이트 */}
-          <div className="pt-8 flex flex-col gap-4 md:flex-row md:items-start md:justify-between text-[13px] leading-[1.75] text-white/35">
-            <div className="space-y-1">
-              <p>
-                <span className="text-white/55 font-semibold">픽셀페이지</span>
-                <span className="mx-2 text-white/15">|</span>
-                대표 박희규
-                <span className="mx-2 text-white/15">|</span>
-                사업자등록번호 <span className="tabular-nums">477-11-01530</span>
-              </p>
-              <p>
-                경기도 용인시 수지구 광교중앙로296번길 10, 207호-제24호 (상현동, 광교 리치안 오피스텔)
-              </p>
-            </div>
-            <p className="text-white/30 whitespace-nowrap">© 2026 PIXELPAGE. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+      <LpFooter onLp />
 
       {/* 모바일 스크롤 시 하단 플로팅 CTA */}
       <a
