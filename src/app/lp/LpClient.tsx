@@ -200,7 +200,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 3. 문제 제기 ── */}
       <section id="problem" className="py-24 lg:py-32">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="mb-16">
+          <div className="mb-16 text-center">
             <PillLabel color="#f87171">Problem</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-normal text-white/40">기존의 DB 마케팅 방식으로는</span><br />
@@ -271,7 +271,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         }}
       >
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="mb-16">
+          <div className="mb-16 text-center">
             <PillLabel color="#38bdf8">Solution</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-normal text-white/40">그래서 픽셀페이지는</span><br />
@@ -315,9 +315,9 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 5. Services (좌측 정렬) ── */}
       <section id="service" className="py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="mb-14">
+          <div className="mb-14 text-center">
             <PillLabel color="#facc15">Services</PillLabel>
-            <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] max-w-[820px]">
+            <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] max-w-[820px] mx-auto">
               <span className="font-normal text-white/40">광고소재부터 랜딩페이지, CRM</span><br />
               <span className="font-normal text-white/40">터질 때까지 </span>
               <span className="font-extrabold text-white">무한 테스트</span>
@@ -443,7 +443,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 7. 포트폴리오 ── */}
       <section id="portfolio" className="py-24 lg:py-32">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="mb-14">
+          <div className="mb-14 text-center">
             <PillLabel color="#fb923c">Portfolio</PillLabel>
             <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
               <span className="font-extrabold">파트너사는 이만큼</span><br />
@@ -540,7 +540,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {articles.length > 0 && (
         <section id="blog" className="py-24 lg:py-32 border-t border-white/[0.04]">
           <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-            <div className="mb-14">
+            <div className="mb-14 text-center">
               <PillLabel color="#fb923c">News & blogs</PillLabel>
               <h2 className="mt-6 break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em]">
                 <span className="font-normal text-white/40">꼭 저희가 아니어도 좋습니다</span><br />
