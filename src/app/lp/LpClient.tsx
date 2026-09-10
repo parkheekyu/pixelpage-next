@@ -80,7 +80,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       </header>
 
       {/* ── 1. 히어로 (섹션 전체 영상 배경 + 짙은 오버레이) ── */}
-      <section className="relative pt-[180px] pb-40 lg:pt-[240px] lg:pb-56 bg-black overflow-hidden">
+      <section className="relative pt-[130px] pb-24 md:pt-[180px] md:pb-40 lg:pt-[240px] lg:pb-56 bg-black overflow-hidden">
         {/* 배경 동영상 */}
         <video
           autoPlay
@@ -140,20 +140,23 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             </h1>
 
             {/* 스플릿 CTA */}
-            <div className="mt-14 inline-flex items-center gap-1 p-1 rounded-full" style={{ backgroundColor: "#4090f7" }}>
-              <span className="px-6 py-3 text-white text-[17px] font-semibold whitespace-nowrap">
+            <div
+              className="mt-10 md:mt-14 inline-flex items-center gap-1 p-1 rounded-full max-w-full"
+              style={{ backgroundColor: "#4090f7" }}
+            >
+              <span className="px-3 md:px-6 py-2.5 md:py-3 text-white text-[12px] md:text-[17px] font-semibold whitespace-nowrap">
                 파트너형 DB 마케팅 도입 문의
               </span>
               <a
                 href="#cta"
-                className="inline-flex items-center gap-2 px-4 py-3 rounded-full bg-black text-white text-[16px] font-bold uppercase tracking-[0.1em]"
+                className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-full bg-black text-white text-[10.5px] md:text-[16px] font-bold uppercase tracking-[0.06em] md:tracking-[0.1em] whitespace-nowrap"
               >
                 무료 상담
-                <span className="w-7 h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
+                <span className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
                   <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
                 </span>
-                <span className="w-6 h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#4090f7" }}>
-                  <Phone className="w-3 h-3 text-white" />
+                <span className="w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#4090f7" }}>
+                  <Phone className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
                 </span>
               </a>
             </div>
@@ -212,7 +215,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       </section>
 
       {/* ── 3. 문제 제기 ── */}
-      <section id="problem" className="py-24 lg:py-32">
+      <section id="problem" className="py-16 md:py-24 lg:py-32">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
           <div className="mb-16 text-center">
             <PillLabel color="#f87171">Problem</PillLabel>
@@ -249,7 +252,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 4. 해결 ── */}
       <section
         id="solution"
-        className="py-24 lg:py-32 relative overflow-hidden"
+        className="py-16 md:py-24 lg:py-32 relative overflow-hidden"
         style={{
           backgroundColor: "#040814",
           backgroundImage: "url(/lp-solution-bg.png)",
@@ -306,7 +309,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       </section>
 
       {/* ── 5. Services (좌측 정렬) ── */}
-      <section id="service" className="py-24 lg:py-32 border-t border-white/[0.04]">
+      <section id="service" className="py-16 md:py-24 lg:py-32 border-t border-white/[0.04]">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
           <div className="mb-14 text-center">
             <PillLabel color="#facc15">Services</PillLabel>
@@ -434,7 +437,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       </div>
 
       {/* ── 7. 포트폴리오 ── */}
-      <section id="portfolio" className="py-24 lg:py-32">
+      <section id="portfolio" className="py-16 md:py-24 lg:py-32">
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
           <div className="mb-14 text-center">
             <PillLabel color="#fb923c">Portfolio</PillLabel>
@@ -539,7 +542,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
       {/* ── 10. News & blogs (좌측 정렬, Notion 최근 칼럼) ── */}
       {articles.length > 0 && (
-        <section id="blog" className="py-24 lg:py-32 border-t border-white/[0.04]">
+        <section id="blog" className="py-16 md:py-24 lg:py-32 border-t border-white/[0.04]">
           <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
             <div className="mb-14 text-center">
               <PillLabel color="#fb923c">News & blogs</PillLabel>
@@ -644,7 +647,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       {/* ── 10. CTA (WeTechPro DNA — 좌 폼 + 우 캐릭터 마스코트) ── */}
       <section
         id="cta"
-        className="py-24 lg:py-32 relative overflow-hidden border-t border-white/[0.06]"
+        className="py-16 md:py-24 lg:py-32 relative overflow-hidden border-t border-white/[0.06]"
         style={{
           backgroundColor: "#040814",
           backgroundImage: "url(/lp-cta-bg.png)",
