@@ -41,7 +41,7 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
-  const [form, setForm] = useState({ name: "", company: "", phone: "", budget: "", agree: false });
+  const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
   const [submitted, setSubmitted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
@@ -55,7 +55,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.phone || !form.agree) return;
-    const body = `이름: ${form.name}%0A회사: ${form.company}%0A연락처: ${form.phone}%0A월 광고 예산: ${form.budget}`;
+    const body = `이름: ${form.name}%0A회사: ${form.company}%0A연락처: ${form.phone}%0A업종: ${form.industry}%0A월 광고 예산: ${form.budget}`;
     window.location.href = `mailto:contact@pixelpage.co.kr?subject=%5B무료%20상담%20신청%5D%20${encodeURIComponent(form.company || form.name)}&body=${body}`;
     setSubmitted(true);
   };
@@ -662,17 +662,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         }}
       >
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-          <div className="rounded-3xl border border-white/[0.06] bg-[#0c0c14]/80 backdrop-blur-sm p-6 md:p-10 lg:p-14 relative overflow-hidden">
-            {/* 파도 라인 패턴 */}
-            <div
-              className="absolute inset-0 opacity-25 pointer-events-none"
-              style={{
-                backgroundImage:
-                  "repeating-linear-gradient(115deg, transparent, transparent 40px, rgba(255,255,255,0.03) 40px, rgba(255,255,255,0.03) 42px)",
-              }}
-            />
-
-            <div className="relative max-w-[720px] mx-auto">
+          <div className="p-2 md:p-4">
+            <div className="max-w-[720px] mx-auto">
               {/* 헤드라인 (가운데) */}
               <div className="text-center mb-12">
                 <PillLabel color="#38bdf8">Free Consultation</PillLabel>
@@ -706,7 +697,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         required
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        placeholder="박희규"
+                        placeholder="홍길동"
                         className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
                       />
                     </div>
@@ -728,6 +719,26 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         placeholder="010-0000-0000"
                         className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
                       />
+                    </div>
+                    <div>
+                      <label className="text-[15px] text-white/55 mb-1.5 block">업종 *</label>
+                      <select
+                        required
+                        value={form.industry}
+                        onChange={(e) => setForm({ ...form, industry: e.target.value })}
+                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-sky-400"
+                      >
+                        <option value="" className="bg-[#0a0a13]">선택하세요</option>
+                        <option className="bg-[#0a0a13]">교육·코칭</option>
+                        <option className="bg-[#0a0a13]">병원·의료·성형</option>
+                        <option className="bg-[#0a0a13]">부동산·인테리어</option>
+                        <option className="bg-[#0a0a13]">시공·설비 (태양광 등)</option>
+                        <option className="bg-[#0a0a13]">법률·전문 서비스</option>
+                        <option className="bg-[#0a0a13]">프랜차이즈·가맹</option>
+                        <option className="bg-[#0a0a13]">이커머스·D2C</option>
+                        <option className="bg-[#0a0a13]">지식 SaaS·B2B</option>
+                        <option className="bg-[#0a0a13]">기타</option>
+                      </select>
                     </div>
                     <div>
                       <label className="text-[15px] text-white/55 mb-1.5 block">월 광고 예산 *</label>
