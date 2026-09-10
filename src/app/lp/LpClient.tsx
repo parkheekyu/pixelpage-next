@@ -663,8 +663,11 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         id="cta"
         className="py-24 lg:py-32 relative overflow-hidden border-t border-white/[0.06]"
         style={{
-          background:
-            "radial-gradient(ellipse 900px 500px at 50% 100%, rgba(99,102,241,0.28) 0%, transparent 70%), linear-gradient(180deg, #08080d 0%, #0b0b16 100%)",
+          backgroundColor: "#040814",
+          backgroundImage: "url(/lp-cta-bg.png)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          backgroundRepeat: "no-repeat",
         }}
       >
         <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
