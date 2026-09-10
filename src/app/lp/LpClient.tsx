@@ -138,7 +138,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             {/* 스플릿 CTA */}
             <div
               className="mt-10 md:mt-14 inline-flex items-center gap-1 p-1 rounded-full max-w-full"
-              style={{ backgroundColor: "#4090f7" }}
+              style={{ backgroundImage: "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)" }}
             >
               <span className="px-3 md:px-6 py-2.5 md:py-3 text-white text-[12px] md:text-[17px] font-semibold whitespace-nowrap">
                 파트너형 DB 마케팅 도입 문의
