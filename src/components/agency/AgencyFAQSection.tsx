@@ -33,9 +33,15 @@ const AgencyFAQSection = ({ variant = "light" }: { variant?: Variant } = {}) => 
     <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#ffffff" }}>
       <div className="max-w-[840px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-14">
-          <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 uppercase ${isDark ? "text-blue-400" : "text-blue-500"}`}>
+          <span
+            className={`inline-flex items-center px-4 py-1.5 mb-5 rounded-full text-[14px] font-semibold tracking-[0.18em] uppercase border ${
+              isDark
+                ? "text-blue-400 border-blue-400/40 bg-blue-400/[0.08]"
+                : "text-blue-500 border-blue-500/40 bg-blue-500/[0.08]"
+            }`}
+          >
             FAQ
-          </p>
+          </span>
           <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] ${isDark ? "text-white" : "text-foreground"}`}>
             궁금한 게 있으신가요?
           </h2>
