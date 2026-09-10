@@ -223,8 +223,8 @@ const WhatWeDoSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
     <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#ffffff" }}>
       <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
         <Reveal className="text-center mb-16 lg:mb-24">
-          <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
-            무엇을 해드리나요
+          <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 uppercase ${isDark ? "text-blue-400" : "text-blue-500"}`}>
+            What We Do
           </p>
           <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] mb-6 ${isDark ? "text-white" : "text-foreground"}`}>
             광고부터 전환까지<br />끊기지 않게 연결해요.

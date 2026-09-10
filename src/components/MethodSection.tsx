@@ -454,8 +454,8 @@ const MethodSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
   <section className="py-28 lg:py-36" style={{ background: isDark ? "#0a0f1e" : "#fbfbfb" }}>
     <div className="max-w-[1240px] mx-auto px-6 lg:px-12">
       <Reveal className="text-center mb-20 lg:mb-28">
-        <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 ${isDark ? "text-blue-400" : "text-blue-500"}`}>
-          픽셀페이지의 방식
+        <p className={`text-[12px] font-semibold tracking-[0.18em] mb-5 uppercase ${isDark ? "text-blue-400" : "text-blue-500"}`}>
+          Method
         </p>
         <h2 className={`break-keep text-[clamp(32px,4.5vw,56px)] font-bold leading-[1.18] tracking-[-0.03em] mb-6 ${isDark ? "text-white" : "text-foreground"}`}>
           하나의 팀이<br />처음부터 끝까지
