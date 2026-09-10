@@ -211,21 +211,21 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             {[
               {
                 num: "01",
+                icon: TrendingDown,
+                tag: "늘리는 순간 무너집니다",
+                body: "물량을 키우면 허수가 섞이고 단가는 뜁니다. 매출을 키우고 싶어도, 구조가 못 받쳐줍니다.",
+              },
+              {
+                num: "02",
                 icon: Search,
                 tag: "출처를 모릅니다",
                 body: "어떤 광고를 보고 온 고객인지 모르니, 상담 품질이 복불복입니다.",
               },
               {
-                num: "02",
+                num: "03",
                 icon: Users,
                 tag: "나만의 DB가 아닙니다",
                 body: "같은 DB가 여러 업체에 팔립니다. 전화하면 이미 경쟁사와 통화 중입니다.",
-              },
-              {
-                num: "03",
-                icon: TrendingDown,
-                tag: "늘리는 순간 무너집니다",
-                body: "물량을 키우면 허수가 섞이고 단가는 뜁니다. 매출을 키우고 싶어도, 구조가 못 받쳐줍니다.",
               },
               {
                 num: "04",
