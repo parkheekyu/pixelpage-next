@@ -410,17 +410,17 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                   }}
                 >
                   {[
-                    { src: "/lp-landings/landing1.png", dir: "animate-marquee-up" },
-                    { src: "/lp-landings/landing2.png", dir: "animate-marquee-down" },
-                    { src: "/lp-landings/landing3.png", dir: "animate-marquee-up" },
+                    { items: ["/lp-landings/landing1.png", "/lp-landings/landing2.png", "/lp-landings/landing3.png"], dir: "animate-marquee-up" },
+                    { items: ["/lp-landings/landing2.png", "/lp-landings/landing3.png", "/lp-landings/landing1.png"], dir: "animate-marquee-down" },
+                    { items: ["/lp-landings/landing3.png", "/lp-landings/landing1.png", "/lp-landings/landing2.png"], dir: "animate-marquee-up" },
                   ].map((col, ci) => (
                     <div key={ci} className="flex-1 overflow-hidden">
-                      <div className={col.dir} style={{ animationDuration: "55s" }}>
-                        {[0, 1].map((k) => (
+                      <div className={col.dir} style={{ animationDuration: "60s" }}>
+                        {[...col.items, ...col.items].map((src, k) => (
                           /* eslint-disable-next-line @next/next/no-img-element */
                           <img
-                            key={k}
-                            src={col.src}
+                            key={`${src}-${k}`}
+                            src={src}
                             alt=""
                             className="w-full block select-none pointer-events-none"
                           />
