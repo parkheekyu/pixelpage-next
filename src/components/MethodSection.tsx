@@ -466,6 +466,7 @@ const MethodSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
         <h2 className={`break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] mb-6 ${isDark ? "text-white" : "text-foreground"}`}>
           <span className={`font-normal ${isDark ? "text-white/40" : "text-foreground/40"}`}>하나의 팀이</span><br />
           <span className="font-extrabold">처음부터 끝까지</span>
+          <span className={`font-normal ${isDark ? "text-white/40" : "text-foreground/40"}`}> 합니다.</span>
         </h2>
         <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[520px] mx-auto ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
           기획부터 디자인, 개발까지<br />
