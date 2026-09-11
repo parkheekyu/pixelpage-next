@@ -397,6 +397,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                               muted
                               loop
                               playsInline
+                              preload="metadata"
                               className="w-full aspect-[2/3] object-cover bg-black"
                             />
                             <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-black/10 via-transparent to-black/40" />
