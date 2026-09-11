@@ -767,26 +767,28 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
       <LpFooter onLp />
 
-      {/* 모바일 전용 — 히어로 지나면 나타나는 하단 플로팅 스플릿 CTA (히어로 것과 동일 스타일) */}
+      {/* 모바일 전용 — 히어로 스플릿 CTA가 하단으로 부드럽게 내려오는 플로팅 (히어로와 동일 사이즈/스타일) */}
       <div
         aria-hidden={!showFloatingHeroCta}
-        className="md:hidden fixed left-3 right-3 z-40 pointer-events-none"
+        className="md:hidden fixed left-0 right-0 z-40 flex justify-center pointer-events-none will-change-transform px-3"
         style={{
-          bottom: showFloatingHeroCta ? 16 : -80,
+          bottom: 16,
+          transform: showFloatingHeroCta ? "translate3d(0, 0, 0)" : "translate3d(0, 140%, 0)",
           opacity: showFloatingHeroCta ? 1 : 0,
-          transition: "bottom 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease",
+          transition:
+            "transform 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease",
         }}
       >
         <div
-          className="mx-auto inline-flex items-center gap-1 p-1 rounded-full shadow-[0_18px_40px_-14px_rgba(64,144,247,0.55)] pointer-events-auto w-full max-w-[420px]"
+          className="inline-flex items-center gap-1 p-1 rounded-full shadow-[0_18px_40px_-14px_rgba(64,144,247,0.55)] pointer-events-auto"
           style={{ backgroundImage: "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)" }}
         >
-          <span className="pl-4 pr-2 py-2.5 text-white text-[13px] font-semibold whitespace-nowrap flex-1 text-center">
+          <span className="px-3 py-2.5 text-white text-[12px] font-semibold whitespace-nowrap">
             파트너형 DB 마케팅 도입 문의
           </span>
           <a
             href="#cta"
-            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-full bg-black text-white text-[11px] font-bold uppercase tracking-[0.06em] whitespace-nowrap"
+            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-full bg-black text-white text-[10.5px] font-bold uppercase tracking-[0.06em] whitespace-nowrap"
           >
             무료 상담
             <span className="w-5 h-5 rounded-full bg-white overflow-hidden flex items-center justify-center">
