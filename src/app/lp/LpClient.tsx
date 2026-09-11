@@ -61,7 +61,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
     };
 
     const update = () => {
-      setPastHero(window.scrollY > window.innerHeight * 0.6);
+      setPastHero(window.scrollY > 40);
       const ctaEl = document.getElementById("cta");
       if (ctaEl) {
         const r = ctaEl.getBoundingClientRect();
