@@ -42,35 +42,52 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
-  // 모바일 히어로 CTA를 자연스럽게 하단으로 내리기 위한 위치 트래킹
+  // 모바일 히어로 CTA를 스크롤에 맞춰 자연스럽게 하단으로 내리기
   const heroCtaSlotRef = useRef<HTMLDivElement>(null);
   const floatingCtaRef = useRef<HTMLDivElement>(null);
-  const [floatingTop, setFloatingTop] = useState<number | null>(null);
+  const [initialSlotY, setInitialSlotY] = useState<number>(0);
+  const [floatingTop, setFloatingTop] = useState<number>(0);
+  const [ctaReady, setCtaReady] = useState(false);
   const [ctaSectionReached, setCtaSectionReached] = useState(false);
 
   useEffect(() => {
-    const update = () => {
+    const measureInitial = () => {
       const slot = heroCtaSlotRef.current;
-      const float = floatingCtaRef.current;
-      if (!slot || !float) return;
-      const slotTop = slot.getBoundingClientRect().top;
-      const ctaHeight = float.offsetHeight || 60;
-      const bottomAnchor = window.innerHeight - ctaHeight - 16;
-      setFloatingTop(Math.min(slotTop, bottomAnchor));
-      const ctaEl = document.getElementById("cta");
-      if (ctaEl) {
-        const rect = ctaEl.getBoundingClientRect();
-        setCtaSectionReached(rect.top < window.innerHeight);
+      if (slot && window.scrollY < 10) {
+        setInitialSlotY(slot.getBoundingClientRect().top);
       }
     };
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
+
+    const update = () => {
+      const float = floatingCtaRef.current;
+      if (!float) return;
+      const ctaH = float.offsetHeight || 60;
+      const bottomY = window.innerHeight - ctaH - 16;
+      // 히어로 절반 스크롤 동안 시작 위치 → 하단 위치까지 선형 보간
+      const distance = Math.max(300, window.innerHeight * 0.5);
+      const p = Math.min(1, Math.max(0, window.scrollY / distance));
+      const startY = initialSlotY > 0 ? initialSlotY : bottomY;
+      setFloatingTop(startY + p * (bottomY - startY));
+      setCtaReady(true);
+
+      const ctaEl = document.getElementById("cta");
+      if (ctaEl) {
+        const r = ctaEl.getBoundingClientRect();
+        setCtaSectionReached(r.top < window.innerHeight);
+      }
+    };
+
+    measureInitial();
     update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", () => {
+      measureInitial();
+      update();
+    });
     return () => {
       window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
     };
-  }, []);
+  }, [initialSlotY]);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -108,13 +125,13 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         >
           <source src="/lp-hero/hero.mp4" type="video/mp4" />
         </video>
-        {/* 오버레이 (영상 80% 노출) */}
-        <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+        {/* 오버레이 (영상 85% 노출) */}
+        <div className="absolute inset-0 bg-black/15 pointer-events-none" />
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
             background:
-              "radial-gradient(ellipse 85% 60% at 50% 55%, transparent 0%, rgba(0,0,0,0.3) 100%)",
+              "radial-gradient(ellipse 85% 60% at 50% 55%, transparent 0%, rgba(0,0,0,0.22) 100%)",
           }}
         />
         <div className="relative max-w-[1120px] mx-auto px-6 lg:px-8 text-center">
@@ -780,14 +797,13 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
       <LpFooter onLp />
 
-      {/* 모바일 전용 — 히어로 CTA를 스크롤 위치와 정확히 동기화해서 위→아래로 자연스럽게 이동 */}
+      {/* 모바일 전용 — 히어로 CTA가 스크롤에 따라 위→아래로 자연스럽게 이동 */}
       <div
         className="md:hidden fixed left-0 right-0 z-40 flex justify-center pointer-events-none px-3"
         style={{
-          top: floatingTop ?? -9999,
-          opacity: ctaSectionReached ? 0 : 1,
+          top: floatingTop,
+          opacity: !ctaReady ? 0 : ctaSectionReached ? 0 : 1,
           transition: "opacity 400ms ease",
-          visibility: floatingTop === null ? "hidden" : "visible",
         }}
       >
         <div
