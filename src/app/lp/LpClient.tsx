@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -42,6 +42,23 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
+  const [pastHero, setPastHero] = useState(false);
+  const [nearCta, setNearCta] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setPastHero(window.scrollY > window.innerHeight * 0.75);
+      const ctaEl = document.getElementById("cta");
+      if (ctaEl) {
+        const rect = ctaEl.getBoundingClientRect();
+        setNearCta(rect.top < window.innerHeight);
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  const showFloatingHeroCta = pastHero && !nearCta;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -749,6 +766,41 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
       </section>
 
       <LpFooter onLp />
+
+      {/* 모바일 전용 — 히어로 지나면 나타나는 하단 플로팅 스플릿 CTA (히어로 것과 동일 스타일) */}
+      <div
+        aria-hidden={!showFloatingHeroCta}
+        className="md:hidden fixed left-3 right-3 z-40 pointer-events-none"
+        style={{
+          bottom: showFloatingHeroCta ? 16 : -80,
+          opacity: showFloatingHeroCta ? 1 : 0,
+          transition: "bottom 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease",
+        }}
+      >
+        <div
+          className="mx-auto inline-flex items-center gap-1 p-1 rounded-full shadow-[0_18px_40px_-14px_rgba(64,144,247,0.55)] pointer-events-auto w-full max-w-[420px]"
+          style={{ backgroundImage: "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)" }}
+        >
+          <span className="pl-4 pr-2 py-2.5 text-white text-[13px] font-semibold whitespace-nowrap flex-1 text-center">
+            파트너형 DB 마케팅 도입 문의
+          </span>
+          <a
+            href="#cta"
+            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-full bg-black text-white text-[11px] font-bold uppercase tracking-[0.06em] whitespace-nowrap"
+          >
+            무료 상담
+            <span className="w-5 h-5 rounded-full bg-white overflow-hidden flex items-center justify-center">
+              <Image src={charMale} alt="" width={20} height={20} className="w-full h-full object-cover" />
+            </span>
+            <span
+              className="w-5 h-5 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: "#4090f7" }}
+            >
+              <Phone className="w-2.5 h-2.5 text-white" />
+            </span>
+          </a>
+        </div>
+      </div>
     </div>
   );
 };

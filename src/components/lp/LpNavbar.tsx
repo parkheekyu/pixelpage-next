@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
 import { MessageSquare } from "lucide-react";
 import logoWhite from "@/assets/logo-white.png";
 
@@ -16,62 +15,9 @@ type Props = {
 const anchor = (onLp: boolean, id: string) => (onLp ? `#${id}` : `/#${id}`);
 
 export default function LpNavbar({ onLp = false }: Props) {
-  const [pastHero, setPastHero] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [offsetY, setOffsetY] = useState(16);
-  const shellRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 767px)");
-    const handleMq = () => setIsMobile(mq.matches);
-    handleMq();
-    mq.addEventListener("change", handleMq);
-
-    const recompute = () => {
-      const scrolledPastHero = window.scrollY > window.innerHeight * 0.75;
-      setPastHero(scrolledPastHero);
-      const isMobileNow = mq.matches;
-      const navH = shellRef.current?.offsetHeight ?? 56;
-      if (isMobileNow && scrolledPastHero) {
-        setOffsetY(window.innerHeight - navH - 16);
-      } else {
-        setOffsetY(16);
-      }
-    };
-    window.addEventListener("scroll", recompute, { passive: true });
-    window.addEventListener("resize", recompute);
-    recompute();
-
-    return () => {
-      mq.removeEventListener("change", handleMq);
-      window.removeEventListener("scroll", recompute);
-      window.removeEventListener("resize", recompute);
-    };
-  }, []);
-
-  const bottomMode = isMobile && pastHero;
-
   return (
-    <header
-      className="fixed left-1/2 z-50 w-[min(1120px,calc(100%-24px))] will-change-transform"
-      style={{
-        top: 0,
-        transform: `translate3d(-50%, ${offsetY}px, 0)`,
-        transition:
-          "transform 900ms cubic-bezier(0.22, 1, 0.36, 1)",
-      }}
-    >
-      <div
-        ref={shellRef}
-        className="rounded-full backdrop-blur-xl shadow-[0_18px_50px_-20px_rgba(0,0,0,0.7)] px-5 py-2.5 flex items-center gap-2 border"
-        style={{
-          background: bottomMode
-            ? "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)"
-            : "rgba(14, 14, 24, 0.85)",
-          borderColor: bottomMode ? "rgba(255,255,255,0.25)" : "rgba(255,255,255,0.08)",
-          transition: "background 700ms ease-out, border-color 700ms ease-out",
-        }}
-      >
+    <header className="fixed top-4 left-1/2 -translate-x-1/2 z-50 w-[min(1120px,calc(100%-24px))]">
+      <div className="rounded-full bg-[#0e0e18]/85 backdrop-blur-xl border border-white/[0.08] shadow-[0_18px_50px_-20px_rgba(0,0,0,0.7)] px-5 py-2.5 flex items-center gap-2">
         <a href="/" className="flex items-center gap-2 pl-1 pr-3">
           <Image src={logoWhite} alt="PixelPage" width={100} height={20} className="h-5 w-auto" />
         </a>
