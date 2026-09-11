@@ -83,17 +83,6 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.phone || !form.agree) return;
-    const body = `이름: ${form.name}%0A회사: ${form.company}%0A연락처: ${form.phone}%0A업종: ${form.industry}%0A월 광고 예산: ${form.budget}`;
-    const mailto = `mailto:contact@pixelpage.co.kr?subject=%5B무료%20상담%20신청%5D%20${encodeURIComponent(form.company || form.name)}&body=${body}`;
-    try {
-      const a = document.createElement("a");
-      a.href = mailto;
-      a.rel = "noopener";
-      a.style.display = "none";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-    } catch {}
     router.push("/thank-you");
   };
 
