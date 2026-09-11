@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, ArrowRight, MessageSquare } from "lucide-react";
+import { Check, ArrowRight, MessageSquare, UserPlus } from "lucide-react";
 import logoWhite from "@/assets/logo-white.png";
 
-const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
+const KAKAO_CHAT_URL = "http://pf.kakao.com/_cxccdX/chat";
+const KAKAO_CHANNEL_URL = "http://pf.kakao.com/_cxccdX";
 
 export const metadata: Metadata = {
   title: "신청 완료 · 픽셀페이지",
@@ -38,23 +39,34 @@ export default function Page() {
         </h1>
         <p className="text-[16px] md:text-[17px] text-white/60 leading-[1.85] mb-10">
           빠른 시일 내에 연락드리겠습니다.<br />
-          급하신 경우 카카오톡으로 바로 문의 주세요.
+          아래 카카오톡 채널을 추가해두시면 놓치지 않고 안내받으실 수 있습니다.
         </p>
 
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-6">
           <a
-            href={KAKAO_URL}
+            href={KAKAO_CHANNEL_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FEE500] text-[#181600] text-[15px] font-bold whitespace-nowrap"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#FEE500] text-[#181600] text-[15px] font-bold whitespace-nowrap hover:brightness-95"
+          >
+            <UserPlus className="w-4 h-4" /> 카카오톡 채널 추가하기
+          </a>
+          <a
+            href={KAKAO_CHAT_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-[#FEE500]/60 text-[#FEE500] text-[15px] font-semibold whitespace-nowrap hover:bg-[#FEE500]/10 transition-colors"
           >
             <MessageSquare className="w-4 h-4" /> 카카오톡으로 바로 문의
           </a>
+        </div>
+
+        <div className="mb-16">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full border border-white/15 text-white/80 hover:text-white hover:border-white/30 text-[15px] font-semibold transition-colors whitespace-nowrap"
+            className="inline-flex items-center gap-2 text-[14px] text-white/50 hover:text-white transition-colors"
           >
-            홈으로 돌아가기 <ArrowRight className="w-4 h-4" />
+            홈으로 돌아가기 <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
