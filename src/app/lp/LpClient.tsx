@@ -42,34 +42,26 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
-  // 모바일 히어로 CTA를 스크롤에 맞춰 자연스럽게 하단으로 내리기
+  // 모바일 히어로 CTA — 히어로 지나면 부드럽게 하단으로 이동
   const heroCtaSlotRef = useRef<HTMLDivElement>(null);
   const floatingCtaRef = useRef<HTMLDivElement>(null);
   const [initialSlotY, setInitialSlotY] = useState<number>(0);
-  const [floatingTop, setFloatingTop] = useState<number>(0);
-  const [ctaReady, setCtaReady] = useState(false);
+  const [ctaHeight, setCtaHeight] = useState<number>(60);
+  const [pastHero, setPastHero] = useState(false);
   const [ctaSectionReached, setCtaSectionReached] = useState(false);
 
   useEffect(() => {
     const measureInitial = () => {
       const slot = heroCtaSlotRef.current;
+      const float = floatingCtaRef.current;
       if (slot && window.scrollY < 10) {
         setInitialSlotY(slot.getBoundingClientRect().top);
       }
+      if (float) setCtaHeight(float.offsetHeight || 60);
     };
 
     const update = () => {
-      const float = floatingCtaRef.current;
-      if (!float) return;
-      const ctaH = float.offsetHeight || 60;
-      const bottomY = window.innerHeight - ctaH - 16;
-      // 히어로 절반 스크롤 동안 시작 위치 → 하단 위치까지 선형 보간
-      const distance = Math.max(300, window.innerHeight * 0.5);
-      const p = Math.min(1, Math.max(0, window.scrollY / distance));
-      const startY = initialSlotY > 0 ? initialSlotY : bottomY;
-      setFloatingTop(startY + p * (bottomY - startY));
-      setCtaReady(true);
-
+      setPastHero(window.scrollY > window.innerHeight * 0.6);
       const ctaEl = document.getElementById("cta");
       if (ctaEl) {
         const r = ctaEl.getBoundingClientRect();
@@ -87,7 +79,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
     return () => {
       window.removeEventListener("scroll", update);
     };
-  }, [initialSlotY]);
+  }, []);
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -797,13 +789,20 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
       <LpFooter onLp />
 
-      {/* 모바일 전용 — 히어로 CTA가 스크롤에 따라 위→아래로 자연스럽게 이동 */}
+      {/* 모바일 전용 — 히어로 지나면 부드러운 모션으로 하단에 도착 */}
       <div
-        className="md:hidden fixed left-0 right-0 z-40 flex justify-center pointer-events-none px-3"
+        className="md:hidden fixed left-0 right-0 z-40 flex justify-center pointer-events-none px-3 will-change-transform"
         style={{
-          top: floatingTop,
-          opacity: !ctaReady ? 0 : ctaSectionReached ? 0 : 1,
-          transition: "opacity 400ms ease",
+          top: 0,
+          transform: (() => {
+            if (typeof window === "undefined" || initialSlotY === 0) return "translate3d(0, -9999px, 0)";
+            const bottomY = window.innerHeight - ctaHeight - 16;
+            const y = pastHero ? bottomY : initialSlotY;
+            return `translate3d(0, ${y}px, 0)`;
+          })(),
+          opacity: initialSlotY === 0 ? 0 : ctaSectionReached ? 0 : 1,
+          transition:
+            "transform 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease",
         }}
       >
         <div
