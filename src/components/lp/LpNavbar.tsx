@@ -29,7 +29,7 @@ export default function LpNavbar({ onLp = false }: Props) {
         </nav>
         <a
           href={anchor(onLp, "cta")}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/40 text-white text-[16px] font-medium"
+          className="ml-auto inline-flex items-center gap-2 px-4 py-2 rounded-full border border-sky-400/40 text-white text-[15px] md:text-[16px] font-medium whitespace-nowrap"
         >
           <span className="w-6 h-6 rounded-full bg-sky-500/25 flex items-center justify-center">
             <MessageSquare className="w-3 h-3 text-sky-300" />
