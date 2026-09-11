@@ -42,8 +42,8 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
   // 모바일 히어로 CTA — 히어로 지나면 부드럽게 하단으로 이동
-  const heroCtaSlotRef = useRef<HTMLDivElement>(null);
-  const floatingCtaRef = useRef<HTMLDivElement>(null);
+  const heroCtaSlotRef = useRef<HTMLAnchorElement>(null);
+  const floatingCtaRef = useRef<HTMLAnchorElement>(null);
   const [initialSlotY, setInitialSlotY] = useState<number>(0);
   const [ctaHeight, setCtaHeight] = useState<number>(60);
   const [pastHero, setPastHero] = useState(false);
@@ -154,25 +154,23 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             </h1>
 
             {/* 스플릿 CTA — 데스크톱에선 인라인 노출, 모바일에선 자리(placeholder)만 잡고 실제 버튼은 fixed 요소로 스크롤 따라 자연스럽게 하강 */}
-            <div
+            <a
               ref={heroCtaSlotRef}
+              href="#cta"
               className="mt-10 md:mt-14 inline-flex items-center gap-1 p-1 rounded-full max-w-full md:opacity-100 opacity-0 md:pointer-events-auto pointer-events-none"
               style={{ backgroundImage: "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)" }}
-              aria-hidden={undefined}
+              aria-label="파트너형 DB 마케팅 도입 문의"
             >
               <span className="px-3 md:px-6 py-2.5 md:py-3 text-white text-[12px] md:text-[17px] font-semibold whitespace-nowrap">
                 파트너형 DB 마케팅 도입 문의
               </span>
-              <a
-                href="#cta"
-                className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-full bg-black text-white text-[10.5px] md:text-[16px] font-bold uppercase tracking-[0.06em] md:tracking-[0.1em] whitespace-nowrap"
-              >
+              <span className="inline-flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2.5 md:py-3 rounded-full bg-black text-white text-[10.5px] md:text-[16px] font-bold uppercase tracking-[0.06em] md:tracking-[0.1em] whitespace-nowrap">
                 무료 상담
                 <span className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
                   <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
                 </span>
-              </a>
-            </div>
+              </span>
+            </a>
         </div>
       </section>
 
@@ -790,24 +788,23 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             "transform 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease",
         }}
       >
-        <div
+        <a
           ref={floatingCtaRef}
+          href="#cta"
+          aria-label="파트너형 DB 마케팅 도입 문의"
           className="inline-flex items-center gap-1 p-1 rounded-full shadow-[0_18px_40px_-14px_rgba(64,144,247,0.55)] pointer-events-auto"
           style={{ backgroundImage: "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)" }}
         >
           <span className="px-3 py-2.5 text-white text-[12px] font-semibold whitespace-nowrap">
             파트너형 DB 마케팅 도입 문의
           </span>
-          <a
-            href="#cta"
-            className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-full bg-black text-white text-[10.5px] font-bold uppercase tracking-[0.06em] whitespace-nowrap"
-          >
+          <span className="inline-flex items-center gap-1.5 px-3 py-2.5 rounded-full bg-black text-white text-[10.5px] font-bold uppercase tracking-[0.06em] whitespace-nowrap">
             무료 상담
             <span className="w-5 h-5 rounded-full bg-white overflow-hidden flex items-center justify-center">
               <Image src={charMale} alt="" width={20} height={20} className="w-full h-full object-cover" />
             </span>
-          </a>
-        </div>
+          </span>
+        </a>
       </div>
     </div>
   );
