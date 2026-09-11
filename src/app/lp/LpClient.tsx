@@ -7,7 +7,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Check,
-  Phone,
   Star,
   Search,
   Users,
@@ -182,9 +181,6 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 무료 상담
                 <span className="w-5 h-5 md:w-7 md:h-7 rounded-full bg-white overflow-hidden flex items-center justify-center">
                   <Image src={charMale} alt="" width={28} height={28} className="w-full h-full object-cover" />
-                </span>
-                <span className="w-5 h-5 md:w-6 md:h-6 rounded-full flex items-center justify-center" style={{ backgroundColor: "#4090f7" }}>
-                  <Phone className="w-2.5 h-2.5 md:w-3 md:h-3 text-white" />
                 </span>
               </a>
             </div>
@@ -820,12 +816,6 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
             무료 상담
             <span className="w-5 h-5 rounded-full bg-white overflow-hidden flex items-center justify-center">
               <Image src={charMale} alt="" width={20} height={20} className="w-full h-full object-cover" />
-            </span>
-            <span
-              className="w-5 h-5 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: "#4090f7" }}
-            >
-              <Phone className="w-2.5 h-2.5 text-white" />
             </span>
           </a>
         </div>
