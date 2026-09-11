@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -42,23 +42,35 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const router = useRouter();
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
-  const [pastHero, setPastHero] = useState(false);
-  const [nearCta, setNearCta] = useState(false);
+  // 모바일 히어로 CTA를 자연스럽게 하단으로 내리기 위한 위치 트래킹
+  const heroCtaSlotRef = useRef<HTMLDivElement>(null);
+  const floatingCtaRef = useRef<HTMLDivElement>(null);
+  const [floatingTop, setFloatingTop] = useState<number | null>(null);
+  const [ctaSectionReached, setCtaSectionReached] = useState(false);
 
   useEffect(() => {
-    const onScroll = () => {
-      setPastHero(window.scrollY > window.innerHeight * 0.75);
+    const update = () => {
+      const slot = heroCtaSlotRef.current;
+      const float = floatingCtaRef.current;
+      if (!slot || !float) return;
+      const slotTop = slot.getBoundingClientRect().top;
+      const ctaHeight = float.offsetHeight || 60;
+      const bottomAnchor = window.innerHeight - ctaHeight - 16;
+      setFloatingTop(Math.min(slotTop, bottomAnchor));
       const ctaEl = document.getElementById("cta");
       if (ctaEl) {
         const rect = ctaEl.getBoundingClientRect();
-        setNearCta(rect.top < window.innerHeight);
+        setCtaSectionReached(rect.top < window.innerHeight);
       }
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+    update();
+    return () => {
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
   }, []);
-  const showFloatingHeroCta = pastHero && !nearCta;
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,10 +156,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               </span>
             </h1>
 
-            {/* 스플릿 CTA */}
+            {/* 스플릿 CTA — 데스크톱에선 인라인 노출, 모바일에선 자리(placeholder)만 잡고 실제 버튼은 fixed 요소로 스크롤 따라 자연스럽게 하강 */}
             <div
-              className="mt-10 md:mt-14 inline-flex items-center gap-1 p-1 rounded-full max-w-full"
+              ref={heroCtaSlotRef}
+              className="mt-10 md:mt-14 inline-flex items-center gap-1 p-1 rounded-full max-w-full md:opacity-100 opacity-0 md:pointer-events-auto pointer-events-none"
               style={{ backgroundImage: "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)" }}
+              aria-hidden={undefined}
             >
               <span className="px-3 md:px-6 py-2.5 md:py-3 text-white text-[12px] md:text-[17px] font-semibold whitespace-nowrap">
                 파트너형 DB 마케팅 도입 문의
@@ -767,19 +781,18 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
 
       <LpFooter onLp />
 
-      {/* 모바일 전용 — 히어로 스플릿 CTA가 하단으로 부드럽게 내려오는 플로팅 (히어로와 동일 사이즈/스타일) */}
+      {/* 모바일 전용 — 히어로 CTA를 스크롤 위치와 정확히 동기화해서 위→아래로 자연스럽게 이동 */}
       <div
-        aria-hidden={!showFloatingHeroCta}
-        className="md:hidden fixed left-0 right-0 z-40 flex justify-center pointer-events-none will-change-transform px-3"
+        className="md:hidden fixed left-0 right-0 z-40 flex justify-center pointer-events-none px-3"
         style={{
-          bottom: 16,
-          transform: showFloatingHeroCta ? "translate3d(0, 0, 0)" : "translate3d(0, 140%, 0)",
-          opacity: showFloatingHeroCta ? 1 : 0,
-          transition:
-            "transform 900ms cubic-bezier(0.22, 1, 0.36, 1), opacity 500ms ease",
+          top: floatingTop ?? -9999,
+          opacity: ctaSectionReached ? 0 : 1,
+          transition: "opacity 400ms ease",
+          visibility: floatingTop === null ? "hidden" : "visible",
         }}
       >
         <div
+          ref={floatingCtaRef}
           className="inline-flex items-center gap-1 p-1 rounded-full shadow-[0_18px_40px_-14px_rgba(64,144,247,0.55)] pointer-events-auto"
           style={{ backgroundImage: "linear-gradient(90deg, #4396F8 0%, #4FAFF9 50%, #59C3FA 100%)" }}
         >
