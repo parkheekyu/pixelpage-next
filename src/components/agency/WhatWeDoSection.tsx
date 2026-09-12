@@ -233,12 +233,11 @@ const WhatWeDoSection = ({ variant = "light" }: { variant?: Variant } = {}) => {
             What We Do
           </span>
           <h2 className={`break-keep text-[clamp(30px,4.5vw,52px)] font-bold leading-[1.2] tracking-[-0.03em] mb-6 ${isDark ? "text-white" : "text-foreground"}`}>
-            <span className={`font-normal ${isDark ? "text-white/40" : "text-foreground/40"}`}>광고부터 전환까지</span><br />
-            <span className="font-extrabold">끊기지 않게 연결해요.</span>
+            <span className="font-extrabold">매출이 오를 수 밖에 없는 이유?</span>
           </h2>
           <p className={`text-[17px] md:text-[18px] leading-[1.85] max-w-[560px] mx-auto ${isDark ? "text-white/55" : "text-muted-foreground"}`}>
-            고품질 DB를 만들기 위해<br />
-            쉬지 않고 연구합니다.
+            저렴한 저품질 DB가 아닌<br />
+            매출로 이어지는 DB를 찾기 때문입니다.
           </p>
         </Reveal>
 

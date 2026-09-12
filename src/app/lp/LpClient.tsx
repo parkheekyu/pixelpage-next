@@ -445,9 +445,9 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </section>
 
-      {/* ── 6. 하나의 팀이 처음부터 끝까지 (MethodSection 재사용) ── */}
+      {/* ── 6. 매출이 오를 수 밖에 없는 이유 (WhatWeDoSection 재사용) ── */}
       <div className="border-t border-white/[0.04]">
-        <MethodSection variant="dark" />
+        <WhatWeDoSection variant="dark" />
       </div>
 
       {/* ── 7. 포트폴리오 ── */}
@@ -536,9 +536,9 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
         </div>
       </section>
 
-      {/* ── 8. WhatWeDo (marketing agency 재사용, 다크) ── */}
+      {/* ── 8. 하나의 팀이 처음부터 끝까지 (MethodSection 재사용) ── */}
       <div className="border-t border-white/[0.04]">
-        <WhatWeDoSection variant="dark" />
+        <MethodSection variant="dark" />
       </div>
 
       {/* ── 8. Process (marketing agency 재사용, 다크 + LP 전용 딥 블루 배경) ── */}
