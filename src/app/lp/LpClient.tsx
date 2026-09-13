@@ -409,7 +409,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 </div>
               ) : (
                 <div
-                  className="relative rounded-2xl overflow-hidden bg-black h-[440px] md:h-[480px] flex"
+                  className="relative rounded-2xl overflow-hidden bg-black h-[440px] md:h-[480px]"
                   style={{
                     WebkitMaskImage:
                       "linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%)",
@@ -417,27 +417,41 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       "linear-gradient(to bottom, transparent 0%, black 6%, black 94%, transparent 100%)",
                   }}
                 >
-                  {[
-                    { src: "/lp-landings/landing1.webp", dir: "animate-marquee-up" },
-                    { src: "/lp-landings/landing2.webp", dir: "animate-marquee-down" },
-                    { src: "/lp-landings/landing3.webp", dir: "animate-marquee-up" },
-                  ].map((col, ci) => (
-                    <div key={ci} className="flex-1 overflow-hidden">
-                      <div className={col.dir} style={{ animationDuration: "70s" }}>
-                        {[0, 1].map((k) => (
-                          /* eslint-disable-next-line @next/next/no-img-element */
-                          <img
-                            key={k}
-                            src={col.src}
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full block select-none pointer-events-none"
-                          />
+                  {/* 가로 마퀴: 안쪽 컬럼들이 전체적으로 왼쪽으로 흐름 */}
+                  <div
+                    className="animate-marquee flex h-full"
+                    style={{ animationDuration: "50s", width: "max-content" }}
+                  >
+                    {[0, 1].map((dup) => (
+                      <div key={dup} className="flex h-full">
+                        {[
+                          { src: "/lp-landings/landing1.webp", dir: "animate-marquee-up" },
+                          { src: "/lp-landings/landing2.webp", dir: "animate-marquee-down" },
+                          { src: "/lp-landings/landing3.webp", dir: "animate-marquee-up" },
+                          { src: "/lp-landings/landing4.webp", dir: "animate-marquee-down" },
+                        ].map((col, ci) => (
+                          <div
+                            key={`${dup}-${ci}`}
+                            className="w-[30vw] md:w-[calc((min(1120px,100vw)-3rem)/3.15)] max-w-[220px] shrink-0 overflow-hidden"
+                          >
+                            <div className={col.dir} style={{ animationDuration: "70s" }}>
+                              {[0, 1].map((k) => (
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                <img
+                                  key={k}
+                                  src={col.src}
+                                  alt=""
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="w-full block select-none pointer-events-none"
+                                />
+                              ))}
+                            </div>
+                          </div>
                         ))}
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
