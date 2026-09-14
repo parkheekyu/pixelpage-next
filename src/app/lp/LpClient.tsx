@@ -419,11 +419,11 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 >
                   {/* 가로 마퀴: 안쪽 컬럼들이 전체적으로 왼쪽으로 흐름 */}
                   <div
-                    className="animate-marquee flex h-full"
+                    className="animate-marquee flex h-full gap-2 md:gap-3"
                     style={{ animationDuration: "50s", width: "max-content" }}
                   >
                     {[0, 1].map((dup) => (
-                      <div key={dup} className="flex h-full">
+                      <div key={dup} className="flex h-full gap-2 md:gap-3">
                         {[
                           { src: "/lp-landings/landing1.webp", dir: "animate-marquee-up" },
                           { src: "/lp-landings/landing2.webp", dir: "animate-marquee-down" },
@@ -436,15 +436,16 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                           >
                             <div className={col.dir} style={{ animationDuration: "70s" }}>
                               {[0, 1].map((k) => (
-                                /* eslint-disable-next-line @next/next/no-img-element */
-                                <img
-                                  key={k}
-                                  src={col.src}
-                                  alt=""
-                                  loading="lazy"
-                                  decoding="async"
-                                  className="w-full block select-none pointer-events-none"
-                                />
+                                <div key={k} className="mb-2 md:mb-3 rounded-xl overflow-hidden">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={col.src}
+                                    alt=""
+                                    loading="lazy"
+                                    decoding="async"
+                                    className="w-full block select-none pointer-events-none"
+                                  />
+                                </div>
                               ))}
                             </div>
                           </div>
