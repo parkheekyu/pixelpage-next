@@ -432,7 +432,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         ].map((col, ci) => (
                           <div
                             key={`${dup}-${ci}`}
-                            className="w-[30vw] md:w-[calc((min(1120px,100vw)-3rem)/3.15)] max-w-[220px] shrink-0 overflow-hidden"
+                            className="w-[26vw] md:w-[calc((min(1120px,100vw)-3rem)/3.8)] max-w-[180px] shrink-0 overflow-hidden"
                           >
                             <div className={col.dir} style={{ animationDuration: "70s" }}>
                               {[0, 1].map((k) => (
