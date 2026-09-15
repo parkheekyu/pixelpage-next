@@ -14,9 +14,9 @@ export default function LpFooter({ onLp = false }: Props) {
   return (
     <footer className="pt-16 pb-16 bg-[#06060a] border-t border-white/[0.05] text-white/45">
       <div className="max-w-[1120px] mx-auto px-6 lg:px-8">
-        {/* Top: 로고 · 링크 */}
-        <div className="grid grid-cols-1 md:grid-cols-[1.2fr_1fr_1fr] gap-10 md:gap-12 pb-10 border-b border-white/[0.06]">
-          <div>
+        {/* Top: 로고 · 링크 (로고+매체 왼쪽 넓게, Company·Contact 우측으로 밀착) */}
+        <div className="grid grid-cols-1 md:grid-cols-[minmax(0,1fr)_auto] gap-12 md:gap-16 pb-10 border-b border-white/[0.06]">
+          <div className="min-w-0">
             <a href="/" className="inline-flex items-center gap-2">
               <Image src={logoWhite} alt="PixelPage" width={110} height={22} className="h-5 w-auto opacity-90" />
             </a>
@@ -27,44 +27,45 @@ export default function LpFooter({ onLp = false }: Props) {
             <img
               src="/lp-ad-platforms.webp"
               alt="Meta · Google · Toss · Kakao · 당근 · Naver"
-              className="mt-4 h-6 md:h-7 w-auto max-w-full opacity-90"
-              style={{ mixBlendMode: "lighten" }}
+              className="mt-5 h-9 md:h-11 w-auto opacity-95"
               loading="lazy"
               decoding="async"
             />
           </div>
 
-          <div>
-            <p className="text-[12px] font-semibold tracking-[0.18em] uppercase text-white/60 mb-4">
-              Company
-            </p>
-            <ul className="space-y-2 text-[14px]">
-              <li><a href={anchor(onLp, "solution")} className="hover:text-white">소개</a></li>
-              <li><a href={anchor(onLp, "process")} className="hover:text-white">진행 방식</a></li>
-              <li><a href={anchor(onLp, "faq")} className="hover:text-white">FAQ</a></li>
-              <li><a href="/columns" className="hover:text-white">무료 칼럼</a></li>
-            </ul>
-          </div>
+          <div className="grid grid-cols-2 gap-8 md:gap-10">
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.18em] uppercase text-white/60 mb-4">
+                Company
+              </p>
+              <ul className="space-y-2 text-[14px]">
+                <li><a href={anchor(onLp, "solution")} className="hover:text-white">소개</a></li>
+                <li><a href={anchor(onLp, "process")} className="hover:text-white">진행 방식</a></li>
+                <li><a href={anchor(onLp, "faq")} className="hover:text-white">FAQ</a></li>
+                <li><a href="/columns" className="hover:text-white">무료 칼럼</a></li>
+              </ul>
+            </div>
 
-          <div>
-            <p className="text-[12px] font-semibold tracking-[0.18em] uppercase text-white/60 mb-4">
-              Contact
-            </p>
-            <ul className="space-y-2 text-[14px]">
-              <li>
-                <a href="mailto:contact@pixelpage.co.kr" className="hover:text-white">
-                  contact@pixelpage.co.kr
-                </a>
-              </li>
-              <li>
-                <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white">
-                  카카오톡 상담
-                </a>
-              </li>
-              <li>
-                <a href={anchor(onLp, "cta")} className="hover:text-white">파트너형 DB 도입 문의</a>
-              </li>
-            </ul>
+            <div>
+              <p className="text-[12px] font-semibold tracking-[0.18em] uppercase text-white/60 mb-4">
+                Contact
+              </p>
+              <ul className="space-y-2 text-[14px]">
+                <li>
+                  <a href="mailto:contact@pixelpage.co.kr" className="hover:text-white">
+                    contact@pixelpage.co.kr
+                  </a>
+                </li>
+                <li>
+                  <a href={KAKAO_URL} target="_blank" rel="noopener noreferrer" className="hover:text-white">
+                    카카오톡 상담
+                  </a>
+                </li>
+                <li>
+                  <a href={anchor(onLp, "cta")} className="hover:text-white">파트너형 DB 도입 문의</a>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
 
