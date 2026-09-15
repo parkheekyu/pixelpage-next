@@ -39,7 +39,8 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
   const first = useRef(true);
   const seq = useRef(0);
   // 폼 항목 열은 현재 페이지에 값이 하나라도 있을 때만 표시 (광고 리드만 있는 고객사 시트는 숨김)
-  const cols = COLS.filter((c) => (!c.staff || isStaff) && (!c.ifAny || page.rows.some((r) => r[c.ifAny!])));
+  // 자사 프로젝트(홈페이지 문의)는 항상 표시, 다른 고객사는 값이 있을 때만
+  const cols = COLS.filter((c) => (!c.staff || isStaff) && (!c.ifAny || project.is_own || page.rows.some((r) => r[c.ifAny!])));
   const [widths, setWidths] = useState<Record<string, number>>(() => Object.fromEntries(COLS.map((c) => [c.key, c.w])));
   useEffect(() => {
     // 하이드레이션 후 저장된 너비 적용 (동기 setState 회피)
