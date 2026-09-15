@@ -94,10 +94,17 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   }, []);
 
   // 단계형 폼: 성함 → 연락처 → 업종 → 예산 → (회사명·동의·제출)
+  // 이름·연락처는 타이핑 중에 넘어가지 않도록 "확정"(Enter 또는 칸 벗어남) 후에만 다음 단계
+  const [nameDone, setNameDone] = useState(false);
+  const [phoneDone, setPhoneDone] = useState(false);
   const phoneDigits = form.phone.replace(/\D/g, "");
+  const nameOk = form.name.trim().length >= 2;
+  const phoneOk = phoneDigits.length >= 10;
+  const commitName = () => { if (nameOk) setNameDone(true); };
+  const commitPhone = () => { if (phoneOk) setPhoneDone(true); };
   const step =
-    !form.name.trim() ? 0 :
-    phoneDigits.length < 10 ? 1 :
+    !(nameOk && nameDone) ? 0 :
+    !(phoneOk && (phoneDone || phoneDigits.length === 11)) ? 1 :
     !form.industry ? 2 :
     !form.budget ? 3 : 4;
 
@@ -729,11 +736,15 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                       <input
                         required
                         value={form.name}
-                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                        onChange={(e) => { setForm({ ...form, name: e.target.value }); if (nameDone && e.target.value.trim().length < 2) setNameDone(false); }}
+                        onBlur={commitName}
+                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); commitName(); } }}
+                        enterKeyHint="next"
                         placeholder="홍길동"
                         autoComplete="name"
                         className={inputCls}
                       />
+                      {!nameDone && nameOk && <p className="mt-1.5 text-[13px] text-white/35">Enter 또는 다음 칸을 눌러 계속</p>}
                     </div>
                     {step >= 1 && (
                       <div style={fieldAnim}>
@@ -745,7 +756,10 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                           inputMode="numeric"
                           autoComplete="tel"
                           value={form.phone}
-                          onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })}
+                          onChange={(e) => { setForm({ ...form, phone: formatPhone(e.target.value) }); if (phoneDone) setPhoneDone(false); }}
+                          onBlur={commitPhone}
+                          onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); commitPhone(); } }}
+                          enterKeyHint="next"
                           placeholder="010-0000-0000"
                           className={inputCls}
                         />
