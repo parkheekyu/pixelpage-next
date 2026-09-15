@@ -3,6 +3,7 @@ import { Noto_Serif_KR, Noto_Sans_KR, Cormorant_Garamond, Playfair_Display } fro
 import Navbar from "@/components/Navbar";
 import FooterGate from "@/components/FooterGate";
 import KakaoFloatButton from "@/components/KakaoFloatButton";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
 const notoSerifKr = Noto_Serif_KR({
@@ -87,6 +88,7 @@ export default function RootLayout({
         <main>{children}</main>
         <FooterGate />
         <KakaoFloatButton />
+        <GoogleAnalytics />
       </body>
     </html>
   );

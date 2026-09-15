@@ -28,6 +28,10 @@ export async function submitInquiry(payload: Record<string, unknown>): Promise<{
   try {
     const r = await fetch("/api/inquiry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ ...captureAttribution(), ...payload }) });
     const j = await r.json().catch(() => ({}));
+    if (r.ok) {
+      // GA4 전환 이벤트 (gtag 미로드 시 무시)
+      try { (window as unknown as { gtag?: (...a: unknown[]) => void }).gtag?.("event", "generate_lead", { form: String(payload.form ?? ""), method: "website_form" }); } catch {}
+    }
     return r.ok ? { ok: true } : { ok: false, error: j.error || `HTTP ${r.status}` };
   } catch (e) {
     return { ok: false, error: (e as Error).message };
