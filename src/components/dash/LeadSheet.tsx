@@ -1,65 +1,68 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { setAssignee, updateLead } from "@/app/app/actions";
-import { DAY, fmtN, fmtW, pct } from "@/lib/dash/agg";
+import { useEffect, useRef, useState, useTransition } from "react";
+import { fetchLeadsPage, setAssignee, updateLead } from "@/app/app/actions";
+import { fmtN, fmtW, pct } from "@/lib/dash/agg";
+import { DEFAULT_QUERY, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
 import { DROPS, PAYS, STATUSES, type Lead, type LeadPatch, type Project } from "@/lib/dash/types";
 import { SourcePill } from "./charts";
 
-type View = "all" | "todo" | "conv" | "need" | "drop" | "dup";
-const VIEWS: [View, string][] = [["all", "전체 리드"], ["todo", "처리 필요 (신규·연락중)"], ["conv", "전환 리드"], ["need", "매출 미입력"], ["drop", "드랍"], ["dup", "중복"]];
-
+const VIEWS: [SheetView, string][] = [["all", "전체 리드"], ["todo", "처리 필요 (신규·연락중)"], ["conv", "전환 리드"], ["need", "매출 미입력"], ["drop", "드랍"], ["dup", "중복"]];
 const pad = (n: number) => String(n).padStart(2, "0");
 const fmtTs = (iso: string) => { const d = new Date(iso); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const today = () => new Date().toISOString().slice(0, 10);
 
-export default function LeadSheet({ project, leads: initial, isStaff, now }: { project: Project; leads: Lead[]; isStaff: boolean; now: number }) {
-  const [leads, setLeads] = useState(initial);
-  const [view, setView] = useState<View>("all");
-  const [fStatus, setFStatus] = useState(""), [fSrc, setFSrc] = useState(""), [fSort, setFSort] = useState("ts_desc"), [fRange, setFRange] = useState(28), [q, setQ] = useState("");
+export default function LeadSheet({ project, initial, isStaff }: { project: Project; initial: LeadPage; isStaff: boolean }) {
+  const [query, setQuery] = useState<LeadQuery>(DEFAULT_QUERY);
+  const [page, setPage] = useState<LeadPage>(initial);
+  const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState<string | null>(null), [err, setErr] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const [memoDraft, setMemoDraft] = useState<Record<string, string>>({});
   const [revDraft, setRevDraft] = useState<Record<string, string>>({});
+  const first = useRef(true);
+  const seq = useRef(0);
 
-  const srcs = [...new Set(leads.map((l) => l.utm_source))].sort();
+  // 필터가 바뀌면 서버에서 다시 조회 (검색어는 250ms 디바운스)
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    const id = ++seq.current;
+    const t = setTimeout(async () => {
+      setLoading(true);
+      const r = await fetchLeadsPage(project.id, query);
+      if (id !== seq.current) return;
+      setLoading(false);
+      if ("error" in r) { setErr(r.error); return; }
+      setPage((cur) => (query.offset > 0 ? { ...r, rows: [...cur.rows, ...r.rows] } : r));
+    }, query.q ? 250 : 0);
+    return () => clearTimeout(t);
+  }, [query, project.id]);
 
-  const inRange = leads.filter((l) => new Date(l.submitted_at).getTime() > now - fRange * DAY);
-  const all = inRange.filter((l) => !l.is_duplicate);
-  const conv = all.filter((l) => l.status === "전환"), need = conv.filter((l) => !l.revenue);
-  const rev = conv.filter((l) => l.pay_type === "결제확정").reduce((a, l) => a + Number(l.revenue || 0), 0);
-  const cnt: Record<View, number> = { all: all.length, todo: all.filter((l) => l.status === "신규" || l.status === "연락중").length, conv: conv.length, need: need.length, drop: all.filter((l) => l.status === "드랍").length, dup: inRange.filter((l) => l.is_duplicate).length };
-
-  const rows = (() => {
-    let L = view === "dup" ? inRange.filter((l) => l.is_duplicate) : all;
-    if (view === "todo") L = L.filter((l) => l.status === "신규" || l.status === "연락중");
-    if (view === "conv") L = L.filter((l) => l.status === "전환");
-    if (view === "need") L = L.filter((l) => l.status === "전환" && !l.revenue);
-    if (view === "drop") L = L.filter((l) => l.status === "드랍");
-    if (fStatus) L = L.filter((l) => l.status === fStatus);
-    if (fSrc) L = L.filter((l) => l.utm_source === fSrc);
-    if (q) { const s = q.trim(); L = L.filter((l) => (l.name ?? "").includes(s) || (l.phone ?? "").includes(s) || (l.email ?? "").includes(s)); }
-    const ts = (l: Lead) => new Date(l.submitted_at).getTime();
-    return [...L].sort((a, b) => fSort === "ts_asc" ? ts(a) - ts(b) : fSort === "status" ? (STATUSES.indexOf(a.status) - STATUSES.indexOf(b.status) || ts(b) - ts(a)) : fSort === "rev_desc" ? Number(b.revenue) - Number(a.revenue) : ts(b) - ts(a));
-  })();
+  const set = (patch: Partial<LeadQuery>) => setQuery((q) => ({ ...q, ...patch, offset: 0 }));
+  const more = () => setQuery((q) => ({ ...q, offset: page.rows.length }));
+  const { summary: S, rows, total } = page;
 
   function save(l: Lead, patch: LeadPatch) {
-    // 낙관적 업데이트 + 서버 액션 (실패 시 롤백)
-    const before = leads;
+    const before = page.rows;
     const local: Partial<Lead> = { ...patch };
     if (patch.status && patch.status !== "전환") { local.revenue = 0; local.pay_type = null; local.converted_on = null; }
     if (patch.status && patch.status !== "드랍") local.drop_reason = null;
     if (patch.status === "전환") { local.pay_type = l.pay_type ?? "결제확정"; local.converted_on = l.converted_on ?? today(); }
-    setLeads((cur) => cur.map((x) => (x.id === l.id ? { ...x, ...local } : x)));
+    setPage((p) => ({ ...p, rows: p.rows.map((x) => (x.id === l.id ? { ...x, ...local } : x)) }));
     start(async () => {
       setErr(null);
       const r = await updateLead(project.id, l.id, patch);
-      if (!r.ok) { setLeads(before); setErr(r.error); return; }
+      if (!r.ok) { setPage((p) => ({ ...p, rows: before })); setErr(r.error); return; }
       setSaved(new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+      // 요약 숫자 갱신 (상태 변경 시)
+      if (patch.status !== undefined || patch.revenue !== undefined || patch.pay_type !== undefined) {
+        const fresh = await fetchLeadsPage(project.id, { ...query, limit: 1, offset: 0 });
+        if (!("error" in fresh)) setPage((p) => ({ ...p, summary: fresh.summary }));
+      }
     });
   }
   function saveAssignee(l: Lead, v: string) {
-    setLeads((cur) => cur.map((x) => (x.id === l.id ? { ...x, assignee: v || null } : x)));
+    setPage((p) => ({ ...p, rows: p.rows.map((x) => (x.id === l.id ? { ...x, assignee: v || null } : x)) }));
     start(async () => { const r = await setAssignee(project.id, l.id, v || null); if (!r.ok) setErr(r.error); });
   }
   const revText = (l: Lead) => revDraft[l.id] ?? (l.revenue ? "₩" + Number(l.revenue).toLocaleString("ko-KR") : "");
@@ -70,25 +73,25 @@ export default function LeadSheet({ project, leads: initial, isStaff, now }: { p
         <h2>리드 DB</h2>
         <div className="sp" />
         <div className="stat">
-          <span>리드 <b>{fmtN(all.length)}</b></span>
-          <span>전환 <b>{conv.length}</b> ({pct(conv.length, all.length)})</span>
-          <span>확정 매출 <b>{fmtW(rev)}</b></span>
-          <span style={{ color: need.length ? "var(--warn)" : "inherit" }}>매출 미입력 <b>{need.length}</b></span>
+          <span>리드 <b>{fmtN(S.all)}</b></span>
+          <span>전환 <b>{S.conv}</b> ({pct(S.conv, S.all)})</span>
+          <span>확정 매출 <b>{fmtW(S.revenue)}</b></span>
+          <span style={{ color: S.need ? "var(--warn)" : "inherit" }}>매출 미입력 <b>{S.need}</b></span>
         </div>
       </div>
       <div className="toolbar">
-        <label className="tb">⏷ 상태 <select value={fStatus} onChange={(e) => setFStatus(e.target.value)}><option value="">전체</option>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select></label>
-        <label className="tb">⏷ 매체 <select value={fSrc} onChange={(e) => setFSrc(e.target.value)}><option value="">전체</option>{srcs.map((s) => <option key={s}>{s}</option>)}</select></label>
-        <label className="tb">⇅ 정렬 <select value={fSort} onChange={(e) => setFSort(e.target.value)}><option value="ts_desc">등록일 최신순</option><option value="ts_asc">등록일 오래된순</option><option value="status">상태순</option><option value="rev_desc">매출액 높은순</option></select></label>
-        <label className="tb">기간 <select value={fRange} onChange={(e) => setFRange(+e.target.value)}><option value={7}>7일</option><option value={14}>14일</option><option value={28}>4주</option><option value={90}>90일</option><option value={9999}>전체</option></select></label>
-        <div className="search"><input type="text" placeholder="이름, 연락처 검색" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        <label className="tb">⏷ 상태 <select value={query.status} onChange={(e) => set({ status: e.target.value })}><option value="">전체</option>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select></label>
+        <label className="tb">⏷ 매체 <select value={query.src} onChange={(e) => set({ src: e.target.value })}><option value="">전체</option>{page.sources.map((s) => <option key={s}>{s}</option>)}</select></label>
+        <label className="tb">⇅ 정렬 <select value={query.sort} onChange={(e) => set({ sort: e.target.value as SheetSort })}><option value="ts_desc">등록일 최신순</option><option value="ts_asc">등록일 오래된순</option><option value="status">상태순</option><option value="rev_desc">매출액 높은순</option></select></label>
+        <label className="tb">기간 <select value={query.days} onChange={(e) => set({ days: +e.target.value })}><option value={7}>7일</option><option value={14}>14일</option><option value={28}>4주</option><option value={90}>90일</option><option value={365}>1년</option></select></label>
+        <div className="search"><input type="text" placeholder="이름, 연락처 검색" value={query.q} onChange={(e) => set({ q: e.target.value })} /></div>
       </div>
       <div className="main">
         <aside className="views">
           <h4>뷰</h4>
-          {VIEWS.map(([v, label]) => <button key={v} className={`v ${view === v ? "on" : ""}`} onClick={() => setView(v)}>▦ {label}<small>{cnt[v]}</small></button>)}
+          {VIEWS.map(([v, label]) => <button key={v} className={`v ${query.view === v ? "on" : ""}`} onClick={() => set({ view: v })}>▦ {label}<small>{S[v]}</small></button>)}
         </aside>
-        <div className="gridwrap">
+        <div className="gridwrap" style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s" }}>
           <table className="sheet">
             <thead>
               <tr>
@@ -132,14 +135,15 @@ export default function LeadSheet({ project, leads: initial, isStaff, now }: { p
                   </tr>
                 );
               })}
-              {rows.length === 0 && <tr><td className="num" /><td colSpan={isStaff ? 15 : 13} style={{ color: "var(--muted)", padding: "18px 12px" }}>아직 리드가 없습니다. 광고 폼 제출 시 자동으로 추가됩니다.</td></tr>}
+              {rows.length === 0 && <tr><td className="num" /><td colSpan={isStaff ? 15 : 13} style={{ color: "var(--muted)", padding: "18px 12px" }}>{loading ? "불러오는 중…" : "조건에 맞는 리드가 없습니다. 리드는 광고 폼 제출 시 자동으로 추가됩니다."}</td></tr>}
             </tbody>
           </table>
         </div>
       </div>
       <div className="foot">
         <span>＋ 리드는 광고 폼 제출 시 자동 추가됩니다</span>
-        <span>{rows.length} records</span>
+        <span>{rows.length < total ? `${rows.length} / ${fmtN(total)}` : fmtN(total)} records</span>
+        {rows.length < total && <button className="btn" onClick={more} disabled={loading}>더 보기 (+{DEFAULT_QUERY.limit})</button>}
         {err ? <span className="err">저장 실패: {err}</span> : pending ? <span className="saving">저장 중…</span> : saved ? <span className="saved">저장됨 {saved}</span> : null}
       </div>
     </div>

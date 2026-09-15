@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSession, requireSession, requireStaff } from "@/lib/dash/auth";
 import { DROPS, PAYS, STATUSES, type LeadPatch } from "@/lib/dash/types";
+import { queryLeads, type LeadPage, type LeadQuery } from "@/lib/dash/leads-query";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; error: string };
 
@@ -62,6 +63,17 @@ export async function updateLead(projectId: string, leadId: string, patch: LeadP
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/app/projects/${projectId}`);
   return { ok: true };
+}
+
+// ---------- 리드 시트 페이지 조회 (RLS가 프로젝트 접근을 거른다) ----------
+export async function fetchLeadsPage(projectId: string, query: LeadQuery): Promise<LeadPage | { error: string }> {
+  const s = await getSession();
+  if (!s) return { error: "로그인이 필요합니다." };
+  try {
+    return await queryLeads(s.supabase, projectId, query);
+  } catch (e) {
+    return { error: (e as Error).message };
+  }
 }
 
 // ---------- 직원 전용: 프로젝트 ----------

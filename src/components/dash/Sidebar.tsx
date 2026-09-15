@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
+import logoDark from "@/assets/logo-dark.png";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/app/actions";
 import type { Profile, Project } from "@/lib/dash/types";
@@ -12,8 +14,8 @@ export default function Sidebar({ profile, projects }: { profile: Profile; proje
   return (
     <aside className="pp-side">
       <div className="brand">
-        <div className="logo">P</div>
-        <div>픽셀페이지<small>{isStaff ? "내부 관리자" : "고객사 대시보드"}</small></div>
+        <Image src={logoDark} alt="픽셀페이지" width={120} height={24} className="brand-logo" priority />
+        <small>{isStaff ? "내부 관리자" : "고객사 대시보드"}</small>
       </div>
       {isStaff && (
         <>

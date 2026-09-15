@@ -23,7 +23,7 @@
 ## 1. Supabase 프로젝트 준비
 
 1. https://supabase.com 에서 프로젝트 생성 (리전: Northeast Asia 권장).
-2. SQL Editor 에 `supabase/migrations/0001_dashboard.sql` 전체를 붙여넣고 실행. 테이블은 전용 `dash` 스키마에 만들어진다 (같은 프로젝트의 다른 앱 테이블과 충돌 방지).
+2. SQL Editor 에 `supabase/migrations/0001_dashboard.sql`, 이어서 `0002_lead_summary.sql` 을 순서대로 실행. 테이블은 전용 `dash` 스키마에 만들어진다 (같은 프로젝트의 다른 앱 테이블과 충돌 방지).
    실행 후 Settings → API → **Exposed schemas** 에 `dash` 를 추가한다. 코드의 Supabase 클라이언트는 모두 `db.schema = "dash"` 로 고정되어 있다.
 3. Authentication → Providers → Email 에서 **Confirm email 끄기** (직원이 계정을 만들어 주는 방식이라 필요 없음).
 4. Settings → API 에서 URL, anon key, service_role key 복사.
@@ -96,7 +96,9 @@ curl -X POST https://pixelpage.co.kr/api/leads/webhook \
 
 ## 파일
 
-- `supabase/migrations/0001_dashboard.sql` — 스키마·트리거·RLS
+- `supabase/migrations/0001_dashboard.sql` — 스키마·트리거·RLS · `0002_lead_summary.sql` — 시트 요약 집계 함수
+- `src/lib/dash/leads-query.ts` — 시트 서버 페이지네이션/필터 · `src/lib/dash/report.ts` — 리포트 서버 집계
+- `vercel.json` — 함수 리전 icn1(서울). Supabase 리전과 맞춰야 응답이 빠르다
 - `src/proxy.ts` — `/app/*` 세션 갱신 + 미로그인 리다이렉트
 - `src/lib/supabase/{server,client,admin}.ts` — Supabase 클라이언트 3종
 - `src/lib/dash/{types,agg,data,auth}.ts` — 타입, 집계(프로토타입 shared.js 이식), 로더, 권한 헬퍼

@@ -1,5 +1,5 @@
 import { requireProject } from "@/lib/dash/auth";
-import { loadProjectData } from "@/lib/dash/data";
+import { DEFAULT_QUERY, queryLeads } from "@/lib/dash/leads-query";
 import LeadSheet from "@/components/dash/LeadSheet";
 
 export const dynamic = "force-dynamic";
@@ -7,6 +7,6 @@ export const dynamic = "force-dynamic";
 export default async function ProjectSheetPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase, project, profile } = await requireProject(id);
-  const data = await loadProjectData(supabase, project, 365);
-  return <LeadSheet project={project} leads={data.leads} isStaff={profile.role === "staff"} now={data.now} />;
+  const initial = await queryLeads(supabase, project.id, DEFAULT_QUERY);
+  return <LeadSheet project={project} initial={initial} isStaff={profile.role === "staff"} />;
 }
