@@ -27,7 +27,7 @@ export default function LpFooter({ onLp = false }: Props) {
             <img
               src="/lp-ad-platforms.webp"
               alt="Meta · Google · Toss · Kakao · 당근 · Naver"
-              className="mt-5 h-9 md:h-11 w-auto opacity-95"
+              className="mt-5 h-7 md:h-8 w-auto opacity-95"
               loading="lazy"
               decoding="async"
             />

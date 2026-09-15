@@ -83,10 +83,6 @@ export default function Page() {
               <span className="mt-1 w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0" />
               현재 광고 계정·랜딩·CRM 구조를 함께 진단합니다.
             </li>
-            <li className="flex items-start gap-2.5">
-              <span className="mt-1 w-1.5 h-1.5 rounded-full bg-sky-400 flex-shrink-0" />
-              계약 없이 진단만 받으셔도 괜찮습니다.
-            </li>
           </ul>
         </div>
       </div>
