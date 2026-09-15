@@ -8,6 +8,11 @@ import {
 import ArticleClient from "./ArticleClient";
 
 export const revalidate = 3600;
+
+/** 한글 slug는 퍼센트 인코딩된 채로 들어온다 → Notion의 원문 slug와 맞추기 위해 디코딩 */
+function decodeSlug(raw: string): string {
+  try { return decodeURIComponent(raw); } catch { return raw; }
+}
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
@@ -20,7 +25,7 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const slug = decodeSlug((await params).slug);
   const article = await getArticleBySlug(slug);
 
   if (!article) {
@@ -38,7 +43,7 @@ export default async function Page({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const slug = decodeSlug((await params).slug);
   const article = await getArticleBySlug(slug);
 
   if (!article) {
