@@ -35,6 +35,17 @@ const PillLabel = ({ children, color }: { children: React.ReactNode; color: stri
   </span>
 );
 
+// 연락처 자동 하이픈 (010-1234-5678)
+const formatPhone = (v: string) => {
+  const d = v.replace(/\D/g, "").slice(0, 11);
+  if (d.length < 4) return d;
+  if (d.length < 8) return `${d.slice(0, 3)}-${d.slice(3)}`;
+  return `${d.slice(0, 3)}-${d.slice(3, 7)}-${d.slice(7)}`;
+};
+const inputCls = "w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400";
+const selectCls = "w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-sky-400";
+const fieldAnim: React.CSSProperties = { animation: "fade-up 420ms cubic-bezier(0.22, 1, 0.36, 1) both" };
+
 /* ─────────────────────── Main ─────────────────────── */
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -80,9 +91,17 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
     };
   }, []);
 
+  // 단계형 폼: 성함 → 연락처 → 업종 → 예산 → (회사명·동의·제출)
+  const phoneDigits = form.phone.replace(/\D/g, "");
+  const step =
+    !form.name.trim() ? 0 :
+    phoneDigits.length < 10 ? 1 :
+    !form.industry ? 2 :
+    !form.budget ? 3 : 4;
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.phone || !form.agree) return;
+    if (step < 4 || !form.agree) return;
     router.push("/thank-you");
   };
 
@@ -695,88 +714,111 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
               <div className="rounded-3xl bg-[#0a0a13] border border-white/[0.06] p-7 md:p-8">
                 <p className="text-[16px] font-semibold mb-6">지금 상담부터 시작하세요</p>
                 <form onSubmit={submit} className="space-y-4">
-                    <div>
+                    {/* 단계형: 한 칸을 채우면 다음 칸이 나타난다 */}
+                    <div style={fieldAnim}>
                       <label className="text-[15px] text-white/55 mb-1.5 block">성함 *</label>
                       <input
                         required
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
                         placeholder="홍길동"
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
+                        autoComplete="name"
+                        className={inputCls}
                       />
                     </div>
-                    <div>
-                      <label className="text-[15px] text-white/55 mb-1.5 block">회사·브랜드명</label>
-                      <input
-                        value={form.company}
-                        onChange={(e) => setForm({ ...form, company: e.target.value })}
-                        placeholder="픽셀페이지"
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[15px] text-white/55 mb-1.5 block">연락처 *</label>
-                      <input
-                        required
-                        value={form.phone}
-                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                        placeholder="010-0000-0000"
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white placeholder-white/25 focus:outline-none focus:border-sky-400"
-                      />
-                    </div>
-                    <div>
-                      <label className="text-[15px] text-white/55 mb-1.5 block">업종 *</label>
-                      <select
-                        required
-                        value={form.industry}
-                        onChange={(e) => setForm({ ...form, industry: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-sky-400"
-                      >
-                        <option value="" className="bg-[#0a0a13]">선택하세요</option>
-                        <option className="bg-[#0a0a13]">교육·코칭</option>
-                        <option className="bg-[#0a0a13]">병원·의료·성형</option>
-                        <option className="bg-[#0a0a13]">부동산·인테리어</option>
-                        <option className="bg-[#0a0a13]">시공·설비 (태양광 등)</option>
-                        <option className="bg-[#0a0a13]">법률·전문 서비스</option>
-                        <option className="bg-[#0a0a13]">프랜차이즈·가맹</option>
-                        <option className="bg-[#0a0a13]">이커머스·D2C</option>
-                        <option className="bg-[#0a0a13]">지식 SaaS·B2B</option>
-                        <option className="bg-[#0a0a13]">기타</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label className="text-[15px] text-white/55 mb-1.5 block">월 광고 예산 *</label>
-                      <select
-                        required
-                        value={form.budget}
-                        onChange={(e) => setForm({ ...form, budget: e.target.value })}
-                        className="w-full px-4 py-3 rounded-xl bg-transparent border border-white/10 text-white/90 focus:outline-none focus:border-sky-400"
-                      >
-                        <option value="" className="bg-[#0a0a13]">선택하세요</option>
-                        <option className="bg-[#0a0a13]">500만 원 미만</option>
-                        <option className="bg-[#0a0a13]">500 ~ 1,000만 원</option>
-                        <option className="bg-[#0a0a13]">1,000 ~ 3,000만 원</option>
-                        <option className="bg-[#0a0a13]">3,000만 원 이상</option>
-                      </select>
-                    </div>
-                    <label className="flex items-start gap-2.5 text-[15px] text-white/50 cursor-pointer pt-1">
-                      <input
-                        type="checkbox"
-                        checked={form.agree}
-                        onChange={(e) => setForm({ ...form, agree: e.target.checked })}
-                        className="mt-0.5"
-                        required
-                      />
-                      <span>개인정보 수집·이용에 동의합니다.</span>
-                    </label>
-                    <button
-                      type="submit"
-                      className="w-full mt-2 px-6 py-4 rounded-full bg-sky-500 hover:bg-sky-400 text-white text-[17px] font-bold transition-colors flex items-center justify-center gap-2"
-                    >
-                      무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
-                    </button>
+                    {step >= 1 && (
+                      <div style={fieldAnim}>
+                        <label className="text-[15px] text-white/55 mb-1.5 block">연락처 *</label>
+                        <input
+                          required
+                          autoFocus
+                          type="tel"
+                          inputMode="numeric"
+                          autoComplete="tel"
+                          value={form.phone}
+                          onChange={(e) => setForm({ ...form, phone: formatPhone(e.target.value) })}
+                          placeholder="010-0000-0000"
+                          className={inputCls}
+                        />
+                      </div>
+                    )}
+                    {step >= 2 && (
+                      <div style={fieldAnim}>
+                        <label className="text-[15px] text-white/55 mb-1.5 block">업종 *</label>
+                        <select
+                          required
+                          autoFocus
+                          value={form.industry}
+                          onChange={(e) => setForm({ ...form, industry: e.target.value })}
+                          className={selectCls}
+                        >
+                          <option value="" className="bg-[#0a0a13]">선택하세요</option>
+                          <option className="bg-[#0a0a13]">교육·코칭</option>
+                          <option className="bg-[#0a0a13]">병원·의료·성형</option>
+                          <option className="bg-[#0a0a13]">부동산·인테리어</option>
+                          <option className="bg-[#0a0a13]">시공·설비 (태양광 등)</option>
+                          <option className="bg-[#0a0a13]">법률·전문 서비스</option>
+                          <option className="bg-[#0a0a13]">프랜차이즈·가맹</option>
+                          <option className="bg-[#0a0a13]">이커머스·D2C</option>
+                          <option className="bg-[#0a0a13]">지식 SaaS·B2B</option>
+                          <option className="bg-[#0a0a13]">기타</option>
+                        </select>
+                      </div>
+                    )}
+                    {step >= 3 && (
+                      <div style={fieldAnim}>
+                        <label className="text-[15px] text-white/55 mb-1.5 block">월 광고 예산 *</label>
+                        <select
+                          required
+                          autoFocus
+                          value={form.budget}
+                          onChange={(e) => setForm({ ...form, budget: e.target.value })}
+                          className={selectCls}
+                        >
+                          <option value="" className="bg-[#0a0a13]">선택하세요</option>
+                          <option className="bg-[#0a0a13]">500만 원 미만</option>
+                          <option className="bg-[#0a0a13]">500 ~ 1,000만 원</option>
+                          <option className="bg-[#0a0a13]">1,000 ~ 3,000만 원</option>
+                          <option className="bg-[#0a0a13]">3,000만 원 이상</option>
+                        </select>
+                      </div>
+                    )}
+                    {step >= 4 && (
+                      <>
+                        <div style={fieldAnim}>
+                          <label className="text-[15px] text-white/55 mb-1.5 block">
+                            회사·브랜드명 <span className="text-white/30">(선택)</span>
+                          </label>
+                          <input
+                            value={form.company}
+                            onChange={(e) => setForm({ ...form, company: e.target.value })}
+                            placeholder="픽셀페이지"
+                            autoComplete="organization"
+                            className={inputCls}
+                          />
+                        </div>
+                        <label style={fieldAnim} className="flex items-start gap-2.5 text-[15px] text-white/50 cursor-pointer pt-1">
+                          <input
+                            type="checkbox"
+                            checked={form.agree}
+                            onChange={(e) => setForm({ ...form, agree: e.target.checked })}
+                            className="mt-0.5"
+                            required
+                          />
+                          <span>개인정보 수집·이용에 동의합니다.</span>
+                        </label>
+                        <button
+                          type="submit"
+                          style={fieldAnim}
+                          disabled={!form.agree}
+                          className="w-full mt-2 px-6 py-4 rounded-full bg-sky-500 hover:bg-sky-400 disabled:bg-white/10 disabled:text-white/35 disabled:cursor-not-allowed text-white text-[17px] font-bold transition-colors flex items-center justify-center gap-2"
+                        >
+                          무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
+                        </button>
+                      </>
+                    )}
                     <p className="text-center text-[16px] text-white/40 pt-1">
-                      빠른 시일 내에 연락드리겠습니다.
+                      {step >= 4 ? "빠른 시일 내에 연락드리겠습니다." : `${Math.min(step + 1, 4)} / 4 · 입력하시면 다음 항목이 열립니다`}
                     </p>
                   </form>
               </div>

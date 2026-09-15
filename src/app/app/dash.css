@@ -1,0 +1,175 @@
+/* 고객사 대시보드 전용 스타일 — 프로토타입(고객사 대시보드/dashboard/style.css) 이식 */
+.pp-dash {
+  --surface: #fcfcfb; --card: #ffffff; --line: #e6e5e1; --grid: #efeeea;
+  --text: #0b0b0b; --text-2: #52514e; --muted: #8a8985;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --good: #008300; --warn: #c98500; --bad: #e34948;
+  --seq-250:#86b6ef; --seq-350:#5598e7; --seq-450:#2a78d6; --seq-550:#1c5cab; --seq-650:#104281;
+  --tag-gray-bg:#e9e9e6;  --tag-gray-fg:#3a3a37;
+  --tag-yellow-bg:#ffe9a8;--tag-yellow-fg:#5a4200;
+  --tag-blue-bg:#cde2fb;  --tag-blue-fg:#0d366b;
+  --tag-green-bg:#cdefd6; --tag-green-fg:#0a4d1f;
+  --tag-red-bg:#ffd4d2;   --tag-red-fg:#7a1a17;
+  --tag-orange-bg:#ffe8d6;--tag-orange-fg:#7a3b00;
+  --tag-teal-bg:#dff3e6;  --tag-teal-fg:#0b5e2e;
+  background: var(--surface); color: var(--text);
+  font: 14.5px/1.5 "Pretendard", -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", system-ui, sans-serif;
+  min-height: 100vh; line-height: 1.5;
+}
+.pp-dash * { box-sizing: border-box; }
+.pp-dash h1, .pp-dash h2, .pp-dash h3, .pp-dash h4 { margin: 0; }
+
+/* ---- 앱 셸 ---- */
+.pp-shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.pp-side { border-right: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow: auto; }
+.pp-side .brand { display: flex; align-items: center; gap: 10px; padding: 16px 16px 12px; font-weight: 700; font-size: 15px; }
+.pp-side .brand .logo { width: 28px; height: 28px; border-radius: 7px; background: var(--s1); color: #fff; display: grid; place-items: center; font-size: 13px; }
+.pp-side .brand small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.pp-side h4 { font-size: 11.5px; color: var(--muted); margin: 12px 16px 4px; text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.pp-side nav { padding: 0 8px; }
+.pp-side a.item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 7px; color: var(--text-2); text-decoration: none; font-size: 14px; }
+.pp-side a.item:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.pp-side a.item.on { background: color-mix(in srgb, var(--s1) 12%, transparent); color: var(--text); font-weight: 600; }
+.pp-side a.item .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--s3); flex: none; }
+.pp-side a.item .dot.own { background: var(--s2); }
+.pp-side a.item small { margin-left: auto; color: var(--muted); font-weight: 400; font-size: 12px; }
+.pp-side .me { margin-top: auto; padding: 12px 16px; border-top: 1px solid var(--line); font-size: 13px; color: var(--text-2); display: flex; align-items: center; gap: 8px; }
+.pp-side .me b { color: var(--text); display: block; font-size: 13.5px; }
+.pp-side .me .role { font-size: 11px; padding: 1px 7px; border-radius: 99px; background: var(--tag-gray-bg); color: var(--tag-gray-fg); }
+.pp-side .me .role.staff { background: var(--tag-blue-bg); color: var(--tag-blue-fg); }
+.pp-side .me form { margin-left: auto; }
+.pp-main { min-width: 0; padding: 20px 22px 48px; }
+@media (max-width: 860px) {
+  .pp-shell { grid-template-columns: 1fr; }
+  .pp-side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
+  .pp-side nav { display: flex; flex-wrap: wrap; gap: 4px; padding-bottom: 8px; }
+  .pp-main { padding: 16px; }
+}
+
+/* ---- 공통 ---- */
+.pp-dash header.ph { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+.pp-dash h1 { font-size: 20px; font-weight: 700; }
+.pp-dash h1 small { color: var(--muted); font-weight: 400; font-size: 13.5px; margin-left: 8px; }
+.pp-dash .controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pp-dash select, .pp-dash input[type="text"], .pp-dash input[type="email"], .pp-dash input[type="password"], .pp-dash input[type="date"], .pp-dash input:not([type]) {
+  font: inherit; padding: 6px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text);
+}
+.pp-dash .btn { font: inherit; font-size: 13.5px; padding: 6px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text-2); cursor: pointer; }
+.pp-dash .btn:hover { background: color-mix(in srgb, var(--text) 5%, var(--card)); }
+.pp-dash .btn.primary { background: var(--s1); color: #fff; border-color: var(--s1); }
+.pp-dash .btn.primary:hover { background: var(--seq-550); }
+.pp-dash .btn.danger { color: var(--bad); }
+.pp-dash .btn:disabled { opacity: .55; cursor: default; }
+.pp-dash .tabs { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--card); }
+.pp-dash .tabs a { padding: 6px 14px; color: var(--text-2); text-decoration: none; font-size: 13.5px; }
+.pp-dash .tabs a.on { background: var(--s1); color: #fff; }
+.pp-dash .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 14px; }
+.pp-dash .tile { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 13px 15px; }
+.pp-dash .tile .k { color: var(--text-2); font-size: 12.5px; }
+.pp-dash .tile .v { font-size: clamp(18px, 1.7vw, 23px); font-weight: 700; letter-spacing: -0.01em; margin-top: 2px; font-variant-numeric: tabular-nums; }
+.pp-dash .tile .d { font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+.pp-dash .tile .d.up { color: var(--good); } .pp-dash .tile .d.down { color: var(--bad); }
+.pp-dash .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 12px; }
+.pp-dash .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; grid-column: span 12; min-width: 0; }
+@media (min-width: 900px) { .pp-dash .c6 { grid-column: span 6; } .pp-dash .c4 { grid-column: span 4; } .pp-dash .c8 { grid-column: span 8; } }
+.pp-dash .card h2 { font-size: 14.5px; font-weight: 600; margin-bottom: 2px; }
+.pp-dash .card .sub { color: var(--muted); font-size: 12.5px; margin-bottom: 10px; }
+.pp-dash svg.chart { display: block; width: 100%; height: auto; overflow: visible; }
+.pp-dash .grid-line { stroke: var(--grid); stroke-width: 1; }
+.pp-dash .axis { fill: var(--muted); font-size: 12px; }
+.pp-dash .lbl { fill: var(--text-2); font-size: 12px; }
+.pp-dash .lbl.strong { fill: var(--text); font-weight: 600; }
+.pp-dash table.tbl { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.pp-dash .tbl th, .pp-dash .tbl td { text-align: right; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.pp-dash .tbl th { color: var(--text-2); font-weight: 500; font-size: 12.5px; }
+.pp-dash .tbl th:first-child, .pp-dash .tbl td:first-child { text-align: left; }
+.pp-dash .tbl.left th, .pp-dash .tbl.left td { text-align: left; }
+.pp-dash .tbl-wrap { overflow-x: auto; }
+.pp-dash .pill { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12.5px; border: 1px solid var(--line); color: var(--text-2); line-height: 1.6; }
+.pp-dash .st-신규 { background: var(--tag-gray-bg); color: var(--tag-gray-fg); border-color: transparent; }
+.pp-dash .st-연락중 { background: var(--tag-yellow-bg); color: var(--tag-yellow-fg); border-color: transparent; }
+.pp-dash .st-상담완료 { background: var(--tag-blue-bg); color: var(--tag-blue-fg); border-color: transparent; }
+.pp-dash .st-전환 { background: var(--tag-green-bg); color: var(--tag-green-fg); border-color: transparent; }
+.pp-dash .st-드랍 { background: var(--tag-red-bg); color: var(--tag-red-fg); border-color: transparent; }
+.pp-dash .legend { display: flex; flex-wrap: wrap; gap: 12px; font-size: 12.5px; color: var(--text-2); margin-bottom: 8px; }
+.pp-dash .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.pp-dash .hint { color: var(--muted); font-size: 12.5px; margin-top: 8px; }
+.pp-dash .funnel-row { display: grid; grid-template-columns: 70px 1fr 70px; gap: 10px; align-items: center; margin: 7px 0; font-size: 13.5px; }
+.pp-dash .funnel-bar { height: 22px; border-radius: 0 4px 4px 0; background: var(--seq-450); }
+.pp-dash .funnel-rate { font-size: 12px; color: var(--muted); text-align: right; }
+.pp-dash .clients-tbl td:first-child { font-weight: 600; }
+.pp-dash .clients-tbl tr.row:hover td { background: color-mix(in srgb, var(--s1) 8%, transparent); cursor: pointer; }
+.pp-dash .badge { display: inline-block; min-width: 22px; text-align: center; padding: 1px 7px; border-radius: 99px; font-size: 12.5px; background: var(--bad); color: #fff; }
+.pp-dash .badge.ok { background: transparent; color: var(--muted); }
+.pp-dash .note { color: var(--muted); font-size: 12.5px; margin-top: 24px; border-top: 1px solid var(--line); padding-top: 12px; }
+.pp-dash .msg { padding: 8px 12px; border-radius: 8px; font-size: 13.5px; margin: 8px 0; }
+.pp-dash .msg.ok { background: var(--tag-green-bg); color: var(--tag-green-fg); }
+.pp-dash .msg.err { background: var(--tag-red-bg); color: var(--tag-red-fg); }
+.pp-dash .form-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.pp-dash label.f { display: flex; flex-direction: column; gap: 4px; font-size: 12.5px; color: var(--text-2); }
+.pp-dash .src { display: inline-block; padding: 2px 10px; border-radius: 99px; font-size: 12px; line-height: 1.6; background: var(--tag-blue-bg); color: var(--tag-blue-fg); }
+.pp-dash .src.google { background: var(--tag-green-bg); color: var(--tag-green-fg); }
+.pp-dash .src.daangn { background: var(--tag-orange-bg); color: var(--tag-orange-fg); }
+.pp-dash .src.naver { background: var(--tag-teal-bg); color: var(--tag-teal-fg); }
+.pp-dash .src.youtube { background: var(--tag-red-bg); color: var(--tag-red-fg); }
+.pp-dash .src.kakao { background: var(--tag-yellow-bg); color: var(--tag-yellow-fg); }
+.pp-dash .src.unknown { background: var(--tag-gray-bg); color: var(--tag-gray-fg); }
+
+/* ---- 시트 ---- */
+.sheet-app { display: grid; grid-template-rows: auto auto 1fr auto; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: var(--card); min-height: 560px; height: calc(100vh - 120px); }
+.sheet-app .bar { display: flex; align-items: center; gap: 14px; padding: 10px 16px; border-bottom: 1px solid var(--line); flex-wrap: wrap; }
+.sheet-app .bar h2 { font-size: 16px; font-weight: 700; }
+.sheet-app .bar .sp { flex: 1; }
+.sheet-app .bar .stat { font-size: 13.5px; color: var(--text-2); display: flex; gap: 14px; flex-wrap: wrap; }
+.sheet-app .bar .stat b { color: var(--text); font-weight: 600; }
+.sheet-app .toolbar { display: flex; align-items: center; gap: 6px; padding: 7px 12px; border-bottom: 1px solid var(--line); font-size: 13px; flex-wrap: wrap; }
+.sheet-app .tb { display: inline-flex; align-items: center; gap: 5px; padding: 4px 8px; border-radius: 6px; color: var(--text-2); }
+.sheet-app .tb select { border: 0; background: transparent; color: inherit; font: inherit; padding: 2px 4px; }
+.sheet-app .toolbar .search { margin-left: auto; }
+.sheet-app .toolbar .search input { width: 200px; padding: 5px 10px; }
+.sheet-app .main { display: grid; grid-template-columns: 210px 1fr; min-height: 0; }
+@media (max-width: 800px) { .sheet-app .main { grid-template-columns: 1fr; } .sheet-app .views { display: none; } }
+.sheet-app .views { border-right: 1px solid var(--line); padding: 10px 8px; font-size: 14px; overflow: auto; }
+.sheet-app .views .v { display: flex; align-items: center; gap: 7px; padding: 6px 10px; border-radius: 6px; cursor: pointer; color: var(--text-2); background: none; border: 0; width: 100%; font: inherit; text-align: left; }
+.sheet-app .views .v:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.sheet-app .views .v.on { background: color-mix(in srgb, var(--s1) 14%, transparent); color: var(--text); font-weight: 600; }
+.sheet-app .views .v small { margin-left: auto; color: var(--muted); font-weight: 400; }
+.sheet-app .views h4 { font-size: 11.5px; color: var(--muted); margin: 6px 10px 4px; text-transform: uppercase; letter-spacing: .05em; }
+.sheet-app .gridwrap { overflow: auto; background: var(--surface); }
+table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min-width: max-content; }
+.sheet th, .sheet td { border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); padding: 0; height: 38px; white-space: nowrap; text-align: left; vertical-align: middle; background: var(--card); }
+.sheet th { position: sticky; top: 0; z-index: 3; background: var(--surface); color: var(--text-2); font-weight: 500; font-size: 12.5px; padding: 0 12px; }
+.sheet th .ic { color: var(--muted); margin-right: 6px; font-size: 11px; }
+.sheet th.num, .sheet td.num { position: sticky; left: 0; z-index: 2; width: 44px; min-width: 44px; text-align: center; color: var(--muted); font-size: 12px; padding: 0; background: var(--surface); }
+.sheet th.num { z-index: 4; }
+.sheet th.name, .sheet td.name { position: sticky; left: 44px; z-index: 2; box-shadow: 2px 0 0 var(--line); }
+.sheet th.name { z-index: 4; }
+.sheet td { padding: 0 12px; color: var(--text); }
+.sheet td.muted { color: var(--muted); }
+.sheet td.wide { max-width: 300px; overflow: hidden; text-overflow: ellipsis; }
+.sheet tr:hover td { background: color-mix(in srgb, var(--text) 3%, var(--card)); }
+.sheet td:focus-within { outline: 2px solid var(--s1); outline-offset: -2px; }
+.sheet .cell-sel { appearance: none; -webkit-appearance: none; border: 1px solid color-mix(in srgb, currentColor 22%, transparent); background: transparent; font: inherit; font-size: 13px; padding: 2px 12px; border-radius: 99px; cursor: pointer; color: var(--text); line-height: 1.5; }
+.sheet .cell-sel option { background: var(--card); color: var(--text); }
+.sheet .cell-sel.plain { border-radius: 4px; padding: 2px 6px; background: transparent; border-color: transparent; color: var(--text); }
+.sheet .cell-sel.plain:hover { background: color-mix(in srgb, var(--text) 6%, transparent); }
+.sheet .cell-sel.empty { color: var(--muted); }
+.sheet .cell-in { border: 0; background: transparent; font: inherit; font-size: 14px; color: var(--text); width: 100%; padding: 0; outline: none; }
+.sheet td.locked { background: color-mix(in srgb, var(--text) 3%, var(--card)) !important; color: var(--muted); }
+.sheet td.locked::after { content: "—"; }
+.sheet td.needs { background: color-mix(in srgb, var(--tag-yellow-fg) 14%, var(--card)) !important; }
+.sheet td.needs .cell-in::placeholder { color: var(--warn); }
+.sheet td.dup { color: var(--muted); font-style: italic; }
+.sheet-app .foot { display: flex; align-items: center; gap: 14px; padding: 8px 14px; border-top: 1px solid var(--line); font-size: 13px; color: var(--text-2); }
+.sheet-app .foot .saved { color: var(--good); margin-left: auto; }
+.sheet-app .foot .saving { color: var(--muted); margin-left: auto; }
+.sheet-app .foot .err { color: var(--bad); margin-left: auto; }
+
+/* ---- 로그인 ---- */
+.pp-login { min-height: 100vh; display: grid; place-items: center; padding: 24px; }
+.pp-login .box { width: 100%; max-width: 380px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+.pp-login .box h1 { font-size: 20px; margin-bottom: 4px; }
+.pp-login .box p { color: var(--muted); font-size: 13.5px; margin: 0 0 18px; }
+.pp-login .box label { display: block; font-size: 13px; color: var(--text-2); margin: 10px 0 4px; }
+.pp-login .box input { width: 100%; }
+.pp-login .box .btn { width: 100%; margin-top: 16px; padding: 9px; font-size: 14.5px; }

@@ -52,3 +52,7 @@ __pycache__/
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# 예시 env 파일은 커밋 허용
+!.env.example
+.gstack/
