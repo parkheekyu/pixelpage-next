@@ -18,21 +18,16 @@ export async function POST(req: NextRequest) {
   if (!s("name") || !s("phone")) return NextResponse.json({ ok: false, error: "이름과 연락처를 입력해 주세요." }, { status: 400 });
 
   const form = s("form") === "lp" ? "lp" : "consult";
-  const lines = [
-    `[${form === "lp" ? "LP 상담 신청" : "홈페이지 문의"}]`,
-    s("company") && `회사·브랜드: ${s("company")}`,
-    s("industry") && `업종: ${s("industry")}`,
-    s("category") && `분야: ${s("category")}`,
-    s("marketingStatus") && `현재 마케팅: ${s("marketingStatus")}`,
-    s("budget") && `월 광고 예산: ${s("budget")}`,
-    Array.isArray(b.services) && b.services.length ? `관심 서비스: ${(b.services as unknown[]).map(String).join(", ")}` : "",
-    s("message") && `문의: ${s("message")}`,
-  ].filter(Boolean);
-
+  // 출처는 landing_id(consult/lp)와 utm 으로 구분한다
   const r = await ingestLead({
     client: OWN_SLUG,
     name: s("name"), phone: s("phone"), email: s("email"),
-    message: lines.join("\n"),
+    message: s("message"),
+    company: s("company"),
+    industry: s("industry") || s("category"),
+    budget: s("budget"),
+    services: Array.isArray(b.services) ? (b.services as unknown[]).map(String).join(", ") : s("services"),
+    marketing_status: s("marketingStatus") || s("marketing_status"),
     utm_source: s("utm_source") || "organic",
     utm_medium: s("utm_medium") || (s("utm_source") ? "" : "site"),
     utm_campaign: s("utm_campaign"), utm_content: s("utm_content"), utm_term: s("utm_term"),

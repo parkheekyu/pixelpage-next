@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import DateRangePicker from "./DateRangePicker";
-import { AlignLeft, ArrowUpDown, Banknote, Calendar, ChevronDown, Filter, LayoutGrid, Mail, Megaphone, Phone, Plus, Table2, UserRound, UserRoundCog, type LucideIcon } from "lucide-react";
+import { AlignLeft, ArrowUpDown, Banknote, Briefcase, Building2, Calendar, ChevronDown, Filter, LayoutGrid, Mail, Megaphone, Phone, PiggyBank, Plus, Radar, Table2, UserRound, UserRoundCog, type LucideIcon } from "lucide-react";
 import { fetchLeadsPage, setAssignee, updateLead } from "@/app/app/actions";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
 import { defaultQuery, PAGE_LIMIT, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
@@ -11,9 +11,12 @@ import { SourcePill } from "./charts";
 
 
 // 열 정의 (key, 라벨, 기본 너비). 너비는 드래그로 조절, localStorage 에 저장
-const COLS: { key: string; label: string; w: number; ic: LucideIcon; staff?: boolean }[] = [
+const COLS: { key: string; label: string; w: number; ic: LucideIcon; staff?: boolean; ifAny?: keyof Lead }[] = [
   { key: "name", label: "이름", w: 120, ic: UserRound }, { key: "ts", label: "등록일", w: 140, ic: Calendar }, { key: "phone", label: "연락처", w: 130, ic: Phone },
-  { key: "email", label: "이메일", w: 160, ic: Mail }, { key: "message", label: "문의내용", w: 240, ic: AlignLeft }, { key: "src", label: "유입매체", w: 100, ic: Megaphone },
+  { key: "email", label: "이메일", w: 160, ic: Mail },
+  { key: "company", label: "회사·브랜드", w: 140, ic: Building2, ifAny: "company" }, { key: "industry", label: "업종", w: 130, ic: Briefcase, ifAny: "industry" }, { key: "budget", label: "월 광고 예산", w: 140, ic: PiggyBank, ifAny: "budget" },
+  { key: "services", label: "관심 서비스", w: 180, ic: LayoutGrid, ifAny: "services" }, { key: "marketing_status", label: "현재 마케팅", w: 140, ic: Radar, ifAny: "marketing_status" },
+  { key: "message", label: "문의내용", w: 240, ic: AlignLeft }, { key: "src", label: "유입매체", w: 100, ic: Megaphone },
   { key: "content", label: "소재", w: 120, ic: LayoutGrid, staff: true }, { key: "assignee", label: "담당자", w: 100, ic: UserRoundCog, staff: true },
   { key: "status", label: "상태", w: 110, ic: ChevronDown }, { key: "revenue", label: "매출액", w: 130, ic: Banknote }, { key: "pay", label: "결제구분", w: 110, ic: ChevronDown },
   { key: "conv", label: "전환일", w: 140, ic: Calendar }, { key: "drop", label: "드랍사유", w: 120, ic: ChevronDown }, { key: "memo", label: "메모", w: 220, ic: AlignLeft },
@@ -35,7 +38,8 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
   const [revDraft, setRevDraft] = useState<Record<string, string>>({});
   const first = useRef(true);
   const seq = useRef(0);
-  const cols = COLS.filter((c) => !c.staff || isStaff);
+  // 폼 항목 열은 현재 페이지에 값이 하나라도 있을 때만 표시 (광고 리드만 있는 고객사 시트는 숨김)
+  const cols = COLS.filter((c) => (!c.staff || isStaff) && (!c.ifAny || page.rows.some((r) => r[c.ifAny!])));
   const [widths, setWidths] = useState<Record<string, number>>(() => Object.fromEntries(COLS.map((c) => [c.key, c.w])));
   useEffect(() => {
     // 하이드레이션 후 저장된 너비 적용 (동기 setState 회피)
@@ -146,6 +150,11 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
                     <td className="muted">{fmtTs(l.submitted_at)}</td>
                     <td>{l.phone}</td>
                     <td className="muted">{l.email || ""}</td>
+                    {cols.some((c) => c.key === "company") && <td title={l.company ?? ""}>{l.company || ""}</td>}
+                    {cols.some((c) => c.key === "industry") && <td>{l.industry || ""}</td>}
+                    {cols.some((c) => c.key === "budget") && <td>{l.budget || ""}</td>}
+                    {cols.some((c) => c.key === "services") && <td title={l.services ?? ""}>{l.services || ""}</td>}
+                    {cols.some((c) => c.key === "marketing_status") && <td>{l.marketing_status || ""}</td>}
                     <td className="wide" title={l.message ?? ""}>{l.message || ""}</td>
                     <td><SourcePill s={l.utm_source} /></td>
                     {isStaff && <>
@@ -171,7 +180,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
                   </tr>
                 );
               })}
-              {rows.length === 0 && <tr><td className="num" /><td colSpan={isStaff ? 15 : 13} style={{ color: "var(--muted)", padding: "18px 12px" }}>{loading ? "불러오는 중…" : "조건에 맞는 리드가 없습니다. 리드는 광고 폼 제출 시 자동으로 추가됩니다."}</td></tr>}
+              {rows.length === 0 && <tr><td className="num" /><td colSpan={cols.length + 1} style={{ color: "var(--muted)", padding: "18px 12px" }}>{loading ? "불러오는 중…" : "조건에 맞는 리드가 없습니다. 리드는 광고 폼 제출 시 자동으로 추가됩니다."}</td></tr>}
             </tbody>
           </table>
         </div>

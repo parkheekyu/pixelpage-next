@@ -8,7 +8,7 @@ import { isDate, MIN_DATE, todayKST } from "./dates";
 
 type DashClient = Awaited<ReturnType<typeof createClient>>;
 
-export const LEAD_COLS = "id,project_id,submitted_at,name,phone,email,message,utm_source,utm_medium,utm_campaign,utm_content,utm_term,landing_id,status,drop_reason,assignee,first_contact_at,consulted_at,converted_on,revenue,pay_type,memo,is_duplicate";
+export const LEAD_COLS = "id,project_id,submitted_at,name,phone,email,message,company,industry,budget,services,marketing_status,utm_source,utm_medium,utm_campaign,utm_content,utm_term,landing_id,status,drop_reason,assignee,first_contact_at,consulted_at,converted_on,revenue,pay_type,memo,is_duplicate";
 
 
 /** 리드 시트 한 페이지 + 요약. 필터·정렬·페이지네이션은 전부 DB에서. */

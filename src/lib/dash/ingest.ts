@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export interface IngestInput {
   client: string;            // projects.slug
   name?: string; phone: string; email?: string; message?: string;
+  company?: string; industry?: string; budget?: string; services?: string; marketing_status?: string;
   submitted_at?: string;
   utm_source?: string; utm_medium?: string; utm_campaign?: string; utm_content?: string; utm_term?: string;
   landing_id?: string; landing_url?: string;
@@ -42,6 +43,11 @@ export async function ingestLead(input: IngestInput): Promise<IngestResult> {
     phone_norm: phoneNorm,
     email: str(input.email).slice(0, 200) || null,
     message: str(input.message).slice(0, 4000) || null,
+    company: str(input.company).slice(0, 120) || null,
+    industry: str(input.industry).slice(0, 80) || null,
+    budget: str(input.budget).slice(0, 80) || null,
+    services: str(input.services).slice(0, 300) || null,
+    marketing_status: str(input.marketing_status).slice(0, 120) || null,
     utm_source: (str(input.utm_source) || "unknown").toLowerCase().slice(0, 60),
     utm_medium: str(input.utm_medium).slice(0, 60) || null,
     utm_campaign: str(input.utm_campaign).slice(0, 120) || null,

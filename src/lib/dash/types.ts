@@ -60,6 +60,11 @@ export interface Lead {
   phone_norm: string | null;
   email: string | null;
   message: string | null;
+  company: string | null;
+  industry: string | null;
+  budget: string | null;
+  services: string | null;
+  marketing_status: string | null;
   utm_source: string;
   utm_medium: string | null;
   utm_campaign: string | null;
