@@ -1,19 +1,31 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import DateRangePicker from "./DateRangePicker";
 import { fetchLeadsPage, setAssignee, updateLead } from "@/app/app/actions";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
-import { DEFAULT_QUERY, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
+import { defaultQuery, PAGE_LIMIT, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
 import { DROPS, PAYS, STATUSES, type Lead, type LeadPatch, type Project } from "@/lib/dash/types";
 import { SourcePill } from "./charts";
 
+
+// 열 정의 (key, 라벨, 기본 너비). 너비는 드래그로 조절, localStorage 에 저장
+const COLS: { key: string; label: string; w: number; ic?: string; staff?: boolean }[] = [
+  { key: "name", label: "이름", w: 120, ic: "A" }, { key: "ts", label: "등록일", w: 140, ic: "📅" }, { key: "phone", label: "연락처", w: 130, ic: "☎" },
+  { key: "email", label: "이메일", w: 160, ic: "@" }, { key: "message", label: "문의내용", w: 240, ic: "≡" }, { key: "src", label: "유입매체", w: 100, ic: "◉" },
+  { key: "content", label: "소재", w: 120, ic: "▣", staff: true }, { key: "assignee", label: "담당자", w: 100, ic: "👤", staff: true },
+  { key: "status", label: "상태", w: 110, ic: "▾" }, { key: "revenue", label: "매출액", w: 130, ic: "₩" }, { key: "pay", label: "결제구분", w: 110, ic: "▾" },
+  { key: "conv", label: "전환일", w: 140, ic: "📅" }, { key: "drop", label: "드랍사유", w: 120, ic: "▾" }, { key: "memo", label: "메모", w: 220, ic: "≡" },
+];
+const NUM_W = 44;
+const WIDTH_KEY = "leadSheetColWidths";
 const VIEWS: [SheetView, string][] = [["all", "전체 리드"], ["todo", "처리 필요 (신규·연락중)"], ["conv", "전환 리드"], ["need", "매출 미입력"], ["drop", "드랍"], ["dup", "중복"]];
 const pad = (n: number) => String(n).padStart(2, "0");
 const fmtTs = (iso: string) => { const d = new Date(iso); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
 const today = () => new Date().toISOString().slice(0, 10);
 
 export default function LeadSheet({ project, initial, isStaff }: { project: Project; initial: LeadPage; isStaff: boolean }) {
-  const [query, setQuery] = useState<LeadQuery>(DEFAULT_QUERY);
+  const [query, setQuery] = useState<LeadQuery>(() => defaultQuery());
   const [page, setPage] = useState<LeadPage>(initial);
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState<string | null>(null), [err, setErr] = useState<string | null>(null);
@@ -22,6 +34,21 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
   const [revDraft, setRevDraft] = useState<Record<string, string>>({});
   const first = useRef(true);
   const seq = useRef(0);
+  const cols = COLS.filter((c) => !c.staff || isStaff);
+  const [widths, setWidths] = useState<Record<string, number>>(() => Object.fromEntries(COLS.map((c) => [c.key, c.w])));
+  useEffect(() => {
+    // 하이드레이션 후 저장된 너비 적용 (동기 setState 회피)
+    const t = setTimeout(() => { try { const v = JSON.parse(localStorage.getItem(WIDTH_KEY) || "{}"); if (v && typeof v === "object") setWidths((w) => ({ ...w, ...v })); } catch {} }, 0);
+    return () => clearTimeout(t);
+  }, []);
+  const startResize = (key: string, e: React.PointerEvent) => {
+    e.preventDefault();
+    const startX = e.clientX, startW = widths[key];
+    const move = (ev: PointerEvent) => setWidths((w) => ({ ...w, [key]: Math.max(60, Math.min(600, startW + ev.clientX - startX)) }));
+    const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); setWidths((w) => { try { localStorage.setItem(WIDTH_KEY, JSON.stringify(w)); } catch {} return w; }); };
+    window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
+  };
+  const tableW = NUM_W + cols.reduce((a, c) => a + widths[c.key], 0);
 
   // 필터가 바뀌면 서버에서 다시 조회 (검색어는 250ms 디바운스)
   useEffect(() => {
@@ -83,7 +110,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
         <label className="tb">⏷ 상태 <select value={query.status} onChange={(e) => set({ status: e.target.value })}><option value="">전체</option>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select></label>
         <label className="tb">⏷ 매체 <select value={query.src} onChange={(e) => set({ src: e.target.value })}><option value="">전체</option>{page.sources.map((s) => <option key={s}>{s}</option>)}</select></label>
         <label className="tb">⇅ 정렬 <select value={query.sort} onChange={(e) => set({ sort: e.target.value as SheetSort })}><option value="ts_desc">등록일 최신순</option><option value="ts_asc">등록일 오래된순</option><option value="status">상태순</option><option value="rev_desc">매출액 높은순</option></select></label>
-        <label className="tb">기간 <select value={query.days} onChange={(e) => set({ days: +e.target.value })}><option value={7}>7일</option><option value={14}>14일</option><option value={28}>4주</option><option value={90}>90일</option><option value={365}>1년</option></select></label>
+        <DateRangePicker value={{ from: query.from, to: query.to }} onChange={(r) => set(r)} />
         <div className="search"><input type="text" placeholder="이름, 연락처 검색" value={query.q} onChange={(e) => set({ q: e.target.value })} /></div>
       </div>
       <div className="main">
@@ -92,12 +119,20 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
           {VIEWS.map(([v, label]) => <button key={v} className={`v ${query.view === v ? "on" : ""}`} onClick={() => set({ view: v })}>▦ {label}<small>{S[v]}</small></button>)}
         </aside>
         <div className="gridwrap" style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s" }}>
-          <table className="sheet">
+          <table className="sheet" style={{ width: tableW, tableLayout: "fixed" }}>
+            <colgroup>
+              <col style={{ width: NUM_W }} />
+              {cols.map((c) => <col key={c.key} style={{ width: widths[c.key] }} />)}
+            </colgroup>
             <thead>
               <tr>
-                <th className="num">#</th><th className="name"><span className="ic">A</span>이름</th><th><span className="ic">📅</span>등록일</th><th><span className="ic">☎</span>연락처</th><th><span className="ic">@</span>이메일</th><th><span className="ic">≡</span>문의내용</th><th><span className="ic">◉</span>유입매체</th>
-                {isStaff && <><th><span className="ic">▣</span>소재</th><th><span className="ic">👤</span>담당자</th></>}
-                <th><span className="ic">▾</span>상태</th><th><span className="ic">₩</span>매출액</th><th><span className="ic">▾</span>결제구분</th><th><span className="ic">📅</span>전환일</th><th><span className="ic">▾</span>드랍사유</th><th><span className="ic">≡</span>메모</th>
+                <th className="num">#</th>
+                {cols.map((c) => (
+                  <th key={c.key} className={c.key === "name" ? "name" : ""}>
+                    <span className="ic">{c.ic}</span>{c.label}
+                    <span className="rz" onPointerDown={(e) => startResize(c.key, e)} onDoubleClick={() => setWidths((w) => ({ ...w, [c.key]: c.w }))} title="드래그로 너비 조절 · 더블클릭 초기화" />
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody>
@@ -143,7 +178,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
       <div className="foot">
         <span>＋ 리드는 광고 폼 제출 시 자동 추가됩니다</span>
         <span>{rows.length < total ? `${rows.length} / ${fmtN(total)}` : fmtN(total)} records</span>
-        {rows.length < total && <button className="btn" onClick={more} disabled={loading}>더 보기 (+{DEFAULT_QUERY.limit})</button>}
+        {rows.length < total && <button className="btn" onClick={more} disabled={loading}>더 보기 (+{PAGE_LIMIT})</button>}
         {err ? <span className="err">저장 실패: {err}</span> : pending ? <span className="saving">저장 중…</span> : saved ? <span className="saved">저장됨 {saved}</span> : null}
       </div>
     </div>

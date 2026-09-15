@@ -1,10 +1,10 @@
 import "server-only";
 import type { createClient } from "@/lib/supabase/server";
-import { DAY } from "./agg";
 import type { Lead } from "./types";
 import type { LeadPage, LeadQuery, LeadSummary } from "./leads-types";
 export type { LeadPage, LeadQuery, LeadSummary, SheetSort, SheetView } from "./leads-types";
-export { DEFAULT_QUERY } from "./leads-types";
+export { defaultQuery } from "./leads-types";
+import { isDate, MIN_DATE, todayKST } from "./dates";
 
 type DashClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -13,11 +13,15 @@ export const LEAD_COLS = "id,project_id,submitted_at,name,phone,email,message,ut
 
 /** 리드 시트 한 페이지 + 요약. 필터·정렬·페이지네이션은 전부 DB에서. */
 export async function queryLeads(supabase: DashClient, projectId: string, p: LeadQuery, now = Date.now()): Promise<LeadPage> {
-  const since = new Date(now - Math.min(Math.max(p.days, 1), 365) * DAY).toISOString();
+  const today = todayKST(now);
+  const from = isDate(p.from) && p.from >= MIN_DATE ? p.from : today;
+  const to = isDate(p.to) && p.to >= from ? p.to : today;
+  const since = new Date(from + "T00:00:00+09:00").toISOString();
+  const until = new Date(to + "T23:59:59.999+09:00").toISOString();
   const limit = Math.min(Math.max(p.limit, 1), 500);
   const offset = Math.max(p.offset, 0);
 
-  let q = supabase.from("leads").select(LEAD_COLS, { count: "exact" }).eq("project_id", projectId).gt("submitted_at", since);
+  let q = supabase.from("leads").select(LEAD_COLS, { count: "exact" }).eq("project_id", projectId).gte("submitted_at", since).lte("submitted_at", until);
   q = p.view === "dup" ? q.eq("is_duplicate", true) : q.eq("is_duplicate", false);
   if (p.view === "todo") q = q.in("status", ["신규", "연락중"]);
   if (p.view === "conv") q = q.eq("status", "전환");
@@ -37,7 +41,7 @@ export async function queryLeads(supabase: DashClient, projectId: string, p: Lea
 
   const [page, summary, srcRows] = await Promise.all([
     q,
-    supabase.rpc("lead_summary", { p_project: projectId, p_since: since }),
+    supabase.rpc("lead_summary", { p_project: projectId, p_since: since, p_until: until }),
     supabase.from("creatives").select("source").eq("project_id", projectId),
   ]);
 
