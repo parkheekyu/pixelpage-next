@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState, useEffect, useRef } from "react";
+import { captureAttribution, submitInquiry } from "@/lib/attribution";
 import { useRouter } from "next/navigation";
 import {
   ArrowRight,
@@ -51,6 +52,7 @@ const fieldAnim: React.CSSProperties = { animation: "fade-up 420ms cubic-bezier(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
   const router = useRouter();
+  useEffect(() => { captureAttribution(); }, []);
   const [form, setForm] = useState({ name: "", company: "", phone: "", industry: "", budget: "", agree: false });
   // 모바일 히어로 CTA — 히어로 지나면 부드럽게 하단으로 이동
   const heroCtaSlotRef = useRef<HTMLAnchorElement>(null);
@@ -99,9 +101,15 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
     !form.industry ? 2 :
     !form.budget ? 3 : 4;
 
-  const submit = (e: React.FormEvent) => {
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (step < 4 || !form.agree) return;
+    if (step < 4 || !form.agree || submitting) return;
+    setSubmitting(true); setSubmitError(null);
+    const r = await submitInquiry({ form: "lp", name: form.name, phone: form.phone, company: form.company, industry: form.industry, budget: form.budget });
+    setSubmitting(false);
+    if (!r.ok) { setSubmitError("전송에 실패했습니다. 잠시 후 다시 시도하거나 카카오톡으로 문의해 주세요."); return; }
     router.push("/thank-you");
   };
 
@@ -715,6 +723,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 <p className="text-[16px] font-semibold mb-6">지금 상담부터 시작하세요</p>
                 <form onSubmit={submit} className="space-y-4">
                     {/* 단계형: 한 칸을 채우면 다음 칸이 나타난다 */}
+                    <input type="text" name="website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
                     <div style={fieldAnim}>
                       <label className="text-[15px] text-white/55 mb-1.5 block">성함 *</label>
                       <input
@@ -810,11 +819,12 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                         <button
                           type="submit"
                           style={fieldAnim}
-                          disabled={!form.agree}
+                          disabled={!form.agree || submitting}
                           className="w-full mt-2 px-6 py-4 rounded-full bg-sky-500 hover:bg-sky-400 disabled:bg-white/10 disabled:text-white/35 disabled:cursor-not-allowed text-white text-[17px] font-bold transition-colors flex items-center justify-center gap-2"
                         >
-                          무료 상담 신청하기 <ArrowUpRight className="w-4 h-4" />
+                          {submitting ? "전송 중..." : "무료 상담 신청하기"} <ArrowUpRight className="w-4 h-4" />
                         </button>
+                        {submitError && <p className="text-center text-[14px] text-red-400">{submitError}</p>}
                       </>
                     )}
                     <p className="text-center text-[16px] text-white/40 pt-1">

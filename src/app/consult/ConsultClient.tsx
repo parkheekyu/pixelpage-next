@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { captureAttribution, submitInquiry } from "@/lib/attribution";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import Reveal from "@/components/Reveal";
@@ -20,6 +21,7 @@ const ConsultClient = () => {
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [submitted, setSubmitted] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  useEffect(() => { captureAttribution(); }, []);
 
   const [name, setName] = useState("");
   const [company, setCompany] = useState("");
@@ -53,15 +55,11 @@ const ConsultClient = () => {
       submittedAt: new Date().toISOString(),
     };
 
-    try {
-      await fetch(WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-    } catch {
-      // 웹훅 실패해도 사용자에게는 완료 화면을 보여줌
-    }
+    // 내부 관리자 시트(픽셀페이지 프로젝트) 적재 + 기존 n8n 웹훅 병행
+    await Promise.allSettled([
+      submitInquiry({ form: "consult", ...payload }),
+      fetch(WEBHOOK_URL, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) }),
+    ]);
 
     setSubmitting(false);
     setSubmitted(true);
