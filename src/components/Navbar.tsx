@@ -31,7 +31,8 @@ const navItems: {
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
+  const [mounted, setMounted] = useState(false);
+  const pathname = usePathname() ?? "";
   const isDarkHero =
     darkHeroPages.includes(pathname) ||
     pathname.startsWith("/columns/") ||
@@ -39,6 +40,7 @@ const Navbar = () => {
   const useLight = isDarkHero && !scrolled;
 
   useEffect(() => {
+    setMounted(true);
     const fn = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", fn, { passive: true });
     fn();
@@ -47,6 +49,7 @@ const Navbar = () => {
 
   useEffect(() => setMobileOpen(false), [pathname]);
 
+  if (!mounted) return null;
   if (hiddenChromePages.includes(pathname) || hiddenPrefixes.some((p) => pathname === p || pathname.startsWith(p + "/"))) return null;
 
   return (
