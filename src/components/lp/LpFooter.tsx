@@ -21,8 +21,17 @@ export default function LpFooter({ onLp = false }: Props) {
               <Image src={logoWhite} alt="PixelPage" width={110} height={22} className="h-5 w-auto opacity-90" />
             </a>
             <p className="mt-5 text-[14px] text-white/50 leading-[1.85] max-w-[360px]">
-              매출 성장의 진짜 파트너가 되겠습니다.
+              아래 광고 매체를 통해 운영합니다.
             </p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/lp-ad-platforms.webp"
+              alt="Meta · Google · Toss · Kakao · 당근 · Naver"
+              className="mt-4 h-6 md:h-7 w-auto max-w-full opacity-90"
+              style={{ mixBlendMode: "lighten" }}
+              loading="lazy"
+              decoding="async"
+            />
           </div>
 
           <div>
