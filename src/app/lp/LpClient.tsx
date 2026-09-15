@@ -518,7 +518,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 stats: [
                   { k: "DB 단가", v: "-42%" },
                   { k: "DB 수", v: "×3.1배" },
-                  { k: "매출 성장", v: "×3배" },
+                  { k: "매출 성장", v: "×2배" },
                 ],
               },
               {
@@ -527,7 +527,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 stats: [
                   { k: "DB 단가", v: "-55%" },
                   { k: "DB 수", v: "×20배" },
-                  { k: "매출 성장", v: "×3배" },
+                  { k: "매출 성장", v: "×1.5배" },
                 ],
               },
               {
@@ -545,7 +545,7 @@ const LpClient = ({ articles = [] }: { articles?: Article[] }) => {
                 stats: [
                   { k: "DB 단가", v: "-58%" },
                   { k: "DB 수", v: "×2.4배" },
-                  { k: "매출 성장", v: "×2배" },
+                  { k: "매출 성장", v: "×3배" },
                 ],
               },
             ].map((c) => (
