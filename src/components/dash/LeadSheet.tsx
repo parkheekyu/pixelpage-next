@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import DateRangePicker from "./DateRangePicker";
+import { AlignLeft, ArrowUpDown, Banknote, Calendar, ChevronDown, Filter, LayoutGrid, Mail, Megaphone, Phone, Plus, Table2, UserRound, UserRoundCog, type LucideIcon } from "lucide-react";
 import { fetchLeadsPage, setAssignee, updateLead } from "@/app/app/actions";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
 import { defaultQuery, PAGE_LIMIT, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
@@ -10,12 +11,12 @@ import { SourcePill } from "./charts";
 
 
 // 열 정의 (key, 라벨, 기본 너비). 너비는 드래그로 조절, localStorage 에 저장
-const COLS: { key: string; label: string; w: number; ic?: string; staff?: boolean }[] = [
-  { key: "name", label: "이름", w: 120, ic: "A" }, { key: "ts", label: "등록일", w: 140, ic: "📅" }, { key: "phone", label: "연락처", w: 130, ic: "☎" },
-  { key: "email", label: "이메일", w: 160, ic: "@" }, { key: "message", label: "문의내용", w: 240, ic: "≡" }, { key: "src", label: "유입매체", w: 100, ic: "◉" },
-  { key: "content", label: "소재", w: 120, ic: "▣", staff: true }, { key: "assignee", label: "담당자", w: 100, ic: "👤", staff: true },
-  { key: "status", label: "상태", w: 110, ic: "▾" }, { key: "revenue", label: "매출액", w: 130, ic: "₩" }, { key: "pay", label: "결제구분", w: 110, ic: "▾" },
-  { key: "conv", label: "전환일", w: 140, ic: "📅" }, { key: "drop", label: "드랍사유", w: 120, ic: "▾" }, { key: "memo", label: "메모", w: 220, ic: "≡" },
+const COLS: { key: string; label: string; w: number; ic: LucideIcon; staff?: boolean }[] = [
+  { key: "name", label: "이름", w: 120, ic: UserRound }, { key: "ts", label: "등록일", w: 140, ic: Calendar }, { key: "phone", label: "연락처", w: 130, ic: Phone },
+  { key: "email", label: "이메일", w: 160, ic: Mail }, { key: "message", label: "문의내용", w: 240, ic: AlignLeft }, { key: "src", label: "유입매체", w: 100, ic: Megaphone },
+  { key: "content", label: "소재", w: 120, ic: LayoutGrid, staff: true }, { key: "assignee", label: "담당자", w: 100, ic: UserRoundCog, staff: true },
+  { key: "status", label: "상태", w: 110, ic: ChevronDown }, { key: "revenue", label: "매출액", w: 130, ic: Banknote }, { key: "pay", label: "결제구분", w: 110, ic: ChevronDown },
+  { key: "conv", label: "전환일", w: 140, ic: Calendar }, { key: "drop", label: "드랍사유", w: 120, ic: ChevronDown }, { key: "memo", label: "메모", w: 220, ic: AlignLeft },
 ];
 const NUM_W = 44;
 const WIDTH_KEY = "leadSheetColWidths";
@@ -107,16 +108,16 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
         </div>
       </div>
       <div className="toolbar">
-        <label className="tb">⏷ 상태 <select value={query.status} onChange={(e) => set({ status: e.target.value })}><option value="">전체</option>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select></label>
-        <label className="tb">⏷ 매체 <select value={query.src} onChange={(e) => set({ src: e.target.value })}><option value="">전체</option>{page.sources.map((s) => <option key={s}>{s}</option>)}</select></label>
-        <label className="tb">⇅ 정렬 <select value={query.sort} onChange={(e) => set({ sort: e.target.value as SheetSort })}><option value="ts_desc">등록일 최신순</option><option value="ts_asc">등록일 오래된순</option><option value="status">상태순</option><option value="rev_desc">매출액 높은순</option></select></label>
+        <label className="tb"><Filter className="ico" aria-hidden /> 상태 <select value={query.status} onChange={(e) => set({ status: e.target.value })}><option value="">전체</option>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select></label>
+        <label className="tb"><Filter className="ico" aria-hidden /> 매체 <select value={query.src} onChange={(e) => set({ src: e.target.value })}><option value="">전체</option>{page.sources.map((s) => <option key={s}>{s}</option>)}</select></label>
+        <label className="tb"><ArrowUpDown className="ico" aria-hidden /> 정렬 <select value={query.sort} onChange={(e) => set({ sort: e.target.value as SheetSort })}><option value="ts_desc">등록일 최신순</option><option value="ts_asc">등록일 오래된순</option><option value="status">상태순</option><option value="rev_desc">매출액 높은순</option></select></label>
         <DateRangePicker value={{ from: query.from, to: query.to }} onChange={(r) => set(r)} />
         <div className="search"><input type="text" placeholder="이름, 연락처 검색" value={query.q} onChange={(e) => set({ q: e.target.value })} /></div>
       </div>
       <div className="main">
         <aside className="views">
           <h4>뷰</h4>
-          {VIEWS.map(([v, label]) => <button key={v} className={`v ${query.view === v ? "on" : ""}`} onClick={() => set({ view: v })}>▦ {label}<small>{S[v]}</small></button>)}
+          {VIEWS.map(([v, label]) => <button key={v} className={`v ${query.view === v ? "on" : ""}`} onClick={() => set({ view: v })}><Table2 className="ico" aria-hidden /> {label}<small>{S[v]}</small></button>)}
         </aside>
         <div className="gridwrap" style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s" }}>
           <table className="sheet" style={{ width: tableW, tableLayout: "fixed" }}>
@@ -129,7 +130,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
                 <th className="num">#</th>
                 {cols.map((c) => (
                   <th key={c.key} className={c.key === "name" ? "name" : ""}>
-                    <span className="ic">{c.ic}</span>{c.label}
+                    <c.ic className="ico" aria-hidden />{c.label}
                     <span className="rz" onPointerDown={(e) => startResize(c.key, e)} onDoubleClick={() => setWidths((w) => ({ ...w, [c.key]: c.w }))} title="드래그로 너비 조절 · 더블클릭 초기화" />
                   </th>
                 ))}
@@ -176,7 +177,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
         </div>
       </div>
       <div className="foot">
-        <span>＋ 리드는 광고 폼 제출 시 자동 추가됩니다</span>
+        <span><Plus className="ico" aria-hidden /> 리드는 광고 폼 제출 시 자동 추가됩니다</span>
         <span>{rows.length < total ? `${rows.length} / ${fmtN(total)}` : fmtN(total)} records</span>
         {rows.length < total && <button className="btn" onClick={more} disabled={loading}>더 보기 (+{PAGE_LIMIT})</button>}
         {err ? <span className="err">저장 실패: {err}</span> : pending ? <span className="saving">저장 중…</span> : saved ? <span className="saved">저장됨 {saved}</span> : null}

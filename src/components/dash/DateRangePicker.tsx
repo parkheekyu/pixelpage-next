@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight, RotateCcw } from "lucide-react";
 import { addDays, MIN_DATE, PRESETS, presetRange, rangeLabel, todayKST, type DateRange } from "@/lib/dash/dates";
 
 const DOW = ["일", "월", "화", "수", "목", "금", "토"];
 
-/** 작은 달력 팝업 + 프리셋. 시작일 클릭 → 종료일 클릭으로 범위 지정. */
+/** 작은 달력 팝업 + 프리셋. 시작일 클릭 후 종료일 클릭으로 범위 지정. */
 export default function DateRangePicker({ value, onChange }: { value: DateRange; onChange: (r: DateRange) => void }) {
   const [open, setOpen] = useState(false);
   const [month, setMonth] = useState(value.to.slice(0, 7)); // YYYY-MM
@@ -44,7 +45,7 @@ export default function DateRangePicker({ value, onChange }: { value: DateRange;
   return (
     <div className="drp" ref={ref}>
       <button type="button" className="tb drp-btn" onClick={() => { setOpen((o) => !o); setMonth(value.to.slice(0, 7)); setPick(null); }}>
-        📅 {rangeLabel(value)} <span className="drp-caret">▾</span>
+        <Calendar className="ico" aria-hidden /> {rangeLabel(value)} <ChevronDown className="ico drp-caret" aria-hidden />
       </button>
       {open && (
         <div className="drp-pop">
@@ -55,9 +56,9 @@ export default function DateRangePicker({ value, onChange }: { value: DateRange;
           </div>
           <div className="drp-cal">
             <div className="drp-head">
-              <button type="button" className="drp-nav" onClick={() => shiftMonth(-1)}>‹</button>
+              <button type="button" className="drp-nav" onClick={() => shiftMonth(-1)} aria-label="이전 달"><ChevronLeft className="ico" /></button>
               <strong>{y}년 {m}월</strong>
-              <button type="button" className="drp-nav" onClick={() => shiftMonth(1)} disabled={month >= today.slice(0, 7)}>›</button>
+              <button type="button" className="drp-nav" onClick={() => shiftMonth(1)} disabled={month >= today.slice(0, 7)} aria-label="다음 달"><ChevronRight className="ico" /></button>
             </div>
             <div className="drp-grid">
               {DOW.map((d) => <div key={d} className="drp-dow">{d}</div>)}
@@ -71,7 +72,7 @@ export default function DateRangePicker({ value, onChange }: { value: DateRange;
             </div>
             <div className="drp-foot">
               <span>{pick ? `${pick} 부터 · 종료일을 선택하세요` : `${value.from} ~ ${value.to}`}</span>
-              <button type="button" className="drp-nav" onClick={() => apply({ from: addDays(today, -29), to: today })} title="초기화">↺</button>
+              <button type="button" className="drp-nav" onClick={() => apply({ from: addDays(today, -29), to: today })} title="초기화" aria-label="초기화"><RotateCcw className="ico" /></button>
             </div>
           </div>
         </div>

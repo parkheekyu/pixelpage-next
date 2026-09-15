@@ -1,12 +1,13 @@
 "use client";
 
+import { ArrowDown, ArrowUp } from "lucide-react";
 import { fmtN, fmtW, pct, ratio, type Agg, type Bucket } from "@/lib/dash/agg";
 
 // ---------- 타일 ----------
 function Delta({ a, b, inverse }: { a: number; b: number; inverse?: boolean }) {
   if (!b) return null;
   const d = ((a - b) / b) * 100, up = d >= 0, good = inverse ? !up : up;
-  return <div className={`d ${good ? "up" : "down"}`}>{up ? "▲" : "▼"} {Math.abs(d).toFixed(0)}% vs 이전 기간</div>;
+  return <div className={`d ${good ? "up" : "down"}`}>{up ? <ArrowUp className="ico" aria-hidden /> : <ArrowDown className="ico" aria-hidden />} {Math.abs(d).toFixed(0)}% vs 이전 기간</div>;
 }
 
 export type TileKey = "leads" | "cost" | "cpl" | "conv" | "cvr" | "revenue" | "roas" | "stale";
@@ -109,7 +110,7 @@ export function Spark({ pts, W = 90, H = 24 }: { pts: number[]; W?: number; H?: 
 export function Trend({ a, b, inverse }: { a: number; b: number; inverse?: boolean }) {
   if (!b) return null;
   const d = ((a - b) / b) * 100, good = inverse ? d <= 0 : d >= 0;
-  return <small style={{ color: `var(${good ? "--good" : "--bad"})` }}>{d >= 0 ? "▲" : "▼"}{Math.abs(d).toFixed(0)}%</small>;
+  return <small style={{ color: `var(${good ? "--good" : "--bad"})`, whiteSpace: "nowrap" }}>{d >= 0 ? <ArrowUp className="ico sm" aria-hidden /> : <ArrowDown className="ico sm" aria-hidden />}{Math.abs(d).toFixed(0)}%</small>;
 }
 
 export function SourcePill({ s }: { s: string }) {
