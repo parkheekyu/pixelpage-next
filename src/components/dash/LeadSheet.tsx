@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import DateRangePicker from "./DateRangePicker";
-import { AlignLeft, ArrowUpDown, Banknote, Briefcase, Building2, Calendar, ChevronDown, Filter, LayoutGrid, Mail, Megaphone, Phone, PiggyBank, Plus, Radar, Table2, UserRound, UserRoundCog, type LucideIcon } from "lucide-react";
-import { fetchLeadsPage, setAssignee, updateLead } from "@/app/app/actions";
+import { AlignLeft, ArrowUpDown, Banknote, Briefcase, Building2, Calendar, ChevronDown, Filter, LayoutGrid, Mail, Megaphone, Phone, PiggyBank, Plus, Radar, Table2, Trash2, UserRound, UserRoundCog, X, type LucideIcon } from "lucide-react";
+import { createLead, deleteLead, fetchLeadsPage, setAssignee, updateLead, updateProjectColumns } from "@/app/app/actions";
+import ColumnsMenu from "./ColumnsMenu";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
 import { defaultQuery, PAGE_LIMIT, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
-import { DROPS, PAYS, STATUSES, type Lead, type LeadPatch, type Project } from "@/lib/dash/types";
+import { DROPS, PAYS, STATUSES, type CustomField, type Lead, type LeadPatch, type Project } from "@/lib/dash/types";
 import { SourcePill } from "./charts";
 
 
@@ -39,8 +40,46 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
   const first = useRef(true);
   const seq = useRef(0);
   // 폼 항목 열은 현재 페이지에 값이 하나라도 있을 때만 표시 (광고 리드만 있는 고객사 시트는 숨김)
-  // 자사 프로젝트(홈페이지 문의)는 항상 표시, 다른 고객사는 값이 있을 때만
-  const cols = COLS.filter((c) => (!c.staff || isStaff) && (!c.ifAny || project.is_own || page.rows.some((r) => r[c.ifAny!])));
+  // 열 설정: 기본 열 숨김 + 사용자 정의 열 (직원이 변경, 프로젝트에 저장)
+  const [hidden, setHidden] = useState<string[]>(project.hidden_columns ?? []);
+  const [fields, setFields] = useState<CustomField[]>(project.custom_fields ?? []);
+  const [colBusy, setColBusy] = useState(false);
+  const saveCols = (next: { hidden_columns?: string[]; custom_fields?: CustomField[] }) => {
+    setColBusy(true);
+    start(async () => { const r = await updateProjectColumns(project.id, next); setColBusy(false); if (!r.ok) setErr(r.error); });
+  };
+  const toggleHidden = (key: string) => { const next = hidden.includes(key) ? hidden.filter((k) => k !== key) : [...hidden, key]; setHidden(next); saveCols({ hidden_columns: next }); };
+  const addField = (f: CustomField) => { const next = [...fields, f]; setFields(next); saveCols({ custom_fields: next }); };
+  const removeField = (key: string) => { const next = fields.filter((f) => f.key !== key); setFields(next); saveCols({ custom_fields: next }); };
+  // 자사 프로젝트(홈페이지 문의)는 폼 항목 열 항상 표시, 다른 고객사는 값이 있을 때만
+  const builtinCols = COLS.filter((c) => (!c.staff || isStaff) && (!c.ifAny || project.is_own || page.rows.some((r) => r[c.ifAny!])));
+  const cols = [
+    ...builtinCols.filter((c) => c.key === "name" || !hidden.includes(c.key)),
+    ...fields.map((f) => ({ key: "custom:" + f.key, label: f.label, w: 140, ic: (f.type === "date" ? Calendar : f.type === "number" ? Banknote : f.type === "select" ? ChevronDown : AlignLeft) as LucideIcon, custom: f })),
+  ];
+  const has = (key: string) => cols.some((c) => c.key === key);
+
+  // 행 추가 폼
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState({ name: "", phone: "", email: "", utm_source: "", message: "" });
+  const submitNew = () => {
+    if (!draft.name.trim() || draft.phone.replace(/\D/g, "").length < 9) { setErr("이름과 연락처(9자리 이상)를 입력해 주세요."); return; }
+    start(async () => {
+      setErr(null);
+      const r = await createLead(project.id, draft);
+      if (!r.ok) { setErr(r.error); return; }
+      setAdding(false); setDraft({ name: "", phone: "", email: "", utm_source: "", message: "" });
+      setSaved(new Date().toLocaleTimeString("ko-KR", { hour: "2-digit", minute: "2-digit", second: "2-digit" }));
+      setQuery((q) => ({ ...q, offset: 0 })); // 목록·요약 다시 조회
+    });
+  };
+  const removeRow = (l: Lead) => {
+    if (!confirm(`${l.name || "이 리드"} (${l.phone}) 를 삭제할까요? 되돌릴 수 없습니다.`)) return;
+    const before = page;
+    setPage((p) => ({ ...p, rows: p.rows.filter((x) => x.id !== l.id), total: Math.max(0, p.total - 1) }));
+    start(async () => { const r = await deleteLead(project.id, l.id); if (!r.ok) { setPage(before); setErr(r.error); } });
+  };
+  const setCustom = (l: Lead, key: string, v: string | number | null) => save(l, { custom: { ...(l.custom ?? {}), [key]: v } });
   const [widths, setWidths] = useState<Record<string, number>>(() => Object.fromEntries(COLS.map((c) => [c.key, c.w])));
   useEffect(() => {
     // 하이드레이션 후 저장된 너비 적용 (동기 setState 회피)
@@ -49,12 +88,12 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
   }, []);
   const startResize = (key: string, e: React.PointerEvent) => {
     e.preventDefault();
-    const startX = e.clientX, startW = widths[key];
+    const startX = e.clientX, startW = widths[key] ?? cols.find((c) => c.key === key)?.w ?? 140;
     const move = (ev: PointerEvent) => setWidths((w) => ({ ...w, [key]: Math.max(60, Math.min(600, startW + ev.clientX - startX)) }));
     const up = () => { window.removeEventListener("pointermove", move); window.removeEventListener("pointerup", up); setWidths((w) => { try { localStorage.setItem(WIDTH_KEY, JSON.stringify(w)); } catch {} return w; }); };
     window.addEventListener("pointermove", move); window.addEventListener("pointerup", up);
   };
-  const tableW = NUM_W + cols.reduce((a, c) => a + widths[c.key], 0);
+  const tableW = NUM_W + cols.reduce((a, c) => a + (widths[c.key] ?? c.w), 0) + (isStaff ? 44 : 0);
 
   // 필터가 바뀌면 서버에서 다시 조회 (검색어는 250ms 디바운스)
   useEffect(() => {
@@ -117,6 +156,8 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
         <label className="tb"><Filter className="ico" aria-hidden /> 매체 <select value={query.src} onChange={(e) => set({ src: e.target.value })}><option value="">전체</option>{page.sources.map((s) => <option key={s}>{s}</option>)}</select></label>
         <label className="tb"><ArrowUpDown className="ico" aria-hidden /> 정렬 <select value={query.sort} onChange={(e) => set({ sort: e.target.value as SheetSort })}><option value="ts_desc">등록일 최신순</option><option value="ts_asc">등록일 오래된순</option><option value="status">상태순</option><option value="rev_desc">매출액 높은순</option></select></label>
         <DateRangePicker value={{ from: query.from, to: query.to }} onChange={(r) => set(r)} />
+        <button type="button" className="tb drp-btn" onClick={() => setAdding((a) => !a)}><Plus className="ico" aria-hidden /> 행 추가</button>
+        {isStaff && <ColumnsMenu builtin={builtinCols.filter((c) => c.key !== "name").map((c) => ({ key: c.key, label: c.label }))} hidden={hidden} fields={fields} busy={colBusy} onToggleHidden={toggleHidden} onAddField={addField} onRemoveField={removeField} />}
         <div className="search"><input type="text" placeholder="이름, 연락처 검색" value={query.q} onChange={(e) => set({ q: e.target.value })} /></div>
       </div>
       <div className="main">
@@ -128,7 +169,8 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
           <table className="sheet" style={{ width: tableW, tableLayout: "fixed" }}>
             <colgroup>
               <col style={{ width: NUM_W }} />
-              {cols.map((c) => <col key={c.key} style={{ width: widths[c.key] }} />)}
+              {cols.map((c) => <col key={c.key} style={{ width: widths[c.key] ?? c.w }} />)}
+              {isStaff && <col style={{ width: 44 }} />}
             </colgroup>
             <thead>
               <tr>
@@ -139,49 +181,79 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
                     <span className="rz" onPointerDown={(e) => startResize(c.key, e)} onDoubleClick={() => setWidths((w) => ({ ...w, [c.key]: c.w }))} title="드래그로 너비 조절 · 더블클릭 초기화" />
                   </th>
                 ))}
+                {isStaff && <th className="del" />}
               </tr>
             </thead>
             <tbody>
+              {adding && (
+                <tr className="newrow">
+                  <td className="num"><Plus className="ico" aria-hidden /></td>
+                  <td colSpan={cols.length + (isStaff ? 1 : 0)}>
+                    <div className="newrow-form">
+                      <input className="cell-in" autoFocus placeholder="이름 *" value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} />
+                      <input className="cell-in" placeholder="연락처 *" inputMode="tel" value={draft.phone} onChange={(e) => setDraft({ ...draft, phone: e.target.value })} />
+                      <input className="cell-in" placeholder="이메일" value={draft.email} onChange={(e) => setDraft({ ...draft, email: e.target.value })} />
+                      <input className="cell-in" placeholder="유입매체 (기본: manual)" list="src-list" value={draft.utm_source} onChange={(e) => setDraft({ ...draft, utm_source: e.target.value })} />
+                      <datalist id="src-list">{page.sources.map((x) => <option key={x} value={x} />)}</datalist>
+                      <input className="cell-in" placeholder="문의내용" value={draft.message} onChange={(e) => setDraft({ ...draft, message: e.target.value })} onKeyDown={(e) => { if (e.key === "Enter") submitNew(); }} />
+                      <button type="button" className="btn primary" onClick={submitNew} disabled={pending}>저장</button>
+                      <button type="button" className="btn" onClick={() => setAdding(false)} aria-label="취소"><X className="ico" aria-hidden /></button>
+                    </div>
+                  </td>
+                </tr>
+              )}
               {rows.map((l, i) => {
                 const isConv = l.status === "전환", isDrop = l.status === "드랍";
                 return (
                   <tr key={l.id}>
                     <td className="num">{i + 1}</td>
                     <td className={`name ${l.is_duplicate ? "dup" : ""}`}>{l.name || "–"}{l.is_duplicate && " (중복)"}</td>
-                    <td className="muted">{fmtTs(l.submitted_at)}</td>
-                    <td>{l.phone}</td>
-                    <td className="muted">{l.email || ""}</td>
-                    {cols.some((c) => c.key === "company") && <td title={l.company ?? ""}>{l.company || ""}</td>}
-                    {cols.some((c) => c.key === "industry") && <td>{l.industry || ""}</td>}
-                    {cols.some((c) => c.key === "budget") && <td>{l.budget || ""}</td>}
-                    {cols.some((c) => c.key === "services") && <td title={l.services ?? ""}>{l.services || ""}</td>}
-                    {cols.some((c) => c.key === "marketing_status") && <td>{l.marketing_status || ""}</td>}
-                    <td className="wide" title={l.message ?? ""}>{l.message || ""}</td>
-                    <td><SourcePill s={l.utm_source} /></td>
-                    {isStaff && <>
-                      <td className="muted">{l.utm_content || ""}</td>
-                      <td><input className="cell-in" defaultValue={l.assignee ?? ""} placeholder="담당자" style={{ minWidth: 70 }} onBlur={(e) => { if (e.target.value !== (l.assignee ?? "")) saveAssignee(l, e.target.value); }} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></td>
-                    </>}
-                    <td><select className={`cell-sel st-${l.status}`} value={l.status} onChange={(e) => save(l, { status: e.target.value as Lead["status"] })}>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select></td>
-                    {isConv ? (
+                    {has("ts") && <td className="muted">{fmtTs(l.submitted_at)}</td>}
+                    {has("phone") && <td>{l.phone}</td>}
+                    {has("email") && <td className="muted">{l.email || ""}</td>}
+                    {has("company") && <td title={l.company ?? ""}>{l.company || ""}</td>}
+                    {has("industry") && <td>{l.industry || ""}</td>}
+                    {has("budget") && <td>{l.budget || ""}</td>}
+                    {has("services") && <td title={l.services ?? ""}>{l.services || ""}</td>}
+                    {has("marketing_status") && <td>{l.marketing_status || ""}</td>}
+                    {has("message") && <td className="wide" title={l.message ?? ""}>{l.message || ""}</td>}
+                    {has("src") && <td><SourcePill s={l.utm_source} /></td>}
+                    {has("content") && <td className="muted">{l.utm_content || ""}</td>}
+                    {has("assignee") && <td><input className="cell-in" defaultValue={l.assignee ?? ""} placeholder="담당자" style={{ minWidth: 70 }} onBlur={(e) => { if (e.target.value !== (l.assignee ?? "")) saveAssignee(l, e.target.value); }} onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></td>}
+                    {has("status") && <td><select className={`cell-sel st-${l.status}`} value={l.status} onChange={(e) => save(l, { status: e.target.value as Lead["status"] })}>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select></td>}
+                    {has("revenue") && (isConv ? (
                       <td className={l.revenue ? "" : "needs"}>
                         <input className="cell-in" inputMode="numeric" placeholder="매출액 입력" value={revText(l)}
                           onChange={(e) => { const n = +e.target.value.replace(/[^0-9]/g, ""); setRevDraft((d) => ({ ...d, [l.id]: n ? "₩" + n.toLocaleString("ko-KR") : "" })); }}
                           onBlur={(e) => { const n = +e.target.value.replace(/[^0-9]/g, ""); setRevDraft((d) => { const c = { ...d }; delete c[l.id]; return c; }); if (n !== Number(l.revenue)) save(l, { revenue: n }); }}
                           onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} />
                       </td>
-                    ) : <td className="locked" />}
-                    {isConv ? <td><select className="cell-sel plain" value={l.pay_type ?? "결제확정"} onChange={(e) => save(l, { pay_type: e.target.value as Lead["pay_type"] })}>{PAYS.map((p) => <option key={p}>{p}</option>)}</select></td> : <td className="locked" />}
-                    {isConv ? <td><input className="cell-in" type="date" value={l.converted_on ?? today()} onChange={(e) => save(l, { converted_on: e.target.value })} /></td> : <td className="locked" />}
-                    {isDrop ? <td><select className={`cell-sel plain ${l.drop_reason ? "" : "empty"}`} value={l.drop_reason ?? ""} onChange={(e) => save(l, { drop_reason: (e.target.value || null) as Lead["drop_reason"] })}><option value="">사유 선택</option>{DROPS.map((d) => <option key={d}>{d}</option>)}</select></td> : <td className="locked" />}
-                    <td><input className="cell-in" style={{ minWidth: 200 }} value={memoDraft[l.id] ?? (l.memo ?? "")}
+                    ) : <td className="locked" />)}
+                    {has("pay") && (isConv ? <td><select className="cell-sel plain" value={l.pay_type ?? "결제확정"} onChange={(e) => save(l, { pay_type: e.target.value as Lead["pay_type"] })}>{PAYS.map((p) => <option key={p}>{p}</option>)}</select></td> : <td className="locked" />)}
+                    {has("conv") && (isConv ? <td><input className="cell-in" type="date" value={l.converted_on ?? today()} onChange={(e) => save(l, { converted_on: e.target.value })} /></td> : <td className="locked" />)}
+                    {has("drop") && (isDrop ? <td><select className={`cell-sel plain ${l.drop_reason ? "" : "empty"}`} value={l.drop_reason ?? ""} onChange={(e) => save(l, { drop_reason: (e.target.value || null) as Lead["drop_reason"] })}><option value="">사유 선택</option>{DROPS.map((d) => <option key={d}>{d}</option>)}</select></td> : <td className="locked" />)}
+                    {has("memo") && <td><input className="cell-in" style={{ minWidth: 200 }} value={memoDraft[l.id] ?? (l.memo ?? "")}
                       onChange={(e) => setMemoDraft((d) => ({ ...d, [l.id]: e.target.value }))}
                       onBlur={(e) => { setMemoDraft((d) => { const c = { ...d }; delete c[l.id]; return c; }); if (e.target.value !== (l.memo ?? "")) save(l, { memo: e.target.value }); }}
-                      onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></td>
+                      onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} /></td>}
+                    {fields.map((f) => { const v = l.custom?.[f.key] ?? null; return (
+                      <td key={f.key}>
+                        {f.type === "select" ? (
+                          <select className={`cell-sel plain ${v == null ? "empty" : ""}`} value={v == null ? "" : String(v)} onChange={(e) => setCustom(l, f.key, e.target.value || null)}><option value="">선택</option>{(f.options ?? []).map((o) => <option key={o}>{o}</option>)}</select>
+                        ) : f.type === "date" ? (
+                          <input className="cell-in" type="date" value={v == null ? "" : String(v)} onChange={(e) => setCustom(l, f.key, e.target.value || null)} />
+                        ) : (
+                          <input className="cell-in" inputMode={f.type === "number" ? "decimal" : undefined} defaultValue={v == null ? "" : String(v)}
+                            onBlur={(e) => { const raw = e.target.value.trim(); const nv = raw === "" ? null : f.type === "number" ? (Number.isFinite(+raw) ? +raw : null) : raw; if (nv !== v) setCustom(l, f.key, nv); }}
+                            onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }} />
+                        )}
+                      </td>
+                    ); })}
+                    {isStaff && <td className="del"><button type="button" className="rowdel" title="행 삭제" onClick={() => removeRow(l)}><Trash2 className="ico" aria-hidden /></button></td>}
                   </tr>
                 );
               })}
-              {rows.length === 0 && <tr><td className="num" /><td colSpan={cols.length + 1} style={{ color: "var(--muted)", padding: "18px 12px" }}>{loading ? "불러오는 중…" : "조건에 맞는 리드가 없습니다. 리드는 광고 폼 제출 시 자동으로 추가됩니다."}</td></tr>}
+              {rows.length === 0 && <tr><td className="num" /><td colSpan={cols.length + (isStaff ? 1 : 0)} style={{ color: "var(--muted)", padding: "18px 12px" }}>{loading ? "불러오는 중…" : "조건에 맞는 리드가 없습니다. 리드는 광고 폼 제출 시 자동으로 추가됩니다."}</td></tr>}
             </tbody>
           </table>
         </div>

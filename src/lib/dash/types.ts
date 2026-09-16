@@ -19,6 +19,10 @@ export interface Profile {
   created_at: string;
 }
 
+export const CUSTOM_TYPES = ["text", "number", "date", "select"] as const;
+export type CustomType = (typeof CUSTOM_TYPES)[number];
+export interface CustomField { key: string; label: string; type: CustomType; options?: string[] }
+
 export interface Project {
   id: string;
   slug: string;
@@ -26,6 +30,8 @@ export interface Project {
   is_own: boolean;
   active: boolean;
   created_at: string;
+  custom_fields: CustomField[];
+  hidden_columns: string[];
 }
 
 export interface Creative {
@@ -81,6 +87,7 @@ export interface Lead {
   revenue: number;
   pay_type: PayType | null;
   memo: string | null;
+  custom: Record<string, string | number | null>;
   is_duplicate: boolean;
   original_lead_id: string | null;
   created_at: string;
@@ -95,4 +102,5 @@ export interface LeadPatch {
   pay_type?: PayType | null;
   converted_on?: string | null;
   memo?: string | null;
+  custom?: Record<string, string | number | null>;
 }

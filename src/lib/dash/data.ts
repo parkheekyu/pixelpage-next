@@ -13,7 +13,7 @@ export interface ProjectData {
   now: number;
 }
 
-const LEAD_COLS = "id,project_id,submitted_at,name,phone,email,message,company,industry,budget,services,marketing_status,utm_source,utm_medium,utm_campaign,utm_content,utm_term,landing_id,status,drop_reason,assignee,first_contact_at,consulted_at,converted_on,revenue,pay_type,memo,is_duplicate";
+const LEAD_COLS = "id,project_id,submitted_at,name,phone,email,message,company,industry,budget,services,marketing_status,utm_source,utm_medium,utm_campaign,utm_content,utm_term,landing_id,status,drop_reason,assignee,first_contact_at,consulted_at,converted_on,revenue,pay_type,memo,custom,is_duplicate";
 const SPEND_COLS = "id,project_id,date,creative_id,source,impressions,clicks,cost";
 const PAGE = 1000; // PostgREST max_rows
 
