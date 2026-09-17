@@ -1,4 +1,5 @@
 import { Client } from "@notionhq/client";
+import { toAsciiSlug } from "@/lib/slug";
 
 const notionApiKey = process.env.NOTION_API_KEY;
 const databaseId = process.env.NOTION_DATABASE_ID;
@@ -138,7 +139,7 @@ export async function publishColumn(input: PublishInput): Promise<PublishResult>
 
   const {
     title,
-    slug,
+    slug: rawSlug,
     description,
     blocks,
     category = "칼럼",
@@ -147,6 +148,9 @@ export async function publishColumn(input: PublishInput): Promise<PublishResult>
     cover_url,
     replace_existing = true,
   } = input;
+
+  // 한글 slug 는 로마자 ASCII 로 변환 (Vercel 캐시 태그 헤더가 ASCII 만 허용)
+  const slug = toAsciiSlug(rawSlug) || `column-${Date.now().toString(36)}`;
 
   let archived = 0;
   if (replace_existing) archived = await archiveExistingBySlug(slug);

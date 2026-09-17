@@ -6,18 +6,21 @@ import {
   getArticleContent,
 } from "@/lib/notion";
 import ArticleClient from "./ArticleClient";
+import { isAscii, toAsciiSlug } from "@/lib/slug";
 
 export const revalidate = 3600;
 
-/** 한글 slug는 퍼센트 인코딩된 채로 들어온다 → Notion의 원문 slug와 맞추기 위해 디코딩 */
+/** 퍼센트 인코딩 해제 + 한글이면 로마자 slug 로 정규화 (Notion 에는 ASCII slug 만 저장한다) */
 function decodeSlug(raw: string): string {
-  try { return decodeURIComponent(raw); } catch { return raw; }
+  let s = raw;
+  try { s = decodeURIComponent(raw); } catch {}
+  return isAscii(s) ? s : toAsciiSlug(s);
 }
 export const dynamicParams = true;
 
 export async function generateStaticParams() {
   const articles = await getPublishedArticles();
-  return articles.map((a) => ({ slug: a.slug }));
+  return articles.filter((a) => a.slug && isAscii(a.slug)).map((a) => ({ slug: a.slug }));
 }
 
 export async function generateMetadata({
