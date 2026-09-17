@@ -247,3 +247,50 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .sheet-app .foot .live.off i { background: var(--bad); }
 .sheet-app .foot .live.connecting i { background: var(--warn); }
 .sheet-app .foot .btn.incoming { background: color-mix(in srgb, var(--s1) 12%, var(--card)); color: var(--s1); border-color: transparent; font-weight: 600; }
+
+/* ---- 사이드바 토글 그룹 ---- */
+.pp-side nav.groups { display: block; }
+.pp-side .group { margin-bottom: 2px; }
+.pp-side .group-head { display: flex; align-items: center; gap: 6px; width: 100%; padding: 7px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--text); font: inherit; font-size: 14px; font-weight: 600; cursor: pointer; text-align: left; }
+.pp-side .group-head:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.pp-side .group-head svg.ico:first-child { color: var(--muted); }
+.pp-side .group.active .group-head { color: var(--s1); }
+.pp-side .group-head small { margin-left: auto; color: var(--muted); font-weight: 400; font-size: 12px; }
+.pp-side .group-body { padding: 2px 0 6px; }
+.pp-side a.item.sub { padding-left: 30px; font-size: 13.5px; }
+@media (max-width: 860px) { .pp-side nav.groups { display: block; } }
+
+/* ---- 분석 페이지 공통 ---- */
+.pp-dash .report { line-height: 1.7; font-size: 14.5px; }
+.pp-dash .report h1, .pp-dash .report h2, .pp-dash .report h3 { font-weight: 700; margin: 18px 0 8px; }
+.pp-dash .report h2 { font-size: 16px; border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+.pp-dash .report h3 { font-size: 14.5px; }
+.pp-dash .report p { margin: 6px 0; }
+.pp-dash .report ul, .pp-dash .report ol { margin: 6px 0 10px 20px; }
+.pp-dash .report li { margin: 3px 0; }
+.pp-dash .report table { width: 100%; border-collapse: collapse; margin: 8px 0 12px; font-size: 13.5px; }
+.pp-dash .report th, .pp-dash .report td { border: 1px solid var(--line); padding: 6px 9px; text-align: left; vertical-align: top; white-space: normal; }
+.pp-dash .report th { background: var(--surface); color: var(--text-2); font-weight: 600; }
+.pp-dash .report blockquote { border-left: 3px solid var(--s1); margin: 8px 0; padding: 4px 12px; color: var(--text-2); background: color-mix(in srgb, var(--s1) 6%, transparent); }
+.pp-dash .report code { background: var(--surface); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+.pp-dash .report strong { font-weight: 700; }
+.pp-dash .kv { display: grid; grid-template-columns: 140px 1fr; gap: 6px 12px; font-size: 13.5px; }
+.pp-dash .kv b { color: var(--text-2); font-weight: 500; }
+.pp-dash textarea { font: inherit; padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); width: 100%; min-height: 64px; resize: vertical; }
+.pp-dash .tree { font-size: 13.5px; }
+.pp-dash .tree .camp { border: 1px solid var(--line); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+.pp-dash .tree .camp-head { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; padding: 9px 12px; background: var(--surface); font-weight: 600; }
+.pp-dash .tree .set { padding: 6px 12px 6px 22px; border-top: 1px solid var(--line); }
+.pp-dash .tree .set-head { display: flex; flex-wrap: wrap; gap: 6px 12px; align-items: center; font-weight: 600; }
+.pp-dash .tree .ad { display: grid; grid-template-columns: 56px 1fr; gap: 10px; padding: 6px 0 6px 18px; border-top: 1px dashed var(--line); }
+.pp-dash .tree .ad img { width: 56px; height: 56px; object-fit: cover; border-radius: 6px; background: var(--surface); }
+.pp-dash .tree .ad .noimg { width: 56px; height: 56px; border-radius: 6px; background: var(--surface); display: grid; place-items: center; color: var(--muted); font-size: 11px; }
+.pp-dash .tree .metrics { color: var(--text-2); font-size: 12.5px; }
+.pp-dash .tree .copy { color: var(--text-2); font-size: 12.5px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.pp-dash .st { display: inline-block; padding: 1px 8px; border-radius: 99px; font-size: 11.5px; }
+.pp-dash .st.ACTIVE { background: var(--tag-green-bg); color: var(--tag-green-fg); }
+.pp-dash .st.PAUSED, .pp-dash .st.CAMPAIGN_PAUSED, .pp-dash .st.ADSET_PAUSED { background: var(--tag-gray-bg); color: var(--tag-gray-fg); }
+.pp-dash .winner { display: grid; grid-template-columns: 72px 1fr; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+.pp-dash .winner img { width: 72px; height: 72px; object-fit: cover; border-radius: 8px; background: var(--surface); }
+.pp-dash .winner .rank { font-weight: 700; color: var(--s1); margin-right: 6px; }
+@media (min-width: 900px) { .pp-dash .c3 { grid-column: span 3; } .pp-dash .c5 { grid-column: span 5; } .pp-dash .c7 { grid-column: span 7; } .pp-dash .c9 { grid-column: span 9; } }

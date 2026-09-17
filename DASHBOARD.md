@@ -13,6 +13,9 @@
 | `/app/admin/users` | 직원 | 회원 추가(즉시 생성 또는 초대 메일), 역할 변경, 프로젝트 배정, 삭제 |
 | `/app/projects/[id]` | 직원·배정된 고객사 | 리드 시트. 상태·매출액·결제구분·전환일·드랍사유·메모 인라인 편집. 행 추가(직원·고객사), 행 삭제(직원), 열 숨기기·사용자 정의 열 추가/삭제(직원), 열 너비 드래그, 날짜 범위 |
 | `/app/projects/[id]/report` | 직원·배정된 고객사 | 성과 리포트. 직원에게만 소재별 CPL·4단계 전환율·드랍 사유·랜딩·TM 담당자 패널 노출 |
+| `/app/research/[id]` | 직원·배정된 고객사 | 리서치: 상품·타깃 입력 → AI '본능분석·반박제거' 문서. 고객사는 리포트만 열람 |
+| `/app/ads/[id]` | 직원·배정된 고객사 | 광고: Meta 계정 실시간 현황(직원), 위너·캠페인 구조, AI 분석(카피·소재·구조·개선안) |
+| `/app/landing/[id]` | 직원·배정된 고객사 | 랜딩페이지: 페이지 구조·카피 + GA4 + Clarity → AI 개선 리포트 |
 | `POST /api/leads/webhook` | Make/n8n | 리드 적재 (Bearer 토큰) |
 
 권한 모델
@@ -83,7 +86,17 @@ curl -X POST https://pixelpage.co.kr/api/leads/webhook \
 - 같은 프로젝트 안에서 연락처(숫자만)가 같으면 `is_duplicate=true`, 상태 `드랍`/사유 `중복`, `original_lead_id` 연결. 버리지 않는다.
 - 응답: `{ ok, id, duplicate, original_lead_id }`
 
-## 7. 광고비 · 소재
+## 7. 리서치 · 광고 · 랜딩 분석 (AI)
+
+환경 변수 (Vercel + .env.local):
+- `ANTHROPIC_API_KEY` — AI 분석 실행에 필수 (모델 `claude-opus-5`). 없으면 실행 버튼은 보이지만 오류로 끝난다.
+- `META_ACCESS_TOKEN` — Meta 마케팅 API 토큰 (`ads_read`). 시스템 사용자 토큰(만료 없음) 권장. 광고 계정 ID는 프로젝트별로 광고 화면에서 저장.
+- `GA4_SERVICE_ACCOUNT_JSON` — Google 서비스 계정 키 JSON 전체(한 줄). 각 GA4 속성에 그 서비스 계정 이메일을 '뷰어'로 추가. 속성 ID는 랜딩 화면에서 프로젝트별 저장.
+- Clarity — 프로젝트별 API 토큰을 랜딩 화면에서 저장 (Clarity → Settings → Data Export). 최근 1~3일 데이터만 제공.
+
+분석 결과는 `dash.analyses` 에 저장되고, 고객사 계정도 자기 프로젝트의 리포트를 볼 수 있다. 실행은 직원만. 페이지 `maxDuration = 300`.
+
+## 8. 광고비 · 소재
 
 - `creatives` : 소재 마스터. `creative_id` = utm_content. 리포트의 소재별 패널은 여기 등록된 소재만 집계한다.
 - `ad_spend` : 일별·소재별 광고비. `(project_id, creative_id, date)` 유니크라 업서트로 적재. (Meta/Google API 연동은 다음 단계)
@@ -96,7 +109,8 @@ curl -X POST https://pixelpage.co.kr/api/leads/webhook \
 
 ## 파일
 
-- `supabase/migrations/0001_dashboard.sql` — 스키마·트리거·RLS · `0002_lead_summary.sql` — 시트 요약 집계 함수
+- `supabase/migrations/0001~0007` — 스키마·RLS·집계·실시간·분석 테이블 (번호 순서대로 실행)
+- `src/lib/integrations/{meta,ga4,clarity,landing}.ts` — 외부 데이터 연동 · `src/lib/ai/{claude,framework}.ts` — AI 분석과 프레임워크 프롬프트 · `src/app/app/analysis-actions.ts` — 설정·실행 액션
 - `src/lib/dash/leads-query.ts` — 시트 서버 페이지네이션/필터 · `src/lib/dash/report.ts` — 리포트 서버 집계
 - `vercel.json` — 함수 리전 icn1(서울). Supabase 리전과 맞춰야 응답이 빠르다
 - `src/proxy.ts` — `/app/*` 세션 갱신 + 미로그인 리다이렉트
