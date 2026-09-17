@@ -61,7 +61,7 @@ export interface Analysis {
   id: string;
   project_id: string;
   kind: AnalysisKind;
-  status: "running" | "done" | "error";
+  status: "queued" | "running" | "done" | "error";
   title: string | null;
   input: Record<string, unknown> | null;
   result_md: string | null;

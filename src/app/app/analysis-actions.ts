@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/dash/auth";
 import type { ActionResult } from "./actions";
 import type { AnalysisKind, ResearchInput } from "@/lib/dash/types";
-import { MODEL, runAnalysis } from "@/lib/ai/claude";
+import { MODEL, SYSTEM, hasApiKey, runAnalysis } from "@/lib/ai/claude";
 import { fetchMetaSnapshot, snapshotToText } from "@/lib/integrations/meta";
 import { extractLanding, landingToText } from "@/lib/integrations/landing";
 import { ga4Summary } from "@/lib/integrations/ga4";
@@ -58,16 +58,24 @@ export async function deleteAnalysis(projectId: string, id: string): Promise<Act
 // ---------- 분석 실행 (직원) ----------
 async function execute(kind: AnalysisKind, projectId: string, title: string, input: Record<string, unknown>, buildPrompt: () => Promise<string>): Promise<ActionResult & { id?: string }> {
   const s = await requireStaff();
-  const { data: row, error } = await s.supabase.from("analyses").insert({ project_id: projectId, kind, status: "running", title, input, model: MODEL, created_by: s.user.id }).select("id").single();
+  const direct = hasApiKey();
+  const { data: row, error } = await s.supabase.from("analyses").insert({ project_id: projectId, kind, status: direct ? "running" : "queued", title, input, model: direct ? MODEL : "claude-code-cli", created_by: s.user.id }).select("id").single();
   if (error) return { ok: false, error: error.message };
   try {
     const prompt = await buildPrompt();
+    if (!direct) {
+      // API 키 없음 → 대기열. 로컬 워커(claude -p)가 가져가서 처리
+      const { error: jerr } = await s.supabase.from("analysis_jobs").insert({ analysis_id: row.id, project_id: projectId, kind, system_prompt: SYSTEM[kind], prompt });
+      if (jerr) throw new Error(jerr.message);
+      revalidatePath(`${PATHS[kind]}/${projectId}`);
+      return { ok: true, id: row.id, message: "대기열에 등록했습니다. 로컬 분석 워커가 켜져 있으면 1~3분 안에 결과가 표시됩니다." };
+    }
     const r = await runAnalysis(kind, prompt);
     if (r.refusal) throw new Error("모델이 응답을 거부했습니다: " + r.refusal);
     if (!r.text.trim()) throw new Error("빈 응답");
     await s.supabase.from("analyses").update({ status: "done", result_md: r.text, model: r.model, input: { ...input, usage: r.usage, truncated: r.stop_reason === "max_tokens" } }).eq("id", row.id);
     revalidatePath(`${PATHS[kind]}/${projectId}`);
-    return { ok: true, id: row.id };
+    return { ok: true, id: row.id, message: "분석이 완료됐습니다." };
   } catch (e) {
     const msg = (e as Error).message;
     await s.supabase.from("analyses").update({ status: "error", error: msg }).eq("id", row.id);

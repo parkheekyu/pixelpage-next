@@ -89,7 +89,14 @@ curl -X POST https://pixelpage.co.kr/api/leads/webhook \
 ## 7. 리서치 · 광고 · 랜딩 분석 (AI)
 
 환경 변수 (Vercel + .env.local):
-- `ANTHROPIC_API_KEY` — AI 분석 실행에 필수 (모델 `claude-opus-5`). 없으면 실행 버튼은 보이지만 오류로 끝난다.
+- AI 실행 방식 두 가지:
+  1. `ANTHROPIC_API_KEY` 가 있으면 서버(Vercel)에서 바로 실행 (모델 `claude-opus-5`, 버튼 누르면 1~3분 뒤 완료).
+  2. 키가 없으면 **대기열**(`dash.analysis_jobs`)에 쌓이고, 로컬에서 Claude Code 구독으로 처리한다:
+     ```bash
+     node scripts/analysis-worker.mjs --watch   # 터미널을 켜 둔 동안 15초마다 대기열 처리 (claude -p 사용)
+     node scripts/analysis-worker.mjs --once    # 한 번만 처리
+     ```
+     워커가 꺼져 있으면 화면에 "대기열에 있습니다"로 표시되고, 켜면 자동 처리된다. 건당 3~5분.
 - `META_ACCESS_TOKEN` — Meta 마케팅 API 토큰 (`ads_read`). 시스템 사용자 토큰(만료 없음) 권장. 광고 계정 ID는 프로젝트별로 광고 화면에서 저장.
 - `GA4_SERVICE_ACCOUNT_JSON` — Google 서비스 계정 키 JSON 전체(한 줄). 각 GA4 속성에 그 서비스 계정 이메일을 '뷰어'로 추가. 속성 ID는 랜딩 화면에서 프로젝트별 저장.
 - Clarity — 프로젝트별 API 토큰을 랜딩 화면에서 저장 (Clarity → Settings → Data Export). 최근 1~3일 데이터만 제공.
@@ -109,7 +116,7 @@ curl -X POST https://pixelpage.co.kr/api/leads/webhook \
 
 ## 파일
 
-- `supabase/migrations/0001~0007` — 스키마·RLS·집계·실시간·분석 테이블 (번호 순서대로 실행)
+- `supabase/migrations/0001~0008` — 스키마·RLS·집계·실시간·분석 테이블 (번호 순서대로 실행)
 - `src/lib/integrations/{meta,ga4,clarity,landing}.ts` — 외부 데이터 연동 · `src/lib/ai/{claude,framework}.ts` — AI 분석과 프레임워크 프롬프트 · `src/app/app/analysis-actions.ts` — 설정·실행 액션
 - `src/lib/dash/leads-query.ts` — 시트 서버 페이지네이션/필터 · `src/lib/dash/report.ts` — 리포트 서버 집계
 - `vercel.json` — 함수 리전 icn1(서울). Supabase 리전과 맞춰야 응답이 빠르다
