@@ -61,9 +61,10 @@ export function buckets(L: Lead[], days: number, now = Date.now()): Bucket[] {
   for (let d = days - step; d >= 0; d -= step) {
     const to = now - d * DAY, from = to - step * DAY;
     const inB = L.filter((l) => { const t = leadTs(l); return t > from && t <= to; });
-    const dt = new Date(to);
+    const parts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).formatToParts(new Date(to));
+    const md = `${parts.find((x) => x.type === "month")?.value}/${parts.find((x) => x.type === "day")?.value}`;
     out.push({
-      label: (step === 1 ? "" : "~") + `${dt.getMonth() + 1}/${dt.getDate()}`,
+      label: (step === 1 ? "" : "~") + md,
       leads: inB.length,
       conv: inB.filter((l) => l.status === "전환").length,
     });

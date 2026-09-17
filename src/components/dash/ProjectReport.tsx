@@ -43,7 +43,7 @@ export default function ProjectReport({ model: m, isStaff }: { model: ReportMode
           <h2>최근 리드</h2><div className="sub">{isStaff ? "소재 · 담당자 포함 (내부)" : "상태 표시"}</div>
           <div className="tbl-wrap"><table className="tbl left">
             <thead><tr><th>수집일시</th><th>이름</th><th>연락처</th><th>매체</th>{isStaff && <><th>소재</th><th>담당자</th></>}<th>상태</th></tr></thead>
-            <tbody>{m.recent.map((l) => <tr key={l.id}><td>{new Date(l.submitted_at).toLocaleString("ko-KR", { month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}</td><td>{l.name}</td><td>{l.phone}</td><td>{l.utm_source}</td>{isStaff && <><td>{l.utm_content}</td><td>{l.assignee}</td></>}<td><span className={`pill st-${l.status}`}>{l.status}</span></td></tr>)}</tbody>
+            <tbody>{m.recent.map((l) => <tr key={l.id}><td>{new Date(l.submitted_at).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })}</td><td>{l.name}</td><td>{l.phone}</td><td>{l.utm_source}</td>{isStaff && <><td>{l.utm_content}</td><td>{l.assignee}</td></>}<td><span className={`pill st-${l.status}`}>{l.status}</span></td></tr>)}</tbody>
           </table></div>
         </div>
 

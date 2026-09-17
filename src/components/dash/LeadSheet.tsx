@@ -6,6 +6,7 @@ import { AlignLeft, ArrowUpDown, Banknote, Briefcase, Building2, Calendar, Chevr
 import { createLead, deleteLead, fetchLeadsPage, setAssignee, updateLead, updateProjectColumns } from "@/app/app/actions";
 import ColumnsMenu from "./ColumnsMenu";
 import { createClient } from "@/lib/supabase/client";
+import { todayKST } from "@/lib/dash/dates";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
 import { defaultQuery, PAGE_LIMIT, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
 import { DROPS, PAYS, STATUSES, type CustomField, type Lead, type LeadPatch, type Project } from "@/lib/dash/types";
@@ -26,9 +27,10 @@ const COLS: { key: string; label: string; w: number; ic: LucideIcon; staff?: boo
 const NUM_W = 44;
 const WIDTH_KEY = "leadSheetColWidths";
 const VIEWS: [SheetView, string][] = [["all", "전체 리드"], ["todo", "처리 필요 (신규·연락중)"], ["conv", "전환 리드"], ["need", "매출 미입력"], ["drop", "드랍"], ["dup", "중복"]];
-const pad = (n: number) => String(n).padStart(2, "0");
-const fmtTs = (iso: string) => { const d = new Date(iso); return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`; };
-const today = () => new Date().toISOString().slice(0, 10);
+// 서버(UTC)와 브라우저(KST) 렌더 결과가 같도록 시간대를 Asia/Seoul 로 고정 (하이드레이션 불일치 방지)
+const TS_FMT = new Intl.DateTimeFormat("sv-SE", { timeZone: "Asia/Seoul", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
+const fmtTs = (iso: string) => TS_FMT.format(new Date(iso)).replace("T", " ");
+const today = () => todayKST();
 
 export default function LeadSheet({ project, initial, isStaff }: { project: Project; initial: LeadPage; isStaff: boolean }) {
   const [query, setQuery] = useState<LeadQuery>(() => defaultQuery());
@@ -133,20 +135,24 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
       if (!session || cancelled) { setLive("off"); return; }
       await sb.realtime.setAuth(session.access_token);
       channel = sb.channel(`leads:${project.id}`)
-        .on("postgres_changes", { event: "INSERT", schema: "dash", table: "leads", filter: `project_id=eq.${project.id}` }, () => { setIncoming((n) => n + 1); scheduleRefetch(); })
-        .on("postgres_changes", { event: "UPDATE", schema: "dash", table: "leads", filter: `project_id=eq.${project.id}` }, (p) => {
-          const row = p.new as Partial<Lead> & { id: string };
-          setPage((cur) => ({ ...cur, rows: cur.rows.map((x) => (x.id === row.id ? { ...x, ...row } : x)) }));
-          scheduleRefetch();
-        })
-        .on("postgres_changes", { event: "DELETE", schema: "dash", table: "leads", filter: `project_id=eq.${project.id}` }, (p) => {
+        .on("postgres_changes", { event: "*", schema: "dash", table: "leads", filter: `project_id=eq.${project.id}` }, (p) => {
+          if (p.eventType === "INSERT") { setIncoming((n) => n + 1); scheduleRefetch(); return; }
+          if (p.eventType === "UPDATE") {
+            const row = p.new as Partial<Lead> & { id: string };
+            setPage((cur) => ({ ...cur, rows: cur.rows.map((x) => (x.id === row.id ? { ...x, ...row } : x)) }));
+            scheduleRefetch(); return;
+          }
           const id = (p.old as { id?: string }).id;
           if (id) setPage((cur) => (cur.rows.some((x) => x.id === id) ? { ...cur, rows: cur.rows.filter((x) => x.id !== id), total: Math.max(0, cur.total - 1) } : cur));
           scheduleRefetch();
         })
         .subscribe((status) => setLive(status === "SUBSCRIBED" ? "on" : status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED" ? "off" : "connecting"));
     })();
-    return () => { cancelled = true; if (channel) sb.removeChannel(channel); if (refetchTimer.current) clearTimeout(refetchTimer.current); };
+    // 안전장치: Realtime 이벤트가 드물게 누락되므로, 탭이 보이는 동안 20초마다 · 탭 복귀 시 조용히 재조회
+    const poll = () => { if (document.visibilityState === "visible") scheduleRefetch(); };
+    const iv = setInterval(poll, 20000);
+    document.addEventListener("visibilitychange", poll);
+    return () => { cancelled = true; if (channel) sb.removeChannel(channel); if (refetchTimer.current) clearTimeout(refetchTimer.current); clearInterval(iv); document.removeEventListener("visibilitychange", poll); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [project.id]);
 
