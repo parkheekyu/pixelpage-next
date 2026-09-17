@@ -5,6 +5,7 @@ import DateRangePicker from "./DateRangePicker";
 import { AlignLeft, ArrowUpDown, Banknote, Briefcase, Building2, Calendar, ChevronDown, Filter, LayoutGrid, Mail, Megaphone, Phone, PiggyBank, Plus, Radar, Table2, Trash2, UserRound, UserRoundCog, X, type LucideIcon } from "lucide-react";
 import { createLead, deleteLead, fetchLeadsPage, setAssignee, updateLead, updateProjectColumns } from "@/app/app/actions";
 import ColumnsMenu from "./ColumnsMenu";
+import { createClient } from "@/lib/supabase/client";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
 import { defaultQuery, PAGE_LIMIT, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
 import { DROPS, PAYS, STATUSES, type CustomField, type Lead, type LeadPatch, type Project } from "@/lib/dash/types";
@@ -110,7 +111,46 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
     return () => clearTimeout(t);
   }, [query, project.id]);
 
-  const set = (patch: Partial<LeadQuery>) => setQuery((q) => ({ ...q, ...patch, offset: 0 }));
+  // ---- 실시간: 다른 곳에서 리드가 추가/수정/삭제되면 새로고침 없이 반영 ----
+  const [live, setLive] = useState<"connecting" | "on" | "off">("connecting");
+  const [incoming, setIncoming] = useState(0);
+  const queryRef = useRef(query); queryRef.current = query;
+  const refetchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scheduleRefetch = () => {
+    if (refetchTimer.current) clearTimeout(refetchTimer.current);
+    refetchTimer.current = setTimeout(async () => {
+      const q = queryRef.current;
+      const r = await fetchLeadsPage(project.id, { ...q, offset: 0, limit: Math.max(q.limit, page.rows.length || q.limit) });
+      if (!("error" in r)) setPage(r);
+    }, 600);
+  };
+  useEffect(() => {
+    const sb = createClient();
+    let channel: ReturnType<typeof sb.channel> | null = null;
+    let cancelled = false;
+    (async () => {
+      const { data: { session } } = await sb.auth.getSession();
+      if (!session || cancelled) { setLive("off"); return; }
+      await sb.realtime.setAuth(session.access_token);
+      channel = sb.channel(`leads:${project.id}`)
+        .on("postgres_changes", { event: "INSERT", schema: "dash", table: "leads", filter: `project_id=eq.${project.id}` }, () => { setIncoming((n) => n + 1); scheduleRefetch(); })
+        .on("postgres_changes", { event: "UPDATE", schema: "dash", table: "leads", filter: `project_id=eq.${project.id}` }, (p) => {
+          const row = p.new as Partial<Lead> & { id: string };
+          setPage((cur) => ({ ...cur, rows: cur.rows.map((x) => (x.id === row.id ? { ...x, ...row } : x)) }));
+          scheduleRefetch();
+        })
+        .on("postgres_changes", { event: "DELETE", schema: "dash", table: "leads", filter: `project_id=eq.${project.id}` }, (p) => {
+          const id = (p.old as { id?: string }).id;
+          if (id) setPage((cur) => (cur.rows.some((x) => x.id === id) ? { ...cur, rows: cur.rows.filter((x) => x.id !== id), total: Math.max(0, cur.total - 1) } : cur));
+          scheduleRefetch();
+        })
+        .subscribe((status) => setLive(status === "SUBSCRIBED" ? "on" : status === "CHANNEL_ERROR" || status === "TIMED_OUT" || status === "CLOSED" ? "off" : "connecting"));
+    })();
+    return () => { cancelled = true; if (channel) sb.removeChannel(channel); if (refetchTimer.current) clearTimeout(refetchTimer.current); };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [project.id]);
+
+  const set = (patch: Partial<LeadQuery>) => { setIncoming(0); setQuery((q) => ({ ...q, ...patch, offset: 0 })); };
   const more = () => setQuery((q) => ({ ...q, offset: page.rows.length }));
   const { summary: S, rows, total } = page;
 
@@ -261,6 +301,8 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
       <div className="foot">
         <span><Plus className="ico" aria-hidden /> 리드는 광고 폼 제출 시 자동 추가됩니다</span>
         <span>{rows.length < total ? `${rows.length} / ${fmtN(total)}` : fmtN(total)} records</span>
+        <span className={`live ${live}`} title={live === "on" ? "실시간 연결됨: 새 리드·상태 변경이 자동 반영됩니다" : live === "off" ? "실시간 연결 끊김" : "연결 중"}><i />{live === "on" ? "실시간" : live === "off" ? "오프라인" : "연결 중"}</span>
+        {incoming > 0 && <button type="button" className="btn incoming" onClick={() => { setIncoming(0); setQuery((q) => ({ ...q, offset: 0 })); }}>새 리드 {incoming}건 반영됨</button>}
         {rows.length < total && <button className="btn" onClick={more} disabled={loading}>더 보기 (+{PAGE_LIMIT})</button>}
         {err ? <span className="err">저장 실패: {err}</span> : pending ? <span className="saving">저장 중…</span> : saved ? <span className="saved">저장됨 {saved}</span> : null}
       </div>

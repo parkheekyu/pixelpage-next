@@ -239,3 +239,11 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .colmenu-del:hover { color: var(--bad); }
 .colmenu-add { display: flex; flex-direction: column; gap: 6px; padding: 6px 8px 2px; }
 .colmenu-add input, .colmenu-add select { font-size: 13px; padding: 5px 8px; }
+
+/* ---- 실시간 표시 ---- */
+.sheet-app .foot .live { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); }
+.sheet-app .foot .live i { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); display: inline-block; }
+.sheet-app .foot .live.on i { background: var(--good); box-shadow: 0 0 0 3px color-mix(in srgb, var(--good) 20%, transparent); }
+.sheet-app .foot .live.off i { background: var(--bad); }
+.sheet-app .foot .live.connecting i { background: var(--warn); }
+.sheet-app .foot .btn.incoming { background: color-mix(in srgb, var(--s1) 12%, var(--card)); color: var(--s1); border-color: transparent; font-weight: 600; }
