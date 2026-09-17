@@ -8,6 +8,6 @@ export const maxDuration = 300;
 export default async function ResearchPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const { supabase, project, profile } = await requireProject(id);
-  const analyses = await listAnalyses(supabase, project.id, "research");
-  return <ResearchClient project={project} analyses={analyses} isStaff={profile.role === "staff"} />;
+  const [analyses, market] = await Promise.all([listAnalyses(supabase, project.id, "research"), listAnalyses(supabase, project.id, "market")]);
+  return <ResearchClient project={project} analyses={analyses} market={market} isStaff={profile.role === "staff"} />;
 }

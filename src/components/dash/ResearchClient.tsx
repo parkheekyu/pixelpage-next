@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Save } from "lucide-react";
-import { runResearch, saveResearchInput } from "@/app/app/analysis-actions";
+import { runMarketResearch, runResearch, saveResearchInput } from "@/app/app/analysis-actions";
 import type { Analysis, Project, ResearchInput } from "@/lib/dash/types";
 import AnalysisPanel from "./AnalysisPanel";
 
@@ -17,7 +17,7 @@ const FIELDS: { key: keyof ResearchInput; label: string; ph: string; required?: 
   { key: "notes", label: "기타", ph: "브랜드 톤, 하지 말아야 할 표현, 과거에 안 됐던 광고 등" },
 ];
 
-export default function ResearchClient({ project, analyses, isStaff }: { project: Project; analyses: Analysis[]; isStaff: boolean }) {
+export default function ResearchClient({ project, analyses, market, isStaff }: { project: Project; analyses: Analysis[]; market: Analysis[]; isStaff: boolean }) {
   const [input, setInput] = useState<ResearchInput>(project.research_input ?? {});
   const [saved, setSaved] = useState<string | null>(null);
   const [pending, start] = useTransition();
@@ -53,7 +53,12 @@ export default function ResearchClient({ project, analyses, isStaff }: { project
           </div>
         )
       )}
-      <AnalysisPanel projectId={project.id} analyses={analyses} isStaff={isStaff} runLabel="AI 리서치 실행" canRun={canRun} disabledReason="상품/서비스와 타깃 고객을 입력하고 저장한 뒤 실행하세요." onRun={async () => { const r = await saveResearchInput(project.id, input); if (!r.ok) return r; return runResearch(project.id); }} />
+      <h2 style={{ margin: "18px 0 8px", fontSize: 16 }}>1. 본능분석과 반박 제거</h2>
+      <div className="sub" style={{ marginBottom: 8 }}>입력한 상품·타깃 정보로 고객의 본능과 예상 반박, 메시지 각도를 정리합니다. 광고·랜딩 분석의 기준 문서입니다.</div>
+      <AnalysisPanel projectId={project.id} analyses={analyses} isStaff={isStaff} runLabel="AI 본능분석·반박제거 실행" canRun={canRun} disabledReason="상품/서비스와 타깃 고객을 입력하고 저장한 뒤 실행하세요." onRun={async () => { const r = await saveResearchInput(project.id, input); if (!r.ok) return r; return runResearch(project.id); }} />
+      <h2 style={{ margin: "26px 0 8px", fontSize: 16 }}>2. 시장 리서치 브리핑</h2>
+      <div className="sub" style={{ marginBottom: 8 }}>웹 검색으로 시장·경쟁사·키워드·광고 레퍼런스를 조사해 변화 → 왜 중요한가 → 추천 액션으로 정리합니다. 확인된 출처와 추정을 구분해 표시합니다. 5~10분 걸립니다.</div>
+      <AnalysisPanel projectId={project.id} analyses={market} isStaff={isStaff} runLabel="AI 시장 리서치 실행 (웹 검색)" canRun={canRun} disabledReason="상품/서비스와 타깃 고객을 입력하고 저장한 뒤 실행하세요." onRun={async () => { const r = await saveResearchInput(project.id, input); if (!r.ok) return r; return runMarketResearch(project.id); }} />
     </>
   );
 }

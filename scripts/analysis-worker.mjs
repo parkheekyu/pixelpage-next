@@ -21,11 +21,16 @@ if (!url || !key) { console.error("NEXT_PUBLIC_SUPABASE_URL / SUPABASE_SERVICE_R
 const db = createClient(url, key, { db: { schema: "dash" }, auth: { autoRefreshToken: false, persistSession: false } });
 const log = (...a) => console.log(new Date().toLocaleTimeString("ko-KR", { hour12: false }), ...a);
 
-function runClaude(system, prompt) {
+function runClaude(system, prompt, kind) {
   return new Promise((resolve, reject) => {
-    const p = spawn("claude", ["-p", "--model", MODEL, "--effort", EFFORT, "--output-format", "text", "--no-session-persistence", "--system-prompt", system, "--disallowedTools", "Bash,Edit,Write,Read,Glob,Grep,WebFetch,WebSearch,Agent,NotebookEdit"], { stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, CLAUDECODE: "" } });
+    // 시장 리서치는 웹 검색·페이지 읽기 허용, 나머지는 도구 없이 문서만 작성
+    const tools = kind === "market"
+      ? ["--allowedTools", "WebSearch,WebFetch", "--disallowedTools", "Bash,Edit,Write,Read,Glob,Grep,Agent,NotebookEdit"]
+      : ["--disallowedTools", "Bash,Edit,Write,Read,Glob,Grep,WebFetch,WebSearch,Agent,NotebookEdit"];
+    const limitMin = kind === "market" ? 30 : 15;
+    const p = spawn("claude", ["-p", "--model", MODEL, "--effort", EFFORT, "--output-format", "text", "--no-session-persistence", "--system-prompt", system, ...tools], { stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, CLAUDECODE: "" } });
     let out = "", err = "";
-    const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error("15분 초과로 중단")); }, 15 * 60 * 1000);
+    const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error(`${limitMin}분 초과로 중단`)); }, limitMin * 60 * 1000);
     p.stdout.on("data", (d) => (out += d)); p.stderr.on("data", (d) => (err += d));
     p.on("error", (e) => { clearTimeout(timer); reject(e); });
     p.on("close", (code) => { clearTimeout(timer); if (code === 0 && out.trim()) resolve(out.trim()); else reject(new Error(`claude 종료 코드 ${code}: ${err.trim().slice(0, 500) || out.slice(0, 300) || "빈 응답"}`)); });
@@ -43,7 +48,7 @@ async function processOne() {
   log(`처리 시작 [${job.kind}] ${job.analysis_id} (프롬프트 ${job.prompt.length.toLocaleString()}자)`);
   const t0 = Date.now();
   try {
-    let text = await runClaude(job.system_prompt, job.prompt);
+    let text = await runClaude(job.system_prompt, job.prompt, job.kind);
     // 문서 제목 앞에 붙은 짧은 작업 메모(예: '파일 쓰기 도구가 없어서…')는 제거
     const h = text.search(/^#\s/m); if (h > 0 && h < 400) text = text.slice(h);
     await db.from("analyses").update({ status: "done", result_md: text, model: `claude-code-cli/${MODEL}`, error: null }).eq("id", job.analysis_id);

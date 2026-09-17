@@ -1,0 +1,10 @@
+23시 57분 19초 워커 시작 (baghuigyuui-iMac.local#44008, model=opus, effort=high, watch)
+23시 57분 20초 처리 시작 [research] 82c89f30-faef-4e53-9a07-6dc4ced32c62 (프롬프트 320자)
+23시 58분 36초 워커 시작 (baghuigyuui-iMac.local#44164, model=opus, effort=high, watch)
+23시 58분 52초 처리 시작 [research] 82c89f30-faef-4e53-9a07-6dc4ced32c62 (프롬프트 320자)
+23시 58분 52초 실패 82c89f30-faef-4e53-9a07-6dc4ced32c62: claude 종료 코드 1: error: unknown option '--effort'
+23시 59분 23초 처리 시작 [research] 0329f3a2-3d81-43c1-b0b0-03286b12d8cc (프롬프트 320자)
+23시 59분 24초 실패 0329f3a2-3d81-43c1-b0b0-03286b12d8cc: claude 종료 코드 1: error: unknown option '--effort'
+23시 59분 39초 워커 시작 (baghuigyuui-iMac.local#44481, model=opus, effort=high, watch)
+0시 0분 25초 처리 시작 [research] 01244c3e-e82a-4576-b8b5-24ddc1118560 (프롬프트 320자)
+0시 2분 14초 완료 01244c3e-e82a-4576-b8b5-24ddc1118560 (108s, 6,322자)

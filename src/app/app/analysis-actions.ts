@@ -10,7 +10,7 @@ import { extractLanding, landingToText } from "@/lib/integrations/landing";
 import { ga4Summary } from "@/lib/integrations/ga4";
 import { claritySummary } from "@/lib/integrations/clarity";
 
-const PATHS: Record<AnalysisKind, string> = { research: "/app/research", ads: "/app/ads", landing: "/app/landing" };
+const PATHS: Record<AnalysisKind, string> = { research: "/app/research", market: "/app/research", ads: "/app/ads", landing: "/app/landing" };
 
 // ---------- 설정 ----------
 export async function saveIntegrations(projectId: string, input: { meta_ad_account_id?: string; ga4_property_id?: string; clarity_project_id?: string; clarity_api_token?: string }): Promise<ActionResult> {
@@ -97,6 +97,17 @@ export async function runResearch(projectId: string): Promise<ActionResult & { i
   const r = (p.research_input ?? {}) as ResearchInput;
   if (!r.product || !r.target) return { ok: false, error: "상품/서비스와 타깃 고객은 입력해 주세요." };
   return execute("research", projectId, `${p.name} 본능분석·반박제거 리서치`, { research_input: r }, async () => `다음 고객사 정보를 바탕으로 리서치 문서를 작성해 주세요.\n\n${researchText(p.name, r)}`);
+}
+
+export async function runMarketResearch(projectId: string): Promise<ActionResult & { id?: string }> {
+  const s = await requireStaff();
+  const { data: p } = await s.supabase.from("projects").select("name,research_input,landing_url").eq("id", projectId).single();
+  if (!p) return { ok: false, error: "프로젝트 없음" };
+  const r = (p.research_input ?? {}) as ResearchInput;
+  if (!r.product || !r.target) return { ok: false, error: "상품/서비스와 타깃 고객은 입력해 주세요." };
+  const today = new Date().toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric" });
+  return execute("market", projectId, `${p.name} 시장 리서치 브리핑`, { research_input: r }, async () =>
+    `오늘은 ${today}입니다. 다음 고객사에 대해 웹 검색으로 시장·경쟁사·키워드·광고 레퍼런스를 조사하고 브리핑을 작성해 주세요. 한국 시장 기준입니다.${p.landing_url ? `\n우리 랜딩페이지: ${p.landing_url}` : ""}\n\n${researchText(p.name, r)}\n\n검색은 최소 8회 이상, 경쟁사(입력에 있는 곳 + 검색으로 찾은 상위 3~5곳)와 핵심 키워드 5개 이상을 다뤄 주세요.`);
 }
 
 export async function runAdsAnalysis(projectId: string, datePreset = "last_30d"): Promise<ActionResult & { id?: string }> {

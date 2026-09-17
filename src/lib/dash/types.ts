@@ -56,7 +56,7 @@ export interface ProjectIntegrations {
   updated_at: string;
 }
 
-export type AnalysisKind = "research" | "ads" | "landing";
+export type AnalysisKind = "research" | "market" | "ads" | "landing";
 export interface Analysis {
   id: string;
   project_id: string;
