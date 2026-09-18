@@ -13,6 +13,7 @@ import { readFileSync, existsSync } from "node:fs";
 import os, { hostname } from "node:os";
 import path from "node:path";
 import fs from "node:fs";
+import { processEmployeeTurn, enqueueRoutines } from "./employees.mjs";
 
 if (existsSync(".env.local")) for (const line of readFileSync(".env.local", "utf8").split("\n")) { const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, ""); }
 const args = process.argv.slice(2);
@@ -64,6 +65,11 @@ async function processAgentJob() {
   if (!job) return false;
   const { data: claimed } = await db.from("agent_jobs").update({ claimed_at: new Date().toISOString(), worker: WORKER, status: "running" }).eq("id", job.id).is("claimed_at", null).select("id");
   if (!claimed?.length) return true;
+  if (job.kind === "employee_turn") {
+    try { await processEmployeeTurn(db, job, { log, model: MODEL, effort: EFFORT }); }
+    catch (e) { await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id); log(`[직원] 실패 ${job.id}: ${e.message}`); }
+    return true;
+  }
   if (job.kind === "creative_proposal") await db.from("proposals").update({ status: "running" }).eq("job_id", job.id);
   log(`[agent:${job.engine}] 시작 ${job.kind} ${job.id} (프롬프트 ${job.prompt.length.toLocaleString()}자)`);
   const t0 = Date.now();
@@ -122,7 +128,8 @@ await db.from("analysis_jobs").update({ claimed_at: null, worker: null }).lt("cl
 await db.from("agent_jobs").update({ claimed_at: null, worker: null, status: "queued" }).eq("status", "running").lt("claimed_at", new Date(Date.now() - 30 * 60 * 1000).toISOString());
 log(`워커 시작 (${WORKER}, model=${MODEL}, effort=${EFFORT}, ${WATCH ? "watch" : "once"})`);
 do {
+  try { await enqueueRoutines(db, { log }); } catch (e) { log(`정기 업무 확인 실패: ${e.message}`); }
   while ((await processOne()) || (await processAgentJob())) { /* 대기열이 빌 때까지 */ }
-  if (WATCH) await new Promise((r) => setTimeout(r, 15000));
+  if (WATCH) await new Promise((r) => setTimeout(r, 5000));
 } while (WATCH);
 log("대기열 비어 있음, 종료");

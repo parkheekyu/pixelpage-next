@@ -28,7 +28,7 @@ async function buildContext(db: AnyClient, projectId: string) {
 }
 
 /** 제안 작업 생성: proposals(queued) + agent_jobs. 워커가 처리 후 슬랙에 게시 */
-export async function createProposalJob(db: AnyClient, projectId: string, brief: CreativeBrief, opts: { parentId?: string; feedback?: string; createdBy?: string | null; requestedBy?: string }): Promise<{ id: string; engine: Engine; name: string }> {
+export async function createProposalJob(db: AnyClient, projectId: string, brief: CreativeBrief, opts: { parentId?: string; feedback?: string; createdBy?: string | null; requestedBy?: string; slack?: { channel: string; thread_ts?: string } }): Promise<{ id: string; engine: Engine; name: string }> {
   const { name, context } = await buildContext(db, projectId);
   const count = Math.min(8, Math.max(2, brief.count || 4));
   const formats = brief.formats.filter((f) => FORMAT_LABEL[f]).length ? brief.formats.filter((f) => FORMAT_LABEL[f]) : ["image_1x1", "video_9x16"];
@@ -39,7 +39,7 @@ export async function createProposalJob(db: AnyClient, projectId: string, brief:
     if (parent?.variants) prev = `\n\n[이전 제안 (반려됨)]\n${JSON.stringify(parent.variants).slice(0, 8000)}\n\n[대표 코멘트 — 최우선 반영]\n${opts.feedback ?? parent.feedback ?? ""}`;
   }
   const prompt = `${context}\n\n[요청]\n포맷: ${formats.map((f) => FORMAT_LABEL[f]).join(", ")}\n개수: ${count}개 (포맷을 골고루)\n${brief.notes ? `추가 요청: ${brief.notes}\n` : ""}${opts.requestedBy ? `요청자: ${opts.requestedBy}\n` : ""}${prev}\n\n위 원칙과 JSON 형식으로 ${count}개의 소재안을 제안해 주세요.`;
-  const { data: prop, error } = await db.from("proposals").insert({ project_id: projectId, kind: "creative", status: "queued", engine, title: `${name} 소재 제안`, brief: { goal: brief.goal, formats, count, notes: brief.notes }, parent_id: opts.parentId ?? null, feedback: opts.feedback ?? null, created_by: opts.createdBy ?? null }).select("id").single();
+  const { data: prop, error } = await db.from("proposals").insert({ project_id: projectId, kind: "creative", status: "queued", engine, title: `${name} 소재 제안`, brief: { goal: brief.goal, formats, count, notes: brief.notes, slack: opts.slack }, parent_id: opts.parentId ?? null, feedback: opts.feedback ?? null, created_by: opts.createdBy ?? null }).select("id").single();
   if (error) throw new Error(error.message);
   const { data: job, error: jerr } = await db.from("agent_jobs").insert({ project_id: projectId, kind: "creative_proposal", engine, system_prompt: CREATIVE_SYSTEM, prompt, created_by: opts.createdBy ?? null }).select("id").single();
   if (jerr) throw new Error(jerr.message);

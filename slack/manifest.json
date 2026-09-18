@@ -6,29 +6,22 @@
     "bot_user": {
       "display_name": "pixelpage-bot",
       "always_online": true
-    },
-    "slash_commands": [
-      {
-        "command": "/pixel",
-        "url": "https://pixelpage.co.kr/api/slack/commands",
-        "description": "픽셀페이지 봇에게 요청",
-        "usage_hint": "소재 고객사이름 [메모]",
-        "should_escape": false
-      }
-    ]
+    }
   },
   "oauth_config": {
     "scopes": {
       "bot": [
         "chat:write",
         "chat:write.public",
+        "chat:write.customize",
         "channels:history",
         "groups:history",
+        "im:history",
         "channels:read",
         "groups:read",
+        "im:read",
         "users:read",
-        "reactions:write",
-        "commands"
+        "reactions:write"
       ]
     }
   },
@@ -37,7 +30,8 @@
       "request_url": "https://pixelpage.co.kr/api/slack/events",
       "bot_events": [
         "message.channels",
-        "message.groups"
+        "message.groups",
+        "message.im"
       ]
     },
     "interactivity": {
