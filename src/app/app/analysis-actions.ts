@@ -92,11 +92,13 @@ const researchText = (name: string, r: ResearchInput) => [
 
 export async function runResearch(projectId: string): Promise<ActionResult & { id?: string }> {
   const s = await requireStaff();
-  const { data: p } = await s.supabase.from("projects").select("name,research_input").eq("id", projectId).single();
+  const { data: p } = await s.supabase.from("projects").select("name,research_input,landing_url").eq("id", projectId).single();
   if (!p) return { ok: false, error: "프로젝트 없음" };
   const r = (p.research_input ?? {}) as ResearchInput;
   if (!r.product || !r.target) return { ok: false, error: "상품/서비스와 타깃 고객은 입력해 주세요." };
-  return execute("research", projectId, `${p.name} 본능분석·반박제거 리서치`, { research_input: r }, async () => `다음 고객사 정보를 바탕으로 리서치 문서를 작성해 주세요.\n\n${researchText(p.name, r)}`);
+  const today = new Date().toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric" });
+  return execute("research", projectId, `${p.name} 종합 리서치 보고서`, { research_input: r }, async () =>
+    `오늘은 ${today}입니다. 다음 고객사에 대해 종합 리서치 보고서를 작성해 주세요. 먼저 웹 검색으로 시장·경쟁사·키워드·광고 레퍼런스를 조사한 뒤(최소 8회, 입력에 있는 경쟁사 + 검색으로 찾은 상위 3~5곳, 핵심 키워드 5개 이상), 그 결과를 근거로 본능분석과 반박 제거, 실행 계획까지 한 편으로 씁니다. 한국 시장 기준입니다.${p.landing_url ? `\n우리 랜딩페이지: ${p.landing_url}` : ""}\n\n${researchText(p.name, r)}`);
 }
 
 export async function runMarketResearch(projectId: string): Promise<ActionResult & { id?: string }> {

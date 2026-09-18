@@ -24,10 +24,10 @@ const log = (...a) => console.log(new Date().toLocaleTimeString("ko-KR", { hour1
 function runClaude(system, prompt, kind) {
   return new Promise((resolve, reject) => {
     // 시장 리서치는 웹 검색·페이지 읽기 허용, 나머지는 도구 없이 문서만 작성
-    const tools = kind === "market"
+    const tools = kind === "market" || kind === "research"
       ? ["--allowedTools", "WebSearch,WebFetch", "--disallowedTools", "Bash,Edit,Write,Read,Glob,Grep,Agent,NotebookEdit"]
       : ["--disallowedTools", "Bash,Edit,Write,Read,Glob,Grep,WebFetch,WebSearch,Agent,NotebookEdit"];
-    const limitMin = kind === "market" ? 30 : 15;
+    const limitMin = kind === "market" || kind === "research" ? 30 : 15;
     const p = spawn("claude", ["-p", "--model", MODEL, "--effort", EFFORT, "--output-format", "text", "--no-session-persistence", "--system-prompt", system, ...tools], { stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, CLAUDECODE: "" } });
     let out = "", err = "";
     const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error(`${limitMin}분 초과로 중단`)); }, limitMin * 60 * 1000);

@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Save } from "lucide-react";
-import { runMarketResearch, runResearch, saveResearchInput } from "@/app/app/analysis-actions";
+import { runResearch, saveResearchInput } from "@/app/app/analysis-actions";
 import type { Analysis, Project, ResearchInput } from "@/lib/dash/types";
 import AnalysisPanel from "./AnalysisPanel";
 
@@ -31,7 +31,7 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
       </header>
       {isStaff ? (
         <div className="card" style={{ marginBottom: 12 }}>
-          <h2>고객사 정보</h2><div className="sub">AI가 이 내용을 바탕으로 타깃의 본능과 예상 반박을 분석합니다. 자세할수록 정확합니다.</div>
+          <h2>고객사 정보</h2><div className="sub">AI가 웹 검색으로 시장·경쟁사·키워드를 조사한 뒤, 그 근거로 타깃의 본능과 예상 반박, 메시지 각도, 실행 계획을 한 편의 종합 보고서로 씁니다. 자세할수록 정확합니다. 5~10분 걸립니다.</div>
           <div style={{ display: "grid", gap: 10, gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))" }}>
             {FIELDS.map((f) => (
               <label key={f.key} className="f">
@@ -53,12 +53,7 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
           </div>
         )
       )}
-      <h2 style={{ margin: "18px 0 8px", fontSize: 16 }}>1. 본능분석과 반박 제거</h2>
-      <div className="sub" style={{ marginBottom: 8 }}>입력한 상품·타깃 정보로 고객의 본능과 예상 반박, 메시지 각도를 정리합니다. 광고·랜딩 분석의 기준 문서입니다.</div>
-      <AnalysisPanel projectId={project.id} analyses={analyses} isStaff={isStaff} runLabel="AI 본능분석·반박제거 실행" canRun={canRun} disabledReason="상품/서비스와 타깃 고객을 입력하고 저장한 뒤 실행하세요." onRun={async () => { const r = await saveResearchInput(project.id, input); if (!r.ok) return r; return runResearch(project.id); }} />
-      <h2 style={{ margin: "26px 0 8px", fontSize: 16 }}>2. 시장 리서치 브리핑</h2>
-      <div className="sub" style={{ marginBottom: 8 }}>웹 검색으로 시장·경쟁사·키워드·광고 레퍼런스를 조사해 변화 → 왜 중요한가 → 추천 액션으로 정리합니다. 확인된 출처와 추정을 구분해 표시합니다. 5~10분 걸립니다.</div>
-      <AnalysisPanel projectId={project.id} analyses={market} isStaff={isStaff} runLabel="AI 시장 리서치 실행 (웹 검색)" canRun={canRun} disabledReason="상품/서비스와 타깃 고객을 입력하고 저장한 뒤 실행하세요." onRun={async () => { const r = await saveResearchInput(project.id, input); if (!r.ok) return r; return runMarketResearch(project.id); }} />
+      <AnalysisPanel projectId={project.id} analyses={[...analyses, ...market].sort((a, b) => b.created_at.localeCompare(a.created_at))} isStaff={isStaff} runLabel="AI 리서치 실행 (종합 보고서)" canRun={canRun} disabledReason="상품/서비스와 타깃 고객을 입력하고 저장한 뒤 실행하세요." onRun={async () => { const r = await saveResearchInput(project.id, input); if (!r.ok) return r; return runResearch(project.id); }} />
     </>
   );
 }
