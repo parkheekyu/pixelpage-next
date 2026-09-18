@@ -45,6 +45,7 @@ export interface ResearchInput {
   competitors?: string;  // 경쟁사/대안
   objections?: string;   // 상담에서 실제로 듣는 반박·거절 이유
   notes?: string;        // 기타
+  pre_research?: string; // 퍼플렉시티 등에서 직접 조사해 붙여 넣은 자료 (1차 근거)
 }
 
 export interface ProjectIntegrations {

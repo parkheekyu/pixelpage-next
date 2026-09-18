@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { Save } from "lucide-react";
+import { Copy, Save } from "lucide-react";
+import { perplexityPrompts } from "@/lib/dash/research-prompts";
 import { runResearch, saveResearchInput } from "@/app/app/analysis-actions";
 import type { Analysis, Project, ResearchInput } from "@/lib/dash/types";
 import AnalysisPanel from "./AnalysisPanel";
@@ -20,6 +21,7 @@ const FIELDS: { key: keyof ResearchInput; label: string; ph: string; required?: 
 export default function ResearchClient({ project, analyses, market, isStaff }: { project: Project; analyses: Analysis[]; market: Analysis[]; isStaff: boolean }) {
   const [input, setInput] = useState<ResearchInput>(project.research_input ?? {});
   const [saved, setSaved] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
   const [pending, start] = useTransition();
   const canRun = !!(input.product?.trim() && input.target?.trim());
   const save = () => start(async () => { const r = await saveResearchInput(project.id, input); setSaved(r.ok ? "저장됨" : r.error); });
@@ -44,6 +46,17 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
             <button type="button" className="btn" onClick={save} disabled={pending}><Save className="ico" aria-hidden /> 정보 저장</button>
             {saved && <span className="hint" style={{ marginTop: 0 }}>{saved}</span>}
           </div>
+
+          <h2 style={{ marginTop: 18 }}>퍼플렉시티 사전 조사 (선택)</h2>
+          <div className="sub">API 없이 퍼플렉시티 구독으로 조사하는 방법: 아래 프롬프트를 복사해 퍼플렉시티 Research 모드에 붙여 넣고, 나온 답(출처 포함)을 복사해서 아래 칸에 붙여 넣으세요. AI 리서치가 이 자료를 1차 근거로 씁니다. 비워 두면 Claude가 직접 웹 검색합니다.</div>
+          <div className="form-row" style={{ marginBottom: 8 }}>
+            {perplexityPrompts(project.name, input).map((q) => (
+              <button type="button" key={q.title} className="btn" disabled={!canRun} title={!canRun ? "상품/서비스와 타깃 고객을 먼저 입력하세요" : "클립보드에 복사"} onClick={() => { navigator.clipboard?.writeText(q.prompt).then(() => setCopied(q.title)); }}><Copy className="ico" aria-hidden /> {copied === q.title ? "복사됨" : q.title}</button>
+            ))}
+            <a className="btn" href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer">퍼플렉시티 열기</a>
+          </div>
+          <textarea value={input.pre_research ?? ""} placeholder="퍼플렉시티 답변을 그대로 붙여 넣으세요 (3개를 이어서 붙여도 됩니다). 출처 링크가 함께 있으면 보고서에 출처로 표시됩니다." onChange={(e) => setInput({ ...input, pre_research: e.target.value })} rows={6} style={{ marginTop: 4 }} />
+          <div className="hint">{(input.pre_research ?? "").length.toLocaleString()}자 · 저장은 위 "정보 저장" 또는 실행 시 자동</div>
         </div>
       ) : (
         project.research_input?.product && (

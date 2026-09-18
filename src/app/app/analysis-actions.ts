@@ -42,7 +42,7 @@ export async function saveLandingUrl(projectId: string, url: string): Promise<Ac
 export async function saveResearchInput(projectId: string, input: ResearchInput): Promise<ActionResult> {
   const s = await requireStaff();
   const clean: ResearchInput = {};
-  for (const k of ["product", "target", "price", "offer", "proof", "competitors", "objections", "notes"] as const) { const v = (input[k] ?? "").trim().slice(0, 4000); if (v) clean[k] = v; }
+  for (const k of ["product", "target", "price", "offer", "proof", "competitors", "objections", "notes", "pre_research"] as const) { const v = (input[k] ?? "").trim().slice(0, k === "pre_research" ? 60000 : 4000); if (v) clean[k] = v; }
   const { error } = await s.supabase.from("projects").update({ research_input: clean }).eq("id", projectId);
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/app/research/${projectId}`);
@@ -102,11 +102,12 @@ export async function runResearch(projectId: string): Promise<ActionResult & { i
   return execute("research", projectId, `${p.name} 종합 리서치 보고서`, { research_input: r, perplexity: hasPerplexity() }, async () => {
     // Perplexity 사전 심층 조사 (키가 있을 때만). 실패해도 Claude 자체 검색으로 진행
     let pre = "";
-    if (hasPerplexity()) {
+    if (r.pre_research?.trim()) pre = r.pre_research.trim();
+    else if (hasPerplexity()) {
       try { pre = await preResearch({ name: p.name, product: r.product!, target: r.target!, competitors: r.competitors, landing_url: p.landing_url }); }
       catch (e) { pre = `(사전 조사 실패: ${(e as Error).message})`; }
     }
-    return `오늘은 ${today}입니다. 다음 고객사에 대해 종합 리서치 보고서를 작성해 주세요. 한국 시장 기준입니다.${p.landing_url ? `\n우리 랜딩페이지: ${p.landing_url}` : ""}\n\n${researchText(p.name, r)}${pre ? `\n\n[사전 심층 조사 자료 — Perplexity 검색 결과. 1차 근거로 쓰되 검증·보강할 것. 출처 번호는 각 절의 출처 목록 기준]\n${pre}` : "\n\n(사전 조사 자료 없음 — 웹 검색으로 직접 조사할 것)"}`;
+    return `오늘은 ${today}입니다. 다음 고객사에 대해 종합 리서치 보고서를 작성해 주세요. 한국 시장 기준입니다.${p.landing_url ? `\n우리 랜딩페이지: ${p.landing_url}` : ""}\n\n${researchText(p.name, r)}${pre ? `\n\n[사전 심층 조사 자료 — 퍼플렉시티 등에서 조사한 결과. 1차 근거로 쓰되 검증·보강할 것. 출처 표기는 자료의 링크·매체명을 그대로 사용]\n${pre}` : "\n\n(사전 조사 자료 없음 — 웹 검색으로 직접 조사할 것)"}`;
   });
 }
 
