@@ -34,7 +34,7 @@ export default function ProjectNav({ project, isStaff, unread, right }: { projec
           );
         })}
       </nav>
-      {right && <div className="controls">{right}</div>}
+      <div className="pnav-right controls">{right}</div>
     </header>
   );
 }
