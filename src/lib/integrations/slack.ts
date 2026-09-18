@@ -5,8 +5,8 @@ import { createHmac, timingSafeEqual } from "node:crypto";
 const API = "https://slack.com/api";
 export const hasSlack = () => !!process.env.SLACK_BOT_TOKEN;
 
-export async function slack<T = Record<string, unknown>>(method: string, body: Record<string, unknown>): Promise<T & { ok: boolean; error?: string }> {
-  const token = process.env.SLACK_BOT_TOKEN;
+export async function slack<T = Record<string, unknown>>(method: string, body: Record<string, unknown>, tokenOverride?: string | null): Promise<T & { ok: boolean; error?: string }> {
+  const token = tokenOverride || process.env.SLACK_BOT_TOKEN;
   if (!token) throw new Error("SLACK_BOT_TOKEN 미설정");
   const r = await fetch(`${API}/${method}`, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json; charset=utf-8" }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
   const j = (await r.json()) as T & { ok: boolean; error?: string };
@@ -15,12 +15,25 @@ export async function slack<T = Record<string, unknown>>(method: string, body: R
 }
 
 /** 요청 서명 검증 (Signing Secret) */
-export function verifySlack(rawBody: string, timestamp: string | null, signature: string | null): boolean {
-  const secret = process.env.SLACK_SIGNING_SECRET;
+export function verifySlack(rawBody: string, timestamp: string | null, signature: string | null, secretOverride?: string | null): boolean {
+  const secret = secretOverride || process.env.SLACK_SIGNING_SECRET;
   if (!secret || !timestamp || !signature) return false;
   if (Math.abs(Date.now() / 1000 - Number(timestamp)) > 60 * 5) return false;
   const mine = "v0=" + createHmac("sha256", secret).update(`v0:${timestamp}:${rawBody}`).digest("hex");
   try { return timingSafeEqual(Buffer.from(mine), Buffer.from(signature)); } catch { return false; }
+}
+
+/** 직원별 슬랙 앱 자격 (dash.slack_bots). employeeId 가 없거나 미설치면 null */
+export interface SlackBot { employee_id: string; app_id: string | null; client_id: string | null; client_secret: string | null; signing_secret: string | null; bot_token: string | null; bot_user_id: string | null }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function botFor(db: any, employeeId: string): Promise<SlackBot | null> {
+  const { data } = await db.from("slack_bots").select("*").eq("employee_id", employeeId).maybeSingle();
+  return (data as SlackBot | null) ?? null;
+}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function botByApp(db: any, appId: string): Promise<SlackBot | null> {
+  const { data } = await db.from("slack_bots").select("*").eq("app_id", appId).maybeSingle();
+  return (data as SlackBot | null) ?? null;
 }
 
 export interface VariantLike { id: string; angle: string; format: string; headline: string; primary_text: string; cta: string; visual: string; hook?: string; why: string }

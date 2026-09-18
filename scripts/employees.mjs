@@ -10,26 +10,32 @@ const EMP = Object.fromEntries(TEAM.employees.map((e) => [e.id, e]));
 const byName = (s) => TEAM.employees.find((e) => e.id === s || e.name === s || e.aliases.includes(s)) ?? null;
 const MAX_DEPTH = 2;
 
-// ---------- Slack ----------
-async function slackApi(method, body) {
-  const r = await fetch(`https://slack.com/api/${method}`, { method: "POST", headers: { authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`, "content-type": "application/json; charset=utf-8" }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
+// ---------- Slack (직원별 봇 토큰) ----------
+let BOTS = {}; let botsLoadedAt = 0;
+async function loadBots(db) {
+  if (Date.now() - botsLoadedAt < 60000) return BOTS;
+  const { data } = await db.from("slack_bots").select("employee_id,bot_token,bot_user_id");
+  BOTS = Object.fromEntries((data ?? []).filter((b) => b.bot_token).map((b) => [b.employee_id, b])); botsLoadedAt = Date.now();
+  return BOTS;
+}
+async function slackApi(method, body, token) {
+  const r = await fetch(`https://slack.com/api/${method}`, { method: "POST", headers: { authorization: `Bearer ${token || process.env.SLACK_BOT_TOKEN}`, "content-type": "application/json; charset=utf-8" }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
   return r.json();
 }
-let canCustomize = null;
-/** 봇 토큰 권한에 chat:write.customize 가 있는지 (응답 헤더 x-oauth-scopes) */
-async function checkCustomize() {
-  if (canCustomize !== null) return canCustomize;
-  try { const r = await fetch("https://slack.com/api/auth.test", { method: "POST", headers: { authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` } }); canCustomize = (r.headers.get("x-oauth-scopes") ?? "").split(",").map((s) => s.trim()).includes("chat:write.customize"); } catch { canCustomize = false; }
-  return canCustomize;
-}
-/** 직원 이름·아이콘으로 게시. customize 권한이 없으면 이름을 본문 첫 줄에 붙인다 */
-async function postAs(emp, channel, thread_ts, text) {
+/** 직원 자신의 봇 계정으로 게시. 자기 앱이 아직 설치 안 됐으면 공용 봇으로 이름을 붙여 게시 */
+async function postAs(db, emp, channel, thread_ts, text) {
+  const bots = await loadBots(db); const mine = bots[emp.id];
   const base = { channel, ...(thread_ts ? { thread_ts } : {}) };
-  const j = (await checkCustomize())
-    ? await slackApi("chat.postMessage", { ...base, text, username: `${emp.name} · ${emp.title}`, icon_emoji: emp.emoji })
-    : await slackApi("chat.postMessage", { ...base, text: `*${emp.name} · ${emp.title}*\n${text}` });
+  const j = mine ? await slackApi("chat.postMessage", { ...base, text }, mine.bot_token)
+                 : await slackApi("chat.postMessage", { ...base, text: `*${emp.name} · ${emp.title}*\n${text}` });
   if (!j.ok) throw new Error(`Slack chat.postMessage: ${j.error}`);
   return j;
+}
+/** 답변 본문에서 동료 이름을 그 직원의 슬랙 멘션으로 바꾼다 ("민준," → "<@U…>,") */
+function mentionize(db, text, selfId) {
+  return (async () => { const bots = await loadBots(db); let t = text;
+    for (const e of TEAM.employees) { if (e.id === selfId || !bots[e.id]?.bot_user_id) continue; t = t.replace(new RegExp(`(^|[\\s(])${e.name}(?=[,아야님 ]|$)`, "gm"), `$1<@${bots[e.id].bot_user_id}>`); }
+    return t; })();
 }
 
 // ---------- Claude CLI (도구 허용) ----------
@@ -110,7 +116,7 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
   const { reply, meta } = parseOutput(raw);
   if (!reply) throw new Error("빈 답변");
 
-  const posted = await postAs(emp, pl.channel, thread, reply.slice(0, 3900));
+  const posted = await postAs(db, emp, pl.channel, thread, (await mentionize(db, reply, emp.id)).slice(0, 3900));
   await db.from("agent_messages").upsert({ channel: pl.channel, channel_type: pl.channel_type ?? null, thread_ts: thread && thread !== posted.ts ? thread : null, ts: posted.ts, employee_id: emp.id, user_name: emp.name, project_id: project?.id ?? null, text: reply }, { onConflict: "channel,ts" });
   await db.from("agent_jobs").update({ status: "done", result_text: raw, result_json: meta, finished_at: new Date().toISOString(), project_id: project?.id ?? null }).eq("id", job.id);
 
