@@ -97,6 +97,7 @@ curl -X POST https://pixelpage.co.kr/api/leads/webhook \
      node scripts/analysis-worker.mjs --once    # 한 번만 처리
      ```
      워커가 꺼져 있으면 화면에 "대기열에 있습니다"로 표시되고, 켜면 자동 처리된다. 건당 3~5분.
+- `PERPLEXITY_API_KEY` (선택) — 리서치 실행 시 Perplexity Sonar 로 타깃 목소리(커뮤니티 원문)·경쟁사·키워드를 먼저 긁어 Claude 에 넘긴다. 없으면 Claude 웹 검색만. `PERPLEXITY_MODEL` 기본 sonar-pro.
 - `META_ACCESS_TOKEN` — Meta 마케팅 API 토큰 (`ads_read`). 시스템 사용자 토큰(만료 없음) 권장. 광고 계정 ID는 프로젝트별로 광고 화면에서 저장.
 - `GA4_SERVICE_ACCOUNT_JSON` — Google 서비스 계정 키 JSON 전체(한 줄). 각 GA4 속성에 그 서비스 계정 이메일을 '뷰어'로 추가. 속성 ID는 랜딩 화면에서 프로젝트별 저장.
 - Clarity — 프로젝트별 API 토큰을 랜딩 화면에서 저장 (Clarity → Settings → Data Export). 최근 1~3일 데이터만 제공.

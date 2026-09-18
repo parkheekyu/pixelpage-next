@@ -9,6 +9,7 @@ import { fetchMetaSnapshot, snapshotToText } from "@/lib/integrations/meta";
 import { extractLanding, landingToText } from "@/lib/integrations/landing";
 import { ga4Summary } from "@/lib/integrations/ga4";
 import { claritySummary } from "@/lib/integrations/clarity";
+import { hasPerplexity, preResearch } from "@/lib/integrations/perplexity";
 
 const PATHS: Record<AnalysisKind, string> = { research: "/app/research", market: "/app/research", ads: "/app/ads", landing: "/app/landing" };
 
@@ -97,8 +98,15 @@ export async function runResearch(projectId: string): Promise<ActionResult & { i
   const r = (p.research_input ?? {}) as ResearchInput;
   if (!r.product || !r.target) return { ok: false, error: "상품/서비스와 타깃 고객은 입력해 주세요." };
   const today = new Date().toLocaleDateString("ko-KR", { timeZone: "Asia/Seoul", year: "numeric", month: "long", day: "numeric" });
-  return execute("research", projectId, `${p.name} 종합 리서치 보고서`, { research_input: r }, async () =>
-    `오늘은 ${today}입니다. 다음 고객사에 대해 종합 리서치 보고서를 작성해 주세요. 먼저 웹 검색으로 시장·경쟁사·키워드·광고 레퍼런스를 조사한 뒤(최소 8회, 입력에 있는 경쟁사 + 검색으로 찾은 상위 3~5곳, 핵심 키워드 5개 이상), 그 결과를 근거로 본능분석과 반박 제거, 실행 계획까지 한 편으로 씁니다. 한국 시장 기준입니다.${p.landing_url ? `\n우리 랜딩페이지: ${p.landing_url}` : ""}\n\n${researchText(p.name, r)}`);
+  return execute("research", projectId, `${p.name} 종합 리서치 보고서`, { research_input: r, perplexity: hasPerplexity() }, async () => {
+    // Perplexity 사전 심층 조사 (키가 있을 때만). 실패해도 Claude 자체 검색으로 진행
+    let pre = "";
+    if (hasPerplexity()) {
+      try { pre = await preResearch({ name: p.name, product: r.product!, target: r.target!, competitors: r.competitors, landing_url: p.landing_url }); }
+      catch (e) { pre = `(사전 조사 실패: ${(e as Error).message})`; }
+    }
+    return `오늘은 ${today}입니다. 다음 고객사에 대해 종합 리서치 보고서를 작성해 주세요. 한국 시장 기준입니다.${p.landing_url ? `\n우리 랜딩페이지: ${p.landing_url}` : ""}\n\n${researchText(p.name, r)}${pre ? `\n\n[사전 심층 조사 자료 — Perplexity 검색 결과. 1차 근거로 쓰되 검증·보강할 것. 출처 번호는 각 절의 출처 목록 기준]\n${pre}` : "\n\n(사전 조사 자료 없음 — 웹 검색으로 직접 조사할 것)"}`;
+  });
 }
 
 export async function runMarketResearch(projectId: string): Promise<ActionResult & { id?: string }> {
