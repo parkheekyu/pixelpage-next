@@ -1,13 +1,51 @@
 {
-  "display_information": { "name": "픽셀페이지 봇", "description": "픽셀페이지 AI 봇: 소재 제안·보고·승인", "background_color": "#5b5bd6" },
-  "features": {
-    "bot_user": { "display_name": "픽셀페이지 봇", "always_online": true },
-    "slash_commands": [ { "command": "/pixel", "url": "https://pixelpage.co.kr/api/slack/commands", "description": "픽셀페이지 봇에게 요청", "usage_hint": "소재 고객사이름 [메모] | 고객사 | 도움", "should_escape": false } ]
+  "display_information": {
+    "name": "픽셀페이지 봇"
   },
-  "oauth_config": { "scopes": { "bot": ["chat:write", "chat:write.public", "channels:history", "groups:history", "channels:read", "groups:read", "users:read", "reactions:write", "commands"] } },
+  "features": {
+    "bot_user": {
+      "display_name": "pixelpage-bot",
+      "always_online": true
+    },
+    "slash_commands": [
+      {
+        "command": "/pixel",
+        "url": "https://pixelpage.co.kr/api/slack/commands",
+        "description": "픽셀페이지 봇에게 요청",
+        "usage_hint": "소재 고객사이름 [메모]",
+        "should_escape": false
+      }
+    ]
+  },
+  "oauth_config": {
+    "scopes": {
+      "bot": [
+        "chat:write",
+        "chat:write.public",
+        "channels:history",
+        "groups:history",
+        "channels:read",
+        "groups:read",
+        "users:read",
+        "reactions:write",
+        "commands"
+      ]
+    }
+  },
   "settings": {
-    "event_subscriptions": { "request_url": "https://pixelpage.co.kr/api/slack/events", "bot_events": ["message.channels", "message.groups"] },
-    "interactivity": { "is_enabled": true, "request_url": "https://pixelpage.co.kr/api/slack/interactions" },
-    "org_deploy_enabled": false, "socket_mode_enabled": false, "token_rotation_enabled": false
+    "event_subscriptions": {
+      "request_url": "https://pixelpage.co.kr/api/slack/events",
+      "bot_events": [
+        "message.channels",
+        "message.groups"
+      ]
+    },
+    "interactivity": {
+      "is_enabled": true,
+      "request_url": "https://pixelpage.co.kr/api/slack/interactions"
+    },
+    "org_deploy_enabled": false,
+    "socket_mode_enabled": false,
+    "token_rotation_enabled": false
   }
 }
