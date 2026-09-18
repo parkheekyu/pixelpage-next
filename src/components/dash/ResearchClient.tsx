@@ -56,7 +56,7 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
             <a className="btn" href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer">퍼플렉시티 열기</a>
           </div>
           <textarea value={input.pre_research ?? ""} placeholder="퍼플렉시티 답변을 그대로 붙여 넣으세요 (3개를 이어서 붙여도 됩니다). 출처 링크가 함께 있으면 보고서에 출처로 표시됩니다." onChange={(e) => setInput({ ...input, pre_research: e.target.value })} rows={6} style={{ marginTop: 4 }} />
-          <div className="hint">{(input.pre_research ?? "").length.toLocaleString()}자 · 저장은 위 "정보 저장" 또는 실행 시 자동</div>
+          <div className="hint">{(input.pre_research ?? "").length.toLocaleString()}자 · 저장은 위 정보 저장 버튼 또는 실행 시 자동</div>
         </div>
       ) : (
         project.research_input?.product && (
