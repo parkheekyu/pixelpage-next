@@ -134,7 +134,8 @@ await db.from("agent_jobs").update({ claimed_at: null, worker: null, status: "qu
 log(`워커 시작 (${WORKER}, model=${MODEL}, effort=${EFFORT}, ${WATCH ? "watch" : "once"})`);
 do {
   try { await enqueueRoutines(db, { log }); } catch (e) { log(`정기 업무 확인 실패: ${e.message}`); }
-  while ((await processOne()) || (await processAgentJob())) { /* 대기열이 빌 때까지 */ }
+  // 분석은 1건씩, 직원 대화·배분은 동시에 3건까지
+  for (;;) { const a = await processOne(); const r = await Promise.all([processAgentJob(), processAgentJob(), processAgentJob()]); if (!a && !r.some(Boolean)) break; }
   if (WATCH) await new Promise((r) => setTimeout(r, 5000));
 } while (WATCH);
 log("대기열 비어 있음, 종료");

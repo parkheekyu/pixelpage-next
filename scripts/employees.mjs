@@ -77,6 +77,7 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
   const pl = job.payload ?? {};
   const emp = EMP[pl.employee] ?? TEAM.employees.find((e) => e.default);
   const t0 = Date.now();
+  if (/^U[A-Z0-9]{6,}$/.test(pl.user_name ?? "")) { try { const bots = await loadBots(db); const tok = Object.values(bots)[0]?.bot_token; const j = await slackApi("users.info", { user: pl.user_name }, tok); if (j.ok) { pl.user_name = j.user.real_name ?? j.user.name ?? pl.user_name; await db.from("agent_messages").update({ user_name: pl.user_name }).eq("user_id", pl.user_id).like("user_name", "U%"); } } catch {} }
   const thread = pl.thread_ts ?? null;
 
   // 대화 맥락: 스레드 전체 + (스레드가 없거나 짧으면) 채널 최근 메시지
@@ -143,7 +144,7 @@ export async function processDispatch(db, job, { log }) {
   const { data: recent } = await db.from("agent_messages").select("ts,user_name,employee_id,text").eq("channel", pl.channel).is("thread_ts", null).neq("ts", pl.trigger_ts).order("ts", { ascending: false }).limit(10);
   const line = (m) => `${m.employee_id ? `${EMP[m.employee_id]?.name ?? m.employee_id}(직원)` : m.user_name}: ${String(m.text).slice(0, 200)}`;
   const roster = TEAM.employees.map((e) => `- ${e.id}: ${e.name} (${e.title})`).join("\n");
-  const system = `너는 슬랙 채널의 배분 담당이다. 대표가 멘션 없이 올린 메시지를 보고 어느 AI 직원이 답해야 하는지 정한다.\n직원:\n${roster}\n규칙\n- 특정 직원 이름을 부르면 그 직원. 업무 영역이 분명하면 그 담당 1명. 두 영역에 걸치면 2명.\n- 팀 전체에게 하는 말(인사, 공지, "다들 …", 전원 의견 요청)이면 전원.\n- 스레드 안이면 그 스레드에서 말하던 직원이 우선.\n- 사람끼리 하는 대화, 단순 반응("ㅇㅋ", "고마워" 등 답이 필요 없는 말)이면 빈 배열.\n- 애매하면 hana.\n출력은 JSON 한 개만: {"respond":["doyun"]}`;
+  const system = `너는 슬랙 채널의 배분 담당이다. 대표가 멘션 없이 올린 메시지를 보고 어느 AI 직원이 답해야 하는지 정한다.\n직원:\n${roster}\n규칙\n- 특정 직원 이름을 부르면 그 직원. 업무 영역이 분명하면 그 담당 1명. 두 영역에 걸치면 2명.\n- "모두", "다들", "전원", "각자", "팀" 처럼 전체를 부르거나, 인사·공지·전원 의견 요청이면 6명 전원을 넣는다.\n- 스레드 안이면 그 스레드에서 말하던 직원이 우선.\n- 사람끼리 하는 대화, 단순 반응("ㅇㅋ", "고마워" 등 답이 필요 없는 말)이면 빈 배열.\n- 애매하면 hana.\n출력은 JSON 한 개만: {"respond":["doyun"]}`;
   const prompt = `${(recent ?? []).length ? `[채널 최근]\n${(recent ?? []).reverse().map(line).join("\n")}\n\n` : ""}${(th ?? []).length ? `[이 스레드]\n${(th ?? []).map(line).join("\n")}\n\n` : ""}[메시지] ${pl.user_name}: ${pl.text}`;
   let ids = [];
   try {
