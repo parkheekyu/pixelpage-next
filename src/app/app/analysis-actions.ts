@@ -21,11 +21,12 @@ import { randomBytes } from "node:crypto";
 const PATHS: Record<AnalysisKind, string> = { research: "/app/research", market: "/app/research", ads: "/app/ads", landing: "/app/landing" };
 
 // ---------- 설정 ----------
-export async function saveIntegrations(projectId: string, input: { meta_ad_account_id?: string; ga4_property_id?: string; clarity_project_id?: string; clarity_api_token?: string; google_sheet_id?: string; google_sheet_tab?: string; airtable_base_id?: string; airtable_table?: string; airtable_token?: string; lead_sync_enabled?: boolean }): Promise<ActionResult> {
+export async function saveIntegrations(projectId: string, input: { meta_ad_account_id?: string; meta_goal?: "lead" | "purchase"; ga4_property_id?: string; clarity_project_id?: string; clarity_api_token?: string; google_sheet_id?: string; google_sheet_tab?: string; airtable_base_id?: string; airtable_table?: string; airtable_token?: string; lead_sync_enabled?: boolean }): Promise<ActionResult> {
   const s = await requireStaff();
   const clean = (v?: string) => (v ?? "").trim().slice(0, 300) || null;
   const row: Record<string, unknown> = { project_id: projectId, updated_at: new Date().toISOString() };
   if (input.meta_ad_account_id !== undefined) row.meta_ad_account_id = clean(input.meta_ad_account_id)?.replace(/^act_/, "") ?? null;
+  if (input.meta_goal !== undefined) row.meta_goal = input.meta_goal === "purchase" ? "purchase" : "lead";
   if (input.ga4_property_id !== undefined) row.ga4_property_id = clean(input.ga4_property_id)?.replace(/^properties\//, "") ?? null;
   if (input.clarity_project_id !== undefined) row.clarity_project_id = clean(input.clarity_project_id);
   if (input.clarity_api_token !== undefined && input.clarity_api_token !== "") row.clarity_api_token = clean(input.clarity_api_token);
@@ -139,16 +140,18 @@ export async function runAdsAnalysis(projectId: string, datePreset = "last_30d")
   const s = await requireStaff();
   const [{ data: p }, { data: integ }] = await Promise.all([
     s.supabase.from("projects").select("name,research_input,landing_url").eq("id", projectId).single(),
-    s.supabase.from("project_integrations").select("meta_ad_account_id").eq("project_id", projectId).maybeSingle(),
+    s.supabase.from("project_integrations").select("meta_ad_account_id,meta_goal").eq("project_id", projectId).maybeSingle(),
   ]);
   if (!p) return { ok: false, error: "프로젝트 없음" };
   if (!integ?.meta_ad_account_id) return { ok: false, error: "Meta 광고 계정 ID를 먼저 설정해 주세요." };
+  const goal = (integ.meta_goal === "purchase" ? "purchase" : "lead") as "lead" | "purchase";
   const preset = ["last_7d", "last_14d", "last_30d", "last_90d", "maximum"].includes(datePreset) ? datePreset : "last_30d";
   return execute("ads", projectId, `${p.name} 광고 분석 (${preset})`, { date_preset: preset, ad_account: integ.meta_ad_account_id }, async () => {
     const { snapshot: snap } = await getMetaSnapshot(s.supabase, projectId, integ.meta_ad_account_id!, preset);
     const r = (p.research_input ?? {}) as ResearchInput;
     const ctx = r.product || r.target ? `\n\n[고객사 리서치 메모]\n${researchText(p.name, r)}` : "";
-    return `다음은 고객사 "${p.name}"의 Meta 광고 계정 현황입니다. 위너가 무엇이고 왜 잘되는지, 카피·이미지·영상과 캠페인 구조를 분석하고 개선안을 작성해 주세요.${p.landing_url ? `\n랜딩페이지: ${p.landing_url}` : ""}${ctx}\n\n[광고 계정 데이터]\n${snapshotToText(snap)}`;
+    const goalNote = goal === "purchase" ? "이 캠페인의 목표는 구매(매출)입니다. 위너 판정은 구매 수 → ROAS → CPA 순이며, 리드/CPL 은 참고 지표입니다." : "이 캠페인의 목표는 리드(상담 신청)입니다. 위너 판정은 리드 수 → CPL → CTR 순입니다.";
+    return `다음은 고객사 "${p.name}"의 Meta 광고 계정 현황입니다. ${goalNote} 위너가 무엇이고 왜 잘되는지, 카피·이미지·영상과 캠페인 구조를 분석하고 개선안을 작성해 주세요. CPM·빈도·도달·CTR·CPC·랜딩뷰 같은 지표를 근거로 소재 피로, 타깃 협소, 랜딩 문제를 구분해 주세요.${p.landing_url ? `\n랜딩페이지: ${p.landing_url}` : ""}${ctx}\n\n[광고 계정 데이터]\n${snapshotToText(snap, goal)}`;
   });
 }
 

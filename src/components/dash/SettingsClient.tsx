@@ -43,7 +43,7 @@ export default function SettingsClient({ project, integ, env }: Props) {
   const [open, setOpen] = useState<string | null>(null);
   const toggle = (k: string) => setOpen((o) => (o === k ? null : k));
   const [basic, setBasic] = useState({ name: project.name, landing_url: project.landing_url ?? "" });
-  const [f, setF] = useState({ meta_ad_account_id: integ?.meta_ad_account_id ?? "", ga4_property_id: integ?.ga4_property_id ?? "", clarity_project_id: integ?.clarity_project_id ?? "", clarity_api_token: "", google_sheet_id: integ?.google_sheet_id ?? "", google_sheet_tab: integ?.google_sheet_tab ?? "리드", airtable_base_id: integ?.airtable_base_id ?? "", airtable_table: integ?.airtable_table ?? "", airtable_token: "", lead_sync_enabled: integ?.lead_sync_enabled ?? false });
+  const [f, setF] = useState({ meta_ad_account_id: integ?.meta_ad_account_id ?? "", meta_goal: (integ?.meta_goal ?? "lead") as "lead" | "purchase", ga4_property_id: integ?.ga4_property_id ?? "", clarity_project_id: integ?.clarity_project_id ?? "", clarity_api_token: "", google_sheet_id: integ?.google_sheet_id ?? "", google_sheet_tab: integ?.google_sheet_tab ?? "리드", airtable_base_id: integ?.airtable_base_id ?? "", airtable_table: integ?.airtable_table ?? "", airtable_token: "", lead_sync_enabled: integ?.lead_sync_enabled ?? false });
   const [token, setToken] = useState(project.webhook_token ?? "");
   const [copied, setCopied] = useState<string | null>(null);
   const copy = (k: string, v: string) => navigator.clipboard?.writeText(v).then(() => setCopied(k));
@@ -66,8 +66,12 @@ export default function SettingsClient({ project, integ, env }: Props) {
 
       <h2 style={{ fontSize: 15, margin: "0 0 8px" }}>외부 연동</h2>
       <div className="integ-grid">
-        <Card logo={<Brand id="meta" />} title="Meta 광고" desc="캠페인·광고 성과, 위너 분석" state={!env.meta ? "need" : integ?.meta_ad_account_id ? "on" : "off"} open={open === "meta"} onToggle={() => toggle("meta")}>
-          <div className="form-row"><label className="f">광고 계정 ID<input type="text" value={f.meta_ad_account_id} onChange={(e) => setF({ ...f, meta_ad_account_id: e.target.value })} placeholder="1234567890" /></label>{saveBtn("meta")}</div>
+        <Card logo={<Brand id="meta" />} title="Meta 광고" desc={`캠페인·광고 성과, 위너 분석 · 목표: ${integ?.meta_goal === "purchase" ? "구매" : "리드"}`} state={!env.meta ? "need" : integ?.meta_ad_account_id ? "on" : "off"} open={open === "meta"} onToggle={() => toggle("meta")}>
+          <div className="form-row">
+            <label className="f">광고 계정 ID<input type="text" value={f.meta_ad_account_id} onChange={(e) => setF({ ...f, meta_ad_account_id: e.target.value })} placeholder="1234567890" /></label>
+            <label className="f">전환 목표<select value={f.meta_goal} onChange={(e) => setF({ ...f, meta_goal: e.target.value as "lead" | "purchase" })}><option value="lead">리드 · 상담 신청 (CPL 기준)</option><option value="purchase">구매 · 매출 (CPA·ROAS 기준)</option></select></label>
+            {saveBtn("meta")}
+          </div>
           <div className="hint">광고 관리자 주소의 <code>act=</code> 뒤 숫자. 토큰은 서버 환경 변수 META_ACCESS_TOKEN {env.meta ? "(설정됨)" : "(미설정)"}.</div>
           {renderMsg("meta")}
         </Card>

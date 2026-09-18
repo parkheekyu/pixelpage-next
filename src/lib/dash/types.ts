@@ -52,6 +52,7 @@ export interface ResearchInput {
 export interface ProjectIntegrations {
   project_id: string;
   meta_ad_account_id: string | null;
+  meta_goal: "lead" | "purchase";
   ga4_property_id: string | null;
   clarity_project_id: string | null;
   clarity_api_token: string | null;
