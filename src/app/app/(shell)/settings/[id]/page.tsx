@@ -14,7 +14,7 @@ export default async function SettingsPage({ params }: { params: Promise<{ id: s
   return (
     <>
       <ProjectNav project={project} isStaff unread={unread[project.id] ?? {}} />
-      <SettingsClient project={project} integ={integ} env={{ meta: !!process.env.META_ACCESS_TOKEN, google: hasGoogleServiceAccount(), googleEmail: googleServiceAccountEmail(), siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://pixelpage.co.kr" }} />
+      <SettingsClient project={project} integ={integ} env={{ meta: !!process.env.META_ACCESS_TOKEN, google: hasGoogleServiceAccount(), googleEmail: googleServiceAccountEmail(), siteUrl: process.env.NEXT_PUBLIC_SITE_URL ?? "https://pixelpage.co.kr", slack: !!process.env.SLACK_BOT_TOKEN }} />
     </>
   );
 }

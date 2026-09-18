@@ -21,7 +21,7 @@ import { randomBytes } from "node:crypto";
 const PATHS: Record<AnalysisKind, string> = { research: "/app/research", market: "/app/research", ads: "/app/ads", landing: "/app/landing" };
 
 // ---------- 설정 ----------
-export async function saveIntegrations(projectId: string, input: { meta_ad_account_id?: string; meta_goal?: "lead" | "purchase"; ga4_property_id?: string; clarity_project_id?: string; clarity_api_token?: string; google_sheet_id?: string; google_sheet_tab?: string; airtable_base_id?: string; airtable_table?: string; airtable_token?: string; lead_sync_enabled?: boolean }): Promise<ActionResult> {
+export async function saveIntegrations(projectId: string, input: { meta_ad_account_id?: string; meta_goal?: "lead" | "purchase"; ga4_property_id?: string; clarity_project_id?: string; clarity_api_token?: string; google_sheet_id?: string; google_sheet_tab?: string; airtable_base_id?: string; airtable_table?: string; airtable_token?: string; lead_sync_enabled?: boolean; slack_channel_id?: string }): Promise<ActionResult> {
   const s = await requireStaff();
   const clean = (v?: string) => (v ?? "").trim().slice(0, 300) || null;
   const row: Record<string, unknown> = { project_id: projectId, updated_at: new Date().toISOString() };
@@ -36,6 +36,7 @@ export async function saveIntegrations(projectId: string, input: { meta_ad_accou
   if (input.airtable_table !== undefined) row.airtable_table = clean(input.airtable_table);
   if (input.airtable_token !== undefined && input.airtable_token !== "") row.airtable_token = clean(input.airtable_token);
   if (input.lead_sync_enabled !== undefined) row.lead_sync_enabled = !!input.lead_sync_enabled;
+  if (input.slack_channel_id !== undefined) row.slack_channel_id = clean(input.slack_channel_id);
   const { error } = await s.supabase.from("project_integrations").upsert(row, { onConflict: "project_id" });
   if (error) return { ok: false, error: error.message };
   for (const p of Object.values(PATHS)) revalidatePath(`${p}/${projectId}`);

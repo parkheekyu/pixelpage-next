@@ -62,6 +62,7 @@ export interface ProjectIntegrations {
   airtable_table: string | null;
   airtable_token: string | null;
   lead_sync_enabled: boolean;
+  slack_channel_id: string | null;
   updated_at: string;
 }
 
@@ -151,3 +152,17 @@ export interface LeadPatch {
   memo?: string | null;
   custom?: Record<string, string | number | null>;
 }
+
+export type Engine = "claude" | "codex";
+export interface CreativeVariant { id: string; angle: string; format: string; headline: string; primary_text: string; cta: string; visual: string; hook?: string; why: string }
+export interface Proposal {
+  id: string; project_id: string; kind: string;
+  status: "queued" | "running" | "proposed" | "approved" | "rejected" | "error";
+  engine: Engine; title: string | null;
+  brief: { goal?: string; formats?: string[]; count?: number; notes?: string } | null;
+  variants: CreativeVariant[] | null;
+  feedback: string | null; parent_id: string | null; job_id: string | null; error: string | null;
+  created_by: string | null; decided_by: string | null; decided_at: string | null; created_at: string;
+}
+
+export type MetaGoalLike = "lead" | "purchase";

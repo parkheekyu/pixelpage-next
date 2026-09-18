@@ -398,3 +398,19 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 /* ---- 리포트 카드 머리글 (실행 버튼 포함) ---- */
 .pp-dash .report-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin-bottom: 8px; }
 .pp-dash .report-head .sp { flex: 1; }
+
+/* ---- 소재 제안 ---- */
+.pp-dash .prop { border-top: 1px solid var(--line); padding: 14px 0 6px; margin-top: 10px; }
+.pp-dash .prop-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin-bottom: 6px; }
+.pp-dash .prop-summary { color: var(--text-2); font-size: 13.5px; margin: 4px 0 8px; }
+.pp-dash .prop-fb { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--warn); background: var(--tag-yellow-bg); padding: 6px 10px; border-radius: 8px; margin: 6px 0; }
+.pp-dash .prop-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 12px; margin-top: 8px; }
+.pp-dash .prop-card { border: 1px solid var(--line); border-radius: 10px; padding: 14px; background: var(--surface); display: flex; flex-direction: column; gap: 6px; }
+.pp-dash .prop-card-head { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.pp-dash .prop-card-head small { color: var(--muted); margin-left: auto; }
+.pp-dash .prop-headline { font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+.pp-dash .prop-body { font-size: 13.5px; white-space: pre-wrap; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 10px; }
+.pp-dash .prop-cta { font-size: 12.5px; font-weight: 600; color: var(--s1); }
+.pp-dash .prop-kv { display: grid; grid-template-columns: 52px 1fr; gap: 6px; font-size: 12.5px; color: var(--text-2); }
+.pp-dash .prop-kv b { color: var(--muted); font-weight: 600; }
+.pp-dash .prop-kv.why span { color: var(--text-2); font-style: normal; }

@@ -2,13 +2,13 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, ChevronUp, Copy, Download, RefreshCw, Save, Upload, Webhook } from "lucide-react";
+import { Check, ChevronDown, ChevronUp, Copy, Download, RefreshCw, Save, Upload, Webhook, MessageSquare } from "lucide-react";
 import { regenerateWebhookToken, saveIntegrations, saveProjectBasic, syncLeads } from "@/app/app/analysis-actions";
 import type { ActionResult } from "@/app/app/actions";
 import type { Project, ProjectIntegrations } from "@/lib/dash/types";
 import { BRAND } from "./brand-icons";
 
-interface Props { project: Project; integ: ProjectIntegrations | null; env: { meta: boolean; google: boolean; googleEmail: string | null; siteUrl: string } }
+interface Props { project: Project; integ: ProjectIntegrations | null; env: { meta: boolean; google: boolean; googleEmail: string | null; siteUrl: string; slack: boolean } }
 
 function Brand({ id, size = 28 }: { id: keyof typeof BRAND; size?: number }) {
   const b = BRAND[id];
@@ -43,7 +43,7 @@ export default function SettingsClient({ project, integ, env }: Props) {
   const [open, setOpen] = useState<string | null>(null);
   const toggle = (k: string) => setOpen((o) => (o === k ? null : k));
   const [basic, setBasic] = useState({ name: project.name, landing_url: project.landing_url ?? "" });
-  const [f, setF] = useState({ meta_ad_account_id: integ?.meta_ad_account_id ?? "", meta_goal: (integ?.meta_goal ?? "lead") as "lead" | "purchase", ga4_property_id: integ?.ga4_property_id ?? "", clarity_project_id: integ?.clarity_project_id ?? "", clarity_api_token: "", google_sheet_id: integ?.google_sheet_id ?? "", google_sheet_tab: integ?.google_sheet_tab ?? "리드", airtable_base_id: integ?.airtable_base_id ?? "", airtable_table: integ?.airtable_table ?? "", airtable_token: "", lead_sync_enabled: integ?.lead_sync_enabled ?? false });
+  const [f, setF] = useState({ meta_ad_account_id: integ?.meta_ad_account_id ?? "", meta_goal: (integ?.meta_goal ?? "lead") as "lead" | "purchase", ga4_property_id: integ?.ga4_property_id ?? "", clarity_project_id: integ?.clarity_project_id ?? "", clarity_api_token: "", google_sheet_id: integ?.google_sheet_id ?? "", google_sheet_tab: integ?.google_sheet_tab ?? "리드", airtable_base_id: integ?.airtable_base_id ?? "", airtable_table: integ?.airtable_table ?? "", airtable_token: "", lead_sync_enabled: integ?.lead_sync_enabled ?? false, slack_channel_id: integ?.slack_channel_id ?? "" });
   const [token, setToken] = useState(project.webhook_token ?? "");
   const [copied, setCopied] = useState<string | null>(null);
   const copy = (k: string, v: string) => navigator.clipboard?.writeText(v).then(() => setCopied(k));
@@ -105,6 +105,12 @@ export default function SettingsClient({ project, integ, env }: Props) {
           </div>
           <div className="hint">헤더 <code>Authorization: Bearer 토큰</code> 으로 보내면 <code>client</code> 없이 이 고객사 시트에 들어갑니다. 연락처(phone) 필수.</div>
           {renderMsg("wh")}
+        </Card>
+
+        <Card logo={<span className="integ-mark" style={{ background: "#4A154B" }}><MessageSquare className="ico" aria-hidden /></span>} title="Slack" desc="봇 제안·보고·승인 채널" state={!env.slack ? "need" : integ?.slack_channel_id ? "on" : "off"} open={open === "slack"} onToggle={() => toggle("slack")}>
+          <div className="form-row"><label className="f">채널 ID<input type="text" value={f.slack_channel_id} onChange={(e) => setF({ ...f, slack_channel_id: e.target.value })} placeholder="C0123456789" /></label>{saveBtn("slack")}</div>
+          <div className="hint">이 고객사의 봇 메시지가 올라갈 채널. 채널 세부정보 맨 아래의 ID(C…). 봇을 채널에 초대(/invite @픽셀페이지 봇)해야 합니다. 슬랙에서 <code>/pixel 소재 고객사이름</code> 을 치면 그 채널이 자동 등록됩니다. {env.slack ? "" : "서버에 SLACK_BOT_TOKEN 이 필요합니다."}</div>
+          {renderMsg("slack")}
         </Card>
 
         <Card logo={<Brand id="sheets" />} title="Google Sheets" desc="리드 내보내기 · 가져오기" state={!env.google ? "need" : integ?.google_sheet_id ? "on" : "off"} open={open === "sheets"} onToggle={() => toggle("sheets")}>

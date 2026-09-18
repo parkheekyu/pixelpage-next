@@ -10,7 +10,9 @@
 import { createClient } from "@supabase/supabase-js";
 import { spawn } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
-import { hostname } from "node:os";
+import os, { hostname } from "node:os";
+import path from "node:path";
+import fs from "node:fs";
 
 if (existsSync(".env.local")) for (const line of readFileSync(".env.local", "utf8").split("\n")) { const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, ""); }
 const args = process.argv.slice(2);
@@ -36,6 +38,59 @@ function runClaude(system, prompt, kind) {
     p.on("close", (code) => { clearTimeout(timer); if (code === 0 && out.trim()) resolve(out.trim()); else reject(new Error(`claude 종료 코드 ${code}: ${err.trim().slice(0, 500) || out.slice(0, 300) || "빈 응답"}`)); });
     p.stdin.end(prompt);
   });
+}
+
+// ---------- Codex CLI ----------
+function runCodex(system, prompt, { limitMin = 15 } = {}) {
+  return new Promise((resolve, reject) => {
+    const outFile = path.join(os.tmpdir(), `codex-${Date.now()}-${Math.random().toString(36).slice(2)}.txt`);
+    const full = `[지시사항]\n${system}\n\n[작업]\n${prompt}`;
+    const p = spawn("codex", ["exec", "--sandbox", "read-only", "--skip-git-repo-check", "-o", outFile, full], { stdio: ["ignore", "pipe", "pipe"], env: { ...process.env } });
+    let err = "", out = "";
+    const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error(`${limitMin}분 초과로 중단`)); }, limitMin * 60 * 1000);
+    p.stdout.on("data", (d) => (out += d)); p.stderr.on("data", (d) => (err += d));
+    p.on("error", (e) => { clearTimeout(timer); reject(e); });
+    p.on("close", (code) => { clearTimeout(timer); let text = ""; try { text = fs.readFileSync(outFile, "utf8").trim(); fs.unlinkSync(outFile); } catch {} if (code === 0 && text) resolve(text); else reject(new Error(`codex 종료 코드 ${code}: ${(err || out).trim().slice(0, 500) || "빈 응답"}`)); });
+  });
+}
+function extractJson(text) {
+  const m = text.match(/\{[\s\S]*\}/); if (!m) throw new Error("JSON 을 찾지 못함");
+  return JSON.parse(m[0]);
+}
+
+/** 범용 에이전트 작업 (agent_jobs) — 결과를 kind 별로 후처리 */
+async function processAgentJob() {
+  const { data: job } = await db.from("agent_jobs").select("*").eq("status", "queued").is("claimed_at", null).order("created_at").limit(1).maybeSingle();
+  if (!job) return false;
+  const { data: claimed } = await db.from("agent_jobs").update({ claimed_at: new Date().toISOString(), worker: WORKER, status: "running" }).eq("id", job.id).is("claimed_at", null).select("id");
+  if (!claimed?.length) return true;
+  if (job.kind === "creative_proposal") await db.from("proposals").update({ status: "running" }).eq("job_id", job.id);
+  log(`[agent:${job.engine}] 시작 ${job.kind} ${job.id} (프롬프트 ${job.prompt.length.toLocaleString()}자)`);
+  const t0 = Date.now();
+  try {
+    const text = job.engine === "codex" ? await runCodex(job.system_prompt, job.prompt) : await runClaude(job.system_prompt, job.prompt, job.kind);
+    let json = null; try { json = extractJson(text); } catch {}
+    await db.from("agent_jobs").update({ status: "done", result_text: text, result_json: json, finished_at: new Date().toISOString() }).eq("id", job.id);
+    if (job.kind === "creative_proposal") {
+      if (!json?.variants?.length) throw new Error("제안 JSON 형식 오류: variants 없음");
+      const variants = json.variants.map((v, i) => ({ id: v.id || String.fromCharCode(65 + i), angle: v.angle ?? "", format: v.format ?? "", headline: v.headline ?? "", primary_text: v.primary_text ?? "", cta: v.cta ?? "", visual: v.visual ?? "", hook: v.hook ?? "", why: v.why ?? "" }));
+      await db.from("proposals").update({ status: "proposed", variants, title: json.title || undefined, brief: undefined }).eq("job_id", job.id);
+      // summary 는 brief 에 병합
+      const { data: pr } = await db.from("proposals").select("id,brief").eq("job_id", job.id).maybeSingle();
+      if (pr) await db.from("proposals").update({ brief: { ...(pr.brief ?? {}), summary: json.summary ?? "" } }).eq("job_id", job.id);
+      // 슬랙 게시 (서버가 블록을 만들어 올림)
+      if (pr && process.env.LEAD_WEBHOOK_SECRET) {
+        const site = process.env.WORKER_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://pixelpage.co.kr";
+        try { const r = await fetch(`${site}/api/slack/post-proposal`, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${process.env.LEAD_WEBHOOK_SECRET}` }, body: JSON.stringify({ proposal_id: pr.id }) }); const j = await r.json(); log(`슬랙 게시: ${j.ok ? (j.skipped ? "건너뜀 (" + j.skipped + ")" : "완료 " + j.ts) : "실패 " + j.error}`); } catch (e) { log(`슬랙 게시 실패: ${e.message}`); }
+      }
+    }
+    log(`[agent:${job.engine}] 완료 ${job.id} (${Math.round((Date.now() - t0) / 1000)}s)`);
+  } catch (e) {
+    await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id);
+    if (job.kind === "creative_proposal") await db.from("proposals").update({ status: "error", error: String(e.message ?? e).slice(0, 500) }).eq("job_id", job.id);
+    log(`[agent:${job.engine}] 실패 ${job.id}: ${e.message}`);
+  }
+  return true;
 }
 
 async function processOne() {
@@ -64,9 +119,10 @@ async function processOne() {
 
 // 이전 워커가 죽어 남은 선점(30분 초과)은 해제
 await db.from("analysis_jobs").update({ claimed_at: null, worker: null }).lt("claimed_at", new Date(Date.now() - 30 * 60 * 1000).toISOString());
+await db.from("agent_jobs").update({ claimed_at: null, worker: null, status: "queued" }).eq("status", "running").lt("claimed_at", new Date(Date.now() - 30 * 60 * 1000).toISOString());
 log(`워커 시작 (${WORKER}, model=${MODEL}, effort=${EFFORT}, ${WATCH ? "watch" : "once"})`);
 do {
-  while (await processOne()) { /* 대기열이 빌 때까지 */ }
+  while ((await processOne()) || (await processAgentJob())) { /* 대기열이 빌 때까지 */ }
   if (WATCH) await new Promise((r) => setTimeout(r, 15000));
 } while (WATCH);
 log("대기열 비어 있음, 종료");
