@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { RefreshCw, Save } from "lucide-react";
-import { runAdsAnalysis, saveIntegrations } from "@/app/app/analysis-actions";
+import Link from "next/link";
+import { RefreshCw } from "lucide-react";
+import { runAdsAnalysis } from "@/app/app/analysis-actions";
 import type { MetaAccountSnapshot, MetaInsight } from "@/lib/integrations/meta";
 import type { Analysis, Project } from "@/lib/dash/types";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
@@ -19,36 +20,27 @@ function M({ i }: { i: MetaInsight | null }) {
 
 export default function AdsClient({ project, isStaff, adAccountId, preset, snapshot, snapError, cachedAt, analyses, tokenConfigured }: Props) {
   const router = useRouter(), pathname = usePathname();
-  const [acct, setAcct] = useState(adAccountId ?? "");
-  const [msg, setMsg] = useState<string | null>(null);
   const [pending, start] = useTransition();
-  const save = () => start(async () => { const r = await saveIntegrations(project.id, { meta_ad_account_id: acct }); setMsg(r.ok ? "저장됨" : r.error); if (r.ok) router.refresh(); });
   const canRun = !!adAccountId && tokenConfigured && !snapError;
 
   return (
     <>
-      <header className="ph">
-        <h1>{project.name}<small>광고 · Meta</small></h1>
+      <div className="ph" style={{ marginTop: -4 }}>
+        <h2 style={{ fontSize: 15 }}>Meta 광고 현황</h2>
         {isStaff && <div className="controls">
           <select value={preset} onChange={(e) => start(() => router.replace(`${pathname}?preset=${e.target.value}`))}>{PRESETS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
           {cachedAt && <span className="hint" style={{ marginTop: 0 }}>{new Date(cachedAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })} 조회 · 30분 캐시</span>}
           {adAccountId && <button type="button" className="btn" disabled={pending} onClick={() => start(() => router.replace(`${pathname}?preset=${preset}&refresh=1`))}><RefreshCw className="ico" aria-hidden /> 새로고침</button>}
         </div>}
-      </header>
+      </div>
 
-      {isStaff && (
+      {isStaff && (!adAccountId || snapError || !tokenConfigured) && (
         <div className="card" style={{ marginBottom: 12 }}>
-          <h2>연동 설정</h2><div className="sub">광고 관리자 → 계정 개요의 계정 ID (숫자, act_ 생략 가능). 토큰은 서버 환경 변수 META_ACCESS_TOKEN.</div>
-          <div className="form-row">
-            <label className="f">Meta 광고 계정 ID<input type="text" value={acct} onChange={(e) => setAcct(e.target.value)} placeholder="123456789012345" style={{ minWidth: 220 }} /></label>
-            <button type="button" className="btn" onClick={save} disabled={pending} style={{ alignSelf: "flex-end" }}><Save className="ico" aria-hidden /> 저장</button>
-            {msg && <span className="hint" style={{ alignSelf: "flex-end", marginBottom: 8 }}>{msg}</span>}
-            {!tokenConfigured && <span className="msg err" style={{ margin: 0 }}>META_ACCESS_TOKEN 이 설정되지 않았습니다.</span>}
-          </div>
+          {!adAccountId && <div className="msg err" style={{ margin: 0 }}>Meta 광고 계정 ID가 없습니다. <Link href={`/app/settings/${project.id}`}>설정</Link>에서 입력하세요.</div>}
+          {!tokenConfigured && <div className="msg err">서버에 META_ACCESS_TOKEN 이 설정되지 않았습니다.</div>}
           {snapError && <div className="msg err">광고 계정 조회 실패: {snapError}</div>}
         </div>
       )}
-
       {isStaff && snapshot && (
         <>
           <section className="tiles">

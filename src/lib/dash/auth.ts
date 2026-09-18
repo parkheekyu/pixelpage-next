@@ -41,3 +41,23 @@ export async function requireProject(id: string) {
   if (!data) redirect("/app");
   return { ...s, project: data as Project };
 }
+
+export type SeenKind = "leads" | "research" | "ads" | "landing";
+export type UnreadMap = Record<string, Partial<Record<SeenKind, number>>>;
+
+/** 프로젝트별·종류별 안 본 개수 (요청 단위 캐시) */
+export const getUnreadCounts = cache(async (): Promise<UnreadMap> => {
+  const s = await getSession();
+  if (!s) return {};
+  const { data } = await s.supabase.rpc("unread_counts");
+  const out: UnreadMap = {};
+  for (const r of (data ?? []) as { project_id: string; kind: SeenKind; unread: number }[]) (out[r.project_id] ??= {})[r.kind] = Number(r.unread);
+  return out;
+});
+
+/** 페이지를 열면 그 프로젝트·종류를 확인한 것으로 기록 (배지 제거) */
+export async function markSeen(projectId: string, kind: SeenKind) {
+  const s = await getSession();
+  if (!s) return;
+  await s.supabase.from("user_seen").upsert({ user_id: s.user.id, project_id: projectId, kind, seen_at: new Date().toISOString() }, { onConflict: "user_id,project_id,kind" });
+}

@@ -28,9 +28,6 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
 
   return (
     <>
-      <header className="ph">
-        <h1>{project.name}<small>리서치 · 본능분석과 반박 제거</small></h1>
-      </header>
       {isStaff ? (
         <div className="card" style={{ marginBottom: 12 }}>
           <h2>고객사 정보</h2><div className="sub">AI가 웹 검색으로 시장·경쟁사·키워드를 조사한 뒤, 그 근거로 타깃의 본능과 예상 반박, 메시지 각도, 실행 계획을 한 편의 종합 보고서로 씁니다. 자세할수록 정확합니다. 5~10분 걸립니다.</div>

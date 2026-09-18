@@ -3,23 +3,29 @@ import { createSign } from "node:crypto";
 
 /** GA4 Data API — 서비스 계정 JSON (GA4_SERVICE_ACCOUNT_JSON) 으로 속성 리포트 조회 */
 interface SA { client_email: string; private_key: string }
-let cached: { token: string; exp: number } | null = null;
+const cached = new Map<string, { token: string; exp: number }>();
 
-async function accessToken(): Promise<string> {
+export const hasGoogleServiceAccount = () => !!process.env.GA4_SERVICE_ACCOUNT_JSON;
+export function googleServiceAccountEmail(): string | null { try { return (JSON.parse(process.env.GA4_SERVICE_ACCOUNT_JSON ?? "") as SA).client_email ?? null; } catch { return null; } }
+
+/** 구글 서비스 계정 액세스 토큰 (GA4·Sheets 공용). scope 별 캐시 */
+export async function googleAccessToken(scope = "https://www.googleapis.com/auth/analytics.readonly"): Promise<string> {
   const raw = process.env.GA4_SERVICE_ACCOUNT_JSON;
-  if (!raw) throw new Error("GA4_SERVICE_ACCOUNT_JSON 미설정");
-  if (cached && cached.exp > Date.now() + 60000) return cached.token;
+  if (!raw) throw new Error("GA4_SERVICE_ACCOUNT_JSON 미설정 (구글 서비스 계정 키)");
+  const c = cached.get(scope);
+  if (c && c.exp > Date.now() + 60000) return c.token;
   const sa = JSON.parse(raw) as SA;
   const now = Math.floor(Date.now() / 1000);
   const b64 = (o: object) => Buffer.from(JSON.stringify(o)).toString("base64url");
-  const unsigned = `${b64({ alg: "RS256", typ: "JWT" })}.${b64({ iss: sa.client_email, scope: "https://www.googleapis.com/auth/analytics.readonly", aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3600 })}`;
+  const unsigned = `${b64({ alg: "RS256", typ: "JWT" })}.${b64({ iss: sa.client_email, scope, aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3600 })}`;
   const sig = createSign("RSA-SHA256").update(unsigned).sign(sa.private_key, "base64url");
   const r = await fetch("https://oauth2.googleapis.com/token", { method: "POST", headers: { "content-type": "application/x-www-form-urlencoded" }, body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion: `${unsigned}.${sig}` }) });
   const j = (await r.json()) as { access_token?: string; expires_in?: number; error_description?: string };
-  if (!j.access_token) throw new Error("GA4 토큰 발급 실패: " + (j.error_description ?? r.status));
-  cached = { token: j.access_token, exp: Date.now() + (j.expires_in ?? 3600) * 1000 };
+  if (!j.access_token) throw new Error("구글 토큰 발급 실패: " + (j.error_description ?? r.status));
+  cached.set(scope, { token: j.access_token, exp: Date.now() + (j.expires_in ?? 3600) * 1000 });
   return j.access_token;
 }
+const accessToken = () => googleAccessToken();
 
 export interface Ga4Row { dims: string[]; metrics: number[] }
 export interface Ga4Report { dimensionHeaders: string[]; metricHeaders: string[]; rows: Ga4Row[] }

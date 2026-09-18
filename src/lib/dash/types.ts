@@ -34,6 +34,7 @@ export interface Project {
   hidden_columns: string[];
   landing_url: string | null;
   research_input: ResearchInput;
+  webhook_token: string | null;
 }
 
 export interface ResearchInput {
@@ -54,6 +55,12 @@ export interface ProjectIntegrations {
   ga4_property_id: string | null;
   clarity_project_id: string | null;
   clarity_api_token: string | null;
+  google_sheet_id: string | null;
+  google_sheet_tab: string | null;
+  airtable_base_id: string | null;
+  airtable_table: string | null;
+  airtable_token: string | null;
+  lead_sync_enabled: boolean;
   updated_at: string;
 }
 
