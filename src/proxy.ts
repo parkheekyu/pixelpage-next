@@ -45,7 +45,9 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // 서명 키가 ES256 이라 로컬에서 검증된다 (auth 서버 왕복 없음). 실패 시에만 getUser 로 확인
+  const { data: claims } = await supabase.auth.getClaims();
+  const user = claims?.claims?.sub ? { id: claims.claims.sub } : (await supabase.auth.getUser()).data.user;
 
   if (!user && !isLogin) {
     const login = new URL("/app/login", request.url);

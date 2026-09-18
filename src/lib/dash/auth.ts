@@ -7,7 +7,10 @@ import type { Profile, Project } from "./types";
 /** 로그인 사용자 + 프로필. 요청 단위로 캐시. */
 export const getSession = cache(async () => {
   const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  // JWT 를 로컬에서 검증 (ES256 공개키). 실패하면 auth 서버로 확인
+  const { data: claims } = await supabase.auth.getClaims();
+  let user: { id: string; email?: string } | null = claims?.claims?.sub ? { id: claims.claims.sub, email: claims.claims.email as string | undefined } : null;
+  if (!user) { const { data } = await supabase.auth.getUser(); user = data.user ? { id: data.user.id, email: data.user.email } : null; }
   if (!user) return null;
   const { data: profile } = await supabase.from("profiles").select("*").eq("id", user.id).maybeSingle();
   if (!profile) return null;

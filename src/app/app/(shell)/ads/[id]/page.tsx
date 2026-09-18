@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { requireProject, getUnreadCounts, markSeen } from "@/lib/dash/auth";
 import ProjectNav from "@/components/dash/ProjectNav";
 import { getIntegrations, getMetaSnapshot, listAnalyses } from "@/lib/dash/analysis-data";
@@ -11,7 +12,7 @@ export default async function AdsPage({ params, searchParams }: { params: Promis
   const [{ id }, sp] = await Promise.all([params, searchParams]);
   const { supabase, project, profile } = await requireProject(id);
   const unread = (await getUnreadCounts())[project.id] ?? {};
-  await markSeen(project.id, "ads");
+  after(() => markSeen(project.id, "ads"));
   const isStaff = profile.role === "staff";
   const preset = ["last_7d", "last_14d", "last_30d", "last_90d"].includes(sp.preset ?? "") ? sp.preset! : "last_30d";
   const [integ, analyses] = await Promise.all([getIntegrations(supabase, project.id), listAnalyses(supabase, project.id, "ads")]);

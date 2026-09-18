@@ -309,3 +309,16 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .pp-dash .ptab.on { background: var(--s1); color: #fff; }
 .pp-dash .ptab .badge-red { margin-left: 2px; }
 @media (max-width: 640px) { .pp-dash .ptab-label { display: none; } .pp-dash .ptab { padding: 6px 9px; } }
+
+/* ---- 로딩 스켈레톤 ---- */
+@keyframes skel-pulse { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.pp-dash .skel > * { background: color-mix(in srgb, var(--text) 6%, var(--card)); border-radius: 10px; animation: skel-pulse 1.2s ease-in-out infinite; }
+.pp-dash .skel-line { height: 28px; margin-bottom: 14px; }
+.pp-dash .skel-line.w40 { width: 40%; }
+.pp-dash .skel-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 14px; background: none !important; animation: none !important; }
+.pp-dash .skel-tile { height: 74px; background: color-mix(in srgb, var(--text) 6%, var(--card)); border-radius: 12px; animation: skel-pulse 1.2s ease-in-out infinite; }
+.pp-dash .skel-block { height: 360px; }
+/* 탭 폭 고정 (배지 유무로 흔들리지 않게) */
+.pp-dash .ptab { min-width: 104px; justify-content: center; }
+.pp-dash .ptab .badge-red { position: absolute; top: -6px; right: -4px; margin: 0; }
+@media (max-width: 640px) { .pp-dash .ptab { min-width: 44px; } }

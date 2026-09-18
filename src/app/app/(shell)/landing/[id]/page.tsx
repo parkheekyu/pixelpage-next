@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { requireProject, getUnreadCounts, markSeen } from "@/lib/dash/auth";
 import ProjectNav from "@/components/dash/ProjectNav";
 import { getIntegrations, listAnalyses } from "@/lib/dash/analysis-data";
@@ -10,7 +11,7 @@ export default async function LandingPage({ params }: { params: Promise<{ id: st
   const { id } = await params;
   const { supabase, project, profile } = await requireProject(id);
   const unread = (await getUnreadCounts())[project.id] ?? {};
-  await markSeen(project.id, "landing");
+  after(() => markSeen(project.id, "landing"));
   const isStaff = profile.role === "staff";
   const [integ, analyses] = await Promise.all([getIntegrations(supabase, project.id), listAnalyses(supabase, project.id, "landing")]);
   return <><ProjectNav project={project} isStaff={profile.role === "staff"} unread={unread} />
