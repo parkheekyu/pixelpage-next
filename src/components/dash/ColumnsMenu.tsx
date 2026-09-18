@@ -14,11 +14,16 @@ interface Props {
   onToggleHidden: (key: string) => void;
   onAddField: (f: CustomField) => void;
   onRemoveField: (key: string) => void;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  compact?: boolean; // 표 헤더의 "+" 버튼으로 표시
 }
 
 /** 열 설정 팝업 (직원): 기본 열 숨기기/보이기, 사용자 정의 열 추가·삭제 */
-export default function ColumnsMenu({ builtin, hidden, fields, busy, onToggleHidden, onAddField, onRemoveField }: Props) {
-  const [open, setOpen] = useState(false);
+export default function ColumnsMenu({ builtin, hidden, fields, busy, onToggleHidden, onAddField, onRemoveField, open: openProp, onOpenChange, compact }: Props) {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp ?? openState;
+  const setOpen = (v: boolean | ((o: boolean) => boolean)) => { const next = typeof v === "function" ? v(open) : v; setOpenState(next); onOpenChange?.(next); };
   const [label, setLabel] = useState(""), [type, setType] = useState<CustomType>("text"), [options, setOptions] = useState("");
   const ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -37,9 +42,11 @@ export default function ColumnsMenu({ builtin, hidden, fields, busy, onToggleHid
 
   return (
     <div className="colmenu" ref={ref}>
-      <button type="button" className="tb drp-btn" onClick={() => setOpen((o) => !o)}><Columns3 className="ico" aria-hidden /> 열</button>
+      {compact
+        ? <button type="button" className="th-add" title="열 추가 · 설정" onClick={() => setOpen((o) => !o)}><Plus className="ico" aria-hidden /></button>
+        : <button type="button" className="tb drp-btn" onClick={() => setOpen((o) => !o)}><Columns3 className="ico" aria-hidden /> 열</button>}
       {open && (
-        <div className="drp-pop colmenu-pop" style={{ opacity: busy ? 0.6 : 1 }}>
+        <div className={`drp-pop colmenu-pop ${compact ? "right" : ""}`} style={{ opacity: busy ? 0.6 : 1 }}>
           <div className="colmenu-sec">
             <h4>기본 열</h4>
             {builtin.map((c) => { const off = hidden.includes(c.key); return (

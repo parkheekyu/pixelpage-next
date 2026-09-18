@@ -8,7 +8,7 @@ import { isDate, MIN_DATE, todayKST } from "./dates";
 
 type DashClient = Awaited<ReturnType<typeof createClient>>;
 
-export const LEAD_COLS = "id,project_id,submitted_at,name,phone,email,message,company,industry,budget,services,marketing_status,utm_source,utm_medium,utm_campaign,utm_content,utm_term,landing_id,status,drop_reason,assignee,first_contact_at,consulted_at,converted_on,revenue,pay_type,memo,custom,is_duplicate";
+export const LEAD_COLS = "id,project_id,submitted_at,name,phone,email,message,company,industry,budget,services,marketing_status,utm_source,utm_medium,utm_campaign,utm_content,utm_term,landing_id,status,drop_reason,assignee,first_contact_at,consulted_at,converted_on,revenue,pay_type,memo,custom,manual_order,is_duplicate";
 
 
 /** 리드 시트 한 페이지 + 요약. 필터·정렬·페이지네이션은 전부 DB에서. */
@@ -33,7 +33,8 @@ export async function queryLeads(supabase: DashClient, projectId: string, p: Lea
     const s = p.q.trim().replace(/[%,()]/g, "");
     q = q.or(`name.ilike.%${s}%,phone.ilike.%${s}%,email.ilike.%${s}%`);
   }
-  if (p.sort === "ts_asc") q = q.order("submitted_at", { ascending: true });
+  if (p.sort === "manual") q = q.order("manual_order", { ascending: true, nullsFirst: false }).order("submitted_at", { ascending: false });
+  else if (p.sort === "ts_asc") q = q.order("submitted_at", { ascending: true });
   else if (p.sort === "rev_desc") q = q.order("revenue", { ascending: false }).order("submitted_at", { ascending: false });
   else if (p.sort === "status") q = q.order("status").order("submitted_at", { ascending: false });
   else q = q.order("submitted_at", { ascending: false });

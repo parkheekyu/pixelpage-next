@@ -116,6 +116,44 @@ export async function deleteLead(projectId: string, leadId: string): Promise<Act
   return { ok: true };
 }
 
+export async function deleteLeads(projectId: string, ids: string[]): Promise<ActionResult & { deleted?: number }> {
+  const s = await requireStaff();
+  const list = ids.filter((x) => /^[0-9a-f-]{36}$/.test(x)).slice(0, 500);
+  if (!list.length) return { ok: false, error: "선택된 리드가 없습니다." };
+  const { error, count } = await s.supabase.from("leads").delete({ count: "exact" }).eq("project_id", projectId).in("id", list);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/app/projects/${projectId}`);
+  return { ok: true, deleted: count ?? 0 };
+}
+
+/** 여러 리드 상태 일괄 변경 (직원·배정 고객사) */
+export async function bulkStatus(projectId: string, ids: string[], status: LeadPatch["status"]): Promise<ActionResult> {
+  const s = await getSession();
+  if (!s) return { ok: false, error: "로그인이 필요합니다." };
+  if (!status || !STATUSES.includes(status)) return { ok: false, error: "잘못된 상태값" };
+  const list = ids.filter((x) => /^[0-9a-f-]{36}$/.test(x)).slice(0, 500);
+  const patch: Record<string, unknown> = { status };
+  if (status !== "전환") { patch.revenue = 0; patch.pay_type = null; patch.converted_on = null; }
+  if (status !== "드랍") patch.drop_reason = null;
+  if (status === "전환") { patch.pay_type = "결제확정"; patch.converted_on = new Date().toISOString().slice(0, 10); }
+  const { error } = await s.supabase.from("leads").update(patch).eq("project_id", projectId).in("id", list);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/app/projects/${projectId}`);
+  return { ok: true };
+}
+
+/** 드래그 정렬 저장: 화면에 보이는 순서대로 manual_order 부여 (직원·배정 고객사) */
+export async function reorderLeads(projectId: string, orderedIds: string[]): Promise<ActionResult> {
+  const s = await getSession();
+  if (!s) return { ok: false, error: "로그인이 필요합니다." };
+  const list = orderedIds.filter((x) => /^[0-9a-f-]{36}$/.test(x)).slice(0, 2000);
+  // 행마다 update (RLS 적용). 수백 건까지는 충분히 빠름
+  const results = await Promise.all(list.map((id, i) => s.supabase.from("leads").update({ manual_order: i }).eq("id", id).eq("project_id", projectId)));
+  const err = results.find((r) => r.error)?.error;
+  if (err) return { ok: false, error: err.message };
+  return { ok: true };
+}
+
 // ---------- 열 설정 (직원): 사용자 정의 열 + 기본 열 숨김 ----------
 export async function updateProjectColumns(projectId: string, input: { custom_fields?: CustomField[]; hidden_columns?: string[] }): Promise<ActionResult> {
   const s = await requireStaff();

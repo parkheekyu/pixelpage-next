@@ -134,6 +134,7 @@ export interface Lead {
   pay_type: PayType | null;
   memo: string | null;
   custom: Record<string, string | number | null>;
+  manual_order: number | null;
   is_duplicate: boolean;
   original_lead_id: string | null;
   created_at: string;

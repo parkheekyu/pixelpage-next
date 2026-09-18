@@ -2,7 +2,7 @@ import type { Lead } from "./types";
 import { presetRange } from "./dates";
 
 export type SheetView = "all" | "todo" | "conv" | "need" | "drop" | "dup";
-export type SheetSort = "ts_desc" | "ts_asc" | "status" | "rev_desc";
+export type SheetSort = "ts_desc" | "ts_asc" | "status" | "rev_desc" | "manual";
 
 export interface LeadQuery {
   from: string; // YYYY-MM-DD (KST, inclusive)

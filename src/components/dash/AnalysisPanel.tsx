@@ -46,24 +46,19 @@ export default function AnalysisPanel({ projectId, analyses, isStaff, runLabel, 
 
   return (
     <>
-      {isStaff && (
-        <div className="card" style={{ marginBottom: 12 }}>
-          <div className="form-row" style={{ alignItems: "center" }}>
-            {extraControls}
-            <button type="button" className="btn primary" onClick={run} disabled={pending || !canRun} title={!canRun ? disabledReason : undefined}><Play className="ico" aria-hidden /> {pending ? "분석 중…" : runLabel}</button>
-            {!canRun && disabledReason && <span className="hint" style={{ marginTop: 0 }}>{disabledReason}</span>}
-          </div>
-          {msg && <div className={`msg ${msg.ok ? "ok" : "err"}`}>{msg.text}</div>}
-        </div>
-      )}
       <section className="grid">
         <div className="card c9">
+          <div className="report-head">
+            {current ? <div><h2 style={{ display: "inline" }}>{current.title ?? "분석 리포트"}</h2> <span className="hint" style={{ display: "inline", marginLeft: 8 }}>{fmt(current.created_at)} · {current.model ?? ""}</span></div> : <h2>리포트</h2>}
+            <span className="sp" />
+            {isStaff && extraControls}
+            {isStaff && <button type="button" className="btn primary" onClick={run} disabled={pending || !canRun} title={!canRun ? disabledReason : undefined}><Play className="ico" aria-hidden /> {pending ? "분석 중…" : runLabel}</button>}
+            {isStaff && current && <button type="button" className="btn danger" title="리포트 삭제" onClick={() => { if (confirm("이 리포트를 삭제할까요?")) start(async () => { const r = await deleteAnalysis(projectId, current.id); if (!r.ok) setMsg({ ok: false, text: r.error }); setSel(null); }); }}><Trash2 className="ico" aria-hidden /></button>}
+          </div>
+          {isStaff && !canRun && disabledReason && <div className="hint" style={{ marginTop: 0 }}>{disabledReason}</div>}
+          {msg && <div className={`msg ${msg.ok ? "ok" : "err"}`}>{msg.text}</div>}
           {current ? (
             <>
-              <div className="form-row" style={{ justifyContent: "space-between", marginBottom: 6 }}>
-                <div><h2 style={{ display: "inline" }}>{current.title ?? "분석 리포트"}</h2> <span className="hint" style={{ display: "inline", marginLeft: 8 }}>{fmt(current.created_at)} · {current.model ?? ""}</span></div>
-                {isStaff && <button type="button" className="btn danger" onClick={() => { if (confirm("이 리포트를 삭제할까요?")) start(async () => { const r = await deleteAnalysis(projectId, current.id); if (!r.ok) setMsg({ ok: false, text: r.error }); setSel(null); }); }}><Trash2 className="ico" aria-hidden /></button>}
-              </div>
               {current.status === "error" && <div className="msg err">분석 실패: {current.error}</div>}
               {current.status === "queued" && <div className="msg ok">대기열에 있습니다. 로컬 분석 워커(`node scripts/analysis-worker.mjs --watch`)가 켜져 있어야 처리됩니다. 처리되면 자동으로 표시됩니다.</div>}
               {current.status === "running" && <div className="msg ok">분석이 진행 중입니다. 완료되면 자동으로 표시됩니다.</div>}
@@ -71,7 +66,7 @@ export default function AnalysisPanel({ projectId, analyses, isStaff, runLabel, 
               {(current.input as { truncated?: boolean } | null)?.truncated && <div className="hint">출력이 길어 마지막 부분이 잘렸을 수 있습니다.</div>}
             </>
           ) : (
-            <div className="hint" style={{ margin: 0 }}>{isStaff ? "아직 분석 리포트가 없습니다. 위 버튼으로 첫 분석을 실행하세요." : "아직 공유된 분석 리포트가 없습니다."}</div>
+            <div className="hint" style={{ margin: 0 }}>{isStaff ? "아직 분석 리포트가 없습니다. 오른쪽 위 버튼으로 첫 분석을 실행하세요." : "아직 공유된 분석 리포트가 없습니다."}</div>
           )}
         </div>
         <div className="card c3">
