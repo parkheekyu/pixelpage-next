@@ -1,0 +1,9 @@
+브라우저 창에서 퍼플렉시티에 로그인하세요. 로그인이 확인되면 자동으로 닫힙니다. (최대 10분)
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+page.waitForTimeout: Target page, context or browser has been closed
+    at /Users/heekyu/픽셀페이지/pixelpage-next/scripts/perplexity-login.mjs:18:14
+
+Node.js v22.19.0

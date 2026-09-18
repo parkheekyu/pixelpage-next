@@ -2,14 +2,14 @@
 
 import { useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Save } from "lucide-react";
+import { RefreshCw, Save } from "lucide-react";
 import { runAdsAnalysis, saveIntegrations } from "@/app/app/analysis-actions";
 import type { MetaAccountSnapshot, MetaInsight } from "@/lib/integrations/meta";
 import type { Analysis, Project } from "@/lib/dash/types";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
 import AnalysisPanel from "./AnalysisPanel";
 
-interface Props { project: Project; isStaff: boolean; adAccountId: string | null; preset: string; snapshot: MetaAccountSnapshot | null; snapError: string | null; analyses: Analysis[]; tokenConfigured: boolean }
+interface Props { project: Project; isStaff: boolean; adAccountId: string | null; preset: string; snapshot: MetaAccountSnapshot | null; snapError: string | null; cachedAt: string | null; analyses: Analysis[]; tokenConfigured: boolean }
 const PRESETS: [string, string][] = [["last_7d", "최근 7일"], ["last_14d", "최근 14일"], ["last_30d", "최근 30일"], ["last_90d", "최근 90일"]];
 
 function M({ i }: { i: MetaInsight | null }) {
@@ -17,7 +17,7 @@ function M({ i }: { i: MetaInsight | null }) {
   return <span className="metrics">지출 {fmtW(i.spend)} · 노출 {fmtN(i.impressions)} · CTR {i.ctr.toFixed(2)}% · CPC {fmtW(i.cpc)} · 링크클릭 {fmtN(i.link_clicks)} · 리드 {i.leads} · CPL {i.cpl == null ? "-" : fmtW(i.cpl)}{i.thruplays ? ` · 훅률 ${pct(i.thruplays, i.impressions)}` : ""}</span>;
 }
 
-export default function AdsClient({ project, isStaff, adAccountId, preset, snapshot, snapError, analyses, tokenConfigured }: Props) {
+export default function AdsClient({ project, isStaff, adAccountId, preset, snapshot, snapError, cachedAt, analyses, tokenConfigured }: Props) {
   const router = useRouter(), pathname = usePathname();
   const [acct, setAcct] = useState(adAccountId ?? "");
   const [msg, setMsg] = useState<string | null>(null);
@@ -29,7 +29,11 @@ export default function AdsClient({ project, isStaff, adAccountId, preset, snaps
     <>
       <header className="ph">
         <h1>{project.name}<small>광고 · Meta</small></h1>
-        {isStaff && <div className="controls"><select value={preset} onChange={(e) => start(() => router.replace(`${pathname}?preset=${e.target.value}`))}>{PRESETS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select></div>}
+        {isStaff && <div className="controls">
+          <select value={preset} onChange={(e) => start(() => router.replace(`${pathname}?preset=${e.target.value}`))}>{PRESETS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+          {cachedAt && <span className="hint" style={{ marginTop: 0 }}>{new Date(cachedAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })} 조회 · 30분 캐시</span>}
+          {adAccountId && <button type="button" className="btn" disabled={pending} onClick={() => start(() => router.replace(`${pathname}?preset=${preset}&refresh=1`))}><RefreshCw className="ico" aria-hidden /> 새로고침</button>}
+        </div>}
       </header>
 
       {isStaff && (

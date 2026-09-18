@@ -5,7 +5,8 @@ import { requireStaff } from "@/lib/dash/auth";
 import type { ActionResult } from "./actions";
 import type { AnalysisKind, ResearchInput } from "@/lib/dash/types";
 import { MODEL, SYSTEM, hasApiKey, runAnalysis } from "@/lib/ai/claude";
-import { fetchMetaSnapshot, snapshotToText } from "@/lib/integrations/meta";
+import { snapshotToText } from "@/lib/integrations/meta";
+import { getMetaSnapshot } from "@/lib/dash/analysis-data";
 import { extractLanding, landingToText } from "@/lib/integrations/landing";
 import { ga4Summary } from "@/lib/integrations/ga4";
 import { claritySummary } from "@/lib/integrations/clarity";
@@ -130,7 +131,7 @@ export async function runAdsAnalysis(projectId: string, datePreset = "last_30d")
   if (!integ?.meta_ad_account_id) return { ok: false, error: "Meta 광고 계정 ID를 먼저 설정해 주세요." };
   const preset = ["last_7d", "last_14d", "last_30d", "last_90d", "maximum"].includes(datePreset) ? datePreset : "last_30d";
   return execute("ads", projectId, `${p.name} 광고 분석 (${preset})`, { date_preset: preset, ad_account: integ.meta_ad_account_id }, async () => {
-    const snap = await fetchMetaSnapshot(integ.meta_ad_account_id!, preset);
+    const { snapshot: snap } = await getMetaSnapshot(s.supabase, projectId, integ.meta_ad_account_id!, preset);
     const r = (p.research_input ?? {}) as ResearchInput;
     const ctx = r.product || r.target ? `\n\n[고객사 리서치 메모]\n${researchText(p.name, r)}` : "";
     return `다음은 고객사 "${p.name}"의 Meta 광고 계정 현황입니다. 위너가 무엇이고 왜 잘되는지, 카피·이미지·영상과 캠페인 구조를 분석하고 개선안을 작성해 주세요.${p.landing_url ? `\n랜딩페이지: ${p.landing_url}` : ""}${ctx}\n\n[광고 계정 데이터]\n${snapshotToText(snap)}`;

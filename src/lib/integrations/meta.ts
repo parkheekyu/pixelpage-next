@@ -37,23 +37,35 @@ async function gget<T>(path: string, params: Record<string, string>): Promise<T>
   if (!r.ok || j.error) throw new Error(`Meta API: ${j.error?.message ?? r.status}`);
   return j;
 }
-async function gall<T>(path: string, params: Record<string, string>, cap = 500): Promise<T[]> {
-  const out: T[] = [];
-  let p = { ...params, limit: params.limit ?? "100" };
-  let after: string | undefined;
-  do {
-    const j = await gget<{ data: T[]; paging?: { cursors?: { after?: string }; next?: string } }>(path, after ? { ...p, after } : p);
-    out.push(...(j.data ?? []));
-    after = j.paging?.next ? j.paging.cursors?.after : undefined;
-    p = { ...p };
-  } while (after && out.length < cap);
-  return out;
+/** 페이지네이션 수집. 큰 계정에서 "reduce the amount of data" 오류가 나면 페이지 크기를 줄여 재시도 */
+async function gall<T>(path: string, params: Record<string, string>, cap = 1500): Promise<T[]> {
+  const sizes = [params.limit ?? "50", "20", "5"];
+  let lastErr: unknown = null;
+  for (const limit of sizes) {
+    try {
+      const out: T[] = [];
+      let after: string | undefined;
+      do {
+        const j = await gget<{ data: T[]; paging?: { cursors?: { after?: string }; next?: string } }>(path, { ...params, limit, ...(after ? { after } : {}) });
+        out.push(...(j.data ?? []));
+        after = j.paging?.next ? j.paging.cursors?.after : undefined;
+      } while (after && out.length < cap);
+      return out;
+    } catch (e) {
+      lastErr = e;
+      if (!/reduce the amount of data|Please retry your request later|code 1\b|\(#1\)/i.test((e as Error).message)) throw e;
+    }
+  }
+  throw lastErr as Error;
 }
 
 const n = (v: unknown) => (v == null ? 0 : Number(v) || 0);
 const act = (arr: MetaAction[] | undefined, ...types: string[]) => { for (const t of types) { const f = arr?.find((a) => a.action_type === t); if (f) return n(f.value); } return 0; };
 
 interface RawInsight { spend?: string; impressions?: string; reach?: string; frequency?: string; clicks?: string; ctr?: string; cpc?: string; cpm?: string; inline_link_clicks?: string; actions?: MetaAction[]; cost_per_action_type?: MetaAction[]; video_p25_watched_actions?: MetaAction[]; video_p50_watched_actions?: MetaAction[]; video_p75_watched_actions?: MetaAction[]; video_p100_watched_actions?: MetaAction[]; video_thruplay_watched_actions?: MetaAction[]; video_play_actions?: MetaAction[]; campaign_id?: string; adset_id?: string; ad_id?: string }
+// 목록: 삭제·보관 제외 / 인사이트: 지출 있는 항목만 (큰 계정의 데이터 초과 오류 방지)
+const LIVE_FILTER = JSON.stringify([{ field: "effective_status", operator: "IN", value: ["ACTIVE", "PAUSED", "CAMPAIGN_PAUSED", "ADSET_PAUSED", "IN_PROCESS", "WITH_ISSUES", "PENDING_REVIEW"] }]);
+const SPEND_FILTER = JSON.stringify([{ field: "spend", operator: "GREATER_THAN", value: "0" }]);
 const INSIGHT_FIELDS = "spend,impressions,reach,frequency,clicks,ctr,cpc,cpm,inline_link_clicks,actions,cost_per_action_type,video_p25_watched_actions,video_p50_watched_actions,video_p75_watched_actions,video_p100_watched_actions,video_thruplay_watched_actions,video_play_actions";
 
 function toInsight(r: RawInsight | undefined): MetaInsight | null {
@@ -101,12 +113,12 @@ export async function fetchMetaSnapshot(adAccountId: string, datePreset = "last_
   const acct = adAccountId.startsWith("act_") ? adAccountId : `act_${adAccountId}`;
   const [account, campaigns, adsets, ads, insC, insS, insA] = await Promise.all([
     gget<{ id: string; name?: string; currency?: string }>(acct, { fields: "id,name,currency" }),
-    gall<{ id: string; name: string; status: string; effective_status?: string; objective?: string; daily_budget?: string; lifetime_budget?: string }>(`${acct}/campaigns`, { fields: "id,name,status,effective_status,objective,daily_budget,lifetime_budget" }),
-    gall<{ id: string; name: string; status: string; campaign_id: string; daily_budget?: string; lifetime_budget?: string; optimization_goal?: string; targeting?: { age_min?: number; age_max?: number; genders?: number[]; geo_locations?: { countries?: string[]; cities?: { name: string }[] }; flexible_spec?: { interests?: { name: string }[] }[]; custom_audiences?: { name: string }[] } }>(`${acct}/adsets`, { fields: "id,name,status,campaign_id,daily_budget,lifetime_budget,optimization_goal,targeting" }),
-    gall<{ id: string; name: string; status: string; adset_id: string; campaign_id: string; creative?: RawCreative }>(`${acct}/ads`, { fields: "id,name,status,adset_id,campaign_id,creative{id,name,title,body,image_url,thumbnail_url,video_id,call_to_action_type,object_story_spec,asset_feed_spec}" }),
-    gall<RawInsight>(`${acct}/insights`, { level: "campaign", date_preset: datePreset, fields: `campaign_id,${INSIGHT_FIELDS}` }),
-    gall<RawInsight>(`${acct}/insights`, { level: "adset", date_preset: datePreset, fields: `adset_id,${INSIGHT_FIELDS}` }),
-    gall<RawInsight>(`${acct}/insights`, { level: "ad", date_preset: datePreset, fields: `ad_id,${INSIGHT_FIELDS}` }),
+    gall<{ id: string; name: string; status: string; effective_status?: string; objective?: string; daily_budget?: string; lifetime_budget?: string }>(`${acct}/campaigns`, { fields: "id,name,status,effective_status,objective,daily_budget,lifetime_budget", filtering: LIVE_FILTER }),
+    gall<{ id: string; name: string; status: string; campaign_id: string; daily_budget?: string; lifetime_budget?: string; optimization_goal?: string; targeting?: { age_min?: number; age_max?: number; genders?: number[]; geo_locations?: { countries?: string[]; cities?: { name: string }[] }; flexible_spec?: { interests?: { name: string }[] }[]; custom_audiences?: { name: string }[] } }>(`${acct}/adsets`, { fields: "id,name,status,campaign_id,daily_budget,lifetime_budget,optimization_goal,targeting", filtering: LIVE_FILTER }),
+    gall<{ id: string; name: string; status: string; adset_id: string; campaign_id: string; creative?: RawCreative }>(`${acct}/ads`, { fields: "id,name,status,adset_id,campaign_id,creative{id,name,title,body,image_url,thumbnail_url,video_id,call_to_action_type,object_story_spec,asset_feed_spec}", filtering: LIVE_FILTER, limit: "25" }),
+    gall<RawInsight>(`${acct}/insights`, { level: "campaign", date_preset: datePreset, fields: `campaign_id,${INSIGHT_FIELDS}`, filtering: SPEND_FILTER }),
+    gall<RawInsight>(`${acct}/insights`, { level: "adset", date_preset: datePreset, fields: `adset_id,${INSIGHT_FIELDS}`, filtering: SPEND_FILTER }),
+    gall<RawInsight>(`${acct}/insights`, { level: "ad", date_preset: datePreset, fields: `ad_id,${INSIGHT_FIELDS}`, filtering: SPEND_FILTER, limit: "25" }),
   ]);
   const byC = new Map(insC.map((r) => [r.campaign_id!, toInsight(r)])), byS = new Map(insS.map((r) => [r.adset_id!, toInsight(r)])), byA = new Map(insA.map((r) => [r.ad_id!, toInsight(r)]));
   const adList: MetaAd[] = ads.map((a) => ({ id: a.id, name: a.name, status: a.status, adset_id: a.adset_id, campaign_id: a.campaign_id, creative: toCreative(a.creative), insight: byA.get(a.id) ?? null }));
