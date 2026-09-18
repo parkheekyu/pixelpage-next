@@ -59,21 +59,26 @@ function extractJson(text) {
   return JSON.parse(m[0]);
 }
 
-/** 범용 에이전트 작업 (agent_jobs) — 결과를 kind 별로 후처리 */
-async function processAgentJob() {
-  const { data: job } = await db.from("agent_jobs").select("*").eq("status", "queued").is("claimed_at", null).order("kind").order("created_at").limit(1).maybeSingle();
-  if (!job) return false;
-  const { data: claimed } = await db.from("agent_jobs").update({ claimed_at: new Date().toISOString(), worker: WORKER, status: "running" }).eq("id", job.id).is("claimed_at", null).select("id");
-  if (!claimed?.length) return true;
+/** 범용 에이전트 작업 (agent_jobs) — 최대 n 건을 선점해 동시에 처리 */
+async function claimAgentJobs(n) {
+  const { data: jobs } = await db.from("agent_jobs").select("*").eq("status", "queued").is("claimed_at", null).order("kind").order("created_at").limit(n);
+  const claimed = [];
+  for (const job of jobs ?? []) {
+    const { data: ok } = await db.from("agent_jobs").update({ claimed_at: new Date().toISOString(), worker: WORKER, status: "running" }).eq("id", job.id).is("claimed_at", null).select("id");
+    if (ok?.length) claimed.push(job);
+  }
+  return claimed;
+}
+async function runAgentJob(job) {
   if (job.kind === "dispatch") {
     try { await processDispatch(db, job, { log }); }
     catch (e) { await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id); log(`[배분] 실패 ${job.id}: ${e.message}`); }
-    return true;
+    return;
   }
   if (job.kind === "employee_turn") {
     try { await processEmployeeTurn(db, job, { log, model: MODEL, effort: EFFORT }); }
     catch (e) { await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id); log(`[직원] 실패 ${job.id}: ${e.message}`); }
-    return true;
+    return;
   }
   if (job.kind === "creative_proposal") await db.from("proposals").update({ status: "running" }).eq("job_id", job.id);
   log(`[agent:${job.engine}] 시작 ${job.kind} ${job.id} (프롬프트 ${job.prompt.length.toLocaleString()}자)`);
@@ -86,10 +91,8 @@ async function processAgentJob() {
       if (!json?.variants?.length) throw new Error("제안 JSON 형식 오류: variants 없음");
       const variants = json.variants.map((v, i) => ({ id: v.id || String.fromCharCode(65 + i), angle: v.angle ?? "", format: v.format ?? "", headline: v.headline ?? "", primary_text: v.primary_text ?? "", cta: v.cta ?? "", visual: v.visual ?? "", hook: v.hook ?? "", why: v.why ?? "" }));
       await db.from("proposals").update({ status: "proposed", variants, title: json.title || undefined, brief: undefined }).eq("job_id", job.id);
-      // summary 는 brief 에 병합
       const { data: pr } = await db.from("proposals").select("id,brief").eq("job_id", job.id).maybeSingle();
       if (pr) await db.from("proposals").update({ brief: { ...(pr.brief ?? {}), summary: json.summary ?? "" } }).eq("job_id", job.id);
-      // 슬랙 게시 (서버가 블록을 만들어 올림)
       if (pr && process.env.LEAD_WEBHOOK_SECRET) {
         const site = process.env.WORKER_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://pixelpage.co.kr";
         try { const r = await fetch(`${site}/api/slack/post-proposal`, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${process.env.LEAD_WEBHOOK_SECRET}` }, body: JSON.stringify({ proposal_id: pr.id }) }); const j = await r.json(); log(`슬랙 게시: ${j.ok ? (j.skipped ? "건너뜀 (" + j.skipped + ")" : "완료 " + j.ts) : "실패 " + j.error}`); } catch (e) { log(`슬랙 게시 실패: ${e.message}`); }
@@ -101,6 +104,11 @@ async function processAgentJob() {
     if (job.kind === "creative_proposal") await db.from("proposals").update({ status: "error", error: String(e.message ?? e).slice(0, 500) }).eq("job_id", job.id);
     log(`[agent:${job.engine}] 실패 ${job.id}: ${e.message}`);
   }
+}
+async function processAgentJobs() {
+  const jobs = await claimAgentJobs(3);
+  if (!jobs.length) return false;
+  await Promise.all(jobs.map(runAgentJob));
   return true;
 }
 
@@ -135,7 +143,7 @@ log(`워커 시작 (${WORKER}, model=${MODEL}, effort=${EFFORT}, ${WATCH ? "watc
 do {
   try { await enqueueRoutines(db, { log }); } catch (e) { log(`정기 업무 확인 실패: ${e.message}`); }
   // 분석은 1건씩, 직원 대화·배분은 동시에 3건까지
-  for (;;) { const a = await processOne(); const r = await Promise.all([processAgentJob(), processAgentJob(), processAgentJob()]); if (!a && !r.some(Boolean)) break; }
+  for (;;) { const a = await processOne(); const b = await processAgentJobs(); if (!a && !b) break; }
   if (WATCH) await new Promise((r) => setTimeout(r, 5000));
 } while (WATCH);
 log("대기열 비어 있음, 종료");
