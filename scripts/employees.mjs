@@ -8,18 +8,26 @@ import { spawn } from "node:child_process";
 const TEAM = JSON.parse(readFileSync("agents/employees.json", "utf8"));
 const EMP = Object.fromEntries(TEAM.employees.map((e) => [e.id, e]));
 const byName = (s) => TEAM.employees.find((e) => e.id === s || e.name === s || e.aliases.includes(s)) ?? null;
-const MAX_DEPTH = 3;
+const MAX_DEPTH = 2;
 
 // ---------- Slack ----------
 async function slackApi(method, body) {
   const r = await fetch(`https://slack.com/api/${method}`, { method: "POST", headers: { authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`, "content-type": "application/json; charset=utf-8" }, body: JSON.stringify(body), signal: AbortSignal.timeout(15000) });
   return r.json();
 }
-/** 직원 이름·아이콘으로 게시. chat:write.customize 권한이 없으면 이름을 본문 앞에 붙인다 */
+let canCustomize = null;
+/** 봇 토큰 권한에 chat:write.customize 가 있는지 (응답 헤더 x-oauth-scopes) */
+async function checkCustomize() {
+  if (canCustomize !== null) return canCustomize;
+  try { const r = await fetch("https://slack.com/api/auth.test", { method: "POST", headers: { authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}` } }); canCustomize = (r.headers.get("x-oauth-scopes") ?? "").split(",").map((s) => s.trim()).includes("chat:write.customize"); } catch { canCustomize = false; }
+  return canCustomize;
+}
+/** 직원 이름·아이콘으로 게시. customize 권한이 없으면 이름을 본문 첫 줄에 붙인다 */
 async function postAs(emp, channel, thread_ts, text) {
-  const base = { channel, text, ...(thread_ts ? { thread_ts } : {}) };
-  let j = await slackApi("chat.postMessage", { ...base, username: `${emp.name} · ${emp.title}`, icon_emoji: emp.emoji });
-  if (!j.ok && j.error === "missing_scope") j = await slackApi("chat.postMessage", { ...base, text: `*${emp.name} (${emp.title})*\n${text}` });
+  const base = { channel, ...(thread_ts ? { thread_ts } : {}) };
+  const j = (await checkCustomize())
+    ? await slackApi("chat.postMessage", { ...base, text, username: `${emp.name} · ${emp.title}`, icon_emoji: emp.emoji })
+    : await slackApi("chat.postMessage", { ...base, text: `*${emp.name} · ${emp.title}*\n${text}` });
   if (!j.ok) throw new Error(`Slack chat.postMessage: ${j.error}`);
   return j;
 }
@@ -111,7 +119,7 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
   if (rem.length) await db.from("agent_memory").insert(rem.map((m) => ({ employee_id: m.shared ? "team" : emp.id, project_id: projId, kind: ["note", "decision", "preference", "todo"].includes(m.kind) ? m.kind : "note", content: m.content.trim().slice(0, 500), importance: Math.min(5, Math.max(1, Number(m.importance) || 3)), source: `slack:${pl.channel}/${posted.ts}` })));
 
   const depth = Number(pl.depth ?? 0);
-  const hos = Array.isArray(meta.handoffs) ? meta.handoffs.filter((h) => h && h.to && h.message).slice(0, 3) : [];
+  const hos = Array.isArray(meta.handoffs) ? meta.handoffs.filter((h) => h && h.to && h.message).slice(0, 2) : [];
   for (const h of hos) {
     const to = byName(String(h.to).trim()); if (!to || to.id === emp.id) continue;
     if (depth >= MAX_DEPTH) { log(`  인계 생략 (깊이 ${depth}): ${emp.name} → ${to.name}`); continue; }
