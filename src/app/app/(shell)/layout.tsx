@@ -1,5 +1,6 @@
 import { requireSession, getMyProjects, getUnreadCounts } from "@/lib/dash/auth";
 import Sidebar from "@/components/dash/Sidebar";
+import TopBar from "@/components/dash/TopBar";
 
 export default async function ShellLayout({ children }: { children: React.ReactNode }) {
   const { profile } = await requireSession();
@@ -7,7 +8,10 @@ export default async function ShellLayout({ children }: { children: React.ReactN
   return (
     <div className="pp-shell">
       <Sidebar profile={profile} projects={projects} unread={unread} />
-      <main className="pp-main">{children}</main>
+      <div className="pp-main-wrap">
+        <TopBar profile={profile} projects={projects} />
+        <main className="pp-main">{children}</main>
+      </div>
     </div>
   );
 }

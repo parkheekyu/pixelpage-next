@@ -3,8 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { Building2, LayoutDashboard, Users } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
-import { signOut } from "@/app/app/actions";
 import type { Profile, Project } from "@/lib/dash/types";
 import type { UnreadMap } from "@/lib/dash/auth";
 
@@ -30,8 +30,8 @@ export default function Sidebar({ profile, projects, unread }: { profile: Profil
         <>
           <h4>관리</h4>
           <nav>
-            <Link className={`item ${pathname === "/app/admin" ? "on" : ""}`} href="/app/admin">전체 고객사 개요</Link>
-            <Link className={`item ${pathname.startsWith("/app/admin/users") ? "on" : ""}`} href="/app/admin/users">회원 · 권한</Link>
+            <Link className={`item ${pathname === "/app/admin" ? "on" : ""}`} href="/app/admin"><LayoutDashboard className="ico" aria-hidden /> 전체 개요</Link>
+            <Link className={`item ${pathname.startsWith("/app/admin/users") ? "on" : ""}`} href="/app/admin/users"><Users className="ico" aria-hidden /> 회원 · 권한</Link>
           </nav>
         </>
       )}
@@ -42,20 +42,14 @@ export default function Sidebar({ profile, projects, unread }: { profile: Profil
           const n = total(p.id);
           return (
             <Link key={p.id} className={`item ${curProject === p.id ? "on" : ""}`} href={hrefFor(p.id)}>
-              <span className={`dot ${p.is_own ? "own" : ""}`} />
+              <Building2 className="ico" aria-hidden />
               <span style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</span>
               {n > 0 ? <span className="badge-red" aria-label={`안 본 항목 ${n}`}>{n > 99 ? "99+" : n}</span> : p.is_own ? <small>자사</small> : null}
             </Link>
           );
         })}
       </nav>
-      <div className="me">
-        <div>
-          <b>{profile.name || profile.email}</b>
-          <span className={`role ${profile.role}`}>{isStaff ? "직원" : "고객사"}</span>
-        </div>
-        <form action={signOut}><button className="btn" type="submit">로그아웃</button></form>
-      </div>
+      <div className="foot">© {new Date().getFullYear()} PixelPage</div>
     </aside>
   );
 }
