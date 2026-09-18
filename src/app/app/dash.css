@@ -322,3 +322,22 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .pp-dash .ptab { min-width: 104px; justify-content: center; }
 .pp-dash .ptab .badge-red { position: absolute; top: -6px; right: -4px; margin: 0; }
 @media (max-width: 640px) { .pp-dash .ptab { min-width: 44px; } }
+
+/* ---- 설정: 연동 카드 ---- */
+.pp-dash .integ-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 12px; }
+.pp-dash .integ { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.pp-dash .integ.open { grid-column: 1 / -1; }
+.pp-dash .integ-head { display: flex; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 0; background: transparent; font: inherit; color: var(--text); text-align: left; cursor: pointer; }
+.pp-dash .integ-head:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
+.pp-dash .integ-logo { width: 40px; height: 40px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; flex: none; }
+.pp-dash .integ-mark { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; background: var(--s1); color: #fff; }
+.pp-dash .integ-mark svg.ico { width: 16px; height: 16px; }
+.pp-dash .integ-title { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.pp-dash .integ-title b { font-size: 14.5px; }
+.pp-dash .integ-title small { color: var(--muted); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pp-dash .integ-state { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; padding: 3px 9px; border-radius: 99px; white-space: nowrap; background: var(--tag-gray-bg); color: var(--tag-gray-fg); }
+.pp-dash .integ-state.on { background: var(--tag-green-bg); color: var(--tag-green-fg); }
+.pp-dash .integ-state.need { background: var(--tag-yellow-bg); color: var(--tag-yellow-fg); }
+.pp-dash .integ-body { padding: 4px 16px 14px; border-top: 1px solid var(--line); }
+.pp-dash .integ-body .form-row { margin-top: 10px; align-items: flex-end; }
+.pp-dash .integ-logos { display: inline-flex; gap: 6px; align-items: center; margin-left: auto; opacity: .8; }
