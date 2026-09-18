@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { Play, Trash2 } from "lucide-react";
-import { deleteAnalysis } from "@/app/app/analysis-actions";
+import { deleteAnalysis, fetchAnalysis } from "@/app/app/analysis-actions";
 import type { ActionResult } from "@/app/app/actions";
 import type { Analysis } from "@/lib/dash/types";
 
@@ -26,7 +26,10 @@ export default function AnalysisPanel({ projectId, analyses, isStaff, runLabel, 
   const [pending, start] = useTransition();
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [sel, setSel] = useState<string | null>(null);
-  const current = analyses.find((a) => a.id === sel) ?? analyses.find((a) => a.status === "done") ?? analyses[0];
+  const [loaded, setLoaded] = useState<Record<string, Analysis>>({});
+  const base = analyses.find((a) => a.id === sel) ?? analyses.find((a) => a.status === "done") ?? analyses[0];
+  const current = base ? (loaded[base.id] ?? base) : undefined;
+  const pick = (id: string) => { setSel(id); const a = analyses.find((x) => x.id === id); if (a && a.status === "done" && !a.result_md && !loaded[id]) start(async () => { const full = await fetchAnalysis(id); if (full) setLoaded((m) => ({ ...m, [id]: full })); }); };
   const fmt = (iso: string) => new Date(iso).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false });
 
   // 대기열/진행 중인 항목이 있으면 10초마다 새로고침 (로컬 워커가 결과를 써 넣음)
@@ -64,7 +67,7 @@ export default function AnalysisPanel({ projectId, analyses, isStaff, runLabel, 
               {current.status === "error" && <div className="msg err">분석 실패: {current.error}</div>}
               {current.status === "queued" && <div className="msg ok">대기열에 있습니다. 로컬 분석 워커(`node scripts/analysis-worker.mjs --watch`)가 켜져 있어야 처리됩니다. 처리되면 자동으로 표시됩니다.</div>}
               {current.status === "running" && <div className="msg ok">분석이 진행 중입니다. 완료되면 자동으로 표시됩니다.</div>}
-              {current.result_md && <div className="report"><ReactMarkdown remarkPlugins={[remarkGfm]}>{current.result_md}</ReactMarkdown></div>}
+              {current.result_md ? <div className="report"><ReactMarkdown remarkPlugins={[remarkGfm]}>{current.result_md}</ReactMarkdown></div> : current.status === "done" ? <div className="hint">불러오는 중…</div> : null}
               {(current.input as { truncated?: boolean } | null)?.truncated && <div className="hint">출력이 길어 마지막 부분이 잘렸을 수 있습니다.</div>}
             </>
           ) : (
@@ -75,7 +78,7 @@ export default function AnalysisPanel({ projectId, analyses, isStaff, runLabel, 
           <h2>이력</h2><div className="sub">최근 {analyses.length}건</div>
           {analyses.length === 0 && <div className="hint" style={{ margin: 0 }}>없음</div>}
           {analyses.map((a) => (
-            <button type="button" key={a.id} className={`colmenu-row ${current?.id === a.id ? "on" : ""}`} style={{ flexDirection: "column", alignItems: "flex-start", gap: 2, background: current?.id === a.id ? "color-mix(in srgb, var(--s1) 12%, transparent)" : undefined }} onClick={() => setSel(a.id)}>
+            <button type="button" key={a.id} className={`colmenu-row ${current?.id === a.id ? "on" : ""}`} style={{ flexDirection: "column", alignItems: "flex-start", gap: 2, background: current?.id === a.id ? "color-mix(in srgb, var(--s1) 12%, transparent)" : undefined }} onClick={() => pick(a.id)}>
               <span style={{ fontSize: 13 }}>{a.title ?? a.kind}</span>
               <small>{fmt(a.created_at)} · {a.status === "done" ? "완료" : a.status === "error" ? "실패" : a.status === "queued" ? "대기" : "진행 중"}</small>
             </button>

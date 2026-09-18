@@ -1,7 +1,9 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { requireStaff } from "@/lib/dash/auth";
+import { requireStaff, getSession } from "@/lib/dash/auth";
+import { loadAnalysis } from "@/lib/dash/analysis-data";
+import type { Analysis } from "@/lib/dash/types";
 import type { ActionResult } from "./actions";
 import type { AnalysisKind, ResearchInput } from "@/lib/dash/types";
 import { MODEL, SYSTEM, hasApiKey, runAnalysis } from "@/lib/ai/claude";
@@ -235,4 +237,11 @@ export async function syncLeads(projectId: string, target: "sheets" | "airtable"
   } catch (e) {
     return { ok: false, error: (e as Error).message };
   }
+}
+
+/** 이력에서 리포트 클릭 시 본문 조회 (RLS: 직원 또는 배정 고객사) */
+export async function fetchAnalysis(id: string): Promise<Analysis | null> {
+  const s = await getSession();
+  if (!s) return null;
+  return loadAnalysis(s.supabase, id);
 }

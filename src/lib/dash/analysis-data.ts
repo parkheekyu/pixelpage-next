@@ -11,9 +11,18 @@ export async function getIntegrations(supabase: DashClient, projectId: string): 
   return (data as ProjectIntegrations | null) ?? null;
 }
 
+/** 목록은 메타만, 본문(result_md)은 최신 완료 1건만 포함 (페이지 크기 절감). 나머지는 클릭 시 loadAnalysis 로 조회 */
 export async function listAnalyses(supabase: DashClient, projectId: string, kind: AnalysisKind, limit = 10): Promise<Analysis[]> {
-  const { data } = await supabase.from("analyses").select("*").eq("project_id", projectId).eq("kind", kind).order("created_at", { ascending: false }).limit(limit);
-  return (data ?? []) as Analysis[];
+  const { data } = await supabase.from("analyses").select("id,project_id,kind,status,title,error,model,created_by,created_at,input").eq("project_id", projectId).eq("kind", kind).order("created_at", { ascending: false }).limit(limit);
+  const list = ((data ?? []) as Omit<Analysis, "result_md">[]).map((a) => ({ ...a, result_md: null as string | null }));
+  const latest = list.find((a) => a.status === "done");
+  if (latest) { const { data: full } = await supabase.from("analyses").select("result_md").eq("id", latest.id).single(); latest.result_md = full?.result_md ?? null; }
+  return list as Analysis[];
+}
+
+export async function loadAnalysis(supabase: DashClient, id: string): Promise<Analysis | null> {
+  const { data } = await supabase.from("analyses").select("*").eq("id", id).maybeSingle();
+  return (data as Analysis | null) ?? null;
 }
 
 const SNAPSHOT_TTL_MS = 30 * 60 * 1000;
