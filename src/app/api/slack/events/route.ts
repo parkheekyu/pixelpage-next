@@ -34,18 +34,17 @@ export async function POST(req: NextRequest) {
         await db.from("agent_messages").upsert({ channel, channel_type: channelType, thread_ts: threadTs ?? null, ts, user_id: user, user_name: userName, project_id: integ?.project_id ?? null, text }, { onConflict: "channel,ts" });
       }
       const mentioned = !!botUser && text.includes(`<@${botUser}>`);
-      const mentionsOther = /<@[A-Z0-9]+>/.test(text.replace(`<@${botUser}>`, ""));
-      let mine = mentioned || channelType === "im";
-      if (!mine && threadTs && !mentionsOther) {
-        // 이 직원이 참여한 스레드의 멘션 없는 답글 → 마지막에 말한 직원이 이어받음
-        const { data: last } = await db.from("agent_messages").select("employee_id").eq("channel", channel).eq("thread_ts", threadTs).not("employee_id", "is", null).order("ts", { ascending: false }).limit(1).maybeSingle();
-        const { data: root } = await db.from("agent_messages").select("employee_id").eq("channel", channel).eq("ts", threadTs).maybeSingle();
-        mine = (last?.employee_id ?? root?.employee_id) === emp.id;
-      }
-      if (!mine) return;
+      const mentionsAny = /<@[A-Z0-9]+>/.test(text);
       const clean = text.replace(/<@[A-Z0-9]+>/g, (m) => (m === `<@${botUser}>` ? "" : m)).trim();
       const { data: u } = await db.from("agent_messages").select("user_name").eq("channel", channel).eq("ts", ts).maybeSingle();
-      await db.from("agent_jobs").insert({ project_id: integ?.project_id ?? null, kind: "employee_turn", engine: "claude", payload: { employee: emp.id, channel, channel_type: channelType, thread_ts: threadTs ?? ts, trigger_ts: ts, text: clean, user_id: user, user_name: u?.user_name ?? user, depth: 0 } });
+      const base = { channel, channel_type: channelType, thread_ts: threadTs ?? ts, trigger_ts: ts, text: clean, user_id: user, user_name: u?.user_name ?? user, depth: 0 };
+      if (mentioned || channelType === "im") {
+        // 이 직원을 직접 불렀거나 DM → 이 직원이 답한다
+        await db.from("agent_jobs").insert({ project_id: integ?.project_id ?? null, kind: "employee_turn", engine: "claude", payload: { ...base, employee: emp.id } });
+      } else if (!mentionsAny && (team.employees as { id: string; default?: boolean }[]).find((e) => e.default)?.id === emp.id) {
+        // 아무도 안 불렀으면 실장 앱이 대표로 받아 "누가 답할지" 를 워커가 맥락으로 판단 (dispatch)
+        await db.from("agent_jobs").insert({ project_id: integ?.project_id ?? null, kind: "dispatch", engine: "claude", payload: base });
+      } else return;
       await slack("reactions.add", { channel, timestamp: ts, name: "eyes" }, bot!.bot_token).catch(() => {});
     });
   }

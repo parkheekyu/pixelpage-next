@@ -13,7 +13,7 @@ import { readFileSync, existsSync } from "node:fs";
 import os, { hostname } from "node:os";
 import path from "node:path";
 import fs from "node:fs";
-import { processEmployeeTurn, enqueueRoutines } from "./employees.mjs";
+import { processEmployeeTurn, processDispatch, enqueueRoutines } from "./employees.mjs";
 
 if (existsSync(".env.local")) for (const line of readFileSync(".env.local", "utf8").split("\n")) { const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, ""); }
 const args = process.argv.slice(2);
@@ -61,10 +61,15 @@ function extractJson(text) {
 
 /** 범용 에이전트 작업 (agent_jobs) — 결과를 kind 별로 후처리 */
 async function processAgentJob() {
-  const { data: job } = await db.from("agent_jobs").select("*").eq("status", "queued").is("claimed_at", null).order("created_at").limit(1).maybeSingle();
+  const { data: job } = await db.from("agent_jobs").select("*").eq("status", "queued").is("claimed_at", null).order("kind").order("created_at").limit(1).maybeSingle();
   if (!job) return false;
   const { data: claimed } = await db.from("agent_jobs").update({ claimed_at: new Date().toISOString(), worker: WORKER, status: "running" }).eq("id", job.id).is("claimed_at", null).select("id");
   if (!claimed?.length) return true;
+  if (job.kind === "dispatch") {
+    try { await processDispatch(db, job, { log }); }
+    catch (e) { await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id); log(`[배분] 실패 ${job.id}: ${e.message}`); }
+    return true;
+  }
   if (job.kind === "employee_turn") {
     try { await processEmployeeTurn(db, job, { log, model: MODEL, effort: EFFORT }); }
     catch (e) { await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id); log(`[직원] 실패 ${job.id}: ${e.message}`); }

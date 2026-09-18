@@ -135,6 +135,33 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
   log(`[직원:${emp.name}] 완료 ${job.id} (${Math.round((Date.now() - t0) / 1000)}s, 기억 ${rem.length}, 인계 ${hos.length})`);
 }
 
+/** 멘션 없는 메시지: 누가 답할지 맥락으로 판단해 employee_turn 등록 (빠른 모델, 도구 없음) */
+export async function processDispatch(db, job, { log }) {
+  const pl = job.payload ?? {};
+  const thread = pl.thread_ts && pl.thread_ts !== pl.trigger_ts ? pl.thread_ts : null;
+  const { data: th } = thread ? await db.from("agent_messages").select("ts,user_name,employee_id,text").eq("channel", pl.channel).or(`thread_ts.eq.${thread},ts.eq.${thread}`).order("ts").limit(30) : { data: [] };
+  const { data: recent } = await db.from("agent_messages").select("ts,user_name,employee_id,text").eq("channel", pl.channel).is("thread_ts", null).neq("ts", pl.trigger_ts).order("ts", { ascending: false }).limit(10);
+  const line = (m) => `${m.employee_id ? `${EMP[m.employee_id]?.name ?? m.employee_id}(직원)` : m.user_name}: ${String(m.text).slice(0, 200)}`;
+  const roster = TEAM.employees.map((e) => `- ${e.id}: ${e.name} (${e.title})`).join("\n");
+  const system = `너는 슬랙 채널의 배분 담당이다. 대표가 멘션 없이 올린 메시지를 보고 어느 AI 직원이 답해야 하는지 정한다.\n직원:\n${roster}\n규칙\n- 특정 직원 이름을 부르면 그 직원. 업무 영역이 분명하면 그 담당 1명. 두 영역에 걸치면 2명.\n- 팀 전체에게 하는 말(인사, 공지, "다들 …", 전원 의견 요청)이면 전원.\n- 스레드 안이면 그 스레드에서 말하던 직원이 우선.\n- 사람끼리 하는 대화, 단순 반응("ㅇㅋ", "고마워" 등 답이 필요 없는 말)이면 빈 배열.\n- 애매하면 hana.\n출력은 JSON 한 개만: {"respond":["doyun"]}`;
+  const prompt = `${(recent ?? []).length ? `[채널 최근]\n${(recent ?? []).reverse().map(line).join("\n")}\n\n` : ""}${(th ?? []).length ? `[이 스레드]\n${(th ?? []).map(line).join("\n")}\n\n` : ""}[메시지] ${pl.user_name}: ${pl.text}`;
+  let ids = [];
+  try {
+    const out = await new Promise((resolve, reject) => {
+      const p = spawn("claude", ["-p", "--model", "sonnet", "--output-format", "text", "--no-session-persistence", "--system-prompt", system, "--disallowedTools", "Bash,Edit,Write,Read,Glob,Grep,WebFetch,WebSearch,Agent,NotebookEdit"], { stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, CLAUDECODE: "" } });
+      let o = "", e = ""; const t = setTimeout(() => { p.kill("SIGKILL"); reject(new Error("배분 판단 60초 초과")); }, 60000);
+      p.stdout.on("data", (d) => (o += d)); p.stderr.on("data", (d) => (e += d)); p.on("error", (x) => { clearTimeout(t); reject(x); });
+      p.on("close", (c) => { clearTimeout(t); c === 0 ? resolve(o) : reject(new Error(e.slice(0, 200))); }); p.stdin.end(prompt);
+    });
+    const m = out.match(/\{[\s\S]*\}/); const j = m ? JSON.parse(m[0]) : {};
+    ids = Array.isArray(j.respond) ? j.respond.map((x) => byName(String(x))?.id).filter(Boolean) : [];
+  } catch (e) { log(`배분 판단 실패(${e.message}) → 하나`); ids = ["hana"]; }
+  ids = [...new Set(ids)];
+  for (const id of ids) await db.from("agent_jobs").insert({ project_id: job.project_id ?? null, kind: "employee_turn", engine: "claude", payload: { ...pl, employee: id } });
+  await db.from("agent_jobs").update({ status: "done", result_json: { respond: ids }, finished_at: new Date().toISOString() }).eq("id", job.id);
+  log(`배분: "${String(pl.text).slice(0, 30)}" → ${ids.map((i) => EMP[i]?.name).join(", ") || "없음"}`);
+}
+
 /** 정기 업무: 시간이 되면 employee_turn 등록 (KST, 하루 한 번) */
 export async function enqueueRoutines(db, { log }) {
   const now = kst(); const today = now.toISOString().slice(0, 10); const hm = now.toISOString().slice(11, 16); const dow = now.getUTCDay(); // kst 보정된 Date 이므로 UTC getter 사용
