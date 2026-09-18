@@ -34,7 +34,7 @@ async function postAs(db, emp, channel, thread_ts, text) {
 /** 답변 본문에서 동료 이름을 그 직원의 슬랙 멘션으로 바꾼다 ("민준," → "<@U…>,") */
 function mentionize(db, text, selfId) {
   return (async () => { const bots = await loadBots(db); let t = text;
-    for (const e of TEAM.employees) { if (e.id === selfId || !bots[e.id]?.bot_user_id) continue; t = t.replace(new RegExp(`(^|[\\s(])${e.name}(?=[,아야님 ]|$)`, "gm"), `$1<@${bots[e.id].bot_user_id}>`); }
+    for (const e of TEAM.employees) { if (e.id === selfId || !bots[e.id]?.bot_user_id) continue; t = t.replace(new RegExp(`(^|[\\s(])${e.name}(?=(아|야|님|,|한테|에게)(?![가-힣]))`, "gm"), `$1<@${bots[e.id].bot_user_id}>`); }
     return t; })();
 }
 
