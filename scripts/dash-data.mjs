@@ -8,6 +8,7 @@
  *   node scripts/dash-data.mjs research --project 픽셀페이지
  *   node scripts/dash-data.mjs analyses --project 픽셀페이지 --kind ads|landing|market
  *   node scripts/dash-data.mjs landing  --project 픽셀페이지
+ *   node scripts/dash-data.mjs perplexity --project 픽셀페이지 [--topic "조사할 주제"]   (API 키 있으면 바로 조사, 없으면 붙여넣기용 프롬프트)
  *   node scripts/dash-data.mjs proposals --project 픽셀페이지
  *   node scripts/dash-data.mjs propose  --project 픽셀페이지 [--count 4] [--notes "요청"] [--parent 제안ID] [--formats image_1x1,video_9x16]
  */

@@ -9,6 +9,9 @@ import { claritySummary } from "@/lib/integrations/clarity";
 import { ga4Summary, hasGoogleServiceAccount } from "@/lib/integrations/ga4";
 import { createProposalJob } from "@/lib/dash/proposals";
 import { isDate } from "@/lib/dash/dates";
+import { perplexityPrompts } from "@/lib/dash/research-prompts";
+import { hasPerplexity, sonar } from "@/lib/integrations/perplexity";
+import type { ResearchInput } from "@/lib/dash/types";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -89,6 +92,16 @@ export async function GET(req: NextRequest) {
       if (integ?.ga4_property_id && hasGoogleServiceAccount()) { try { parts.push("[GA4 28일]\n" + JSON.stringify(await ga4Summary(integ.ga4_property_id, 28)).slice(0, 4000)); } catch (e) { parts.push(`GA4 실패: ${(e as Error).message}`); } }
       if (integ?.clarity_api_token) { try { parts.push("[Clarity 3일]\n" + JSON.stringify(await claritySummary(integ.clarity_api_token, 3)).slice(0, 4000)); } catch (e) { parts.push(`Clarity 실패: ${(e as Error).message}`); } }
       return text(parts.join("\n\n"));
+    }
+    if (op === "perplexity") {
+      // 퍼플렉시티 조사: API 키가 있으면 직접 실행, 없으면 대표가 붙여 넣을 프롬프트를 돌려준다
+      const topic = sp.get("topic") ?? "";
+      const r = (p.research_input ?? {}) as ResearchInput;
+      if (hasPerplexity() && topic) { try { const res = await sonar(`고객사 ${p.name} (${r.product ?? ""}, 타깃 ${r.target ?? ""}) 관련 조사: ${topic}\n한국 시장 기준, 출처 URL 포함, 중복 없이 핵심만.`, { recency: "month" }); return text(`[퍼플렉시티 결과: ${topic}]\n${res.text}\n\n출처:\n${res.citations.map((c) => "- " + c).join("\n")}`); } catch (e) { return text(`퍼플렉시티 API 실패: ${(e as Error).message}`); } }
+      const list = perplexityPrompts(p.name, r);
+      const base = list[0]?.prompt.split("\n\n")[0] ?? `고객사: ${p.name}`;
+      const custom = topic ? [{ title: "0. 요청 주제", prompt: `${base}\n\n${topic}\n\n한국 시장 기준으로, 출처 URL 을 항목마다 붙이고, 같은 말을 반복하지 말고 표나 번호 목록으로 정리해 주세요. 마지막에 '광고·랜딩에 바로 쓸 시사점 5개' 를 붙여 주세요.` }] : [];
+      return text(`PERPLEXITY_API_KEY 없음 → 아래 프롬프트를 대표님이 퍼플렉시티(Research 모드)에 붙여 넣도록 안내. 슬랙에는 각 프롬프트를 \u0060\u0060\u0060 코드 블록으로 올려서 복사하기 쉽게.\n\n${[...custom, ...list].map((x) => `### ${x.title}\n${x.prompt}`).join("\n\n")}`);
     }
     if (op === "proposals") {
       const { data } = await db.from("proposals").select("id,status,title,feedback,variants,created_at").eq("project_id", p.id).order("created_at", { ascending: false }).limit(8);
