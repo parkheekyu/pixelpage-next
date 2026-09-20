@@ -9,3 +9,8 @@ export function perplexityPrompts(name: string, r: ResearchInput): { title: stri
     { title: "3. 키워드·광고 레퍼런스", prompt: `${base}\n\n1) 이 타깃이 정보 탐색 → 비교 → 구매 단계에서 쓰는 검색 키워드를 단계별로 20개 이상 (네이버·유튜브·구글 기준, 가능하면 검색량·경쟁 정도)\n2) 지금 이 시장에서 돌고 있는 광고·콘텐츠의 메시지 패턴(문제제기형/비교형/후기형/권위형 등)과 실제 카피 예시(원문 인용)\n3) 잘 되는 것으로 보이는 콘텐츠(조회수·댓글 반응 근거)와 그 이유` },
   ];
 }
+
+/** 특정 주제 하나를 퍼플렉시티에 물을 때 */
+export function perplexityTopicPrompt(name: string, r: ResearchInput, topic: string): string {
+  return `고객사: ${name}\n상품/서비스: ${r.product ?? ""}\n타깃 고객: ${r.target ?? ""}${r.competitors ? `\n알려진 경쟁사/대안: ${r.competitors}` : ""}\n\n조사 주제: ${topic}\n\n한국 시장 기준으로 조사해 주세요. 항목마다 출처 URL 을 붙이고, 같은 말을 반복하지 말고 번호 목록이나 표로 정리해 주세요. 커뮤니티·후기의 실제 표현은 원문 그대로 인용해 주세요. 마지막에 '광고·랜딩페이지에 바로 쓸 시사점 5개' 를 붙여 주세요.`;
+}

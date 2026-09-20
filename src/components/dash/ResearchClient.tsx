@@ -2,7 +2,7 @@
 
 import { useState, useTransition } from "react";
 import { Copy, Save } from "lucide-react";
-import { perplexityPrompts } from "@/lib/dash/research-prompts";
+import { perplexityPrompts, perplexityTopicPrompt } from "@/lib/dash/research-prompts";
 import { runResearch, saveResearchInput } from "@/app/app/analysis-actions";
 import type { Analysis, Project, ResearchInput } from "@/lib/dash/types";
 import AnalysisPanel from "./AnalysisPanel";
@@ -22,6 +22,13 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
   const [input, setInput] = useState<ResearchInput>(project.research_input ?? {});
   const [saved, setSaved] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [topic, setTopic] = useState("");
+  const [open, setOpen] = useState<string | null>(null);
+  const copy = (title: string, text: string) => {
+    const done = () => { setCopied(title); setTimeout(() => setCopied((c) => (c === title ? null : c)), 2000); };
+    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => setOpen(title));
+    else setOpen(title);
+  };
   const [pending, start] = useTransition();
   const canRun = !!(input.product?.trim() && input.target?.trim());
   const save = () => start(async () => { const r = await saveResearchInput(project.id, input); setSaved(r.ok ? "저장됨" : r.error); });
@@ -45,12 +52,23 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
           </div>
 
           <h2 style={{ marginTop: 18 }}>퍼플렉시티 사전 조사 (선택)</h2>
-          <div className="sub">API 없이 퍼플렉시티 구독으로 조사하는 방법: 아래 프롬프트를 복사해 퍼플렉시티 Research 모드에 붙여 넣고, 나온 답(출처 포함)을 복사해서 아래 칸에 붙여 넣으세요. AI 리서치가 이 자료를 1차 근거로 씁니다. 비워 두면 Claude가 직접 웹 검색합니다.</div>
+          <div className="sub">API 없이 퍼플렉시티 구독으로 조사하는 방법: 프롬프트를 복사해 퍼플렉시티 Research 모드에 붙여 넣고, 나온 답(출처 포함)을 아래 칸에 붙여 넣으세요. AI 리서치가 이 자료를 1차 근거로 씁니다. 비워 두면 Claude가 직접 웹 검색합니다.{!canRun && " 상품/서비스와 타깃 고객을 먼저 채우면 프롬프트가 더 정확해집니다."}</div>
           <div className="form-row" style={{ marginBottom: 8 }}>
-            {perplexityPrompts(project.name, input).map((q) => (
-              <button type="button" key={q.title} className="btn" disabled={!canRun} title={!canRun ? "상품/서비스와 타깃 고객을 먼저 입력하세요" : "클립보드에 복사"} onClick={() => { navigator.clipboard?.writeText(q.prompt).then(() => setCopied(q.title)); }}><Copy className="ico" aria-hidden /> {copied === q.title ? "복사됨" : q.title}</button>
-            ))}
+            <input value={topic} placeholder="특정 주제로 물어보기 (예: 경쟁 강의 가격과 수강생 불만)" onChange={(e) => setTopic(e.target.value)} style={{ flex: "1 1 320px" }} />
+            <button type="button" className="btn" disabled={!topic.trim()} onClick={() => copy("주제", perplexityTopicPrompt(project.name, input, topic.trim()))}><Copy className="ico" aria-hidden /> {copied === "주제" ? "복사됨" : "주제 프롬프트 복사"}</button>
             <a className="btn" href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer">퍼플렉시티 열기</a>
+          </div>
+          <div style={{ display: "grid", gap: 6, marginBottom: 10 }}>
+            {[...(topic.trim() ? [{ title: "주제", prompt: perplexityTopicPrompt(project.name, input, topic.trim()) }] : []), ...perplexityPrompts(project.name, input)].map((q) => (
+              <div key={q.title} style={{ border: "1px solid var(--line)", borderRadius: 8, padding: "6px 10px" }}>
+                <div className="form-row" style={{ alignItems: "center" }}>
+                  <button type="button" className="btn" onClick={() => copy(q.title, q.prompt)}><Copy className="ico" aria-hidden /> {copied === q.title ? "복사됨" : "복사"}</button>
+                  <span style={{ fontWeight: 600 }}>{q.title === "주제" ? `주제: ${topic.trim()}` : q.title}</span>
+                  <button type="button" className="btn ghost" style={{ marginLeft: "auto" }} onClick={() => setOpen(open === q.title ? null : q.title)}>{open === q.title ? "접기" : "내용 보기"}</button>
+                </div>
+                {open === q.title && <textarea readOnly value={q.prompt} rows={8} onFocus={(e) => e.currentTarget.select()} style={{ marginTop: 6, fontSize: 12 }} />}
+              </div>
+            ))}
           </div>
           <textarea value={input.pre_research ?? ""} placeholder="퍼플렉시티 답변을 그대로 붙여 넣으세요 (3개를 이어서 붙여도 됩니다). 출처 링크가 함께 있으면 보고서에 출처로 표시됩니다." onChange={(e) => setInput({ ...input, pre_research: e.target.value })} rows={6} style={{ marginTop: 4 }} />
           <div className="hint">{(input.pre_research ?? "").length.toLocaleString()}자 · 저장은 위 정보 저장 버튼 또는 실행 시 자동</div>
