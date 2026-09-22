@@ -8,7 +8,7 @@ import ColumnsMenu from "./ColumnsMenu";
 import { createClient } from "@/lib/supabase/client";
 import { todayKST } from "@/lib/dash/dates";
 import { fmtN, fmtW, pct } from "@/lib/dash/agg";
-import { defaultQuery, PAGE_LIMIT, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
+import { defaultQuery, type LeadPage, type LeadQuery, type SheetSort, type SheetView } from "@/lib/dash/leads-types";
 import { DROPS, PAYS, STATUSES, type CustomField, type Lead, type LeadPatch, type Project } from "@/lib/dash/types";
 import { SourcePill } from "./charts";
 
@@ -190,6 +190,16 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
 
   const set = (patch: Partial<LeadQuery>) => { setIncoming(0); setQuery((q) => ({ ...q, ...patch, offset: 0 })); };
   const more = () => setQuery((q) => ({ ...q, offset: page.rows.length }));
+  // 스크롤이 바닥 근처에 오면 자동으로 다음 페이지 (더 보기 버튼 없이)
+  const sentinel = useRef<HTMLDivElement | null>(null);
+  const moreRef = useRef(more); moreRef.current = more;
+  const canMore = page.rows.length < page.total && !loading;
+  useEffect(() => {
+    const el = sentinel.current; if (!el || !canMore) return;
+    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) moreRef.current(); }, { root: el.closest(".gridwrap"), rootMargin: "400px 0px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, [canMore, page.rows.length]);
   const { summary: S, rows, total } = page;
 
   function save(l: Lead, patch: LeadPatch) {
@@ -340,6 +350,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
               {!adding && <tr className="addrow" onClick={() => setAdding(true)}><td className="num"><Plus className="ico" aria-hidden /></td><td colSpan={cols.length + (isStaff ? 1 : 0)}>행 추가</td></tr>}
             </tbody>
           </table>
+          <div ref={sentinel} style={{ height: 1 }} aria-hidden />
         </div>
       </div>
       {menu && (
@@ -370,7 +381,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
         <span>{rows.length < total ? `${rows.length} / ${fmtN(total)}` : fmtN(total)} records</span>
         <span className={`live ${live}`} title={live === "on" ? "실시간 연결됨: 새 리드·상태 변경이 자동 반영됩니다" : live === "off" ? "실시간 연결 끊김" : "연결 중"}><i />{live === "on" ? "실시간" : live === "off" ? "오프라인" : "연결 중"}</span>
         {incoming > 0 && <button type="button" className="btn incoming" onClick={() => { setIncoming(0); setQuery((q) => ({ ...q, offset: 0 })); }}>새 리드 {incoming}건 반영됨</button>}
-        {rows.length < total && <button className="btn" onClick={more} disabled={loading}>더 보기 (+{PAGE_LIMIT})</button>}
+        {rows.length < total && loading && <span className="saving">불러오는 중…</span>}
         {err ? <span className="err">저장 실패: {err}</span> : pending ? <span className="saving">저장 중…</span> : saved ? <span className="saved">저장됨 {saved}</span> : null}
       </div>
     </div>
