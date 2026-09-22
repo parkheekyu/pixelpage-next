@@ -21,30 +21,46 @@ export function rowToLeadInput(r: Record<string, string>) {
 const SHEETS = "https://sheets.googleapis.com/v4/spreadsheets";
 const SCOPE = "https://www.googleapis.com/auth/spreadsheets";
 const enc = (s: string) => encodeURIComponent(s);
+/** 탭 이름은 항상 따옴표로 감싼다 (한글·공백·특수문자 대비). A1 표기: '탭'!A:Z */
+const rangeOf = (tab: string, a1: string) => `'${tab.replace(/'/g, "''")}'!${a1}`;
 
 async function sheetsFetch(path: string, init?: RequestInit) {
   const token = await googleAccessToken(SCOPE);
   const r = await fetch(`${SHEETS}/${path}`, { ...init, headers: { authorization: `Bearer ${token}`, "content-type": "application/json", ...(init?.headers ?? {}) }, signal: AbortSignal.timeout(30000) });
   const j = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(`Google Sheets: ${(j as { error?: { message?: string } }).error?.message ?? r.status}`);
+  if (!r.ok) {
+    const msg = (j as { error?: { message?: string } }).error?.message ?? String(r.status);
+    // 탭이 없을 때 구글은 "Unable to parse range" 를 돌려준다 → 실제 탭 목록을 알려 준다
+    if (/Unable to parse range/i.test(msg)) {
+      const sheetId = path.split("/")[0];
+      try {
+        const meta = (await (await fetch(`${SHEETS}/${sheetId}?fields=sheets.properties.title`, { headers: { authorization: `Bearer ${token}` } })).json()) as { sheets?: { properties: { title: string } }[] };
+        const tabs = (meta.sheets ?? []).map((x) => x.properties.title);
+        throw new Error(`Google Sheets: 그 이름의 탭이 없습니다. 이 시트의 탭: ${tabs.map((t) => `"${t}"`).join(", ") || "(없음)"} — 설정의 "탭 이름"을 시트 아래쪽 탭 이름과 똑같이 맞춰 주세요.`);
+      } catch (e) { if ((e as Error).message.startsWith("Google Sheets:")) throw e; }
+    }
+    if (r.status === 403) throw new Error(`Google Sheets: 접근 권한 없음 — 시트를 서비스 계정 이메일에게 편집자로 공유했는지 확인하세요. (${msg})`);
+    if (r.status === 404) throw new Error(`Google Sheets: 시트를 찾을 수 없음 — 시트 주소(ID)를 확인하세요. (${msg})`);
+    throw new Error(`Google Sheets: ${msg}`);
+  }
   return j;
 }
 export async function sheetsEnsureHeader(sheetId: string, tab: string) {
-  const j = (await sheetsFetch(`${sheetId}/values/${enc(`${tab}!1:1`)}`)) as { values?: string[][] };
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "1:1"))}`)) as { values?: string[][] };
   const first = j.values?.[0] ?? [];
-  if (first.length === 0) await sheetsFetch(`${sheetId}/values/${enc(`${tab}!A1`)}?valueInputOption=RAW`, { method: "PUT", body: JSON.stringify({ values: [[...COLUMNS]] }) });
+  if (first.length === 0) await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A1"))}?valueInputOption=RAW`, { method: "PUT", body: JSON.stringify({ values: [[...COLUMNS]] }) });
   return first.length ? first : [...COLUMNS];
 }
 export async function sheetsAppend(sheetId: string, tab: string, leads: Lead[]): Promise<{ appended: number; startRow: number }> {
   const header = await sheetsEnsureHeader(sheetId, tab);
   const rows = leads.map((l) => { const m = leadToRow(l); return header.map((h) => (m as Record<string, string>)[h] ?? ""); });
   if (!rows.length) return { appended: 0, startRow: 0 };
-  const j = (await sheetsFetch(`${sheetId}/values/${enc(`${tab}!A:A`)}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`, { method: "POST", body: JSON.stringify({ values: rows }) })) as { updates?: { updatedRange?: string } };
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A:A"))}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`, { method: "POST", body: JSON.stringify({ values: rows }) })) as { updates?: { updatedRange?: string } };
   const m = j.updates?.updatedRange?.match(/!A(\d+)/);
   return { appended: rows.length, startRow: m ? Number(m[1]) : 0 };
 }
 export async function sheetsReadAll(sheetId: string, tab: string): Promise<ExternalRow[]> {
-  const j = (await sheetsFetch(`${sheetId}/values/${enc(`${tab}!A:Z`)}`)) as { values?: string[][] };
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A:Z"))}`)) as { values?: string[][] };
   const [header, ...rows] = j.values ?? [];
   if (!header) return [];
   return rows.map((r, i) => ({ external_id: String(i + 2), values: Object.fromEntries(header.map((h, k) => [h, r[k] ?? ""])) }));
