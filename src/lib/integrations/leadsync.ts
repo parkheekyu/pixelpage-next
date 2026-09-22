@@ -42,7 +42,9 @@ export function matchHeader(h: string): string | null {
 }
 function parseDate(v: string): string | undefined {
   const t = v.trim(); if (!t) return undefined;
-  const m = t.match(/(\d{4})[.\-/년]\s*(\d{1,2})[.\-/월]\s*(\d{1,2})[일]?(?:[\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  let m = t.match(/(\d{4})[.\-/년]\s*(\d{1,2})[.\-/월]\s*(\d{1,2})[일]?(?:[\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  // 두 자리 연도 (26.08.13 18:34, 26-8-5)
+  if (!m) { const m2 = t.match(/^(\d{2})[.\-/]\s*(\d{1,2})[.\-/]\s*(\d{1,2})\.?(?:[\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/); if (m2) m = [m2[0], "20" + m2[1], m2[2], m2[3], m2[4], m2[5], m2[6]] as unknown as RegExpMatchArray; }
   if (m) { const iso = `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}T${(m[4] ?? "0").padStart(2, "0")}:${m[5] ?? "00"}:${m[6] ?? "00"}+09:00`; const d = new Date(iso); return isNaN(d.getTime()) ? undefined : d.toISOString(); }
   const d = new Date(t); return isNaN(d.getTime()) ? undefined : d.toISOString();
 }
