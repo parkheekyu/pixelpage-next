@@ -24,7 +24,7 @@ const COLS: { key: string; label: string; w: number; ic: LucideIcon; staff?: boo
   { key: "status", label: "상태", w: 110, ic: ChevronDown }, { key: "revenue", label: "매출액", w: 130, ic: Banknote }, { key: "pay", label: "결제구분", w: 110, ic: ChevronDown },
   { key: "conv", label: "전환일", w: 140, ic: Calendar }, { key: "drop", label: "드랍사유", w: 120, ic: ChevronDown }, { key: "memo", label: "메모", w: 220, ic: AlignLeft },
 ];
-const NUM_W = 44;
+const NUM_W = 64;
 const WIDTH_KEY = "leadSheetColWidths";
 const VIEWS: [SheetView, string][] = [["all", "전체 리드"], ["todo", "처리 필요 (신규·연락중)"], ["conv", "전환 리드"], ["need", "매출 미입력"], ["drop", "드랍"], ["dup", "중복"]];
 // 서버(UTC)와 브라우저(KST) 렌더 결과가 같도록 시간대를 Asia/Seoul 로 고정 (하이드레이션 불일치 방지)
