@@ -10,11 +10,59 @@ const kst = (iso: string) => new Date(iso).toLocaleString("sv-SE", { timeZone: "
 export function leadToRow(l: Lead): Record<Col, string> {
   return { "리드ID": l.id, "등록일시": kst(l.submitted_at), "이름": l.name ?? "", "연락처": l.phone ?? "", "이메일": l.email ?? "", "문의내용": l.message ?? "", "회사": l.company ?? "", "업종": l.industry ?? "", "예산": l.budget ?? "", "유입매체": l.utm_source ?? "", "캠페인": l.utm_campaign ?? "", "소재": l.utm_content ?? "", "랜딩": l.landing_id ?? "", "상태": l.status, "드랍사유": l.drop_reason ?? "", "매출액": l.revenue ? String(l.revenue) : "", "결제구분": l.pay_type ?? "", "전환일": l.converted_on ?? "", "담당자": l.assignee ?? "", "메모": l.memo ?? "" };
 }
-/** 외부 행 → 리드 입력 (헤더 이름 기준, 없는 열은 무시) */
+/** 외부 행 → 리드 입력. 헤더 이름은 별칭을 넓게 인식하고(전화번호=연락처 등), 매칭 안 된 열은 extra 로 돌려준다 */
 export interface ExternalRow { external_id: string; values: Record<string, string> }
+const ALIASES: Record<string, string[]> = {
+  "리드ID": ["리드id", "lead_id", "leadid"],
+  "등록일시": ["등록일시", "등록일", "일시", "날짜", "신청일", "신청일시", "제출일", "제출일시", "접수일", "접수일시", "timestamp", "date", "created", "created_at", "타임스탬프"],
+  "이름": ["이름", "성함", "성명", "고객명", "신청자", "name", "이름(성함)"],
+  "연락처": ["연락처", "전화번호", "전화", "휴대폰", "휴대폰번호", "핸드폰", "핸드폰번호", "폰번호", "phone", "mobile", "tel", "번호"],
+  "이메일": ["이메일", "메일", "email", "e-mail", "이메일주소"],
+  "문의내용": ["문의내용", "문의", "내용", "메시지", "상담내용", "message", "요청사항"],
+  "회사": ["회사", "회사명", "업체", "업체명", "브랜드", "company"],
+  "업종": ["업종", "분야", "industry"],
+  "예산": ["예산", "광고예산", "월예산", "budget"],
+  "유입매체": ["유입매체", "매체", "유입경로", "소스", "source", "utm_source"],
+  "캠페인": ["캠페인", "campaign", "utm_campaign"],
+  "소재": ["소재", "광고소재", "utm_content", "content"],
+  "랜딩": ["랜딩", "랜딩페이지", "landing"],
+  "상태": ["상태", "진행상태", "처리상태", "status"],
+  "드랍사유": ["드랍사유", "취소사유", "이탈사유", "실패사유", "사유"],
+  "매출액": ["매출액", "매출", "결제금액", "금액", "계약금액", "revenue", "amount"],
+  "결제구분": ["결제구분", "결제상태", "결제단계"],
+  "전환일": ["전환일", "결제일", "계약일", "구매일", "전환일시", "결제일시"],
+  "담당자": ["담당자", "담당", "assignee"],
+  "메모": ["메모", "비고", "note", "notes", "memo"],
+};
+const normKey = (s: string) => s.toLowerCase().replace(/[\s_\-()/.:]/g, "");
+export function matchHeader(h: string): string | null {
+  const n = normKey(h); if (!n) return null;
+  for (const [std, list] of Object.entries(ALIASES)) if (list.some((a) => normKey(a) === n)) return std;
+  return null;
+}
+function parseDate(v: string): string | undefined {
+  const t = v.trim(); if (!t) return undefined;
+  const m = t.match(/(\d{4})[.\-/년]\s*(\d{1,2})[.\-/월]\s*(\d{1,2})[일]?(?:[\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
+  if (m) { const iso = `${m[1]}-${m[2].padStart(2, "0")}-${m[3].padStart(2, "0")}T${(m[4] ?? "0").padStart(2, "0")}:${m[5] ?? "00"}:${m[6] ?? "00"}+09:00`; const d = new Date(iso); return isNaN(d.getTime()) ? undefined : d.toISOString(); }
+  const d = new Date(t); return isNaN(d.getTime()) ? undefined : d.toISOString();
+}
+/** 외부 상태 문구를 우리 상태로 (결제·구매·완료 → 전환, 취소·환불 → 드랍 …) */
+export function mapStatus(v: string): string {
+  const t = v.trim(); if (!t) return "";
+  if (["신규", "연락중", "상담완료", "전환", "드랍"].includes(t)) return t;
+  if (/환불|취소|드랍|드롭|이탈|실패|거절|노쇼/.test(t)) return "드랍";
+  if (/결제|구매|전환|계약|입금|완료|확정|성공/.test(t)) return "전환";
+  if (/상담|연락|통화|진행|대기/.test(t)) return "연락중";
+  return "";
+}
 export function rowToLeadInput(r: Record<string, string>) {
-  const g = (k: string) => (r[k] ?? "").toString().trim();
-  return { name: g("이름"), phone: g("연락처"), email: g("이메일"), message: g("문의내용"), company: g("회사"), industry: g("업종"), budget: g("예산"), utm_source: g("유입매체"), utm_campaign: g("캠페인"), utm_content: g("소재"), landing_id: g("랜딩"), submitted_at: g("등록일시") ? new Date(g("등록일시").replace(" ", "T") + "+09:00").toISOString() : undefined, memo: g("메모"), assignee: g("담당자"), status: g("상태"), lead_id: g("리드ID") };
+  const std: Record<string, string> = {}; const extra: Record<string, string> = {};
+  for (const [h, v] of Object.entries(r)) { const k = matchHeader(h); const val = (v ?? "").toString().trim(); if (k) { if (!std[k]) std[k] = val; } else if (h.trim() && val) extra[h.trim()] = val; }
+  const g = (k: string) => std[k] ?? "";
+  const revenueNum = Number(g("매출액").replace(/[^0-9.]/g, ""));
+  const pay = g("결제구분"); const payType = ["결제확정", "예약금", "가계약", "환불"].find((p) => pay.includes(p)) ?? (/환불/.test(g("상태")) ? "환불" : "");
+  return { name: g("이름"), phone: g("연락처"), email: g("이메일"), message: g("문의내용"), company: g("회사"), industry: g("업종"), budget: g("예산"), utm_source: g("유입매체"), utm_campaign: g("캠페인"), utm_content: g("소재"), landing_id: g("랜딩"), submitted_at: parseDate(g("등록일시")), memo: g("메모"), assignee: g("담당자"), status: mapStatus(g("상태")), raw_status: g("상태"), lead_id: g("리드ID"),
+    revenue: g("매출액") && !isNaN(revenueNum) ? Math.round(revenueNum) : null, pay_type: payType, converted_on: parseDate(g("전환일"))?.slice(0, 10) ?? null, drop_reason: g("드랍사유"), extra };
 }
 
 // ---------- Google Sheets ----------

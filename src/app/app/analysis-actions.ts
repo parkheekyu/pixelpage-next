@@ -13,6 +13,7 @@ import { extractLanding, landingToText } from "@/lib/integrations/landing";
 import { ga4Summary } from "@/lib/integrations/ga4";
 import { claritySummary } from "@/lib/integrations/clarity";
 import { hasPerplexity, preResearch } from "@/lib/integrations/perplexity";
+import type { CustomField } from "@/lib/dash/types";
 import { airtableCreate, airtableReadAll, rowToLeadInput, sheetsAppend, sheetsReadAll } from "@/lib/integrations/leadsync";
 import { ingestLead } from "@/lib/dash/ingest";
 import type { Lead } from "@/lib/dash/types";
@@ -228,16 +229,37 @@ export async function syncLeads(projectId: string, target: "sheets" | "airtable"
     const rows = target === "sheets" ? await sheetsReadAll(integ.google_sheet_id!, tab) : await airtableReadAll(integ.airtable_token!, integ.airtable_base_id!, integ.airtable_table!);
     const { data: existing } = await s.supabase.from("leads").select("phone_norm").eq("project_id", projectId);
     const known = new Set((existing ?? []).map((x) => x.phone_norm));
-    let added = 0, skipped = 0;
+    // 매칭 안 된 열은 프로젝트 사용자 정의 열로 자동 추가해 값을 보존한다
+    const { data: proj } = await s.supabase.from("projects").select("custom_fields").eq("id", projectId).single();
+    const fields: CustomField[] = [...((proj?.custom_fields ?? []) as CustomField[])];
+    const keyFor = (label: string) => { const found = fields.find((f) => f.label === label); if (found) return found.key; if (fields.length >= 30) return null; let h = 0; for (const ch of label) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const key = `s_${h.toString(36)}`; fields.push({ key, label: label.slice(0, 40), type: "text" }); return key; };
+    let added = 0, skipped = 0, noPhone = 0, dup = 0; const unmatched = new Set<string>();
     for (const row of rows) {
       const li = rowToLeadInput(row.values);
       const norm = li.phone.replace(/[^0-9]/g, "");
-      if (li.lead_id || !norm || known.has(norm)) { skipped++; continue; }
-      const r = await ingestLead({ project_id: projectId, name: li.name, phone: li.phone, email: li.email, message: li.message, company: li.company, industry: li.industry, budget: li.budget, utm_source: li.utm_source || target, utm_medium: "import", utm_campaign: li.utm_campaign, utm_content: li.utm_content, landing_id: li.landing_id || target, submitted_at: li.submitted_at, raw: { imported_from: target, external_id: row.external_id } });
-      if (r.ok) { known.add(norm); added++; await s.supabase.from("lead_sync").upsert({ lead_id: r.id, target, external_id: row.external_id }); if (li.status || li.memo || li.assignee) await s.supabase.from("leads").update({ ...(["신규","연락중","상담완료","전환","드랍"].includes(li.status) ? { status: li.status } : {}), ...(li.memo ? { memo: li.memo } : {}), ...(li.assignee ? { assignee: li.assignee } : {}) }).eq("id", r.id); } else skipped++;
+      if (li.lead_id) { skipped++; continue; }
+      if (!norm) { noPhone++; continue; }
+      if (known.has(norm)) { dup++; continue; }
+      const r = await ingestLead({ project_id: projectId, name: li.name, phone: li.phone, email: li.email, message: li.message, company: li.company, industry: li.industry, budget: li.budget, utm_source: li.utm_source || target, utm_medium: "import", utm_campaign: li.utm_campaign, utm_content: li.utm_content, landing_id: li.landing_id, submitted_at: li.submitted_at });
+      if (!r.ok) { skipped++; continue; }
+      known.add(norm); added++;
+      await s.supabase.from("lead_sync").upsert({ lead_id: r.id, target, external_id: row.external_id });
+      const custom: Record<string, string> = {};
+      for (const [label, v] of Object.entries(li.extra)) { const k = keyFor(label); if (k) custom[k] = v; else unmatched.add(label); }
+      const patch: Record<string, unknown> = {};
+      if (li.status) patch.status = li.status; else if (li.raw_status) custom[keyFor("상태(원본)") ?? "s_status"] = li.raw_status;
+      if (li.memo) patch.memo = li.memo; if (li.assignee) patch.assignee = li.assignee;
+      if (li.revenue != null) patch.revenue = li.revenue; if (li.pay_type) patch.pay_type = li.pay_type;
+      if (li.converted_on) patch.converted_on = li.converted_on; else if (li.status === "전환" && li.submitted_at) patch.converted_on = li.submitted_at.slice(0, 10);
+      if (li.drop_reason) patch.drop_reason = li.drop_reason;
+      if (Object.keys(custom).length) patch.custom = custom;
+      if (Object.keys(patch).length) await s.supabase.from("leads").update(patch).eq("id", r.id);
     }
+    if (fields.length !== ((proj?.custom_fields ?? []) as CustomField[]).length) await s.supabase.from("projects").update({ custom_fields: fields }).eq("id", projectId);
+    skipped += 0;
+    const detail = [dup ? `이미 있는 연락처 ${dup}` : "", noPhone ? `연락처 없음 ${noPhone}` : "", skipped ? `기타 ${skipped}` : ""].filter(Boolean).join(", ");
     revalidatePath(`/app/projects/${projectId}`);
-    return { ok: true, message: `${target === "sheets" ? "구글 시트" : "에어테이블"}에서 ${added}건 가져왔습니다 (건너뜀 ${skipped}건: 이미 있거나 연락처 없음).` };
+    return { ok: true, message: `${target === "sheets" ? "구글 시트" : "에어테이블"}에서 ${added}건 가져왔습니다.${detail ? ` 건너뜀: ${detail}.` : ""}${rows.length && !rows.some((x) => rowToLeadInput(x.values).phone) ? " 연락처 열을 찾지 못했습니다. 헤더에 '연락처' 또는 '전화번호' 열이 있는지 확인하세요." : ""}` };
   } catch (e) {
     return { ok: false, error: (e as Error).message };
   }
