@@ -14,6 +14,7 @@ import { ga4Summary } from "@/lib/integrations/ga4";
 import { claritySummary } from "@/lib/integrations/clarity";
 import { hasPerplexity, preResearch } from "@/lib/integrations/perplexity";
 import type { CustomField } from "@/lib/dash/types";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { airtableCreate, airtableReadAll, rowToLeadInput, sheetsAppend, sheetsReadAll } from "@/lib/integrations/leadsync";
 import { ingestLead } from "@/lib/dash/ingest";
 import type { Lead } from "@/lib/dash/types";
@@ -227,23 +228,19 @@ export async function syncLeads(projectId: string, target: "sheets" | "airtable"
     }
     // pull: 외부 행 중 우리 DB에 없는 연락처만 리드로 추가 (리드ID 있는 행 = 우리가 내보낸 것 → 건너뜀)
     const rows = target === "sheets" ? await sheetsReadAll(integ.google_sheet_id!, tab) : await airtableReadAll(integ.airtable_token!, integ.airtable_base_id!, integ.airtable_table!);
-    const { data: existing } = await s.supabase.from("leads").select("phone_norm").eq("project_id", projectId);
-    const known = new Set((existing ?? []).map((x) => x.phone_norm));
+    const admin = createAdminClient();
+    const { data: existing } = await admin.from("leads").select("id,phone_norm,status,revenue,custom,converted_on,drop_reason").eq("project_id", projectId);
+    const known = new Map((existing ?? []).map((x) => [x.phone_norm as string, x]));
     // 매칭 안 된 열은 프로젝트 사용자 정의 열로 자동 추가해 값을 보존한다
     const { data: proj } = await s.supabase.from("projects").select("custom_fields").eq("id", projectId).single();
     const fields: CustomField[] = [...((proj?.custom_fields ?? []) as CustomField[])];
     const keyFor = (label: string) => { const found = fields.find((f) => f.label === label); if (found) return found.key; if (fields.length >= 30) return null; let h = 0; for (const ch of label) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const key = `s_${h.toString(36)}`; fields.push({ key, label: label.slice(0, 40), type: "text" }); return key; };
-    let added = 0, skipped = 0, noPhone = 0, dup = 0; const unmatched = new Set<string>();
+    let added = 0, skipped = 0, noPhone = 0, dup = 0, updated = 0, failed = 0, lastErr = ""; const unmatched = new Set<string>();
     for (const row of rows) {
       const li = rowToLeadInput(row.values);
       const norm = li.phone.replace(/[^0-9]/g, "");
       if (li.lead_id) { skipped++; continue; }
       if (!norm) { noPhone++; continue; }
-      if (known.has(norm)) { dup++; continue; }
-      const r = await ingestLead({ project_id: projectId, name: li.name, phone: li.phone, email: li.email, message: li.message, company: li.company, industry: li.industry, budget: li.budget, utm_source: li.utm_source || target, utm_medium: "import", utm_campaign: li.utm_campaign, utm_content: li.utm_content, landing_id: li.landing_id, submitted_at: li.submitted_at });
-      if (!r.ok) { skipped++; continue; }
-      known.add(norm); added++;
-      await s.supabase.from("lead_sync").upsert({ lead_id: r.id, target, external_id: row.external_id });
       const custom: Record<string, string> = {};
       for (const [label, v] of Object.entries(li.extra)) { const k = keyFor(label); if (k) custom[k] = v; else unmatched.add(label); }
       const patch: Record<string, unknown> = {};
@@ -253,11 +250,28 @@ export async function syncLeads(projectId: string, target: "sheets" | "airtable"
       if (li.converted_on) patch.converted_on = li.converted_on; else if (li.status === "전환" && li.submitted_at) patch.converted_on = li.submitted_at.slice(0, 10);
       if (li.drop_reason) patch.drop_reason = li.drop_reason;
       if (Object.keys(custom).length) patch.custom = custom;
-      if (Object.keys(patch).length) await s.supabase.from("leads").update(patch).eq("id", r.id);
+      const prev = known.get(norm);
+      if (prev) {
+        // 이미 있는 리드: 대시보드에서 아직 손대지 않은 값(신규·매출 0·빈 항목)만 시트 값으로 채운다
+        const fill: Record<string, unknown> = {};
+        if (patch.status && prev.status === "신규") fill.status = patch.status;
+        if (patch.revenue != null && !(Number(prev.revenue) > 0)) fill.revenue = patch.revenue;
+        if (patch.converted_on && !prev.converted_on) fill.converted_on = patch.converted_on;
+        if (patch.drop_reason && !prev.drop_reason) fill.drop_reason = patch.drop_reason;
+        const pc = (prev.custom ?? {}) as Record<string, unknown>; const nc = { ...pc }; let ch = false;
+        for (const [k, v] of Object.entries(custom)) if (!pc[k]) { nc[k] = v; ch = true; }
+        if (ch) fill.custom = nc;
+        if (Object.keys(fill).length) { const { error } = await admin.from("leads").update(fill).eq("id", prev.id); if (error) failed++; else updated++; }
+        dup++; continue;
+      }
+      const r = await ingestLead({ project_id: projectId, name: li.name, phone: li.phone, email: li.email, message: li.message, company: li.company, industry: li.industry, budget: li.budget, utm_source: li.utm_source || target, utm_medium: "import", utm_campaign: li.utm_campaign, utm_content: li.utm_content, landing_id: li.landing_id, submitted_at: li.submitted_at });
+      if (!r.ok) { skipped++; continue; }
+      known.set(norm, { id: r.id, phone_norm: norm, status: "신규", revenue: 0, custom: {}, converted_on: null, drop_reason: null }); added++;
+      await admin.from("lead_sync").upsert({ lead_id: r.id, target, external_id: row.external_id });
+      if (Object.keys(patch).length) { const { error } = await admin.from("leads").update(patch).eq("id", r.id); if (error) { failed++; lastErr = error.message; } }
     }
-    if (fields.length !== ((proj?.custom_fields ?? []) as CustomField[]).length) await s.supabase.from("projects").update({ custom_fields: fields }).eq("id", projectId);
-    skipped += 0;
-    const detail = [dup ? `이미 있는 연락처 ${dup}` : "", noPhone ? `연락처 없음 ${noPhone}` : "", skipped ? `기타 ${skipped}` : ""].filter(Boolean).join(", ");
+    if (fields.length !== ((proj?.custom_fields ?? []) as CustomField[]).length) await admin.from("projects").update({ custom_fields: fields }).eq("id", projectId);
+    const detail = [dup ? `이미 있는 연락처 ${dup}${updated ? ` (그중 ${updated}건은 상태·매출 등 빈 값 채움)` : ""}` : "", noPhone ? `연락처 없음 ${noPhone}` : "", skipped ? `기타 ${skipped}` : "", failed ? `갱신 실패 ${failed}건 (${lastErr.slice(0, 80)})` : ""].filter(Boolean).join(", ");
     revalidatePath(`/app/projects/${projectId}`);
     return { ok: true, message: `${target === "sheets" ? "구글 시트" : "에어테이블"}에서 ${added}건 가져왔습니다.${detail ? ` 건너뜀: ${detail}.` : ""}${rows.length && !rows.some((x) => rowToLeadInput(x.values).phone) ? " 연락처 열을 찾지 못했습니다. 헤더에 '연락처' 또는 '전화번호' 열이 있는지 확인하세요." : ""}` };
   } catch (e) {

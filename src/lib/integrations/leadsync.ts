@@ -55,14 +55,26 @@ export function mapStatus(v: string): string {
   if (/상담|연락|통화|진행|대기/.test(t)) return "연락중";
   return "";
 }
+const EMPTY = new Set(["-", "—", "–", "없음", "n/a", "na", "null", "x", "X", "."]);
+const clean = (v: unknown) => { const t = (v ?? "").toString().trim(); return EMPTY.has(t) ? "" : t; };
+const DROPS = ["부재", "노쇼", "가격", "타상품", "자격미달", "관심없음", "허위정보", "중복"];
+/** 자유 문구 드랍 사유 → 허용 값. 못 맞추면 "" (원문은 extra 로 보존) */
+export function mapDropReason(v: string): string {
+  const t = v.trim(); if (!t) return "";
+  if (DROPS.includes(t)) return t;
+  if (/부재|연락안|응답없|전화안/.test(t)) return "부재"; if (/노쇼|불참|미방문/.test(t)) return "노쇼"; if (/가격|비싸|비용|예산/.test(t)) return "가격";
+  if (/타사|타상품|경쟁|다른곳|다른 곳/.test(t)) return "타상품"; if (/자격|조건|미달|불가/.test(t)) return "자격미달"; if (/관심|변심|필요없|단순/.test(t)) return "관심없음";
+  if (/허위|가짜|장난|스팸/.test(t)) return "허위정보"; if (/중복/.test(t)) return "중복";
+  return "";
+}
 export function rowToLeadInput(r: Record<string, string>) {
   const std: Record<string, string> = {}; const extra: Record<string, string> = {};
-  for (const [h, v] of Object.entries(r)) { const k = matchHeader(h); const val = (v ?? "").toString().trim(); if (k) { if (!std[k]) std[k] = val; } else if (h.trim() && val) extra[h.trim()] = val; }
+  for (const [h, v] of Object.entries(r)) { const k = matchHeader(h); const val = clean(v); if (k) { if (!std[k]) std[k] = val; } else if (h.trim() && val) extra[h.trim()] = val; }
   const g = (k: string) => std[k] ?? "";
   const revenueNum = Number(g("매출액").replace(/[^0-9.]/g, ""));
   const pay = g("결제구분"); const payType = ["결제확정", "예약금", "가계약", "환불"].find((p) => pay.includes(p)) ?? (/환불/.test(g("상태")) ? "환불" : "");
   return { name: g("이름"), phone: g("연락처"), email: g("이메일"), message: g("문의내용"), company: g("회사"), industry: g("업종"), budget: g("예산"), utm_source: g("유입매체"), utm_campaign: g("캠페인"), utm_content: g("소재"), landing_id: g("랜딩"), submitted_at: parseDate(g("등록일시")), memo: g("메모"), assignee: g("담당자"), status: mapStatus(g("상태")), raw_status: g("상태"), lead_id: g("리드ID"),
-    revenue: g("매출액") && !isNaN(revenueNum) ? Math.round(revenueNum) : null, pay_type: payType, converted_on: parseDate(g("전환일"))?.slice(0, 10) ?? null, drop_reason: g("드랍사유"), extra };
+    revenue: g("매출액") && !isNaN(revenueNum) ? Math.round(revenueNum) : null, pay_type: payType, converted_on: parseDate(g("전환일"))?.slice(0, 10) ?? null, drop_reason: mapDropReason(g("드랍사유")), extra: { ...extra, ...(g("드랍사유") && !mapDropReason(g("드랍사유")) ? { "드랍사유(원본)": g("드랍사유") } : {}) } };
 }
 
 // ---------- Google Sheets ----------
