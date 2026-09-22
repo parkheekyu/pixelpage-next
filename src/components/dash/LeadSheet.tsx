@@ -75,6 +75,72 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
     return () => { window.removeEventListener("click", close); window.removeEventListener("keydown", esc); window.removeEventListener("contextmenu", close); };
   }, [menu]);
   const toggleSel = (id: string) => setSelected((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  // ---- 드래그 선택: 행 번호 칸을 끌면 행 범위, 셀을 끌면 셀 범위(복사용) ----
+  const dragSel = useRef<{ kind: "rows" | "cells"; r: number; c: number } | null>(null);
+  const anchorRow = useRef<number | null>(null);
+  const [cellSel, setCellSel] = useState<{ r1: number; c1: number; r2: number; c2: number } | null>(null);
+  const [cellBox, setCellBox] = useState<{ left: number; top: number; width: number; height: number } | null>(null);
+  const gridRef = useRef<HTMLDivElement | null>(null);
+  const cellAt = (t: EventTarget | null) => { const td = (t as HTMLElement | null)?.closest?.("td"); const tr = td?.parentElement as HTMLTableRowElement | null; const r = tr?.dataset.i; if (!td || !tr || r == null) return null; return { r: Number(r), c: td.cellIndex, td }; };
+  const isControl = (t: EventTarget | null) => !!(t as HTMLElement | null)?.closest?.("input,select,button,textarea,a,.grip");
+  const selectRowRange = (a: number, b: number, rowsNow: Lead[]) => { const [x, y] = a < b ? [a, b] : [b, a]; setSelected(new Set(rowsNow.slice(x, y + 1).map((l) => l.id))); };
+  const onGridMouseDown = (e: React.MouseEvent) => {
+    if (e.button !== 0) return;
+    const cell = cellAt(e.target); if (!cell) return;
+    if (cell.c === 0) { // 행 번호 칸
+      if (isControl(e.target)) return;
+      e.preventDefault();
+      if (e.shiftKey && anchorRow.current != null) { selectRowRange(anchorRow.current, cell.r, page.rows); }
+      else { anchorRow.current = cell.r; setSelected(new Set([page.rows[cell.r]?.id].filter(Boolean) as string[])); }
+      setCellSel(null); dragSel.current = { kind: "rows", r: anchorRow.current ?? cell.r, c: 0 };
+      return;
+    }
+    if (isControl(e.target)) { setCellSel(null); return; }
+    e.preventDefault();
+    if (e.shiftKey && cellSel) { setCellSel({ ...cellSel, r2: cell.r, c2: cell.c }); dragSel.current = { kind: "cells", r: cellSel.r1, c: cellSel.c1 }; return; }
+    setCellSel({ r1: cell.r, c1: cell.c, r2: cell.r, c2: cell.c }); dragSel.current = { kind: "cells", r: cell.r, c: cell.c };
+  };
+  const onGridMouseOver = (e: React.MouseEvent) => {
+    const d = dragSel.current; if (!d) return;
+    const cell = cellAt(e.target); if (!cell) return;
+    if (d.kind === "rows") selectRowRange(d.r, cell.r, page.rows);
+    else setCellSel((cs) => (cs && cs.r2 === cell.r && cs.c2 === cell.c ? cs : { r1: d.r, c1: d.c, r2: cell.r, c2: cell.c }));
+  };
+  useEffect(() => { const up = () => { dragSel.current = null; }; window.addEventListener("mouseup", up); return () => window.removeEventListener("mouseup", up); }, []);
+  // 선택 영역 테두리 (오버레이) — 스크롤·리사이즈에도 따라감
+  useEffect(() => {
+    const g = gridRef.current; if (!g || !cellSel) { setCellBox(null); return; }
+    const calc = () => {
+      const [r1, r2] = cellSel.r1 < cellSel.r2 ? [cellSel.r1, cellSel.r2] : [cellSel.r2, cellSel.r1]; const [c1, c2] = cellSel.c1 < cellSel.c2 ? [cellSel.c1, cellSel.c2] : [cellSel.c2, cellSel.c1];
+      const a = g.querySelector<HTMLElement>(`tr[data-i="${r1}"] td:nth-child(${c1 + 1})`), b = g.querySelector<HTMLElement>(`tr[data-i="${r2}"] td:nth-child(${c2 + 1})`);
+      if (!a || !b) { setCellBox(null); return; }
+      const gr = g.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
+      setCellBox({ left: ra.left - gr.left + g.scrollLeft, top: ra.top - gr.top + g.scrollTop, width: rb.right - ra.left, height: rb.bottom - ra.top });
+    };
+    calc(); g.addEventListener("scroll", calc); window.addEventListener("resize", calc);
+    return () => { g.removeEventListener("scroll", calc); window.removeEventListener("resize", calc); };
+  }, [cellSel, page.rows.length, hidden]);
+  // Cmd/Ctrl+C: 셀 범위(또는 선택한 행)를 탭 구분 텍스트로 복사 · Esc: 선택 해제
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const tag = (document.activeElement?.tagName ?? "").toLowerCase(); if (["input", "select", "textarea"].includes(tag)) return;
+      if (e.key === "Escape") { setCellSel(null); return; }
+      if (!(e.metaKey || e.ctrlKey) || e.key.toLowerCase() !== "c") return;
+      const g = gridRef.current; if (!g) return;
+      const cellText = (td: HTMLElement) => { const ctl = td.querySelector<HTMLInputElement | HTMLSelectElement>("input,select"); return (ctl ? ctl.value : td.innerText).replace(/\s+/g, " ").trim(); };
+      const lines: string[] = [];
+      if (cellSel) {
+        const [r1, r2] = cellSel.r1 < cellSel.r2 ? [cellSel.r1, cellSel.r2] : [cellSel.r2, cellSel.r1]; const [c1, c2] = cellSel.c1 < cellSel.c2 ? [cellSel.c1, cellSel.c2] : [cellSel.c2, cellSel.c1];
+        for (let r = r1; r <= r2; r++) { const tds = [...g.querySelectorAll<HTMLElement>(`tr[data-i="${r}"] td`)]; lines.push(tds.slice(c1, c2 + 1).map(cellText).join("\t")); }
+      } else if (selected.size) {
+        const heads = [...g.querySelectorAll<HTMLElement>("thead th")].slice(1).map((th) => th.innerText.trim());
+        lines.push(heads.join("\t"));
+        page.rows.forEach((l, i) => { if (!selected.has(l.id)) return; const tds = [...g.querySelectorAll<HTMLElement>(`tr[data-i="${i}"] td`)].slice(1); lines.push(tds.map(cellText).join("\t")); });
+      } else return;
+      e.preventDefault(); navigator.clipboard?.writeText(lines.join("\n"));
+    };
+    window.addEventListener("keydown", onKey); return () => window.removeEventListener("keydown", onKey);
+  }, [cellSel, selected, page.rows]);
   const openRowMenu = (e: React.MouseEvent, id: string) => { e.preventDefault(); e.stopPropagation(); if (!selected.has(id)) setSelected(new Set([id])); setMenu({ x: e.clientX, y: e.clientY, kind: "row", rowId: id }); };
   const openColMenu = (e: React.MouseEvent, colKey: string, custom?: CustomField) => { e.preventDefault(); e.stopPropagation(); setMenu({ x: e.clientX, y: e.clientY, kind: "col", colKey, custom }); };
   const selIds = () => [...selected].filter((id) => page.rows.some((r) => r.id === id));
@@ -244,7 +310,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
         <label className="tb"><Filter className="ico" aria-hidden /> 매체 <select value={query.src} onChange={(e) => set({ src: e.target.value })}><option value="">전체</option>{page.sources.map((s) => <option key={s}>{s}</option>)}</select></label>
         <label className="tb"><ArrowUpDown className="ico" aria-hidden /> 정렬 <select value={query.sort} onChange={(e) => set({ sort: e.target.value as SheetSort })}><option value="ts_desc">등록일 최신순</option><option value="ts_asc">등록일 오래된순</option><option value="status">상태순</option><option value="rev_desc">매출액 높은순</option><option value="manual">직접 정렬 (드래그)</option></select></label>
         <DateRangePicker value={{ from: query.from, to: query.to }} onChange={(r) => set(r)} />
-        {selected.size > 0 && <span className="tb sel-info"><CheckSquare className="ico" aria-hidden /> {selected.size}건 선택 · 우클릭으로 작업</span>}
+        {selected.size > 0 && <span className="tb sel-info"><CheckSquare className="ico" aria-hidden /> {selected.size}건 선택 · 우클릭으로 작업 · ⌘C 복사</span>}
         <div className="search"><input type="text" placeholder="이름, 연락처 검색" value={query.q} onChange={(e) => set({ q: e.target.value })} /></div>
       </div>
       <div className="main">
@@ -252,7 +318,8 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
           <h4>뷰</h4>
           {VIEWS.map(([v, label]) => <button key={v} className={`v ${query.view === v ? "on" : ""}`} onClick={() => set({ view: v })}><Table2 className="ico" aria-hidden /> {label}<small>{S[v]}</small></button>)}
         </aside>
-        <div className="gridwrap" style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s" }}>
+        <div className="gridwrap" ref={gridRef} onMouseDown={onGridMouseDown} onMouseOver={onGridMouseOver} style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s", position: "relative" }}>
+          {cellBox && <div className="cellsel" style={{ left: cellBox.left, top: cellBox.top, width: cellBox.width, height: cellBox.height }} aria-hidden />}
           <table className="sheet" style={{ width: tableW, tableLayout: "fixed" }}>
             <colgroup>
               <col style={{ width: NUM_W }} />
@@ -293,7 +360,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
                 const isConv = l.status === "전환", isDrop = l.status === "드랍";
                 const isSel = selected.has(l.id);
                 return (
-                  <tr key={l.id} className={`${isSel ? "sel" : ""} ${overId === l.id && dragId && dragId !== l.id ? "dragover" : ""}`} onContextMenu={(e) => openRowMenu(e, l.id)}
+                  <tr key={l.id} data-i={i} className={`${isSel ? "sel" : ""} ${overId === l.id && dragId && dragId !== l.id ? "dragover" : ""}`} onContextMenu={(e) => openRowMenu(e, l.id)}
                     onDragOver={(e) => { if (dragId) { e.preventDefault(); setOverId(l.id); } }} onDrop={(e) => { e.preventDefault(); onDrop(l.id); }}>
                     <td className="num">
                       <span className="grip" draggable title="드래그로 순서 변경" onDragStart={(e) => { setDragId(l.id); e.dataTransfer.effectAllowed = "move"; }} onDragEnd={() => { setDragId(null); setOverId(null); }}><GripVertical className="ico" aria-hidden /></span>

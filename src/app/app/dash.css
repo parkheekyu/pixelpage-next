@@ -414,3 +414,9 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .pp-dash .prop-kv { display: grid; grid-template-columns: 52px 1fr; gap: 6px; font-size: 12.5px; color: var(--text-2); }
 .pp-dash .prop-kv b { color: var(--muted); font-weight: 600; }
 .pp-dash .prop-kv.why span { color: var(--text-2); font-style: normal; }
+
+/* 드래그 셀 선택 영역 */
+.sheet-app .gridwrap .cellsel { position: absolute; pointer-events: none; border: 2px solid var(--s1); background: color-mix(in srgb, var(--s1) 8%, transparent); border-radius: 2px; z-index: 3; }
+.sheet td.num { cursor: pointer; user-select: none; }
+.sheet td { user-select: none; }
+.sheet td input, .sheet td select, .sheet td textarea { user-select: text; }

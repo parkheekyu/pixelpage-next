@@ -72,8 +72,10 @@ export function rowToLeadInput(r: Record<string, string>) {
   for (const [h, v] of Object.entries(r)) { const k = matchHeader(h); const val = clean(v); if (k) { if (!std[k]) std[k] = val; } else if (h.trim() && val) extra[h.trim()] = val; }
   const g = (k: string) => std[k] ?? "";
   const revenueNum = Number(g("매출액").replace(/[^0-9.]/g, ""));
-  const pay = g("결제구분"); const payType = ["결제확정", "예약금", "가계약", "환불"].find((p) => pay.includes(p)) ?? (/환불/.test(g("상태")) ? "환불" : "");
-  return { name: g("이름"), phone: g("연락처"), email: g("이메일"), message: g("문의내용"), company: g("회사"), industry: g("업종"), budget: g("예산"), utm_source: g("유입매체"), utm_campaign: g("캠페인"), utm_content: g("소재"), landing_id: g("랜딩"), submitted_at: parseDate(g("등록일시")), memo: g("메모"), assignee: g("담당자"), status: mapStatus(g("상태")), raw_status: g("상태"), lead_id: g("리드ID"),
+  const pay = g("결제구분"); const stRaw = g("상태"); const status = mapStatus(stRaw);
+  let payType = ["결제확정", "예약금", "가계약", "환불"].find((p) => pay.includes(p)) ?? "";
+  if (!payType) { if (/환불/.test(stRaw + pay)) payType = "환불"; else if (/가계약/.test(stRaw + pay)) payType = "가계약"; else if (/예약금|계약금|보증금/.test(stRaw + pay)) payType = "예약금"; else if (status === "전환" && (revenueNum > 0 || /결제|입금|구매|완료|확정/.test(stRaw))) payType = "결제확정"; }
+  return { name: g("이름"), phone: g("연락처"), email: g("이메일"), message: g("문의내용"), company: g("회사"), industry: g("업종"), budget: g("예산"), utm_source: g("유입매체"), utm_campaign: g("캠페인"), utm_content: g("소재"), landing_id: g("랜딩"), submitted_at: parseDate(g("등록일시")), memo: g("메모"), assignee: g("담당자"), status, raw_status: stRaw, lead_id: g("리드ID"),
     revenue: g("매출액") && !isNaN(revenueNum) ? Math.round(revenueNum) : null, pay_type: payType, converted_on: parseDate(g("전환일"))?.slice(0, 10) ?? null, drop_reason: mapDropReason(g("드랍사유")), extra: { ...extra, ...(g("드랍사유") && !mapDropReason(g("드랍사유")) ? { "드랍사유(원본)": g("드랍사유") } : {}) } };
 }
 

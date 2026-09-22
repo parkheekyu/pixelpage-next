@@ -229,7 +229,7 @@ export async function syncLeads(projectId: string, target: "sheets" | "airtable"
     // pull: 외부 행 중 우리 DB에 없는 연락처만 리드로 추가 (리드ID 있는 행 = 우리가 내보낸 것 → 건너뜀)
     const rows = target === "sheets" ? await sheetsReadAll(integ.google_sheet_id!, tab) : await airtableReadAll(integ.airtable_token!, integ.airtable_base_id!, integ.airtable_table!);
     const admin = createAdminClient();
-    const { data: existing } = await admin.from("leads").select("id,phone_norm,status,revenue,custom,converted_on,drop_reason").eq("project_id", projectId);
+    const { data: existing } = await admin.from("leads").select("id,phone_norm,status,revenue,pay_type,custom,converted_on,drop_reason").eq("project_id", projectId);
     const known = new Map((existing ?? []).map((x) => [x.phone_norm as string, x]));
     // 매칭 안 된 열은 프로젝트 사용자 정의 열로 자동 추가해 값을 보존한다
     const { data: proj } = await s.supabase.from("projects").select("custom_fields").eq("id", projectId).single();
@@ -256,6 +256,7 @@ export async function syncLeads(projectId: string, target: "sheets" | "airtable"
         const fill: Record<string, unknown> = {};
         if (patch.status && prev.status === "신규") fill.status = patch.status;
         if (patch.revenue != null && !(Number(prev.revenue) > 0)) fill.revenue = patch.revenue;
+        if (patch.pay_type && !prev.pay_type) fill.pay_type = patch.pay_type;
         if (patch.converted_on && !prev.converted_on) fill.converted_on = patch.converted_on;
         if (patch.drop_reason && !prev.drop_reason) fill.drop_reason = patch.drop_reason;
         const pc = (prev.custom ?? {}) as Record<string, unknown>; const nc = { ...pc }; let ch = false;
@@ -266,7 +267,7 @@ export async function syncLeads(projectId: string, target: "sheets" | "airtable"
       }
       const r = await ingestLead({ project_id: projectId, name: li.name, phone: li.phone, email: li.email, message: li.message, company: li.company, industry: li.industry, budget: li.budget, utm_source: li.utm_source || target, utm_medium: "import", utm_campaign: li.utm_campaign, utm_content: li.utm_content, landing_id: li.landing_id, submitted_at: li.submitted_at });
       if (!r.ok) { skipped++; continue; }
-      known.set(norm, { id: r.id, phone_norm: norm, status: "신규", revenue: 0, custom: {}, converted_on: null, drop_reason: null }); added++;
+      known.set(norm, { id: r.id, phone_norm: norm, status: "신규", revenue: 0, pay_type: null, custom: {}, converted_on: null, drop_reason: null }); added++;
       await admin.from("lead_sync").upsert({ lead_id: r.id, target, external_id: row.external_id });
       if (Object.keys(patch).length) { const { error } = await admin.from("leads").update(patch).eq("id", r.id); if (error) { failed++; lastErr = error.message; } }
     }
