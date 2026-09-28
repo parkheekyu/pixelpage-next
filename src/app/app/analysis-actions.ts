@@ -13,17 +13,14 @@ import { extractLanding, landingToText } from "@/lib/integrations/landing";
 import { ga4Summary } from "@/lib/integrations/ga4";
 import { claritySummary } from "@/lib/integrations/clarity";
 import { hasPerplexity, preResearch } from "@/lib/integrations/perplexity";
-import type { CustomField } from "@/lib/dash/types";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { airtableCreate, airtableReadAll, rowToLeadInput, sheetsAppend, sheetsReadAll } from "@/lib/integrations/leadsync";
-import { ingestLead } from "@/lib/dash/ingest";
-import type { Lead } from "@/lib/dash/types";
+import { runLeadSync } from "@/lib/dash/leadsync-run";
 import { randomBytes } from "node:crypto";
 
 const PATHS: Record<AnalysisKind, string> = { research: "/app/research", market: "/app/research", ads: "/app/ads", landing: "/app/landing" };
 
 // ---------- 설정 ----------
-export async function saveIntegrations(projectId: string, input: { meta_ad_account_id?: string; meta_goal?: "lead" | "purchase"; ga4_property_id?: string; clarity_project_id?: string; clarity_api_token?: string; google_sheet_id?: string; google_sheet_tab?: string; airtable_base_id?: string; airtable_table?: string; airtable_token?: string; lead_sync_enabled?: boolean; slack_channel_id?: string }): Promise<ActionResult> {
+export async function saveIntegrations(projectId: string, input: { meta_ad_account_id?: string; meta_goal?: "lead" | "purchase"; ga4_property_id?: string; clarity_project_id?: string; clarity_api_token?: string; google_sheet_id?: string; google_sheet_tab?: string; sync_pull?: boolean; sync_push?: boolean; airtable_base_id?: string; airtable_table?: string; airtable_token?: string; lead_sync_enabled?: boolean; slack_channel_id?: string }): Promise<ActionResult> {
   const s = await requireStaff();
   const clean = (v?: string) => (v ?? "").trim().slice(0, 300) || null;
   const row: Record<string, unknown> = { project_id: projectId, updated_at: new Date().toISOString() };
@@ -38,6 +35,8 @@ export async function saveIntegrations(projectId: string, input: { meta_ad_accou
   if (input.airtable_table !== undefined) row.airtable_table = clean(input.airtable_table);
   if (input.airtable_token !== undefined && input.airtable_token !== "") row.airtable_token = clean(input.airtable_token);
   if (input.lead_sync_enabled !== undefined) row.lead_sync_enabled = !!input.lead_sync_enabled;
+  if (input.sync_pull !== undefined) row.sync_pull = !!input.sync_pull;
+  if (input.sync_push !== undefined) row.sync_push = !!input.sync_push;
   if (input.slack_channel_id !== undefined) row.slack_channel_id = clean(input.slack_channel_id);
   const { error } = await s.supabase.from("project_integrations").upsert(row, { onConflict: "project_id" });
   if (error) return { ok: false, error: error.message };
@@ -204,80 +203,10 @@ export async function regenerateWebhookToken(projectId: string): Promise<ActionR
 
 // ---------- 리드 동기화 (직원): 내보내기(push) / 가져오기(pull) ----------
 export async function syncLeads(projectId: string, target: "sheets" | "airtable", direction: "push" | "pull"): Promise<ActionResult> {
-  const s = await requireStaff();
-  const { data: integ } = await s.supabase.from("project_integrations").select("*").eq("project_id", projectId).maybeSingle();
-  if (!integ) return { ok: false, error: "연동 설정이 없습니다." };
-  if (target === "sheets" && !integ.google_sheet_id) return { ok: false, error: "구글 시트 ID를 먼저 저장하세요." };
-  if (target === "airtable" && !(integ.airtable_token && integ.airtable_base_id && integ.airtable_table)) return { ok: false, error: "에어테이블 토큰·베이스·테이블을 먼저 저장하세요." };
-  const tab = integ.google_sheet_tab || "리드";
-  try {
-    if (direction === "push") {
-      const { data: synced } = await s.supabase.from("lead_sync").select("lead_id").eq("target", target);
-      const done = new Set((synced ?? []).map((x) => x.lead_id));
-      const { data: leads } = await s.supabase.from("leads").select("*").eq("project_id", projectId).order("submitted_at").limit(2000);
-      const todo = ((leads ?? []) as Lead[]).filter((l) => !done.has(l.id));
-      if (!todo.length) return { ok: true, message: "내보낼 새 리드가 없습니다." };
-      if (target === "sheets") {
-        const r = await sheetsAppend(integ.google_sheet_id!, tab, todo);
-        await s.supabase.from("lead_sync").upsert(todo.map((l, i) => ({ lead_id: l.id, target, external_id: r.startRow ? String(r.startRow + i) : null })));
-        return { ok: true, message: `구글 시트로 ${r.appended}건 내보냈습니다.` };
-      }
-      const r = await airtableCreate(integ.airtable_token!, integ.airtable_base_id!, integ.airtable_table!, todo);
-      await s.supabase.from("lead_sync").upsert(todo.map((l) => ({ lead_id: l.id, target, external_id: r.ids[l.id] ?? null })));
-      return { ok: true, message: `에어테이블로 ${r.created}건 내보냈습니다.` };
-    }
-    // pull: 외부 행 중 우리 DB에 없는 연락처만 리드로 추가 (리드ID 있는 행 = 우리가 내보낸 것 → 건너뜀)
-    const rows = target === "sheets" ? await sheetsReadAll(integ.google_sheet_id!, tab) : await airtableReadAll(integ.airtable_token!, integ.airtable_base_id!, integ.airtable_table!);
-    const admin = createAdminClient();
-    const { data: existing } = await admin.from("leads").select("id,phone_norm,status,revenue,pay_type,custom,converted_on,drop_reason").eq("project_id", projectId);
-    const known = new Map((existing ?? []).map((x) => [x.phone_norm as string, x]));
-    // 매칭 안 된 열은 프로젝트 사용자 정의 열로 자동 추가해 값을 보존한다
-    const { data: proj } = await s.supabase.from("projects").select("custom_fields").eq("id", projectId).single();
-    const fields: CustomField[] = [...((proj?.custom_fields ?? []) as CustomField[])];
-    const keyFor = (label: string) => { const found = fields.find((f) => f.label === label); if (found) return found.key; if (fields.length >= 30) return null; let h = 0; for (const ch of label) h = (h * 31 + ch.charCodeAt(0)) >>> 0; const key = `s_${h.toString(36)}`; fields.push({ key, label: label.slice(0, 40), type: "text" }); return key; };
-    let added = 0, skipped = 0, noPhone = 0, dup = 0, updated = 0, failed = 0, lastErr = ""; const unmatched = new Set<string>();
-    for (const row of rows) {
-      const li = rowToLeadInput(row.values);
-      const norm = li.phone.replace(/[^0-9]/g, "");
-      if (li.lead_id) { skipped++; continue; }
-      if (!norm) { noPhone++; continue; }
-      const custom: Record<string, string> = {};
-      for (const [label, v] of Object.entries(li.extra)) { const k = keyFor(label); if (k) custom[k] = v; else unmatched.add(label); }
-      const patch: Record<string, unknown> = {};
-      if (li.status) patch.status = li.status; else if (li.raw_status) custom[keyFor("상태(원본)") ?? "s_status"] = li.raw_status;
-      if (li.memo) patch.memo = li.memo; if (li.assignee) patch.assignee = li.assignee;
-      if (li.revenue != null) patch.revenue = li.revenue; if (li.pay_type) patch.pay_type = li.pay_type;
-      if (li.converted_on) patch.converted_on = li.converted_on; else if (li.status === "전환" && li.submitted_at) patch.converted_on = li.submitted_at.slice(0, 10);
-      if (li.drop_reason) patch.drop_reason = li.drop_reason;
-      if (Object.keys(custom).length) patch.custom = custom;
-      const prev = known.get(norm);
-      if (prev) {
-        // 이미 있는 리드: 대시보드에서 아직 손대지 않은 값(신규·매출 0·빈 항목)만 시트 값으로 채운다
-        const fill: Record<string, unknown> = {};
-        if (patch.status && prev.status === "신규") fill.status = patch.status;
-        if (patch.revenue != null && !(Number(prev.revenue) > 0)) fill.revenue = patch.revenue;
-        if (patch.pay_type && !prev.pay_type) fill.pay_type = patch.pay_type;
-        if (patch.converted_on && !prev.converted_on) fill.converted_on = patch.converted_on;
-        if (patch.drop_reason && !prev.drop_reason) fill.drop_reason = patch.drop_reason;
-        const pc = (prev.custom ?? {}) as Record<string, unknown>; const nc = { ...pc }; let ch = false;
-        for (const [k, v] of Object.entries(custom)) if (!pc[k]) { nc[k] = v; ch = true; }
-        if (ch) fill.custom = nc;
-        if (Object.keys(fill).length) { const { error } = await admin.from("leads").update(fill).eq("id", prev.id); if (error) failed++; else updated++; }
-        dup++; continue;
-      }
-      const r = await ingestLead({ project_id: projectId, name: li.name, phone: li.phone, email: li.email, message: li.message, company: li.company, industry: li.industry, budget: li.budget, utm_source: li.utm_source || target, utm_medium: "import", utm_campaign: li.utm_campaign, utm_content: li.utm_content, landing_id: li.landing_id, submitted_at: li.submitted_at });
-      if (!r.ok) { skipped++; continue; }
-      known.set(norm, { id: r.id, phone_norm: norm, status: "신규", revenue: 0, pay_type: null, custom: {}, converted_on: null, drop_reason: null }); added++;
-      await admin.from("lead_sync").upsert({ lead_id: r.id, target, external_id: row.external_id });
-      if (Object.keys(patch).length) { const { error } = await admin.from("leads").update(patch).eq("id", r.id); if (error) { failed++; lastErr = error.message; } }
-    }
-    if (fields.length !== ((proj?.custom_fields ?? []) as CustomField[]).length) await admin.from("projects").update({ custom_fields: fields }).eq("id", projectId);
-    const detail = [dup ? `이미 있는 연락처 ${dup}${updated ? ` (그중 ${updated}건은 상태·매출 등 빈 값 채움)` : ""}` : "", noPhone ? `연락처 없음 ${noPhone}` : "", skipped ? `기타 ${skipped}` : "", failed ? `갱신 실패 ${failed}건 (${lastErr.slice(0, 80)})` : ""].filter(Boolean).join(", ");
-    revalidatePath(`/app/projects/${projectId}`);
-    return { ok: true, message: `${target === "sheets" ? "구글 시트" : "에어테이블"}에서 ${added}건 가져왔습니다.${detail ? ` 건너뜀: ${detail}.` : ""}${rows.length && !rows.some((x) => rowToLeadInput(x.values).phone) ? " 연락처 열을 찾지 못했습니다. 헤더에 '연락처' 또는 '전화번호' 열이 있는지 확인하세요." : ""}` };
-  } catch (e) {
-    return { ok: false, error: (e as Error).message };
-  }
+  await requireStaff();
+  const r = await runLeadSync(createAdminClient(), projectId, target, direction);
+  revalidatePath(`/app/projects/${projectId}`);
+  return r.ok ? { ok: true, message: r.message } : { ok: false, error: r.error ?? "동기화 실패" };
 }
 
 /** 이력에서 리포트 클릭 시 본문 조회 (RLS: 직원 또는 배정 고객사) */

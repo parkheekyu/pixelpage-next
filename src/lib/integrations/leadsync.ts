@@ -14,7 +14,7 @@ export function leadToRow(l: Lead): Record<Col, string> {
 export interface ExternalRow { external_id: string; values: Record<string, string> }
 const ALIASES: Record<string, string[]> = {
   "리드ID": ["리드id", "lead_id", "leadid"],
-  "등록일시": ["등록일시", "등록일", "일시", "날짜", "신청일", "신청일시", "제출일", "제출일시", "접수일", "접수일시", "timestamp", "date", "created", "created_at", "타임스탬프"],
+  "등록일시": ["등록일시", "등록일", "등록날짜", "일시", "날짜", "신청일", "신청일시", "제출일", "제출일시", "접수일", "접수일시", "timestamp", "date", "created", "created_at", "타임스탬프"],
   "이름": ["이름", "성함", "성명", "고객명", "신청자", "name", "이름(성함)"],
   "연락처": ["연락처", "전화번호", "전화", "휴대폰", "휴대폰번호", "핸드폰", "핸드폰번호", "폰번호", "phone", "mobile", "tel", "번호"],
   "이메일": ["이메일", "메일", "email", "e-mail", "이메일주소"],
@@ -73,6 +73,7 @@ export function rowToLeadInput(r: Record<string, string>) {
   const std: Record<string, string> = {}; const extra: Record<string, string> = {};
   for (const [h, v] of Object.entries(r)) { const k = matchHeader(h); const val = clean(v); if (k) { if (!std[k]) std[k] = val; } else if (h.trim() && val) extra[h.trim()] = val; }
   const g = (k: string) => std[k] ?? "";
+  if (/^1[0-9]{9,10}$/.test((std["연락처"] ?? "").replace(/[^0-9]/g, ""))) std["연락처"] = "0" + (std["연락처"] ?? "").replace(/[^0-9]/g, "");
   const revenueNum = Number(g("매출액").replace(/[^0-9.]/g, ""));
   const pay = g("결제구분"); const stRaw = g("상태"); const status = mapStatus(stRaw);
   let payType = ["결제확정", "예약금", "가계약", "환불"].find((p) => pay.includes(p)) ?? "";
@@ -115,11 +116,25 @@ export async function sheetsEnsureHeader(sheetId: string, tab: string) {
   if (first.length === 0) await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A1"))}?valueInputOption=RAW`, { method: "PUT", body: JSON.stringify({ values: [[...COLUMNS]] }) });
   return first.length ? first : [...COLUMNS];
 }
-export async function sheetsAppend(sheetId: string, tab: string, leads: Lead[]): Promise<{ appended: number; startRow: number }> {
+/** 시트 헤더(별칭 허용) 기준으로 리드 한 행을 만든다. 매칭 안 되는 헤더는 같은 이름의 사용자 정의 열 값 */
+export function leadToSheetRow(header: string[], l: Lead, fields: { key: string; label: string }[] = []): string[] {
+  const m = leadToRow(l) as Record<string, string>;
+  return header.map((h) => { const std = matchHeader(h); if (std) return m[std] ?? ""; const f = fields.find((x) => x.label === h.trim()); const v = f ? (l.custom as Record<string, unknown> | undefined)?.[f.key] : undefined; return v == null ? "" : String(v); });
+}
+export async function sheetsHeader(sheetId: string, tab: string): Promise<string[]> { return sheetsEnsureHeader(sheetId, tab); }
+const colLetter = (i: number) => { let s = ""; i += 1; while (i > 0) { const r = (i - 1) % 26; s = String.fromCharCode(65 + r) + s; i = Math.floor((i - 1) / 26); } return s; };
+/** 특정 셀들만 갱신 (행 번호는 1부터, 열 인덱스는 0부터) */
+export async function sheetsUpdateCells(sheetId: string, tab: string, cells: { row: number; col: number; value: string }[]) {
+  if (!cells.length) return 0;
+  const data = cells.map((c) => ({ range: rangeOf(tab, `${colLetter(c.col)}${c.row}`), values: [[c.value]] }));
+  for (let i = 0; i < data.length; i += 400) await sheetsFetch(`${sheetId}/values:batchUpdate`, { method: "POST", body: JSON.stringify({ valueInputOption: "RAW", data: data.slice(i, i + 400) }) });
+  return cells.length;
+}
+export async function sheetsAppend(sheetId: string, tab: string, leads: Lead[], fields: { key: string; label: string }[] = []): Promise<{ appended: number; startRow: number }> {
   const header = await sheetsEnsureHeader(sheetId, tab);
-  const rows = leads.map((l) => { const m = leadToRow(l); return header.map((h) => (m as Record<string, string>)[h] ?? ""); });
+  const rows = leads.map((l) => leadToSheetRow(header, l, fields));
   if (!rows.length) return { appended: 0, startRow: 0 };
-  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A:A"))}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`, { method: "POST", body: JSON.stringify({ values: rows }) })) as { updates?: { updatedRange?: string } };
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A:A"))}:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS`, { method: "POST", body: JSON.stringify({ values: rows }) })) as { updates?: { updatedRange?: string } };
   const m = j.updates?.updatedRange?.match(/!A(\d+)/);
   return { appended: rows.length, startRow: m ? Number(m[1]) : 0 };
 }

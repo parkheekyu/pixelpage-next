@@ -43,7 +43,7 @@ export default function SettingsClient({ project, integ, env }: Props) {
   const [open, setOpen] = useState<string | null>(null);
   const toggle = (k: string) => setOpen((o) => (o === k ? null : k));
   const [basic, setBasic] = useState({ name: project.name, landing_url: project.landing_url ?? "" });
-  const [f, setF] = useState({ meta_ad_account_id: integ?.meta_ad_account_id ?? "", meta_goal: (integ?.meta_goal ?? "lead") as "lead" | "purchase", ga4_property_id: integ?.ga4_property_id ?? "", clarity_project_id: integ?.clarity_project_id ?? "", clarity_api_token: "", google_sheet_id: integ?.google_sheet_id ?? "", google_sheet_tab: integ?.google_sheet_tab ?? "리드", airtable_base_id: integ?.airtable_base_id ?? "", airtable_table: integ?.airtable_table ?? "", airtable_token: "", lead_sync_enabled: integ?.lead_sync_enabled ?? false, slack_channel_id: integ?.slack_channel_id ?? "" });
+  const [f, setF] = useState({ meta_ad_account_id: integ?.meta_ad_account_id ?? "", meta_goal: (integ?.meta_goal ?? "lead") as "lead" | "purchase", ga4_property_id: integ?.ga4_property_id ?? "", clarity_project_id: integ?.clarity_project_id ?? "", clarity_api_token: "", google_sheet_id: integ?.google_sheet_id ?? "", google_sheet_tab: integ?.google_sheet_tab ?? "리드", sync_pull: integ?.sync_pull ?? true, sync_push: integ?.sync_push ?? false, airtable_base_id: integ?.airtable_base_id ?? "", airtable_table: integ?.airtable_table ?? "", airtable_token: "", lead_sync_enabled: integ?.lead_sync_enabled ?? false, slack_channel_id: integ?.slack_channel_id ?? "" });
   const [token, setToken] = useState(project.webhook_token ?? "");
   const [copied, setCopied] = useState<string | null>(null);
   const copy = (k: string, v: string) => navigator.clipboard?.writeText(v).then(() => setCopied(k));
@@ -117,8 +117,12 @@ export default function SettingsClient({ project, integ, env }: Props) {
           <div className="form-row">
             <label className="f" style={{ flex: 1, minWidth: 260 }}>시트 주소 또는 ID<input type="text" value={f.google_sheet_id} onChange={(e) => setF({ ...f, google_sheet_id: e.target.value })} placeholder="https://docs.google.com/spreadsheets/d/…" /></label>
             <label className="f">탭 이름<input type="text" value={f.google_sheet_tab} onChange={(e) => setF({ ...f, google_sheet_tab: e.target.value })} placeholder="리드" /></label>
-            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-end", paddingBottom: 8 }}><input type="checkbox" checked={f.lead_sync_enabled} onChange={(e) => setF({ ...f, lead_sync_enabled: e.target.checked })} /> 새 리드 자동 내보내기</label>
             {saveBtn("sheets")}
+          </div>
+          <div className="form-row" style={{ marginTop: 6, gap: 16 }}>
+            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><input type="checkbox" checked={f.sync_pull} onChange={(e) => setF({ ...f, sync_pull: e.target.checked })} /> 시트 → 대시보드 자동 가져오기 (5분마다)</label>
+            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><input type="checkbox" checked={f.lead_sync_enabled} onChange={(e) => setF({ ...f, lead_sync_enabled: e.target.checked })} /> 새 리드 들어오면 시트에 추가</label>
+            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><input type="checkbox" checked={f.sync_push} onChange={(e) => setF({ ...f, sync_push: e.target.checked })} /> 대시보드 수정(상태·매출 등)을 시트에 반영</label>
           </div>
           <div className="hint">{env.google ? <>시트를 <code>{env.googleEmail}</code> 에게 편집자로 공유하세요. 첫 행 열 이름은 자동 생성됩니다.</> : "서버에 구글 서비스 계정 키가 필요합니다."}</div>
           <div className="form-row" style={{ marginTop: 8 }}>

@@ -27,5 +27,5 @@ export interface LeadPage {
   sources: string[];
 }
 
-export const defaultQuery = (now = Date.now()): LeadQuery => ({ ...presetRange("30d", now), view: "all", status: "", src: "", q: "", sort: "ts_desc", offset: 0, limit: 150 });
-export const PAGE_LIMIT = 150;
+export const defaultQuery = (now = Date.now()): LeadQuery => ({ ...presetRange("30d", now), view: "all", status: "", src: "", q: "", sort: "ts_desc", offset: 0, limit: 5000 });
+export const PAGE_LIMIT = 5000;

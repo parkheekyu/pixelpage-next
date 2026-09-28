@@ -56,10 +56,12 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
   const removeField = (key: string) => { const next = fields.filter((f) => f.key !== key); setFields(next); saveCols({ custom_fields: next }); };
   // 자사 프로젝트(홈페이지 문의)는 폼 항목 열 항상 표시, 다른 고객사는 값이 있을 때만
   const builtinCols = COLS.filter((c) => (!c.staff || isStaff) && (!c.ifAny || project.is_own || page.rows.some((r) => r[c.ifAny!])));
+  const colsRef = useRef<{ key: string; label: string }[]>([]);
   const cols = [
     ...builtinCols.filter((c) => c.key === "name" || !hidden.includes(c.key)),
     ...fields.map((f) => ({ key: "custom:" + f.key, label: f.label, w: 140, ic: (f.type === "date" ? Calendar : f.type === "number" ? Banknote : f.type === "select" ? ChevronDown : AlignLeft) as LucideIcon, custom: f })),
   ];
+  colsRef.current = cols;
   const has = (key: string) => cols.some((c) => c.key === key);
 
   // 선택 · 우클릭 메뉴 · 드래그 정렬 · 열 메뉴 열기
@@ -112,10 +114,13 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
     const g = gridRef.current; if (!g || !cellSel) { setCellBox(null); return; }
     const calc = () => {
       const [r1, r2] = cellSel.r1 < cellSel.r2 ? [cellSel.r1, cellSel.r2] : [cellSel.r2, cellSel.r1]; const [c1, c2] = cellSel.c1 < cellSel.c2 ? [cellSel.c1, cellSel.c2] : [cellSel.c2, cellSel.c1];
-      const a = g.querySelector<HTMLElement>(`tr[data-i="${r1}"] td:nth-child(${c1 + 1})`), b = g.querySelector<HTMLElement>(`tr[data-i="${r2}"] td:nth-child(${c2 + 1})`);
-      if (!a || !b) { setCellBox(null); return; }
+      const anyRow = g.querySelector<HTMLElement>("tr[data-i]"); const first = g.querySelector<HTMLElement>('tr[data-i="0"]');
+      const a = anyRow?.querySelector<HTMLElement>(`td:nth-child(${c1 + 1})`), b = anyRow?.querySelector<HTMLElement>(`td:nth-child(${c2 + 1})`);
+      const thead = g.querySelector<HTMLElement>("thead"); const newrow = g.querySelector<HTMLElement>("tr.newrow");
+      if (!a || !b || !thead) { setCellBox(null); return; }
       const gr = g.getBoundingClientRect(), ra = a.getBoundingClientRect(), rb = b.getBoundingClientRect();
-      setCellBox({ left: ra.left - gr.left + g.scrollLeft, top: ra.top - gr.top + g.scrollTop, width: rb.right - ra.left, height: rb.bottom - ra.top });
+      const top0 = first ? first.getBoundingClientRect().top - gr.top + g.scrollTop : thead.offsetHeight + (newrow?.offsetHeight ?? 0);
+      setCellBox({ left: ra.left - gr.left + g.scrollLeft, top: top0 + r1 * ROW_H, width: rb.right - ra.left, height: (r2 - r1 + 1) * ROW_H });
     };
     calc(); g.addEventListener("scroll", calc); window.addEventListener("resize", calc);
     return () => { g.removeEventListener("scroll", calc); window.removeEventListener("resize", calc); };
@@ -133,9 +138,11 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
         const [r1, r2] = cellSel.r1 < cellSel.r2 ? [cellSel.r1, cellSel.r2] : [cellSel.r2, cellSel.r1]; const [c1, c2] = cellSel.c1 < cellSel.c2 ? [cellSel.c1, cellSel.c2] : [cellSel.c2, cellSel.c1];
         for (let r = r1; r <= r2; r++) { const tds = [...g.querySelectorAll<HTMLElement>(`tr[data-i="${r}"] td`)]; lines.push(tds.slice(c1, c2 + 1).map(cellText).join("\t")); }
       } else if (selected.size) {
-        const heads = [...g.querySelectorAll<HTMLElement>("thead th")].slice(1).map((th) => th.innerText.trim());
-        lines.push(heads.join("\t"));
-        page.rows.forEach((l, i) => { if (!selected.has(l.id)) return; const tds = [...g.querySelectorAll<HTMLElement>(`tr[data-i="${i}"] td`)].slice(1); lines.push(tds.map(cellText).join("\t")); });
+        const cs = colsRef.current; lines.push(cs.map((c) => c.label).join("\t"));
+        const val = (l: Lead, key: string): string => { if (key.startsWith("custom:")) { const v = (l.custom as Record<string, unknown> | undefined)?.[key.slice(7)]; return v == null ? "" : String(v); }
+          const m: Record<string, unknown> = { name: l.name, ts: fmtTs(l.submitted_at), phone: l.phone, email: l.email, company: l.company, industry: l.industry, budget: l.budget, services: l.services, marketing_status: l.marketing_status, message: l.message, src: l.utm_source, content: l.utm_content, assignee: l.assignee, status: l.status, revenue: l.revenue || "", pay: l.pay_type, conv: l.converted_on, drop: l.drop_reason, memo: l.memo };
+          const v = m[key]; return v == null ? "" : String(v).replace(/\s+/g, " "); };
+        page.rows.forEach((l) => { if (selected.has(l.id)) lines.push(cs.map((c) => val(l, c.key)).join("\t")); });
       } else return;
       e.preventDefault(); navigator.clipboard?.writeText(lines.join("\n"));
     };
@@ -255,17 +262,13 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
   }, [project.id]);
 
   const set = (patch: Partial<LeadQuery>) => { setIncoming(0); setQuery((q) => ({ ...q, ...patch, offset: 0 })); };
-  const more = () => setQuery((q) => ({ ...q, offset: page.rows.length }));
-  // 스크롤이 바닥 근처에 오면 자동으로 다음 페이지 (더 보기 버튼 없이)
-  const sentinel = useRef<HTMLDivElement | null>(null);
-  const moreRef = useRef(more); moreRef.current = more;
-  const canMore = page.rows.length < page.total && !loading;
-  useEffect(() => {
-    const el = sentinel.current; if (!el || !canMore) return;
-    const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) moreRef.current(); }, { root: el.closest(".gridwrap"), rootMargin: "400px 0px" });
-    io.observe(el);
-    return () => io.disconnect();
-  }, [canMore, page.rows.length]);
+  // 가상 스크롤: 전체 행을 한 번에 받아 두고 화면에 보이는 구간(+여유)만 그린다 (구글 시트처럼 끊김 없이 스크롤)
+  const ROW_H = 39; const OVERSCAN = 12;
+  const [viewport, setViewport] = useState({ top: 0, h: 800 });
+  const onGridScroll = (e: React.UIEvent<HTMLDivElement>) => { const el = e.currentTarget; const top = el.scrollTop, h = el.clientHeight; setViewport((v) => (Math.abs(v.top - top) < ROW_H / 2 && v.h === h ? v : { top, h })); };
+  useEffect(() => { const g = gridRef.current; if (!g) return; const ro = new ResizeObserver(() => setViewport((v) => ({ ...v, h: g.clientHeight }))); ro.observe(g); return () => ro.disconnect(); }, []);
+  const vStart = Math.max(0, Math.floor(viewport.top / ROW_H) - OVERSCAN);
+  const vEnd = Math.min(page.rows.length, Math.ceil((viewport.top + viewport.h) / ROW_H) + OVERSCAN);
   const { summary: S, rows, total } = page;
 
   function save(l: Lead, patch: LeadPatch) {
@@ -318,7 +321,7 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
           <h4>뷰</h4>
           {VIEWS.map(([v, label]) => <button key={v} className={`v ${query.view === v ? "on" : ""}`} onClick={() => set({ view: v })}><Table2 className="ico" aria-hidden /> {label}<small>{S[v]}</small></button>)}
         </aside>
-        <div className="gridwrap" ref={gridRef} onMouseDown={onGridMouseDown} onMouseOver={onGridMouseOver} style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s", position: "relative" }}>
+        <div className="gridwrap" ref={gridRef} onMouseDown={onGridMouseDown} onMouseOver={onGridMouseOver} onScroll={onGridScroll} style={{ opacity: loading ? 0.6 : 1, transition: "opacity .15s", position: "relative" }}>
           {cellBox && <div className="cellsel" style={{ left: cellBox.left, top: cellBox.top, width: cellBox.width, height: cellBox.height }} aria-hidden />}
           <table className="sheet" style={{ width: tableW, tableLayout: "fixed" }}>
             <colgroup>
@@ -356,7 +359,9 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
                   </td>
                 </tr>
               )}
-              {rows.map((l, i) => {
+              {vStart > 0 && <tr aria-hidden style={{ height: vStart * ROW_H }}><td className="num" /><td colSpan={cols.length + (isStaff ? 1 : 0)} /></tr>}
+              {rows.slice(vStart, vEnd).map((l, k) => {
+                const i = vStart + k;
                 const isConv = l.status === "전환", isDrop = l.status === "드랍";
                 const isSel = selected.has(l.id);
                 return (
@@ -413,11 +418,11 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
                   </tr>
                 );
               })}
+              {vEnd < rows.length && <tr aria-hidden style={{ height: (rows.length - vEnd) * ROW_H }}><td className="num" /><td colSpan={cols.length + (isStaff ? 1 : 0)} /></tr>}
               {rows.length === 0 && <tr><td className="num" /><td colSpan={cols.length + (isStaff ? 1 : 0)} style={{ color: "var(--muted)", padding: "18px 12px" }}>{loading ? "불러오는 중…" : "조건에 맞는 리드가 없습니다. 리드는 광고 폼 제출 시 자동으로 추가됩니다."}</td></tr>}
               {!adding && <tr className="addrow" onClick={() => setAdding(true)}><td className="num"><Plus className="ico" aria-hidden /></td><td colSpan={cols.length + (isStaff ? 1 : 0)}>행 추가</td></tr>}
             </tbody>
           </table>
-          <div ref={sentinel} style={{ height: 1 }} aria-hidden />
         </div>
       </div>
       {menu && (
@@ -445,10 +450,10 @@ export default function LeadSheet({ project, initial, isStaff }: { project: Proj
       )}
       <div className="foot">
         <span><Plus className="ico" aria-hidden /> 리드는 광고 폼 제출 시 자동 추가됩니다</span>
-        <span>{rows.length < total ? `${rows.length} / ${fmtN(total)}` : fmtN(total)} records</span>
+        <span>{fmtN(total)} records{rows.length < total ? ` (표시 ${fmtN(rows.length)})` : ""}</span>
         <span className={`live ${live}`} title={live === "on" ? "실시간 연결됨: 새 리드·상태 변경이 자동 반영됩니다" : live === "off" ? "실시간 연결 끊김" : "연결 중"}><i />{live === "on" ? "실시간" : live === "off" ? "오프라인" : "연결 중"}</span>
         {incoming > 0 && <button type="button" className="btn incoming" onClick={() => { setIncoming(0); setQuery((q) => ({ ...q, offset: 0 })); }}>새 리드 {incoming}건 반영됨</button>}
-        {rows.length < total && loading && <span className="saving">불러오는 중…</span>}
+        {loading && <span className="saving">불러오는 중…</span>}
         {err ? <span className="err">저장 실패: {err}</span> : pending ? <span className="saving">저장 중…</span> : saved ? <span className="saved">저장됨 {saved}</span> : null}
       </div>
     </div>

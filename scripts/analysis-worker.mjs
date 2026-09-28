@@ -140,7 +140,19 @@ async function processOne() {
 await db.from("analysis_jobs").update({ claimed_at: null, worker: null }).lt("claimed_at", new Date(Date.now() - 30 * 60 * 1000).toISOString());
 await db.from("agent_jobs").update({ claimed_at: null, worker: null, status: "queued" }).eq("status", "running").lt("claimed_at", new Date(Date.now() - 30 * 60 * 1000).toISOString());
 log(`워커 시작 (${WORKER}, model=${MODEL}, effort=${EFFORT}, ${WATCH ? "watch" : "once"})`);
+let lastSync = 0;
+async function syncExternalLeads() {
+  if (Date.now() - lastSync < 300000 || !process.env.LEAD_WEBHOOK_SECRET) return; lastSync = Date.now();
+  const site = process.env.WORKER_SITE_URL || process.env.NEXT_PUBLIC_SITE_URL || "https://pixelpage.co.kr";
+  try {
+    const r = await fetch(`${site}/api/sync/leads`, { method: "POST", headers: { authorization: `Bearer ${process.env.LEAD_WEBHOOK_SECRET}` }, signal: AbortSignal.timeout(280000) });
+    const j = await r.json();
+    const changed = (j.results ?? []).filter((x) => (x.pull?.added || x.pull?.updated || x.push?.pushed || x.push?.pushedUpdates || x.pull?.error || x.push?.error));
+    if (changed.length) log(`시트 동기화: ${changed.map((x) => `${x.target} +${x.pull?.added ?? 0}/~${x.pull?.updated ?? 0} →${x.push?.pushed ?? 0}/~${x.push?.pushedUpdates ?? 0}${x.pull?.error ? " 가져오기 오류: " + x.pull.error : ""}${x.push?.error ? " 내보내기 오류: " + x.push.error : ""}`).join(" · ")} (${j.ms}ms)`);
+  } catch (e) { log(`시트 동기화 실패: ${e.message}`); }
+}
 do {
+  try { await syncExternalLeads(); } catch {}
   try { await enqueueRoutines(db, { log }); } catch (e) { log(`정기 업무 확인 실패: ${e.message}`); }
   // 분석은 1건씩, 직원 대화·배분은 동시에 3건까지
   for (;;) { const a = await processOne(); const b = await processAgentJobs(); if (!a && !b) break; }

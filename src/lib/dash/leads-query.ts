@@ -18,7 +18,7 @@ export async function queryLeads(supabase: DashClient, projectId: string, p: Lea
   const to = isDate(p.to) && p.to >= from ? p.to : today;
   const since = new Date(from + "T00:00:00+09:00").toISOString();
   const until = new Date(to + "T23:59:59.999+09:00").toISOString();
-  const limit = Math.min(Math.max(p.limit, 1), 500);
+  const limit = Math.min(Math.max(p.limit, 1), 5000);
   const offset = Math.max(p.offset, 0);
 
   let q = supabase.from("leads").select(LEAD_COLS, { count: "exact" }).eq("project_id", projectId).gte("submitted_at", since).lte("submitted_at", until);

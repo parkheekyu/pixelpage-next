@@ -62,6 +62,8 @@ export interface ProjectIntegrations {
   airtable_table: string | null;
   airtable_token: string | null;
   lead_sync_enabled: boolean;
+  sync_pull: boolean;
+  sync_push: boolean;
   slack_channel_id: string | null;
   updated_at: string;
 }
