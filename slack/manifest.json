@@ -21,7 +21,9 @@
         "groups:read",
         "im:read",
         "users:read",
-        "reactions:write"
+        "reactions:write",
+        "files:write",
+        "files:read"
       ]
     }
   },

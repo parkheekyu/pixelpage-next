@@ -13,7 +13,8 @@ import { readFileSync, existsSync } from "node:fs";
 import os, { hostname } from "node:os";
 import path from "node:path";
 import fs from "node:fs";
-import { processEmployeeTurn, processDispatch, enqueueRoutines } from "./employees.mjs";
+import { processEmployeeTurn, processDispatch, processVideoAd, enqueueRoutines } from "./employees.mjs";
+import { checkYoutube } from "./youtube-watch.mjs";
 
 if (existsSync(".env.local")) for (const line of readFileSync(".env.local", "utf8").split("\n")) { const m = line.match(/^\s*([A-Z0-9_]+)\s*=\s*(.*)\s*$/); if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, ""); }
 const args = process.argv.slice(2);
@@ -60,8 +61,11 @@ function extractJson(text) {
 }
 
 /** 범용 에이전트 작업 (agent_jobs) — 최대 n 건을 선점해 동시에 처리 */
+let videoRunning = 0;
 async function claimAgentJobs(n) {
-  const { data: jobs } = await db.from("agent_jobs").select("*").eq("status", "queued").is("claimed_at", null).order("kind").order("created_at").limit(n);
+  let q = db.from("agent_jobs").select("*").eq("status", "queued").is("claimed_at", null).order("kind").order("created_at").limit(n);
+  if (videoRunning > 0) q = q.neq("kind", "video_ad");
+  const { data: jobs } = await q;
   const claimed = [];
   for (const job of jobs ?? []) {
     const { data: ok } = await db.from("agent_jobs").update({ claimed_at: new Date().toISOString(), worker: WORKER, status: "running" }).eq("id", job.id).is("claimed_at", null).select("id");
@@ -73,6 +77,11 @@ async function runAgentJob(job) {
   if (job.kind === "dispatch") {
     try { await processDispatch(db, job, { log }); }
     catch (e) { await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id); log(`[배분] 실패 ${job.id}: ${e.message}`); }
+    return;
+  }
+  if (job.kind === "video_ad") {
+    try { await processVideoAd(db, job, { log }); }
+    catch (e) { await db.from("agent_jobs").update({ status: "error", error: String(e.message ?? e).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id); log(`[영상광고] 실패 ${job.id}: ${e.message}`); }
     return;
   }
   if (job.kind === "employee_turn") {
@@ -108,7 +117,7 @@ async function runAgentJob(job) {
 async function processAgentJobs() {
   const jobs = await claimAgentJobs(3);
   if (!jobs.length) return false;
-  await Promise.all(jobs.map(runAgentJob));
+  await Promise.all(jobs.map(async (j) => { if (j.kind === "video_ad") videoRunning++; try { await runAgentJob(j); } finally { if (j.kind === "video_ad") videoRunning--; } }));
   return true;
 }
 
@@ -151,8 +160,10 @@ async function syncExternalLeads() {
     if (changed.length) log(`시트 동기화: ${changed.map((x) => `${x.target} +${x.pull?.added ?? 0}/~${x.pull?.updated ?? 0} →${x.push?.pushed ?? 0}/~${x.push?.pushedUpdates ?? 0}${x.pull?.error ? " 가져오기 오류: " + x.pull.error : ""}${x.push?.error ? " 내보내기 오류: " + x.push.error : ""}`).join(" · ")} (${j.ms}ms)`);
   } catch (e) { log(`시트 동기화 실패: ${e.message}`); }
 }
+let lastYt = 0;
 do {
   try { await syncExternalLeads(); } catch {}
+  if (Date.now() - lastYt > 10 * 60 * 1000) { lastYt = Date.now(); try { const { data: bl } = await db.from("slack_bots").select("employee_id,bot_token"); await checkYoutube(db, { log, bots: Object.fromEntries((bl ?? []).map((b) => [b.employee_id, b])) }); } catch (e) { log(`유튜브 확인 실패: ${e.message}`); } }
   try { await enqueueRoutines(db, { log }); } catch (e) { log(`정기 업무 확인 실패: ${e.message}`); }
   // 분석은 1건씩, 직원 대화·배분은 동시에 3건까지
   for (;;) { const a = await processOne(); const b = await processAgentJobs(); if (!a && !b) break; }

@@ -13,7 +13,7 @@ const [cmd, token] = process.argv.slice(2);
 const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { db: { schema: "dash" }, auth: { persistSession: false } });
 const TEAM = JSON.parse(readFileSync("agents/employees.json", "utf8"));
 const SITE = process.env.NEXT_PUBLIC_SITE_URL || "https://pixelpage.co.kr";
-const SCOPES = ["chat:write", "chat:write.public", "chat:write.customize", "channels:history", "groups:history", "im:history", "channels:read", "groups:read", "im:read", "users:read", "reactions:write"];
+const SCOPES = ["chat:write", "chat:write.public", "chat:write.customize", "channels:history", "groups:history", "im:history", "channels:read", "groups:read", "im:read", "users:read", "reactions:write", "files:write", "files:read"];
 
 const manifest = (e, displayName) => ({
   display_information: { name: `${e.name} · ${e.title}`.slice(0, 35), description: `픽셀페이지 AI 직원 — ${e.title}`, background_color: "#5b5bd6" },

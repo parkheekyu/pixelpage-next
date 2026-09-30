@@ -4,6 +4,10 @@
  */
 import { readFileSync } from "node:fs";
 import { spawn } from "node:child_process";
+import { YES, NO } from "./youtube-watch.mjs";
+import { existsSync, readdirSync, statSync } from "node:fs";
+import path from "node:path";
+import os from "node:os";
 
 const TEAM = JSON.parse(readFileSync("agents/employees.json", "utf8"));
 const EMP = Object.fromEntries(TEAM.employees.map((e) => [e.id, e]));
@@ -112,6 +116,27 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
     pl.routine ? "\n(정기 업무이므로 질문을 되묻지 말고 데이터를 조회해 보고 형태로 작성한다.)" : "",
   ].filter(Boolean).join("\n");
 
+  // 유튜브 영상 질문 스레드에 대표가 답했으면 승인/거절을 바로 처리 (LLM 없이)
+  if (thread && !pl.from_employee) {
+    const { data: yv } = await db.from("yt_videos").select("*").eq("slack_channel", pl.channel).eq("slack_ts", thread).eq("status", "asked").maybeSingle();
+    if (yv) {
+      const t = String(pl.text).trim();
+      const say = async (msg) => { const posted = await postAs(db, emp, pl.channel, thread, msg); await db.from("agent_messages").upsert({ channel: pl.channel, thread_ts: thread, ts: posted.ts, employee_id: emp.id, user_name: emp.name, project_id: yv.project_id, text: msg }, { onConflict: "channel,ts" }); };
+      if (YES.test(t)) {
+        const { data: vj } = await db.from("agent_jobs").insert({ project_id: yv.project_id, kind: "video_ad", engine: "claude", payload: { video_id: yv.video_id, url: yv.url, title: yv.title, channel_title: yv.channel_title, project_id: yv.project_id, employee: emp.id, channel: pl.channel, thread_ts: thread } }).select("id").single();
+        await db.from("yt_videos").update({ status: "approved", decided_at: new Date().toISOString(), job_id: vj?.id ?? null }).eq("video_id", yv.video_id);
+        await say("네, 지금 만들게요. 보통 10~20분 걸려요. 끝나면 여기에 올릴게요.");
+        await db.from("agent_jobs").update({ status: "done", result_json: { yt: "approved" }, finished_at: new Date().toISOString() }).eq("id", job.id);
+        log(`[직원:${emp.name}] 유튜브 광고 승인 → video_ad 등록 (${yv.title})`); return;
+      }
+      if (NO.test(t)) {
+        await db.from("yt_videos").update({ status: "declined", decided_at: new Date().toISOString() }).eq("video_id", yv.video_id);
+        await say("알겠어요, 이건 패스할게요.");
+        await db.from("agent_jobs").update({ status: "done", result_json: { yt: "declined" }, finished_at: new Date().toISOString() }).eq("id", job.id);
+        log(`[직원:${emp.name}] 유튜브 광고 거절 (${yv.title})`); return;
+      }
+    }
+  }
   log(`[직원:${emp.name}] 시작 ${job.id} (${who}: ${String(pl.text).slice(0, 40)}…)`);
   const env = { DASH_SLACK_CHANNEL: pl.channel, DASH_SLACK_THREAD: thread ?? "", DASH_EMPLOYEE: emp.name };
   const raw = await runEmployee(system, prompt, env, { model, effort });
@@ -135,6 +160,60 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
     log(`  인계: ${emp.name} → ${to.name}: ${String(h.message).slice(0, 50)}`);
   }
   log(`[직원:${emp.name}] 완료 ${job.id} (${Math.round((Date.now() - t0) / 1000)}s, 기억 ${rem.length}, 인계 ${hos.length})`);
+}
+
+const AD_DIR = "/Users/heekyu/광고제작";
+// 광고제작 프로젝트에서 허용하는 도구: 파일·셸 작업은 그 프로젝트 안에서만 (permission 은 -p 모드에서 허용 목록 외 자동 거부)
+const AD_TOOLS = "Bash,Read,Write,Edit,Glob,Grep,WebFetch";
+/** 승인된 유튜브 영상 → 광고제작 프로젝트에서 유튜브-디하클 프리셋으로 편집, 결과를 스레드에 보고 */
+export async function processVideoAd(db, job, { log }) {
+  const pl = job.payload ?? {}; const emp = EMP[pl.employee] ?? TEAM.employees.find((e) => e.default);
+  const { data: proj } = await db.from("projects").select("name,slug").eq("id", pl.project_id).maybeSingle();
+  const slug = proj?.slug ?? "beforest";
+  await db.from("yt_videos").update({ status: "producing" }).eq("video_id", pl.video_id);
+  const t0 = Date.now();
+  const prompt = `${proj?.name ?? slug}(${slug}) 광고 소재 제작 요청입니다.\n유튜브 원본: ${pl.url}\n채널: ${pl.channel_title ?? ""} / 제목: ${pl.title ?? ""}\n\n유튜브-디하클 프리셋(youtube_dhc, pipeline/clip_ad.py)으로 편집해 주세요. clients/${slug}/CLAUDE.md 와 references 의 확정 스타일을 그대로 따르고, 결과물은 ~/Desktop/YYMMDD_강사명/ 에 NN숏폼_강사.mp4 + NN정방형_강사.mp4 로 저장합니다. 사람에게 되묻지 말고 판단해서 끝까지 진행하세요.\n완료되면 마지막 줄에 정확히 이 형식으로만 출력하세요:\nOUTPUT_DIR: <결과 폴더 절대경로>\nSUMMARY: <헤드라인과 편집 요약 두 문장>`;
+  const desk = path.join(os.homedir(), "Desktop");
+  const before = new Set(existsSync(desk) ? readdirSync(desk) : []);
+  let out = "";
+  try {
+    out = await new Promise((resolve, reject) => {
+      const p = spawn("claude", ["-p", "--model", "opus", "--effort", "high", "--output-format", "text", "--no-session-persistence", "--allowedTools", AD_TOOLS], { cwd: AD_DIR, stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, CLAUDECODE: "" } });
+      let o = "", e = ""; const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error("45분 초과로 중단")); }, 45 * 60 * 1000);
+      p.stdout.on("data", (d) => (o += d)); p.stderr.on("data", (d) => (e += d)); p.on("error", (x) => { clearTimeout(timer); reject(x); });
+      p.on("close", (c) => { clearTimeout(timer); c === 0 && o.trim() ? resolve(o) : reject(new Error(`claude 종료 코드 ${c}: ${(e || o).slice(-400)}`)); });
+      p.stdin.end(prompt);
+    });
+  } catch (e) {
+    await db.from("yt_videos").update({ status: "error", error: String(e.message).slice(0, 500) }).eq("video_id", pl.video_id);
+    await db.from("agent_jobs").update({ status: "error", error: String(e.message).slice(0, 1000), finished_at: new Date().toISOString() }).eq("id", job.id);
+    await postAs(db, emp, pl.channel, pl.thread_ts, `죄송해요, 편집이 중간에 멈췄어요. (${String(e.message).slice(0, 120)}) 다시 시도할까요?`);
+    log(`[영상광고] 실패 ${job.id}: ${e.message}`); return;
+  }
+  let dir = out.match(/OUTPUT_DIR:\s*(.+)/)?.[1]?.trim().replace(/^~/, os.homedir()) ?? "";
+  const summary = out.match(/SUMMARY:\s*([\s\S]+)$/)?.[1]?.trim().slice(0, 400) ?? "";
+  if (!dir || !existsSync(dir)) { const added = readdirSync(desk).filter((f) => !before.has(f) && /^\d{6}_/.test(f)).map((f) => path.join(desk, f)).sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs); if (added[0]) dir = added[0]; }
+  const files = dir && existsSync(dir) ? readdirSync(dir).filter((f) => /\.mp4$/i.test(f)).sort() : [];
+  await db.from("yt_videos").update({ status: files.length ? "done" : "error", output_path: dir || null, error: files.length ? null : "결과 파일 없음" }).eq("video_id", pl.video_id);
+  await db.from("agent_jobs").update({ status: "done", result_text: out.slice(-4000), finished_at: new Date().toISOString() }).eq("id", job.id);
+  const mins = Math.round((Date.now() - t0) / 60000);
+  const text = files.length
+    ? `다 됐어요 (${mins}분). 바탕화면 ${path.basename(dir)} 폴더에 ${files.length}개 저장했어요.\n${files.map((f) => "• " + f).join("\n")}${summary ? "\n\n" + summary : ""}\n${dir}`
+    : `편집은 끝났는데 결과 파일을 못 찾았어요. 바탕화면을 한번 봐 주세요.${summary ? "\n" + summary : ""}`;
+  const posted = await postAs(db, emp, pl.channel, pl.thread_ts, text);
+  await db.from("agent_messages").upsert({ channel: pl.channel, thread_ts: pl.thread_ts, ts: posted.ts, employee_id: emp.id, user_name: emp.name, project_id: pl.project_id, text }, { onConflict: "channel,ts" });
+  for (const f of files.slice(0, 4)) { try { await uploadFile(db, emp, pl.channel, pl.thread_ts, path.join(dir, f)); } catch (e) { log(`업로드 생략 ${f}: ${e.message}`); break; } }
+  log(`[영상광고] 완료 ${job.id} (${mins}분, ${files.length}개)`);
+}
+async function uploadFile(db, emp, channel, thread_ts, file) {
+  const bots = await loadBots(db); const tok = bots[emp.id]?.bot_token; if (!tok) throw new Error("토큰 없음");
+  const buf = readFileSync(file); const name = path.basename(file);
+  const u = await slackApi("files.getUploadURLExternal", { filename: name, length: buf.length }, tok);
+  if (!u.ok) throw new Error(u.error);
+  const fd = new FormData(); fd.append("file", new Blob([buf]), name);
+  await fetch(u.upload_url, { method: "POST", body: fd });
+  const c = await slackApi("files.completeUploadExternal", { files: [{ id: u.file_id, title: name }], channel_id: channel, thread_ts }, tok);
+  if (!c.ok) throw new Error(c.error);
 }
 
 /** 멘션 없는 메시지: 누가 답할지 맥락으로 판단해 employee_turn 등록 (빠른 모델, 도구 없음) */
