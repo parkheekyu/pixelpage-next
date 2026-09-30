@@ -64,7 +64,8 @@ function parseOutput(text) {
   return { reply: text.slice(0, i).trim(), meta };
 }
 
-async function resolveProject(db, payload, transcript) {
+async function resolveProject(db, payload, transcript, emp) {
+  if (emp?.project && !payload.project_id) { const { data } = await db.from("projects").select("id,name").eq("name", emp.project).maybeSingle(); if (data) { const hay = [payload.text, ...transcript.map((m) => m.text)].join("\n"); const { data: all } = await db.from("projects").select("id,name").eq("active", true); const other = (all ?? []).find((p) => p.name !== emp.project && hay.includes(p.name)); return other ?? data; } }
   if (payload.project_id) { const { data } = await db.from("projects").select("id,name").eq("id", payload.project_id).maybeSingle(); if (data) return data; }
   const { data: integ } = await db.from("project_integrations").select("project_id").eq("slack_channel_id", payload.channel).maybeSingle();
   if (integ?.project_id) { const { data } = await db.from("projects").select("id,name").eq("id", integ.project_id).maybeSingle(); if (data) return data; }
@@ -84,7 +85,7 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
   const { data: th } = thread ? await db.from("agent_messages").select("ts,user_name,employee_id,text").eq("channel", pl.channel).or(`thread_ts.eq.${thread},ts.eq.${thread}`).order("ts").limit(60) : { data: [] };
   const { data: recent } = await db.from("agent_messages").select("ts,user_name,employee_id,text,thread_ts").eq("channel", pl.channel).is("thread_ts", null).order("ts", { ascending: false }).limit(12);
   const transcript = (th ?? []);
-  const project = await resolveProject(db, pl, transcript);
+  const project = await resolveProject(db, pl, transcript, emp);
 
   // 기억: 이 직원 + 팀 공유, 고객사 무관 + 해당 고객사
   let mq = db.from("agent_memory").select("employee_id,project_id,kind,content,importance,created_at").in("employee_id", [emp.id, "team"]).order("importance", { ascending: false }).order("created_at", { ascending: false }).limit(60);
@@ -139,12 +140,25 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
 /** 멘션 없는 메시지: 누가 답할지 맥락으로 판단해 employee_turn 등록 (빠른 모델, 도구 없음) */
 export async function processDispatch(db, job, { log }) {
   const pl = job.payload ?? {};
+  // 고객사 채널이면 그 고객사 담당자가 답한다 (담당자가 스레드에서 이름을 부른 다른 직원은 그대로 존중)
+  const { data: integ0 } = await db.from("project_integrations").select("project_id").eq("slack_channel_id", pl.channel).maybeSingle();
+  if (integ0?.project_id) {
+    const { data: pj } = await db.from("projects").select("name").eq("id", integ0.project_id).maybeSingle();
+    const owner = TEAM.employees.find((e) => e.project && pj && e.project === pj.name);
+    const named = TEAM.employees.find((e) => new RegExp(`(^|[\\s,])${e.name}(아|야|님|,|\\s|$)`).test(String(pl.text).slice(0, 20)));
+    const pick = named ?? owner;
+    if (pick) {
+      await db.from("agent_jobs").insert({ project_id: integ0.project_id, kind: "employee_turn", engine: "claude", payload: { ...pl, employee: pick.id, project_id: integ0.project_id } });
+      await db.from("agent_jobs").update({ status: "done", result_json: { respond: [pick.id], reason: "project-channel" }, finished_at: new Date().toISOString() }).eq("id", job.id);
+      log(`배분(고객사 채널 ${pj?.name}): "${String(pl.text).slice(0, 30)}" → ${pick.name}`); return;
+    }
+  }
   const thread = pl.thread_ts && pl.thread_ts !== pl.trigger_ts ? pl.thread_ts : null;
   const { data: th } = thread ? await db.from("agent_messages").select("ts,user_name,employee_id,text").eq("channel", pl.channel).or(`thread_ts.eq.${thread},ts.eq.${thread}`).order("ts").limit(30) : { data: [] };
   const { data: recent } = await db.from("agent_messages").select("ts,user_name,employee_id,text").eq("channel", pl.channel).is("thread_ts", null).neq("ts", pl.trigger_ts).order("ts", { ascending: false }).limit(10);
   const line = (m) => `${m.employee_id ? `${EMP[m.employee_id]?.name ?? m.employee_id}(직원)` : m.user_name}: ${String(m.text).slice(0, 200)}`;
   const roster = TEAM.employees.map((e) => `- ${e.id}: ${e.name} (${e.title})`).join("\n");
-  const system = `너는 슬랙 채널의 배분 담당이다. 대표가 멘션 없이 올린 메시지를 보고 어느 AI 직원이 답해야 하는지 정한다.\n직원:\n${roster}\n규칙\n- 특정 직원 이름을 부르면 그 직원. 업무 영역이 분명하면 그 담당 1명. 두 영역에 걸치면 2명.\n- "모두", "다들", "전원", "각자", "팀" 처럼 전체를 부르거나, 인사·공지·전원 의견 요청이면 6명 전원을 넣는다.\n- 스레드 안이면 그 스레드에서 말하던 직원이 우선.\n- 사람끼리 하는 대화, 단순 반응("ㅇㅋ", "고마워" 등 답이 필요 없는 말)이면 빈 배열.\n- 애매하면 hana.\n출력은 JSON 한 개만: {"respond":["doyun"]}`;
+  const system = `너는 슬랙 채널의 배분 담당이다. 직원은 고객사별 담당자 1명 + 실장이다. 메시지에 고객사 이름이 나오면 그 담당자, 아니면 실장(hana). 대표가 멘션 없이 올린 메시지를 보고 어느 AI 직원이 답해야 하는지 정한다.\n직원:\n${roster}\n규칙\n- 특정 직원 이름을 부르면 그 직원. 업무 영역이 분명하면 그 담당 1명. 두 영역에 걸치면 2명.\n- "모두", "다들", "전원", "각자", "팀" 처럼 전체를 부르거나, 인사·공지·전원 의견 요청이면 6명 전원을 넣는다.\n- 스레드 안이면 그 스레드에서 말하던 직원이 우선.\n- 사람끼리 하는 대화, 단순 반응("ㅇㅋ", "고마워" 등 답이 필요 없는 말)이면 빈 배열.\n- 애매하면 hana.\n출력은 JSON 한 개만: {"respond":["doyun"]}`;
   const prompt = `${(recent ?? []).length ? `[채널 최근]\n${(recent ?? []).reverse().map(line).join("\n")}\n\n` : ""}${(th ?? []).length ? `[이 스레드]\n${(th ?? []).map(line).join("\n")}\n\n` : ""}[메시지] ${pl.user_name}: ${pl.text}`;
   let ids = [];
   try {
