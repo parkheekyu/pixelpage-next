@@ -21,7 +21,8 @@
 .pp-dash h1, .pp-dash h2, .pp-dash h3, .pp-dash h4 { margin: 0; }
 
 /* ---- 앱 셸 ---- */
-.pp-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
+.pp-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; transition: grid-template-columns .15s; }
+.pp-shell.side-collapsed { grid-template-columns: 64px minmax(0, 1fr); }
 .pp-side { border-right: 1px solid var(--line); background: var(--card); display: flex; flex-direction: column; position: sticky; top: 0; height: 100vh; overflow: auto; }
 .pp-side .brand { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; padding: 22px 20px 16px; border-bottom: 1px solid var(--line); margin-bottom: 8px; }
 .pp-side .brand .brand-logo { height: 22px; width: auto; }
@@ -420,3 +421,23 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .sheet td.num { cursor: pointer; user-select: none; }
 .sheet td { user-select: none; }
 .sheet td input, .sheet td select, .sheet td textarea { user-select: text; }
+
+/* 사이드바 접기 */
+.pp-side .brand { position: relative; }
+.pp-side .side-toggle { position: absolute; right: 10px; top: 20px; width: 28px; height: 28px; border-radius: 7px; border: 1px solid var(--line); background: var(--card); color: var(--muted); display: grid; place-items: center; cursor: pointer; }
+.pp-side .side-toggle:hover { color: var(--text); background: color-mix(in srgb, var(--text) 5%, transparent); }
+.pp-side .side-toggle .ico { width: 15px; height: 15px; }
+.pp-side a.item .initial { display: none; }
+.pp-side.collapsed { overflow: visible; }
+.pp-side.collapsed .brand { padding: 18px 0 14px; align-items: center; }
+.pp-side.collapsed .brand .brand-logo, .pp-side.collapsed .brand small, .pp-side.collapsed h4, .pp-side.collapsed .lbl, .pp-side.collapsed .foot, .pp-side.collapsed a.item small { display: none; }
+.pp-side.collapsed .side-toggle { position: static; margin: 0 auto; }
+.pp-side.collapsed nav { padding: 0 8px; }
+.pp-side.collapsed a.item { justify-content: center; padding: 10px 0; gap: 0; position: relative; }
+.pp-side.collapsed a.item .ico { display: none; }
+.pp-side.collapsed a.item .initial { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: #f1f2f7; color: var(--text-2); font-size: 13px; font-weight: 700; }
+.pp-side.collapsed a.item.on .initial { background: var(--s1); color: #fff; }
+.pp-side.collapsed nav:first-of-type a.item .ico { display: block; }
+.pp-side.collapsed nav:first-of-type a.item .initial { display: none; }
+.pp-side.collapsed a.item .badge-red { position: absolute; top: 4px; right: 6px; margin: 0; min-width: 8px; height: 8px; padding: 0; font-size: 0; }
+.pp-side.collapsed .hint { display: none; }
