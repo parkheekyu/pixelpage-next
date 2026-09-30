@@ -13,6 +13,15 @@ export const dynamic = "force-dynamic";
  * Authorization: Bearer LEAD_WEBHOOK_SECRET
  */
 type Emp = { id: string; name: string; project?: string | null; default?: boolean };
+/** 승인 상태 조회: GET ?approval=<id> */
+export async function GET(req: NextRequest) {
+  const secret = process.env.LEAD_WEBHOOK_SECRET;
+  if (!secret || (req.headers.get("authorization") ?? "") !== `Bearer ${secret}`) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
+  const id = req.nextUrl.searchParams.get("approval"); if (!id) return NextResponse.json({ ok: false, error: "approval 필요" }, { status: 400 });
+  const { data } = await createAdminClient().from("agent_approvals").select("id,status,answer,answered_by,decided_at,created_at").eq("id", id).maybeSingle();
+  return data ? NextResponse.json({ ok: true, ...data }) : NextResponse.json({ ok: false, error: "없음" }, { status: 404 });
+}
+
 export async function POST(req: NextRequest) {
   const secret = process.env.LEAD_WEBHOOK_SECRET;
   if (!secret || (req.headers.get("authorization") ?? "") !== `Bearer ${secret}`) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
@@ -28,6 +37,15 @@ export async function POST(req: NextRequest) {
   const { data: integ } = await db.from("project_integrations").select("slack_channel_id").eq("project_id", p.id).maybeSingle();
   const channel = integ?.slack_channel_id || process.env.SLACK_DEFAULT_CHANNEL;
   if (!channel) return NextResponse.json({ ok: false, error: "고객사 슬랙 채널 미설정" }, { status: 400 });
+  if (body.mode === "ask") {
+    // 담당 직원이 질문을 올리고, 대표의 스레드 답(응/아니)을 워커가 판별해 approvals 에 기록
+    const bot = await botFor(db, emp.id);
+    const q = `${text}\n(이 메시지 스레드에 '응' 또는 '아니' 로 답해 주세요)`;
+    const r = await slack<{ ts: string }>("chat.postMessage", { channel, text: q, ...(body.thread_ts ? { thread_ts: body.thread_ts } : {}) }, bot?.bot_token);
+    const { data: ap } = await db.from("agent_approvals").insert({ project_id: p.id, employee_id: emp.id, source: body.source ?? "external", question: text, slack_channel: channel, slack_ts: r.ts }).select("id").single();
+    await db.from("agent_messages").upsert({ channel, thread_ts: body.thread_ts ?? null, ts: r.ts, employee_id: emp.id, user_name: emp.name, project_id: p.id, text: q }, { onConflict: "channel,ts" });
+    return NextResponse.json({ ok: true, mode: "ask", employee: emp.id, channel, ts: r.ts, approval_id: ap?.id });
+  }
   if (body.mode === "raw") {
     const bot = await botFor(db, emp.id);
     const r = await slack<{ ts: string }>("chat.postMessage", { channel, text, ...(body.thread_ts ? { thread_ts: body.thread_ts } : {}) }, bot?.bot_token);

@@ -117,6 +117,21 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
     pl.notify ? "\n(위는 우리 쪽 자동화 도구가 광고 계정에 실제로 적용한 변경 내용이다. 대표님께 '무엇을 왜 어떻게 바꿨는지' 를 네 말투로 2~3문장으로 전한다. 수치는 알림에 있는 그대로 쓰고, 도구 조회는 필요할 때만. 대표 판단이 필요한 점이 있으면 한 줄로 덧붙인다.)" : "",
   ].filter(Boolean).join("\n");
 
+  // 외부 도구의 승인 질문 스레드에 대표가 답했으면 기록 (LLM 없이)
+  if (thread && !pl.from_employee) {
+    const { data: ap } = await db.from("agent_approvals").select("*").eq("slack_channel", pl.channel).eq("slack_ts", thread).eq("status", "pending").maybeSingle();
+    if (ap) {
+      const t = String(pl.text).trim(); const yes = YES.test(t), no = NO.test(t);
+      if (yes || no) {
+        await db.from("agent_approvals").update({ status: yes ? "approved" : "declined", answer: t, answered_by: pl.user_name, decided_at: new Date().toISOString() }).eq("id", ap.id);
+        const msg = yes ? "네, 그렇게 진행할게요." : "알겠어요, 이번엔 안 할게요.";
+        const posted = await postAs(db, emp, pl.channel, thread, msg);
+        await db.from("agent_messages").upsert({ channel: pl.channel, thread_ts: thread, ts: posted.ts, employee_id: emp.id, user_name: emp.name, project_id: ap.project_id, text: msg }, { onConflict: "channel,ts" });
+        await db.from("agent_jobs").update({ status: "done", result_json: { approval: yes ? "approved" : "declined" }, finished_at: new Date().toISOString() }).eq("id", job.id);
+        log(`[직원:${emp.name}] 승인 질문 답변: ${yes ? "승인" : "거절"} (${ap.question.slice(0, 40)})`); return;
+      }
+    }
+  }
   // 유튜브 영상 질문 스레드에 대표가 답했으면 승인/거절을 바로 처리 (LLM 없이)
   if (thread && !pl.from_employee) {
     const { data: yv } = await db.from("yt_videos").select("*").eq("slack_channel", pl.channel).eq("slack_ts", thread).eq("status", "asked").maybeSingle();

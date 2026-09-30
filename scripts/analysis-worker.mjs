@@ -160,8 +160,34 @@ async function syncExternalLeads() {
     if (changed.length) log(`시트 동기화: ${changed.map((x) => `${x.target} +${x.pull?.added ?? 0}/~${x.pull?.updated ?? 0} →${x.push?.pushed ?? 0}/~${x.push?.pushedUpdates ?? 0}${x.pull?.error ? " 가져오기 오류: " + x.pull.error : ""}${x.push?.error ? " 내보내기 오류: " + x.push.error : ""}`).join(" · ")} (${j.ms}ms)`);
   } catch (e) { log(`시트 동기화 실패: ${e.message}`); }
 }
+// ---------- 외부 명령 스케줄 (agents/schedules.json) ----------
+const schedRuns = new Map(); // id -> 'YYYY-MM-DD HH:MM' 마지막 실행 슬롯
+async function runSchedules() {
+  let cfg; try { cfg = JSON.parse(fs.readFileSync("agents/schedules.json", "utf8")); } catch { return; }
+  const now = new Date(Date.now() + 9 * 3600 * 1000); const today = now.toISOString().slice(0, 10); const hm = now.toISOString().slice(11, 16); const dow = now.getUTCDay();
+  for (const j of cfg.jobs ?? []) {
+    if (j.days === "weekdays" && (dow === 0 || dow === 6)) continue;
+    const due = (j.times ?? []).filter((t) => hm >= t).pop(); if (!due) continue;
+    const key = `${today} ${due}`; if (schedRuns.get(j.id) === key) continue;
+    // 워커가 슬롯 뒤에 켜졌어도 하루 안이면 실행 (단 3시간 넘게 지났으면 건너뜀)
+    if ((Number(hm.slice(0, 2)) * 60 + Number(hm.slice(3))) - (Number(due.slice(0, 2)) * 60 + Number(due.slice(3))) > 180) { schedRuns.set(j.id, key); continue; }
+    schedRuns.set(j.id, key);
+    log(`스케줄 실행: ${j.title}`);
+    const t0 = Date.now();
+    try {
+      const out = await new Promise((resolve, reject) => {
+        const p = spawn(j.command[0], j.command.slice(1), { cwd: j.cwd, stdio: ["ignore", "pipe", "pipe"], env: { ...process.env } });
+        let o = "", e = ""; const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error(`${j.timeout_min ?? 60}분 초과`)); }, (j.timeout_min ?? 60) * 60 * 1000);
+        p.stdout.on("data", (d) => (o += d)); p.stderr.on("data", (d) => (e += d)); p.on("error", (x) => { clearTimeout(timer); reject(x); });
+        p.on("close", (c) => { clearTimeout(timer); c === 0 ? resolve(o) : reject(new Error(`종료 코드 ${c}: ${(e || o).slice(-300)}`)); });
+      });
+      log(`스케줄 완료: ${j.title} (${Math.round((Date.now() - t0) / 1000)}s) ${String(out).trim().slice(-200).replace(/\n/g, " | ")}`);
+    } catch (e) { log(`스케줄 실패: ${j.title}: ${e.message}`); }
+  }
+}
 let lastYt = 0;
 do {
+  try { await runSchedules(); } catch (e) { log(`스케줄 확인 실패: ${e.message}`); }
   try { await syncExternalLeads(); } catch {}
   if (Date.now() - lastYt > 10 * 60 * 1000) { lastYt = Date.now(); try { const { data: bl } = await db.from("slack_bots").select("employee_id,bot_token"); await checkYoutube(db, { log, bots: Object.fromEntries((bl ?? []).map((b) => [b.employee_id, b])) }); } catch (e) { log(`유튜브 확인 실패: ${e.message}`); } }
   try { await enqueueRoutines(db, { log }); } catch (e) { log(`정기 업무 확인 실패: ${e.message}`); }

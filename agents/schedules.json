@@ -1,0 +1,6 @@
+{
+  "_comment": "워커가 KST 기준 정해진 시각에 실행하는 외부 명령. 출력은 워커 로그에만 남고, 슬랙 보고는 명령 자체가 notify_slack.py 로 한다.",
+  "jobs": [
+    { "id": "meta-ads-daily-review-jackie", "title": "메타광고AI 재키 일일 점검", "cwd": "/Users/heekyu/메타광고AI", "command": ["python3", "scripts/daily_review.py", "재키"], "times": ["12:00"], "days": "daily", "timeout_min": 200 }
+  ]
+}
