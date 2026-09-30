@@ -105,7 +105,7 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
 
   const system = `${TEAM.team_rules}\n\n[너의 역할]\n${emp.persona}\n\n[팀원]\n${roster}\n\n[데이터 도구 — Bash 로 실행. 이 명령만 허용된다]\n${readFileSync("scripts/dash-data.mjs", "utf8").split("\n").filter((l) => l.startsWith(" *   node")).map((l) => l.replace(/^ \*\s+/, "")).join("\n")}\n고객사 이름은 --project 에 그대로 쓴다. 숫자를 말하기 전에 반드시 조회한다. 웹 검색(WebSearch/WebFetch)은 리서치 목적일 때만.\n\n[출력 형식]\n먼저 슬랙에 올릴 답변 본문만 쓴다. 동료에게 채팅하듯 문장으로, 서식 없이. 인사말·자기소개·마무리 문구 없이 바로 본론.\n본문 뒤에 반드시 한 줄 '===META===' 를 쓰고 JSON 한 개를 붙인다:\n{"remember":[{"content":"기억할 내용(한 문장, 구체적으로)","kind":"note|decision|preference|todo","importance":1-5,"shared":false}],"handoffs":[{"to":"직원이름","message":"그 직원에게 부탁하는 말"}],"project":"고객사이름 또는 null"}\n- remember: 대표의 결정·선호·지시, 고객사 특이사항, 다음에 이어서 할 일만. 잡담·단순 조회 결과는 남기지 않는다. 없으면 [].\n- handoffs: 다른 직원이 이어서 해야 할 일이 있을 때만. 없으면 [].\n- 팀 전체가 알아야 할 기억은 shared:true.`;
 
-  const who = pl.from_employee ? `${EMP[pl.from_employee]?.name ?? pl.from_employee}(직원)` : pl.routine ? "정기 업무(시스템)" : `${pl.user_name}(대표)`;
+  const who = pl.from_employee ? `${EMP[pl.from_employee]?.name ?? pl.from_employee}(직원)` : pl.routine ? "정기 업무(시스템)" : pl.notify ? `${pl.source ?? "시스템"}(자동 알림)` : `${pl.user_name}(대표)`;
   const prompt = [
     `[지금] ${kst().toISOString().slice(0, 16).replace("T", " ")} KST · 채널 ${pl.channel}${pl.channel_type === "im" ? " (대표와의 DM)" : ""}${project ? ` · 이 채널/대화의 고객사: ${project.name}` : " · 고객사 미지정"}`,
     `\n[나의 기억]\n${memText}`,
@@ -114,6 +114,7 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
     thText ? `\n[이 스레드]\n${thText}` : "",
     `\n[지금 답할 메시지] ${who}:\n${pl.text}`,
     pl.routine ? "\n(정기 업무이므로 질문을 되묻지 말고 데이터를 조회해 보고 형태로 작성한다.)" : "",
+    pl.notify ? "\n(위는 우리 쪽 자동화 도구가 광고 계정에 실제로 적용한 변경 내용이다. 대표님께 '무엇을 왜 어떻게 바꿨는지' 를 네 말투로 2~3문장으로 전한다. 수치는 알림에 있는 그대로 쓰고, 도구 조회는 필요할 때만. 대표 판단이 필요한 점이 있으면 한 줄로 덧붙인다.)" : "",
   ].filter(Boolean).join("\n");
 
   // 유튜브 영상 질문 스레드에 대표가 답했으면 승인/거절을 바로 처리 (LLM 없이)
