@@ -78,6 +78,7 @@ export async function pushLeadToIntegrations(projectId: string, lead: Lead) {
   const admin = createAdminClient();
   const { data: integ } = await admin.from("project_integrations").select("lead_sync_enabled,google_sheet_id,google_sheet_tab,airtable_base_id,airtable_table,airtable_token").eq("project_id", projectId).maybeSingle();
   if (!integ?.lead_sync_enabled) return;
+  if (lead.utm_medium === "import") return; // 시트/에어테이블에서 가져온 리드를 다시 그쪽으로 보내면 무한 복제된다
   const jobs: Promise<unknown>[] = [];
   if (integ.google_sheet_id) jobs.push(sheetsAppend(integ.google_sheet_id, integ.google_sheet_tab || "리드", [lead]).then((r) => admin.from("lead_sync").upsert({ lead_id: lead.id, target: "sheets", external_id: r.startRow ? String(r.startRow) : null })));
   if (integ.airtable_token && integ.airtable_base_id && integ.airtable_table) jobs.push(airtableCreate(integ.airtable_token, integ.airtable_base_id, integ.airtable_table, [lead]).then((r) => admin.from("lead_sync").upsert({ lead_id: lead.id, target: "airtable", external_id: r.ids[lead.id] ?? null })));

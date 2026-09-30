@@ -111,10 +111,13 @@ async function sheetsFetch(path: string, init?: RequestInit) {
   return j;
 }
 export async function sheetsEnsureHeader(sheetId: string, tab: string) {
-  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "1:1"))}`)) as { values?: string[][] };
-  const first = j.values?.[0] ?? [];
-  if (first.length === 0) await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A1"))}?valueInputOption=RAW`, { method: "PUT", body: JSON.stringify({ values: [[...COLUMNS]] }) });
-  return first.length ? first : [...COLUMNS];
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A1:Z3"))}`)) as { values?: string[][] };
+  const rows = j.values ?? [];
+  const first = rows[0] ?? [];
+  if (first.some((c) => String(c ?? "").trim())) return first;
+  if (rows.some((r) => r.some((c) => String(c ?? "").trim()))) throw new Error("Google Sheets: 1행이 비어 있는데 아래에 데이터가 있습니다. 1행에 열 이름을 넣어 주세요.");
+  await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A1"))}?valueInputOption=RAW`, { method: "PUT", body: JSON.stringify({ values: [[...COLUMNS]] }) });
+  return [...COLUMNS];
 }
 /** 시트 헤더(별칭 허용) 기준으로 리드 한 행을 만든다. 매칭 안 되는 헤더는 같은 이름의 사용자 정의 열 값 */
 export function leadToSheetRow(header: string[], l: Lead, fields: { key: string; label: string }[] = []): string[] {

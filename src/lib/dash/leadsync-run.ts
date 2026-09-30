@@ -11,19 +11,29 @@ export interface SyncResult { ok: boolean; message?: string; error?: string; add
 
 type Integ = { project_id: string; google_sheet_id: string | null; google_sheet_tab: string | null; airtable_token: string | null; airtable_base_id: string | null; airtable_table: string | null; sync_pull?: boolean | null; sync_push?: boolean | null };
 const hasTarget = (integ: Integ, target: SyncTarget) => target === "sheets" ? !!integ.google_sheet_id : !!(integ.airtable_token && integ.airtable_base_id && integ.airtable_table);
+/** PostgREST 는 한 번에 최대 1000행만 주므로 전부 받을 때는 나눠서 */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyQ = any;
+async function selectAll<T>(db: Db, table: string, columns: string, filters: (q: AnyQ) => AnyQ): Promise<T[]> {
+  const out: T[] = [];
+  for (let off = 0; ; off += 1000) { const { data, error } = await filters(db.from(table).select(columns)).range(off, off + 999); if (error) throw new Error(error.message); out.push(...((data ?? []) as T[])); if (!data || data.length < 1000) break; }
+  return out;
+}
+/** 한 번의 자동 동기화에서 추가할 수 있는 최대 건수 (초과하면 중단: 무한 복제 방지) */
+const MAX_ADD_PER_PASS = 300;
 const keyHash = (label: string) => { let h = 0; for (const ch of label) h = (h * 31 + ch.charCodeAt(0)) >>> 0; return `s_${h.toString(36)}`; };
 
 /** 외부(시트/에어테이블) → 대시보드. 새 행은 리드로 추가, 기존 리드는 대시보드에서 손대지 않았으면 외부 값으로 맞추고, 손댔으면 빈 값만 채운다 */
-export async function pullLeads(db: Db, projectId: string, integ: Integ, target: SyncTarget): Promise<SyncResult> {
+export async function pullLeads(db: Db, projectId: string, integ: Integ, target: SyncTarget, opts: { maxAdd: number } = { maxAdd: Infinity }): Promise<SyncResult> {
   const tab = integ.google_sheet_tab || "리드";
   const rows = target === "sheets" ? await sheetsReadAll(integ.google_sheet_id!, tab) : await airtableReadAll(integ.airtable_token!, integ.airtable_base_id!, integ.airtable_table!);
-  const [{ data: existing }, { data: proj }, { data: syncRows }] = await Promise.all([
-    db.from("leads").select("id,phone_norm,status,revenue,pay_type,custom,converted_on,drop_reason,memo,assignee,updated_at").eq("project_id", projectId),
+  const [existing, { data: proj }, syncRows] = await Promise.all([
+    selectAll<AnyQ>(db, "leads", "id,phone_norm,status,revenue,pay_type,custom,converted_on,drop_reason,memo,assignee,updated_at,is_duplicate", (q) => q.eq("project_id", projectId).order("created_at")),
     db.from("projects").select("custom_fields").eq("id", projectId).single(),
-    db.from("lead_sync").select("lead_id,synced_at,external_id").eq("target", target),
+    selectAll<AnyQ>(db, "lead_sync", "lead_id,synced_at,external_id", (q) => q.eq("target", target)),
   ]);
   const syncedAt = new Map((syncRows ?? []).map((x) => [x.lead_id as string, new Date(x.synced_at as string).getTime()]));
-  const known = new Map((existing ?? []).map((x) => [x.phone_norm as string, x]));
+  const known = new Map<string, AnyQ>(); for (const x of existing) if (!known.has(x.phone_norm as string)) known.set(x.phone_norm as string, x); // 원본(가장 오래된) 우선
   const fields: CustomField[] = [...((proj?.custom_fields ?? []) as CustomField[])]; const fieldCount = fields.length;
   const keyFor = (label: string) => { const f = fields.find((x) => x.label === label); if (f) return f.key; if (fields.length >= 30) return null; const key = keyHash(label); fields.push({ key, label: label.slice(0, 40), type: "text" }); return key; };
   let added = 0, updated = 0, dup = 0, noPhone = 0, skipped = 0, failed = 0, lastErr = "";
@@ -70,6 +80,7 @@ export async function pullLeads(db: Db, projectId: string, integ: Integ, target:
       syncUpserts.push({ lead_id: prev.id, target, external_id: row.external_id, synced_at: new Date(Date.now() + 1000).toISOString() });
       continue;
     }
+    if (added >= opts.maxAdd) { skipped++; continue; }
     const r = await ingestLead({ project_id: projectId, name: li.name, phone: li.phone, email: li.email, message: li.message, company: li.company, industry: li.industry, budget: li.budget, utm_source: li.utm_source || target, utm_medium: "import", utm_campaign: li.utm_campaign, utm_content: li.utm_content, landing_id: li.landing_id, submitted_at: li.submitted_at });
     if (!r.ok) { skipped++; continue; }
     known.set(norm, { id: r.id, phone_norm: norm, status: "신규", revenue: 0, pay_type: null, custom: {}, converted_on: null, drop_reason: null, memo: null, assignee: null, updated_at: new Date(now).toISOString() }); added++;
@@ -78,7 +89,8 @@ export async function pullLeads(db: Db, projectId: string, integ: Integ, target:
   }
   for (let i = 0; i < syncUpserts.length; i += 500) await db.from("lead_sync").upsert(syncUpserts.slice(i, i + 500));
   if (fields.length !== fieldCount) await db.from("projects").update({ custom_fields: fields }).eq("id", projectId);
-  const detail = [dup ? `기존 ${dup}${updated ? ` (변경 반영 ${updated})` : ""}` : "", noPhone ? `연락처 없음 ${noPhone}` : "", skipped ? `기타 ${skipped}` : "", failed ? `갱신 실패 ${failed} (${lastErr.slice(0, 80)})` : ""].filter(Boolean).join(", ");
+  const capped = Number.isFinite(opts.maxAdd) && added >= opts.maxAdd && skipped > 0;
+  const detail = [capped ? `자동 동기화 1회 상한 ${opts.maxAdd}건 도달 → 나머지는 다음 회차 또는 설정에서 '가져오기'` : "", dup ? `기존 ${dup}${updated ? ` (변경 반영 ${updated})` : ""}` : "", noPhone ? `연락처 없음 ${noPhone}` : "", skipped ? `기타 ${skipped}` : "", failed ? `갱신 실패 ${failed} (${lastErr.slice(0, 80)})` : ""].filter(Boolean).join(", ");
   const noPhoneCol = rows.length > 0 && !rows.some((x) => rowToLeadInput(x.values).phone);
   return { ok: true, added, updated, message: `${target === "sheets" ? "구글 시트" : "에어테이블"}에서 ${added}건 가져왔습니다.${detail ? ` (${detail})` : ""}${noPhoneCol ? " 연락처 열을 찾지 못했습니다. 헤더에 '연락처' 또는 '전화번호' 열이 있는지 확인하세요." : ""}` };
 }
@@ -86,15 +98,16 @@ export async function pullLeads(db: Db, projectId: string, integ: Integ, target:
 /** 대시보드 → 외부. 아직 내보내지 않은 리드는 추가하고, 시트는 마지막 동기화 이후 바뀐 리드의 셀을 갱신한다 */
 export async function pushLeads(db: Db, projectId: string, integ: Integ, target: SyncTarget): Promise<SyncResult> {
   const tab = integ.google_sheet_tab || "리드";
-  const [{ data: synced }, { data: leads }, { data: proj }] = await Promise.all([
-    db.from("lead_sync").select("lead_id,external_id,synced_at").eq("target", target),
-    db.from("leads").select("*").eq("project_id", projectId).eq("is_duplicate", false).order("submitted_at").limit(5000),
+  const [synced, leads, { data: proj }] = await Promise.all([
+    selectAll<AnyQ>(db, "lead_sync", "lead_id,external_id,synced_at", (q) => q.eq("target", target)),
+    selectAll<Lead>(db, "leads", "*", (q) => q.eq("project_id", projectId).eq("is_duplicate", false).order("submitted_at")),
     db.from("projects").select("custom_fields").eq("id", projectId).single(),
   ]);
   const fields = (proj?.custom_fields ?? []) as CustomField[];
   const syncMap = new Map((synced ?? []).map((x) => [x.lead_id as string, x]));
   const all = (leads ?? []) as Lead[];
-  const todo = all.filter((l) => !syncMap.has(l.id));
+  // 그 외부에서 온 리드는 다시 내보내지 않는다 (메아리 방지)
+  const todo = all.filter((l) => !syncMap.has(l.id) && !(l.utm_medium === "import" && l.utm_source === target));
   let pushed = 0, pushedUpdates = 0;
   if (target === "airtable") {
     if (!todo.length) return { ok: true, pushed: 0, message: "내보낼 새 리드가 없습니다." };
@@ -139,7 +152,7 @@ export async function runAllLeadSync(db: Db): Promise<{ project_id: string; targ
     for (const target of ["sheets", "airtable"] as SyncTarget[]) {
       if (!hasTarget(integ, target)) continue;
       const r: { project_id: string; target: SyncTarget; pull?: SyncResult; push?: SyncResult } = { project_id: integ.project_id, target };
-      if (integ.sync_pull !== false) { try { r.pull = await pullLeads(db, integ.project_id, integ, target); } catch (e) { r.pull = { ok: false, error: (e as Error).message }; } }
+      if (integ.sync_pull !== false) { try { r.pull = await pullLeads(db, integ.project_id, integ, target, { maxAdd: MAX_ADD_PER_PASS }); } catch (e) { r.pull = { ok: false, error: (e as Error).message }; } }
       if (integ.sync_push === true) { try { r.push = await pushLeads(db, integ.project_id, integ, target); } catch (e) { r.push = { ok: false, error: (e as Error).message }; } }
       if (r.pull || r.push) out.push(r);
     }
