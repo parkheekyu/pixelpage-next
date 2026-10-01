@@ -1,0 +1,109 @@
+{
+ "updated": "2026-10-01",
+ "base": "https://xsauwnhouvphsfsynprb.supabase.co/storage/v1/object/public/presets",
+ "items": [
+  {
+   "key": "youtube_dhc",
+   "name": "유튜브-디하클",
+   "tag": "인터뷰 클립",
+   "desc": "강사 유튜브 롱폼을 9:16 숏폼으로. 검정 배경 + 헤드라인 2줄 + 원본 영상(자막 유지) + CTA. 훅 콜드오픈, 1.25배속, BGM 없음.",
+   "fit": "강사 무료특강 리드(재키 계정). 원본 영상이 있을 때.",
+   "cost": "0원 · 편당 1분",
+   "clients": [
+    "beforest"
+   ]
+  },
+  {
+   "key": "screen_story",
+   "name": "피피 스토리",
+   "tag": "브라우저 캡처",
+   "desc": "실제 웹 화면 캡처를 브라우저 카드로 띄우고 슬로우 줌·팬. 말하는 대본 그대로 단어 단위 자막. 근거 캡처는 웹서치로 찾아 가끔 삽입.",
+   "fit": "증거·화면이 설득력인 서비스(대시보드, SaaS, 랜딩).",
+   "cost": "0원 · 3분",
+   "clients": [
+    "pixelpage",
+    "airbnbq"
+   ]
+  },
+  {
+   "key": "doodle_talk",
+   "name": "두들 토크",
+   "tag": "하찮은 그림체",
+   "desc": "흰 배경, 위에 구절마다 바뀌는 MS페인트풍 그림, 가운데 손글씨 자막, 아래 고정 캐릭터(F) 포즈 5종.",
+   "fit": "가볍고 친근한 톤. 교육·부업·커뮤니티.",
+   "cost": "0원 · 이미지 25장 6분",
+   "clients": [
+    "airbnbq",
+    "pixelpage"
+   ]
+  },
+  {
+   "key": "clean_ui",
+   "name": "클린 UI",
+   "tag": "카드 모션",
+   "desc": "크림/다크 배경 위 카드(리스트·숫자 카운트업·채팅·알림·비교·브라우저 캡처)가 스프링으로 등장. 문장 전체에 단어가 순서대로 켜지는 자막.",
+   "fit": "B2B·서비스 설명. 숫자·구조를 보여줄 때.",
+   "cost": "0원 · 2~3분",
+   "clients": [
+    "pixelpage"
+   ]
+  },
+  {
+   "key": "doodle",
+   "name": "두들툰",
+   "tag": "ffmpeg",
+   "desc": "흰 배경 + 컷당 두들 그림 + 상단 문장(형광펜) + 옆 큰 숫자(연성체). 컨셉 없이 문장별 일반 두들.",
+   "fit": "빠르게 여러 개 뽑을 때. 전자책·리드.",
+   "cost": "0원 · 6분",
+   "clients": [
+    "airbnbq",
+    "pixelpage"
+   ]
+  },
+  {
+   "key": "depth_doc",
+   "name": "뎁스 다큐",
+   "tag": "3D 패럴랙스",
+   "desc": "다큐 설명형. 씬 이미지를 깊이맵으로 3레이어 분리해 드론샷 느낌 카메라 모션. 빨간 주석·흰 자막. 필요한 씬만 Omni 영상.",
+   "fit": "설명형·지식형 콘텐츠. 긴 호흡(60~90초).",
+   "cost": "이미지만 0원 / Omni 4초 약 550원",
+   "clients": [
+    "pixelpage",
+    "airbnbq"
+   ]
+  },
+  {
+   "key": "giphy_meme",
+   "name": "밈 릴스",
+   "tag": "Giphy",
+   "desc": "파스텔 핑크 배경 + 상단 타이틀 + 가운데 밈 gif(단독/VS 비교) + 단어 하나씩 누적 자막. 20~25초, Lyria BGM.",
+   "fit": "가벼운 공감형 후킹. 커뮤니티·젊은 타깃.",
+   "cost": "0원 · 2분",
+   "clients": [
+    "airbnbq"
+   ]
+  },
+  {
+   "key": "stock_cinematic",
+   "name": "스톡 시네마틱",
+   "tag": "Pexels",
+   "desc": "스톡 영상 풀스크린(어둡게) + 중앙 큰 자막(노란 키워드) + 가격 카드·❌·차트 카운터 오버레이.",
+   "fit": "AI 생성 없이 분위기 있게. 금융·부동산 톤.",
+   "cost": "0원 · 3분",
+   "clients": [
+    "pixelpage"
+   ]
+  },
+  {
+   "key": "letterbox",
+   "name": "레터박스",
+   "tag": "3D 캐릭터",
+   "desc": "위아래 검정, 상단 카피 2줄(흰/초록), 하단 CTA, 3D 클레이 캐릭터 씬 A/B샷.",
+   "fit": "캐릭터 세계관이 있을 때. grok/Veo 영상 필요.",
+   "cost": "영상 생성비 발생 · 20분",
+   "clients": [
+    "airbnbq"
+   ]
+  }
+ ]
+}

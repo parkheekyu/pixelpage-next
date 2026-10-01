@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Building2, LayoutDashboard, Users } from "lucide-react";
+import { Building2, Clapperboard, LayoutDashboard, Users } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import { useEffect, useRef, useState } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -59,6 +59,14 @@ export default function Sidebar({ profile, projects, unread }: { profile: Profil
           );
         })}
       </nav>
+      {isStaff && (
+        <>
+          <h4>제작</h4>
+          <nav>
+            <Link className={`item ${pathname.startsWith("/app/presets") ? "on" : ""}`} href="/app/presets" title="소재 프리셋"><Clapperboard className="ico" aria-hidden /> <span className="lbl">소재 프리셋</span></Link>
+          </nav>
+        </>
+      )}
       <div className="foot">© {new Date().getFullYear()} PixelPage</div>
     </aside>
   );

@@ -17,6 +17,7 @@
 | `/app/research/[id]` | 직원·배정된 고객사 | 리서치: 상품·타깃 입력 → AI '본능분석·반박제거' 문서. 고객사는 리포트만 열람 |
 | `/app/ads/[id]` | 직원·배정된 고객사 | 광고: Meta 계정 실시간 현황(직원), 위너·캠페인 구조, AI 분석(카피·소재·구조·개선안) |
 | `/app/landing/[id]` | 직원·배정된 고객사 | 랜딩페이지: 페이지 구조·카피 + GA4 + Clarity → AI 개선 리포트 |
+| `/app/presets` | 직원 | 소재 프리셋 갤러리: 광고제작 머신 프리셋 9종을 9:16 샘플(hover 재생, 클릭 확대)로. 데이터 `src/lib/dash/presets.json`(설명) + Supabase 공개 버킷 `presets`(mp4·jpg), 갱신은 광고제작 `pipeline/publish_presets.py` |
 | `POST /api/leads/webhook` | Make/n8n | 리드 적재 (Bearer 토큰) |
 
 권한 모델
