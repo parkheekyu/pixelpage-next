@@ -103,6 +103,33 @@ export async function GET(req: NextRequest) {
       const custom = topic ? [{ title: "0. 요청 주제", prompt: `${base}\n\n${topic}\n\n한국 시장 기준으로, 출처 URL 을 항목마다 붙이고, 같은 말을 반복하지 말고 표나 번호 목록으로 정리해 주세요. 마지막에 '광고·랜딩에 바로 쓸 시사점 5개' 를 붙여 주세요.` }] : [];
       return text(`PERPLEXITY_API_KEY 없음 → 아래 프롬프트를 대표님이 퍼플렉시티(Research 모드)에 붙여 넣도록 안내. 슬랙에는 각 프롬프트를 \u0060\u0060\u0060 코드 블록으로 올려서 복사하기 쉽게.\n\n${[...custom, ...list].map((x) => `### ${x.title}\n${x.prompt}`).join("\n\n")}`);
     }
+    if (op === "meta-objects") {
+      // 캠페인/세트/광고 ID·이름·상태 목록 (조작 대상 찾기용)
+      if (!integ?.meta_ad_account_id || !process.env.META_ACCESS_TOKEN) return text("메타 미연동");
+      const acct = `act_${integ.meta_ad_account_id}`; const tok = process.env.META_ACCESS_TOKEN;
+      const get = async (path: string) => (await (await fetch(`https://graph.facebook.com/v21.0/${path}&access_token=${tok}`)).json()) as { data?: Record<string, string>[]; error?: { message: string } };
+      const c = await get(`${acct}/campaigns?fields=id,name,effective_status,daily_budget,lifetime_budget&limit=50`); if (c.error) return text(`오류: ${c.error.message}`);
+      const lines: string[] = [];
+      for (const cp of c.data ?? []) {
+        lines.push(`캠페인 ${cp.name} [${cp.id}] ${cp.effective_status}${cp.daily_budget ? ` 일예산 ${Number(cp.daily_budget).toLocaleString()}` : ""}${cp.lifetime_budget ? ` 총예산 ${Number(cp.lifetime_budget).toLocaleString()}` : ""}`);
+        if (["ACTIVE", "PAUSED"].includes(cp.effective_status)) { const as = await get(`${cp.id}/adsets?fields=id,name,effective_status,daily_budget&limit=50`); for (const a of as.data ?? []) lines.push(`  세트 ${a.name} [${a.id}] ${a.effective_status}${a.daily_budget ? ` 일예산 ${Number(a.daily_budget).toLocaleString()}` : ""}`); }
+      }
+      return text(`[${p.name} 메타 구조]\n${lines.join("\n")}`);
+    }
+    if (op === "meta-set") {
+      // 캠페인/세트/광고 상태·예산 변경. 대표의 명시적 지시가 있을 때만 호출 (직원 규칙)
+      if (!integ?.meta_ad_account_id || !process.env.META_ACCESS_TOKEN) return text("메타 미연동");
+      const id = sp.get("id") ?? ""; const status = sp.get("status"); const daily = sp.get("daily_budget"); const lifetime = sp.get("lifetime_budget"); const by = sp.get("by") ?? "AI 직원";
+      if (!/^\d{6,}$/.test(id)) return text("id(캠페인/세트/광고 숫자 ID) 필요");
+      const body = new URLSearchParams({ access_token: process.env.META_ACCESS_TOKEN });
+      if (status && ["ACTIVE", "PAUSED"].includes(status)) body.set("status", status);
+      if (daily && /^\d+$/.test(daily)) body.set("daily_budget", daily); if (lifetime && /^\d+$/.test(lifetime)) body.set("lifetime_budget", lifetime);
+      if ([...body.keys()].length < 2) return text("status=ACTIVE|PAUSED 또는 daily_budget/lifetime_budget(원 단위 정수) 중 하나 필요");
+      const r = (await (await fetch(`https://graph.facebook.com/v21.0/${id}`, { method: "POST", body })).json()) as { success?: boolean; error?: { message: string } };
+      if (r.error) return text(`메타 변경 실패: ${r.error.message}`);
+      await db.from("agent_memory").insert({ employee_id: "team", project_id: p.id, kind: "decision", content: `[광고 조작 기록] ${by}: ${id} → ${status ? "상태 " + status : ""}${daily ? " 일예산 " + daily : ""}${lifetime ? " 총예산 " + lifetime : ""} (${new Date().toISOString().slice(0, 16)})`, importance: 4, source: "meta-set" });
+      return text(`변경 완료: ${id} ${status ?? ""} ${daily ? "일예산 " + daily : ""} ${lifetime ? "총예산 " + lifetime : ""}`.trim());
+    }
     if (op === "proposals") {
       const { data } = await db.from("proposals").select("id,status,title,feedback,variants,created_at").eq("project_id", p.id).order("created_at", { ascending: false }).limit(8);
       return text((data ?? []).map((x) => `- ${String(x.created_at).slice(0, 16).replace("T", " ")} [${x.status}] ${x.title ?? ""} (id ${x.id})${x.feedback ? ` · 코멘트: ${x.feedback.slice(0, 100)}` : ""}\n  ${((x.variants ?? []) as { id: string; angle: string; headline: string }[]).map((v) => `${v.id}. ${v.angle} — ${v.headline}`).join(" / ")}`).join("\n") || "제안 없음");
