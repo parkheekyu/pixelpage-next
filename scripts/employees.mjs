@@ -117,8 +117,20 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
     pl.notify ? "\n(위는 우리 쪽 자동화 도구가 광고 계정에 실제로 적용한 변경 내용이다. 대표님께 '무엇을 왜 어떻게 바꿨는지' 를 네 말투로 2~3문장으로 전한다. 수치는 알림에 있는 그대로 쓰고, 도구 조회는 필요할 때만. 대표 판단이 필요한 점이 있으면 한 줄로 덧붙인다.)" : "",
   ].filter(Boolean).join("\n");
 
+  // 스레드가 아니라 채널에 바로 "응/아니" 라고 답한 경우: 그 채널의 가장 최근(24시간 내) 미답 질문에 대한 답으로 본다
+  let answerThread = thread;
+  if (!thread && !pl.from_employee && (YES.test(String(pl.text).trim()) || NO.test(String(pl.text).trim()))) {
+    const since = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+    const [{ data: ap }, { data: yv }] = await Promise.all([
+      db.from("agent_approvals").select("slack_ts,created_at").eq("slack_channel", pl.channel).eq("status", "pending").gte("created_at", since).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+      db.from("yt_videos").select("slack_ts,created_at").eq("slack_channel", pl.channel).eq("status", "asked").gte("created_at", since).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    ]);
+    const cands = [ap, yv].filter((x) => x?.slack_ts).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at)));
+    if (cands[0]) answerThread = cands[0].slack_ts;
+  }
   // 외부 도구의 승인 질문 스레드에 대표가 답했으면 기록 (LLM 없이)
-  if (thread && !pl.from_employee) {
+  if (answerThread && !pl.from_employee) {
+    const thread = answerThread;
     const { data: ap } = await db.from("agent_approvals").select("*").eq("slack_channel", pl.channel).eq("slack_ts", thread).eq("status", "pending").maybeSingle();
     if (ap) {
       const t = String(pl.text).trim(); const yes = YES.test(t), no = NO.test(t);
@@ -133,7 +145,8 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
     }
   }
   // 유튜브 영상 질문 스레드에 대표가 답했으면 승인/거절을 바로 처리 (LLM 없이)
-  if (thread && !pl.from_employee) {
+  if (answerThread && !pl.from_employee) {
+    const thread = answerThread;
     const { data: yv } = await db.from("yt_videos").select("*").eq("slack_channel", pl.channel).eq("slack_ts", thread).eq("status", "asked").maybeSingle();
     if (yv) {
       const t = String(pl.text).trim();

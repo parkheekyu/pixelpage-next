@@ -27,22 +27,20 @@ export async function POST(req: NextRequest) {
     const { channel, ts, text, user } = ev; const threadTs = ev.thread_ts; const channelType = ev.channel_type;
     after(async () => {
       const { data: integ } = await db.from("project_integrations").select("project_id").eq("slack_channel_id", channel).maybeSingle();
-      const { data: exists } = await db.from("agent_messages").select("id").eq("channel", channel).eq("ts", ts).maybeSingle();
-      if (!exists) {
-        let userName = user;
-        try { const u = await slack<{ user: { real_name?: string; name?: string } }>("users.info", { user }, bot!.bot_token); userName = u.user.real_name ?? u.user.name ?? user; } catch {}
-        await db.from("agent_messages").upsert({ channel, channel_type: channelType, thread_ts: threadTs ?? null, ts, user_id: user, user_name: userName, project_id: integ?.project_id ?? null, text }, { onConflict: "channel,ts" });
-      }
+      // 같은 메시지를 여러 직원 앱이 받으므로, 기록에 성공한(첫 번째) 앱만 배분을 맡는다
+      let userName = user;
+      try { const u = await slack<{ user: { real_name?: string; name?: string } }>("users.info", { user }, bot!.bot_token); userName = u.user.real_name ?? u.user.name ?? user; } catch {}
+      const { error: insErr } = await db.from("agent_messages").insert({ channel, channel_type: channelType, thread_ts: threadTs ?? null, ts, user_id: user, user_name: userName, project_id: integ?.project_id ?? null, text });
+      const first = !insErr;
       const mentioned = !!botUser && text.includes(`<@${botUser}>`);
       const mentionsAny = /<@[A-Z0-9]+>/.test(text);
       const clean = text.replace(/<@[A-Z0-9]+>/g, (m) => (m === `<@${botUser}>` ? "" : m)).trim();
-      const { data: u } = await db.from("agent_messages").select("user_name").eq("channel", channel).eq("ts", ts).maybeSingle();
-      const base = { channel, channel_type: channelType, thread_ts: threadTs ?? ts, trigger_ts: ts, text: clean, user_id: user, user_name: u?.user_name ?? user, depth: 0 };
+      const base = { channel, channel_type: channelType, thread_ts: threadTs ?? ts, trigger_ts: ts, text: clean, user_id: user, user_name: userName, depth: 0 };
       if (mentioned || channelType === "im") {
         // 이 직원을 직접 불렀거나 DM → 이 직원이 답한다
         await db.from("agent_jobs").insert({ project_id: integ?.project_id ?? null, kind: "employee_turn", engine: "claude", payload: { ...base, employee: emp.id } });
-      } else if (!mentionsAny && (team.employees as { id: string; default?: boolean }[]).find((e) => e.default)?.id === emp.id) {
-        // 아무도 안 불렀으면 실장 앱이 대표로 받아 "누가 답할지" 를 워커가 맥락으로 판단 (dispatch)
+      } else if (!mentionsAny && first) {
+        // 아무도 안 불렀으면 메시지를 먼저 기록한 앱이 대표로 받아 "누가 답할지" 를 워커가 맥락으로 판단 (dispatch)
         await db.from("agent_jobs").insert({ project_id: integ?.project_id ?? null, kind: "dispatch", engine: "claude", payload: base });
       } else return;
       await slack("reactions.add", { channel, timestamp: ts, name: "eyes" }, bot!.bot_token).catch(() => {});
