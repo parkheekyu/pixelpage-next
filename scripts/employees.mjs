@@ -152,7 +152,8 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
       const t = String(pl.text).trim();
       const say = async (msg) => { const posted = await postAs(db, emp, pl.channel, thread, msg); await db.from("agent_messages").upsert({ channel: pl.channel, thread_ts: thread, ts: posted.ts, employee_id: emp.id, user_name: emp.name, project_id: yv.project_id, text: msg }, { onConflict: "channel,ts" }); };
       if (YES.test(t)) {
-        const { data: vj } = await db.from("agent_jobs").insert({ project_id: yv.project_id, kind: "video_ad", engine: "claude", payload: { video_id: yv.video_id, url: yv.url, title: yv.title, channel_title: yv.channel_title, project_id: yv.project_id, employee: emp.id, channel: pl.channel, thread_ts: thread } }).select("id").single();
+        const cnt = Number(t.match(/(\d{1,2})\s*(개|안|편)/)?.[1]) || 4;
+        const { data: vj } = await db.from("agent_jobs").insert({ project_id: yv.project_id, kind: "video_ad", engine: "claude", payload: { video_id: yv.video_id, url: yv.url, title: yv.title, channel_title: yv.channel_title, project_id: yv.project_id, employee: emp.id, channel: pl.channel, thread_ts: thread, count: Math.min(12, Math.max(1, cnt)) } }).select("id").single();
         await db.from("yt_videos").update({ status: "approved", decided_at: new Date().toISOString(), job_id: vj?.id ?? null }).eq("video_id", yv.video_id);
         await say("네, 지금 만들게요. 보통 20~40분 걸려요. 끝나면 여기에 올릴게요.");
         await db.from("agent_jobs").update({ status: "done", result_json: { yt: "approved" }, finished_at: new Date().toISOString() }).eq("id", job.id);
@@ -201,7 +202,7 @@ export async function processVideoAd(db, job, { log }) {
   const slug = proj?.slug ?? "beforest";
   await db.from("yt_videos").update({ status: "producing" }).eq("video_id", pl.video_id);
   const t0 = Date.now();
-  const prompt = `${proj?.name ?? slug}(${slug}) 광고 소재 제작 요청입니다.\n유튜브 원본: ${pl.url}\n채널: ${pl.channel_title ?? ""} / 제목: ${pl.title ?? ""}\n\n유튜브-디하클 프리셋(youtube_dhc, pipeline/clip_ad.py)으로 편집해 주세요. clients/${slug}/CLAUDE.md 와 references 의 확정 스타일을 그대로 따르고, 결과물은 ~/Desktop/YYMMDD_강사명/ 에 NN숏폼_강사.mp4 + NN정방형_강사.mp4 로 저장합니다. 사람에게 되묻지 말고 판단해서 끝까지 진행하세요.\n완료되면 마지막 줄에 정확히 이 형식으로만 출력하세요:\nOUTPUT_DIR: <결과 폴더 절대경로>\nSUMMARY: <헤드라인과 편집 요약 두 문장>`;
+  const prompt = `${proj?.name ?? slug}(${slug}) 광고 소재 제작 요청입니다.\n유튜브 원본: ${pl.url}\n채널: ${pl.channel_title ?? ""} / 제목: ${pl.title ?? ""}\n\n유튜브-디하클 프리셋(youtube_dhc, pipeline/clip_ad.py)으로 편집해 주세요. 소재는 ${pl.count ?? 4}안만 만듭니다(숏폼+정방형 각 1개씩, 더 많이 만들지 않음). 렌더는 2~3개씩 동시에 돌려 시간을 줄입니다. clients/${slug}/CLAUDE.md 와 references 의 확정 스타일을 그대로 따르고, 결과물은 ~/Desktop/YYMMDD_강사명/ 에 NN숏폼_강사.mp4 + NN정방형_강사.mp4 로 저장합니다. 사람에게 되묻지 말고 판단해서 끝까지 진행하세요.\n완료되면 마지막 줄에 정확히 이 형식으로만 출력하세요:\nOUTPUT_DIR: <결과 폴더 절대경로>\nSUMMARY: <헤드라인과 편집 요약 두 문장>`;
   const desk = path.join(os.homedir(), "Desktop");
   const before = new Set(existsSync(desk) ? readdirSync(desk) : []);
   let out = "";
