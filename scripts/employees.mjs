@@ -222,12 +222,13 @@ export async function processVideoAd(db, job, { log }) {
   let dir = out.match(/OUTPUT_DIR:\s*(.+)/)?.[1]?.trim().replace(/^~/, os.homedir()) ?? "";
   const summary = out.match(/SUMMARY:\s*([\s\S]+)$/)?.[1]?.trim().slice(0, 400) ?? "";
   if (!dir || !existsSync(dir)) { const added = readdirSync(desk).filter((f) => !before.has(f) && /^\d{6}_/.test(f)).map((f) => path.join(desk, f)).sort((a, b) => statSync(b).mtimeMs - statSync(a).mtimeMs); if (added[0]) dir = added[0]; }
-  const files = dir && existsSync(dir) ? readdirSync(dir).filter((f) => /\.mp4$/i.test(f)).sort() : [];
+  // 이번 작업에서 새로 생긴 파일만 보고 (같은 캠페인 폴더에 이어 쌓는 경우 예전 파일 제외)
+  const files = dir && existsSync(dir) ? readdirSync(dir).filter((f) => /\.mp4$/i.test(f) && statSync(path.join(dir, f)).mtimeMs >= t0 - 60000).sort() : [];
   await db.from("yt_videos").update({ status: files.length ? "done" : "error", output_path: dir || null, error: files.length ? null : "결과 파일 없음" }).eq("video_id", pl.video_id);
   await db.from("agent_jobs").update({ status: "done", result_text: out.slice(-4000), finished_at: new Date().toISOString() }).eq("id", job.id);
   const mins = Math.round((Date.now() - t0) / 60000);
   const text = files.length
-    ? `다 됐어요 (${mins}분). 바탕화면 ${path.basename(dir)} 폴더에 ${files.length}개 저장했어요.\n${files.map((f) => "• " + f).join("\n")}${summary ? "\n\n" + summary : ""}\n${dir}`
+    ? `다 됐어요 (${mins}분). 바탕화면 ${path.basename(dir)} 폴더에 ${files.length}개 넣었어요.\n${files.slice(0, 12).map((f) => "• " + f).join("\n")}${files.length > 12 ? `\n… 외 ${files.length - 12}개` : ""}${summary ? "\n\n" + summary : ""}`
     : `편집은 끝났는데 결과 파일을 못 찾았어요. 바탕화면을 한번 봐 주세요.${summary ? "\n" + summary : ""}`;
   const posted = await postAs(db, emp, pl.channel, pl.thread_ts, text);
   await db.from("agent_messages").upsert({ channel: pl.channel, thread_ts: pl.thread_ts, ts: posted.ts, employee_id: emp.id, user_name: emp.name, project_id: pl.project_id, text }, { onConflict: "channel,ts" });
