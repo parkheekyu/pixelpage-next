@@ -154,7 +154,7 @@ export async function processEmployeeTurn(db, job, { log, model, effort }) {
       if (YES.test(t)) {
         const { data: vj } = await db.from("agent_jobs").insert({ project_id: yv.project_id, kind: "video_ad", engine: "claude", payload: { video_id: yv.video_id, url: yv.url, title: yv.title, channel_title: yv.channel_title, project_id: yv.project_id, employee: emp.id, channel: pl.channel, thread_ts: thread } }).select("id").single();
         await db.from("yt_videos").update({ status: "approved", decided_at: new Date().toISOString(), job_id: vj?.id ?? null }).eq("video_id", yv.video_id);
-        await say("네, 지금 만들게요. 보통 10~20분 걸려요. 끝나면 여기에 올릴게요.");
+        await say("네, 지금 만들게요. 보통 20~40분 걸려요. 끝나면 여기에 올릴게요.");
         await db.from("agent_jobs").update({ status: "done", result_json: { yt: "approved" }, finished_at: new Date().toISOString() }).eq("id", job.id);
         log(`[직원:${emp.name}] 유튜브 광고 승인 → video_ad 등록 (${yv.title})`); return;
       }
@@ -208,7 +208,7 @@ export async function processVideoAd(db, job, { log }) {
   try {
     out = await new Promise((resolve, reject) => {
       const p = spawn("claude", ["-p", "--model", "opus", "--effort", "high", "--output-format", "text", "--no-session-persistence", "--allowedTools", AD_TOOLS], { cwd: AD_DIR, stdio: ["pipe", "pipe", "pipe"], env: { ...process.env, CLAUDECODE: "" } });
-      let o = "", e = ""; const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error("45분 초과로 중단")); }, 45 * 60 * 1000);
+      let o = "", e = ""; const timer = setTimeout(() => { p.kill("SIGKILL"); reject(new Error("120분 초과로 중단")); }, 120 * 60 * 1000);
       p.stdout.on("data", (d) => (o += d)); p.stderr.on("data", (d) => (e += d)); p.on("error", (x) => { clearTimeout(timer); reject(x); });
       p.on("close", (c) => { clearTimeout(timer); c === 0 && o.trim() ? resolve(o) : reject(new Error(`claude 종료 코드 ${c}: ${(e || o).slice(-400)}`)); });
       p.stdin.end(prompt);
