@@ -16,7 +16,7 @@ type SearchParams = Promise<Record<string, string | undefined>>;
 const telHref = (phone: string) => `tel:${phone.replace(/[^0-9+]/g, "")}`;
 const pick = (q: Record<string, string | undefined>, ...keys: string[]) => { for (const k of keys) { const v = q[k]; if (v && v.trim()) return v.trim(); } return ""; };
 
-const Row = ({ label, value, lines }: { label: string; value?: string; lines?: string[] }) => (
+const Row = ({ label, value, lines }: { label: string; value?: string; lines?: string[] }) => (!value && !lines?.length) ? null : (
   <div className="border-t border-white/10 py-5 grid grid-cols-[96px_1fr] gap-4 items-baseline first:border-t-0">
     <span className="text-[12px] font-semibold tracking-[0.12em] text-violet-300/85 leading-[1.6]">{label}</span>
     {lines ? (
@@ -50,8 +50,8 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm px-6 py-2 mb-5">
-          <Row label="성함" value={name} />
-          <Row label="연락처" value={phone} />
+          <Row label="성함" value={name || "—"} />
+          <Row label="연락처" value={phone || "—"} />
           <Row label="고민" value={concern.replace(/\s*,\s*/g, " · ")} />
           <Row label="시작 희망" value={start} />
           <Row label="희망 지점" value={branch.replace(/\s*,\s*/g, " · ")} />

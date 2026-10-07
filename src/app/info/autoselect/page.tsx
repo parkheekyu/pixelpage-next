@@ -15,7 +15,7 @@ type SearchParams = Promise<Record<string, string | undefined>>;
 
 const telHref = (phone: string) => `tel:${phone.replace(/[^0-9+]/g, "")}`;
 
-const Row = ({ label, value }: { label: string; value: string }) => (
+const Row = ({ label, value }: { label: string; value: string }) => !value ? null : (
   <div className="border-t border-white/10 py-5 grid grid-cols-[104px_1fr] gap-5 items-baseline first:border-t-0">
     <span className="text-[12px] font-semibold tracking-[0.14em] text-emerald-300/80">{label}</span>
     <span className="text-[17px] font-medium text-white tracking-[-0.01em] break-all">{value || "—"}</span>
@@ -44,8 +44,8 @@ export default async function Page({ searchParams }: { searchParams: SearchParam
         </div>
 
         <div className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur-sm px-7 py-2 mb-7">
-          <Row label="고객명" value={name} />
-          <Row label="연락처" value={phone} />
+          <Row label="고객명" value={name || "—"} />
+          <Row label="연락처" value={phone || "—"} />
           {rows.map(([k, v]) => <Row key={k} label={k} value={v} />)}
         </div>
 
