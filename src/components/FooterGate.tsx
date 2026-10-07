@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import Footer from "./Footer";
 
 const hiddenChromePages = ["/", "/info", "/thank-you"];
-const hiddenPrefixes = ["/columns", "/app"];
+const hiddenPrefixes = ["/columns", "/app", "/info", "/legal"];
 
 const isHidden = (pathname: string | null | undefined) => {
   if (!pathname) return true; // SSR / 초기 렌더에서는 안전하게 숨김

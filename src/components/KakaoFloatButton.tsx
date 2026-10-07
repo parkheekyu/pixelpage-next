@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 
 const HIDDEN_PATHS = ["/", "/info", "/thank-you"];
-const HIDDEN_PREFIXES = ["/columns", "/app"];
+const HIDDEN_PREFIXES = ["/columns", "/app", "/info", "/legal"];
 const KAKAO_URL = "http://pf.kakao.com/_cxccdX/chat";
 
 const KakaoFloatButton = () => {
