@@ -4,6 +4,7 @@ import ProjectNav from "@/components/dash/ProjectNav";
 import presets from "@/lib/dash/presets.json";
 import ClientPresetsClient from "@/components/dash/ClientPresetsClient";
 import type { ClientPreset } from "@/lib/dash/preset-types";
+import type { EditRow } from "@/lib/dash/editor-types";
 
 export const dynamic = "force-dynamic";
 
@@ -20,10 +21,11 @@ export default async function ClientPresetsPage({ params }: { params: Promise<{ 
     const { data: rows } = await supabase.from("preset_assets").select("client_preset_id").in("client_preset_id", list.map((c) => c.id));
     for (const r of rows ?? []) counts[r.client_preset_id as string] = (counts[r.client_preset_id as string] ?? 0) + 1;
   }
+  const { data: edits } = await supabase.from("project_edits").select("id, name, preset_key, composition, edited_at, render_requested_at, rendered_at, updated_at, data->total").eq("project_id", project.id).order("updated_at", { ascending: false });
   return (
     <>
       <ProjectNav project={project} isStaff unread={unread} />
-      <ClientPresetsClient project={project} list={list} counts={counts} catalog={presets.items} base={presets.base} />
+      <ClientPresetsClient project={project} list={list} counts={counts} catalog={presets.items} base={presets.base} edits={(edits ?? []) as unknown as EditRow[]} />
     </>
   );
 }

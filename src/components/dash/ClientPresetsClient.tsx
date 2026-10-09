@@ -3,7 +3,9 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Layers, X } from "lucide-react";
+import { Plus, Trash2, Layers, X, Clapperboard } from "lucide-react";
+import type { EditRow } from "@/lib/dash/editor-types";
+import { deleteProjectEdit } from "@/app/app/editor-actions";
 import type { Project } from "@/lib/dash/types";
 import type { ClientPreset } from "@/lib/dash/preset-types";
 import { createClientPreset, deleteClientPreset } from "@/app/app/preset-actions";
@@ -11,7 +13,7 @@ import { createClientPreset, deleteClientPreset } from "@/app/app/preset-actions
 type CatalogItem = { key: string; name: string; tag: string; desc: string; fit: string; cost: string; clients: string[] };
 
 /** 고객사 프리셋 목록 + "새 프리셋"(공용 프리셋에서 선택) 모달 */
-export default function ClientPresetsClient({ project, list, counts, catalog, base }: { project: Project; list: ClientPreset[]; counts: Record<string, number>; catalog: CatalogItem[]; base: string }) {
+export default function ClientPresetsClient({ project, list, counts, catalog, base, edits = [] }: { project: Project; list: ClientPreset[]; counts: Record<string, number>; catalog: CatalogItem[]; base: string; edits?: EditRow[] }) {
   const router = useRouter();
   const [pick, setPick] = useState(false);
   const [pending, start] = useTransition();
@@ -58,6 +60,21 @@ export default function ClientPresetsClient({ project, list, counts, catalog, ba
               </article>
             );
           })}
+        </div>
+      )}
+
+      <div className="cpz-head" style={{ marginTop: 8 }}>
+        <div><h2>소재 편집기 <span className="hint">{edits.length}개</span></h2><div className="hint">광고제작 머신이 올린 소재를 캡컷처럼 직접 편집합니다(자막 텍스트·타이밍, 요소 위치, 카드 교체). 저장 후 "렌더 요청"을 누르면 머신이 반영해 렌더합니다.</div></div>
+      </div>
+      {edits.length === 0 ? <div className="cpz-empty"><Clapperboard className="ico" aria-hidden /><p>아직 편집기에 올라온 소재가 없습니다. 머신이 <code>editor_publish.py</code> 로 올리면 여기 나타납니다.</p></div> : (
+        <div className="ve-list">
+          {edits.map((e) => (
+            <article key={e.id} className="ve-item">
+              <Link href={`/app/presets/${project.id}/editor/${e.id}`}><b>{e.name}</b> <code>{e.preset_key}</code></Link>
+              <div className="cpz-meta"><span>{Number(e.total ?? 0).toFixed(1)}s</span><span>{e.edited_at ? `편집 ${new Date(e.edited_at).toLocaleString("ko-KR")}` : "편집 없음"}</span><span>{e.render_requested_at && (!e.rendered_at || e.render_requested_at > e.rendered_at) ? "렌더 대기" : e.rendered_at ? "렌더됨" : ""}</span></div>
+              <button type="button" className="btn danger cpz-del" title="편집기에서 제거" disabled={pending} onClick={() => { if (confirm(`"${e.name}" 을 편집기에서 제거할까요? (렌더된 파일은 남습니다)`)) start(async () => { const r = await deleteProjectEdit(e.id); if (!r.ok) setErr(r.error); else router.refresh(); }); }}><Trash2 className="ico" aria-hidden /></button>
+            </article>
+          ))}
         </div>
       )}
 

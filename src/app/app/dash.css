@@ -556,3 +556,48 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .pp-dash .pe-slider input[type="range"] { width: 100%; accent-color: var(--s1); }
 .pp-dash .pe-reset { font: inherit; font-size: 11px; color: var(--s1); background: none; border: 1px solid color-mix(in srgb, var(--s1) 40%, var(--line)); border-radius: 6px; padding: 3px 7px; cursor: pointer; white-space: nowrap; }
 @media (max-width: 700px) { .pp-dash .pe-field { grid-template-columns: 1fr; } }
+
+/* ---------- 소재 편집기 ---------- */
+.pp-dash .ve { display: grid; gap: 14px; }
+.pp-dash .ve-body { display: grid; grid-template-columns: minmax(280px, 420px) 1fr; gap: 18px; align-items: start; }
+@media (max-width: 900px) { .pp-dash .ve-body { grid-template-columns: 1fr; } }
+.pp-dash .ve-stage { display: grid; gap: 8px; position: sticky; top: 12px; }
+.pp-dash .ve-canvas { position: relative; aspect-ratio: 9/16; background: #000; border-radius: 14px; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,.2); cursor: ns-resize; }
+.pp-dash .ve-guide { position: absolute; left: 0; right: 0; border-top: 1px dashed rgba(255,230,0,.55); pointer-events: none; }
+.pp-dash .ve-guide::after { content: attr(data-k); position: absolute; right: 6px; top: -16px; font-size: 10px; color: #ffe600; text-shadow: 0 1px 2px #000; }
+.pp-dash .ve-transport { display: flex; align-items: center; gap: 8px; }
+.pp-dash .ve-transport input[type="range"] { flex: 1; accent-color: var(--s1); }
+.pp-dash .ve-time { font-variant-numeric: tabular-nums; font-size: 12.5px; color: var(--text-2); white-space: nowrap; }
+.pp-dash .ve-inspector { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 12px 14px; display: grid; gap: 10px; align-content: start; }
+.pp-dash .ve-inspector h3 { margin: 4px 0 0; font-size: 14px; display: flex; gap: 8px; align-items: baseline; }
+.pp-dash .ve-inspector h3 small { color: var(--muted); font-weight: 400; font-size: 12px; }
+.pp-dash .ve-f { display: grid; gap: 4px; font-size: 13px; }
+.pp-dash .ve-f b { font-size: 12.5px; }
+.pp-dash .ve-f input[type="text"], .pp-dash .ve-f input:not([type]), .pp-dash .ve-f textarea { font: inherit; font-size: 13px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 8px; width: 100%; }
+.pp-dash .ve-f small { color: var(--muted); font-size: 11px; }
+.pp-dash .ve-row { display: flex; align-items: center; gap: 8px; }
+.pp-dash .ve-row input[type="range"] { flex: 1; accent-color: var(--s1); }
+.pp-dash .ve-row code { font-size: 11px; color: var(--muted); width: 44px; text-align: right; }
+.pp-dash .ve-k { width: 96px; flex: none; }
+.pp-dash .ve-cards { display: flex; flex-wrap: wrap; gap: 6px; }
+.pp-dash .ve-cardpick { font: inherit; font-size: 11px; border: 2px solid var(--line); background: var(--surface); border-radius: 8px; padding: 0; width: 64px; height: 48px; overflow: hidden; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--muted); }
+.pp-dash .ve-cardpick img { width: 100%; height: 100%; object-fit: cover; }
+.pp-dash .ve-cardpick.on { border-color: var(--s1); }
+.pp-dash .ve-timeline { overflow-x: auto; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px 12px; cursor: text; }
+.pp-dash .ve-track { position: relative; height: 92px; min-width: 100%; }
+.pp-dash .ve-scene { position: absolute; top: 0; height: 100%; border-left: 1px solid var(--line); padding: 0 2px; box-sizing: border-box; cursor: pointer; }
+.pp-dash .ve-scene.cur { background: color-mix(in srgb, var(--s1) 5%, transparent); }
+.pp-dash .ve-scene.sel .ve-scene-head { color: var(--s1); }
+.pp-dash .ve-scene-head { font-size: 11px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; height: 18px; line-height: 18px; }
+.pp-dash .ve-chunks { position: relative; height: 60px; margin-top: 6px; }
+.pp-dash .ve-chunk { position: absolute; top: 0; height: 100%; background: color-mix(in srgb, var(--s1) 18%, var(--card)); border: 1px solid color-mix(in srgb, var(--s1) 45%, var(--line)); border-radius: 6px; box-sizing: border-box; overflow: hidden; display: flex; align-items: center; }
+.pp-dash .ve-chunk span { flex: 1; font-size: 11.5px; padding: 0 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; pointer-events: none; }
+.pp-dash .ve-chunk.cur { background: color-mix(in srgb, var(--s1) 32%, var(--card)); }
+.pp-dash .ve-chunk.sel { border-color: var(--s1); box-shadow: 0 0 0 2px color-mix(in srgb, var(--s1) 35%, transparent); }
+.pp-dash .ve-chunk .h { width: 7px; height: 100%; cursor: ew-resize; background: color-mix(in srgb, var(--s1) 50%, transparent); flex: none; }
+.pp-dash .ve-chunk .h:hover { background: var(--s1); }
+.pp-dash .ve-playhead { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--s2); pointer-events: none; }
+.pp-dash .ve-list { display: grid; gap: 8px; }
+.pp-dash .ve-item { position: relative; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 44px 10px 14px; display: grid; gap: 4px; }
+.pp-dash .ve-item a { color: inherit; text-decoration: none; font-size: 14px; }
+.pp-dash .ve-item code { font-size: 11px; color: var(--muted); }
