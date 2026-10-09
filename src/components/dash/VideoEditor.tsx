@@ -253,17 +253,27 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
       const dx = (ev.clientX - x0) / rect.width, dy = (ev.clientY - y0) / rect.height;
       liveSet((nd) => {
         let { x, y, w, h } = z0;
-        if (mode === "move") { x = Math.min(1 - w, Math.max(0, x + dx)); y = Math.min(1 - h, Math.max(0, y + dy)); }
-        else {
-          if (mode.includes("e")) w = Math.min(1 - x, Math.max(MIN, z0.w + dx));
-          if (mode.includes("s")) h = Math.min(1 - y, Math.max(MIN, z0.h + dy));
-          if (mode.includes("w")) { const nx = Math.min(z0.x + z0.w - MIN, Math.max(0, z0.x + dx)); w = z0.x + z0.w - nx; x = nx; }
-          if (mode.includes("n")) { const ny = Math.min(z0.y + z0.h - MIN, Math.max(0, z0.y + dy)); h = z0.y + z0.h - ny; y = ny; }
+        const gx: number[] = [], gy: number[] = []; const off = ev.altKey;
+        const near = (a: number, b: number) => !off && Math.abs(a - b) < SNAP;
+        if (mode === "move") {
+          x = Math.min(1 - w, Math.max(0, x + dx)); y = Math.min(1 - h, Math.max(0, y + dy));
+          // 마그넷: 세이프존 중심 → 캔버스 세로 중앙선(x 0.5) / 가로 중앙선(y 0.5) = 정중앙
+          if (near(x + w / 2, 0.5)) { x = 0.5 - w / 2; gx.push(0.5); }
+          if (near(y + h / 2, 0.5)) { y = 0.5 - h / 2; gy.push(0.5); }
+        } else {
+          if (mode.includes("e")) { w = Math.min(1 - x, Math.max(MIN, z0.w + dx)); if (near(x + w, 0.5)) { w = 0.5 - x; gx.push(0.5); } }
+          if (mode.includes("s")) { h = Math.min(1 - y, Math.max(MIN, z0.h + dy)); if (near(y + h, 0.5)) { h = 0.5 - y; gy.push(0.5); } }
+          if (mode.includes("w")) { let nx = Math.min(z0.x + z0.w - MIN, Math.max(0, z0.x + dx)); if (near(nx, 0.5)) { nx = 0.5; gx.push(0.5); } w = z0.x + z0.w - nx; x = nx; }
+          if (mode.includes("n")) { let ny = Math.min(z0.y + z0.h - MIN, Math.max(0, z0.y + dy)); if (near(ny, 0.5)) { ny = 0.5; gy.push(0.5); } h = z0.y + z0.h - ny; y = ny; }
+          // 대칭 리사이즈: 반대편 변 기준으로 중심이 0.5 에 오면 붙임
+          if (mode === "e" || mode === "w") { if (near(x + w / 2, 0.5)) { if (mode === "e") w = (0.5 - x) * 2; else { const r = z0.x + z0.w; x = 1 - r; w = r - x; } gx.push(0.5); } }
+          if (mode === "n" || mode === "s") { if (near(y + h / 2, 0.5)) { if (mode === "s") h = (0.5 - y) * 2; else { const b = z0.y + z0.h; y = 1 - b; h = b - y; } gy.push(0.5); } }
         }
+        setGuides({ x: gx, y: gy });
         nd.preset.zone_x = +x.toFixed(3); nd.preset.zone_y = +y.toFixed(3); nd.preset.zone_w = +w.toFixed(3); nd.preset.zone_h = +h.toFixed(3);
       });
     };
-    const up = () => { hist.current.past.push(snap); hist.current.future = []; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+    const up = () => { hist.current.past.push(snap); hist.current.future = []; setGuides({ x: [], y: [] }); window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
     window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
   };
 
