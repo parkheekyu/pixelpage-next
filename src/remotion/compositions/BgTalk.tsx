@@ -36,12 +36,12 @@ const fam = (name: unknown, dflt: string) => FAM[String(name || dflt).replace(/ 
 
 /** 기본값(presets/bg_talk.json 과 동일하게 유지) */
 export const BGTALK_DEFAULTS: Record<string, number | string> = {
-  sub_cx: 0.5, sub_cy: 0.60, sub_size: 0.031, sub_alpha: 0.8, sub_font: "Pretendard", sub_weight: 400, sub_color: "#ffffff", sub_bg: "#000000", sub_lh: 1.25, sub_ls: -0.3, sub_pad_y: 0.12, sub_pad_x: 0.32, sub_radius: 0.12, sub_stroke: 0,
-  label_cx: 0.5, label_cy: 0.26, label_size: 0.048, label_font: "BMJUA", label_color: "#ffffff", label_stroke: 0.06, label_stroke_color: "#222222", label_ls: 0,
-  note_cx: 0.5, note_cy: 0.335, note_size: 0.03, note_font: "BMJUA", note_color: "#ffffff", note_stroke: 0.035,
+  sub_cx: 0.5, sub_cy: 0.60, sub_size: 0.031, sub_alpha: 0.8, sub_font: "Pretendard", sub_weight: 400, sub_color: "#ffffff", sub_bg: "#000000", sub_lh: 1.25, sub_ls: -0.3, sub_pad_y: 0.12, sub_pad_x: 0.32, sub_radius: 0.12, sub_stroke: 0, sub_stroke_color: "#000000", sub_shadow: 0, sub_shadow_color: "#000000",
+  label_cx: 0.5, label_cy: 0.26, label_size: 0.048, label_font: "BMJUA", label_color: "#ffffff", label_stroke: 0.06, label_stroke_color: "#222222", label_ls: 0, label_shadow: 0.35, label_shadow_color: "#000000",
+  note_cx: 0.5, note_cy: 0.335, note_size: 0.03, note_font: "BMJUA", note_color: "#ffffff", note_stroke: 0.035, note_stroke_color: "#222222", note_shadow: 0, note_shadow_color: "#000000",
   card_radius: 0, card_shadow: 0,
   fire_cx: 0.5, fire_cy: 0.55, fire_size: 0.05, fire_rot: -2,
-  cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", cta_stroke: 0.08, logo_w: 0.22, ending_dim: 0,
+  cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", cta_stroke: 0.08, cta_stroke_color: "#000000", cta_shadow: 0.6, cta_shadow_color: "#000000", logo_w: 0.22, ending_dim: 0,
   intro_x: 0.08, intro_y: 0.50, intro_size: 0.03, intro_logo_x: 0.6, intro_logo_y: 0.36, intro_logo_w: 0.17,
   bg_x: 0, bg_y: 0, bg_scale: 1,
   zone_x: 0.2, zone_y: 0.36, zone_w: 0.6, zone_h: 0.16,   // 요소(이미지) 세이프존(화면 비율): 이미지는 비율을 유지한 채 이 박스 안에 맞춰(contain) 가운데 놓인다. 씬별 x/y/w 가 있으면 그걸 우선
@@ -49,13 +49,16 @@ export const BGTALK_DEFAULTS: Record<string, number | string> = {
 const D = BGTALK_DEFAULTS;
 const n = (P: P, k: string) => Number(P[k] ?? D[k]);
 const s = (P: P, k: string) => String(P[k] ?? D[k]);
+/** 그림자 세기 0~1 → text-shadow (0 이면 없음) */
+const shadow = (P: P, k: string, fs: number) => { const v = n(P, k + "_shadow"); return v > 0 ? `0 ${fs * 0.05}px ${fs * (0.08 + 0.3 * v)}px ${rgba(s(P, k + "_shadow_color"), Math.min(1, 0.25 + 0.75 * v))}` : "none"; };
+const stroke = (P: P, k: string, fs: number) => { const v = n(P, k + "_stroke"); return v > 0 ? `${fs * v}px ${s(P, k + "_stroke_color")}` : undefined; };
 const rgba = (hex: string, a: number) => { const h = hex.replace("#", ""); const v = h.length === 3 ? h.split("").map((c) => c + c).join("") : h; const r = parseInt(v.slice(0, 2), 16), g = parseInt(v.slice(2, 4), 16), b = parseInt(v.slice(4, 6), 16); return `rgba(${r},${g},${b},${a})`; };
 
 const SubBox: React.FC<{ text: string; H: number; W: number; P: P }> = ({ text, H, W, P }) => {
-  const fs = H * n(P, "sub_size"), st = n(P, "sub_stroke");
+  const fs = H * n(P, "sub_size");
   return (
     <div style={{ position: "absolute", left: W * n(P, "sub_cx"), top: H * n(P, "sub_cy"), transform: "translate(-50%,-50%)" }}>
-      <div data-el="sub" style={{ background: rgba(s(P, "sub_bg"), n(P, "sub_alpha")), color: s(P, "sub_color"), fontFamily: fam(P.sub_font, "Pretendard"), fontWeight: n(P, "sub_weight"), fontSize: fs, lineHeight: n(P, "sub_lh"), padding: `${fs * n(P, "sub_pad_y")}px ${fs * n(P, "sub_pad_x")}px`, borderRadius: fs * n(P, "sub_radius"), whiteSpace: "pre", letterSpacing: n(P, "sub_ls"), WebkitTextStroke: st ? `${fs * st}px #000` : undefined, paintOrder: "stroke fill", textAlign: "center" }}>{text}</div>
+      <div data-el="sub" style={{ background: rgba(s(P, "sub_bg"), n(P, "sub_alpha")), color: s(P, "sub_color"), fontFamily: fam(P.sub_font, "Pretendard"), fontWeight: n(P, "sub_weight"), fontSize: fs, lineHeight: n(P, "sub_lh"), padding: `${fs * n(P, "sub_pad_y")}px ${fs * n(P, "sub_pad_x")}px`, borderRadius: fs * n(P, "sub_radius"), whiteSpace: "pre", letterSpacing: n(P, "sub_ls"), WebkitTextStroke: stroke(P, "sub", fs), paintOrder: "stroke fill", textShadow: shadow(P, "sub", fs), textAlign: "center" }}>{text}</div>
     </div>
   );
 };
@@ -64,8 +67,8 @@ const Label: React.FC<{ text: string; note?: string; H: number; W: number; P: P 
   const fs = H * n(P, "label_size"), ns = H * n(P, "note_size");
   return (
     <>
-      <div data-el="label" style={{ position: "absolute", left: W * n(P, "label_cx"), top: H * n(P, "label_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.label_font, "BMJUA"), fontSize: fs, color: s(P, "label_color"), WebkitTextStroke: `${fs * n(P, "label_stroke")}px ${s(P, "label_stroke_color")}`, paintOrder: "stroke fill", textShadow: "0 2px 6px rgba(0,0,0,0.35)", whiteSpace: "pre", letterSpacing: n(P, "label_ls") }}>{text}</div>
-      {note && <div data-el="note" style={{ position: "absolute", left: W * n(P, "note_cx"), top: H * n(P, "note_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.note_font, "BMJUA"), fontSize: ns, color: s(P, "note_color"), WebkitTextStroke: `${ns * n(P, "note_stroke")}px ${s(P, "label_stroke_color")}`, paintOrder: "stroke fill", whiteSpace: "pre" }}>{note}</div>}
+      <div data-el="label" style={{ position: "absolute", left: W * n(P, "label_cx"), top: H * n(P, "label_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.label_font, "BMJUA"), fontSize: fs, color: s(P, "label_color"), WebkitTextStroke: stroke(P, "label", fs), paintOrder: "stroke fill", textShadow: shadow(P, "label", fs), whiteSpace: "pre", letterSpacing: n(P, "label_ls") }}>{text}</div>
+      {note && <div data-el="note" style={{ position: "absolute", left: W * n(P, "note_cx"), top: H * n(P, "note_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.note_font, "BMJUA"), fontSize: ns, color: s(P, "note_color"), WebkitTextStroke: stroke(P, "note", ns), paintOrder: "stroke fill", textShadow: shadow(P, "note", ns), whiteSpace: "pre" }}>{note}</div>}
     </>
   );
 };
@@ -133,7 +136,7 @@ const SceneView: React.FC<{ sc: BScene; data: BData; label?: string; note?: stri
       <AbsoluteFill style={{ background: dim ? `rgba(0,0,0,${dim})` : "transparent" }}>
         <div style={{ position: "absolute", left: 0, right: 0, top: H * n(P, "cta_cy"), transform: "translateY(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
           {data.logo && <Img src={src(data.logo)} style={{ width: lw, height: lw, borderRadius: "50%", objectFit: "cover", marginBottom: H * 0.02 }} />}
-          <div data-el="cta" style={{ fontFamily: fam(P.cta_font, "Pretendard"), fontWeight: 800, fontSize: H * n(P, "cta_size"), color: s(P, "cta_color"), textAlign: "center", whiteSpace: "pre-line", padding: "0 60px", WebkitTextStroke: `${H * n(P, "cta_size") * n(P, "cta_stroke")}px #000`, paintOrder: "stroke fill", textShadow: "0 2px 10px rgba(0,0,0,0.6)" }}>{sc.cta ?? data.cta ?? ""}</div>
+          <div data-el="cta" style={{ fontFamily: fam(P.cta_font, "Pretendard"), fontWeight: 800, fontSize: H * n(P, "cta_size"), color: s(P, "cta_color"), textAlign: "center", whiteSpace: "pre-line", padding: "0 60px", WebkitTextStroke: stroke(P, "cta", H * n(P, "cta_size")), paintOrder: "stroke fill", textShadow: shadow(P, "cta", H * n(P, "cta_size")) }}>{sc.cta ?? data.cta ?? ""}</div>
         </div>
       </AbsoluteFill>
     );

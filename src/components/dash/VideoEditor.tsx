@@ -32,6 +32,9 @@ const Row = ({ label, children }: { label: string; children: React.ReactNode }) 
 const NumField = ({ c, k, step = 1, min, max, scale = 1, unit }: NumProps) => <label className="vx-num"><input type="number" step={step} min={min} max={max} value={+(c.num(k) * scale).toFixed(scale === 1 ? 3 : 0)} onChange={(e) => c.setP(k, Number(e.target.value) / scale)} />{unit && <small>{unit}</small>}</label>;
 const ColorField = ({ c, k }: { c: Ctl; k: string }) => <div className="vx-colors">{SWATCH.map((col) => <button key={col} type="button" className={`vx-sw ${c.str(k).toLowerCase() === col.toLowerCase() ? "on" : ""}`} style={{ background: col }} onClick={() => c.setP(k, col)} />)}<label className="vx-sw custom" title="직접 선택"><input type="color" value={/^#[0-9a-f]{6}$/i.test(c.str(k)) ? c.str(k) : "#ffffff"} onChange={(e) => c.setP(k, e.target.value)} />+</label></div>;
 const PosField = ({ c, xk, yk }: { c: Ctl; xk?: string; yk: string }) => <Row label="위치">{xk && <NumField c={c} k={xk} step={0.005} min={0} max={1} />}<NumField c={c} k={yk} step={0.005} min={0} max={1} /><small className="vx-hint">X · Y (0~1, 캔버스에서 드래그 가능)</small></Row>;
+/** 외곽선: 굵기 슬라이더(0=없음) + 색 / 그림자: 세기 슬라이더(0=없음) + 색 */
+const StrokeField = ({ c, k }: { c: Ctl; k: string }) => <div className="vx-fx"><input type="range" min={0} max={0.2} step={0.005} value={c.num(k + "_stroke")} onChange={(e) => c.setP(k + "_stroke", Number(e.target.value))} /><code>{c.num(k + "_stroke") === 0 ? "없음" : c.num(k + "_stroke").toFixed(3)}</code><ColorField c={c} k={k + "_stroke_color"} /></div>;
+const ShadowField = ({ c, k }: { c: Ctl; k: string }) => <div className="vx-fx"><input type="range" min={0} max={1} step={0.05} value={c.num(k + "_shadow")} onChange={(e) => c.setP(k + "_shadow", Number(e.target.value))} /><code>{c.num(k + "_shadow") === 0 ? "없음" : c.num(k + "_shadow").toFixed(2)}</code><ColorField c={c} k={k + "_shadow_color"} /></div>;
 const FontField = ({ c, k }: { c: Ctl; k: string }) => <select className="vx-sel" value={c.str(k).replace(/ .*/, "")} onChange={(e) => c.setP(k, e.target.value)}>{FONTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>;
 
 export default function VideoEditor({ edit, projectId, projectName }: { edit: ProjectEdit; projectId: string; projectName: string }) {
@@ -400,7 +403,8 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               <Row label="폰트"><FontField c={C} k="label_font" /></Row>
               <Row label="사이즈"><NumField c={C} k="label_size" scale={H_REF} step={1} unit="px" /></Row>
               <Row label="색상"><ColorField c={C} k="label_color" /></Row>
-              <Row label="테두리"><NumField c={C} k="label_stroke" step={0.01} min={0} max={0.3} /><ColorField c={C} k="label_stroke_color" /></Row>
+              <Row label="외곽선"><StrokeField c={C} k="label" /></Row>
+              <Row label="그림자"><ShadowField c={C} k="label" /></Row>
               <Row label="자간"><NumField c={C} k="label_ls" step={0.5} unit="px" /></Row>
               <PosField c={C} xk="label_cx" yk="label_cy" />
             </>}
@@ -409,7 +413,8 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               <Row label="폰트"><FontField c={C} k="note_font" /></Row>
               <Row label="사이즈"><NumField c={C} k="note_size" scale={H_REF} step={1} unit="px" /></Row>
               <Row label="색상"><ColorField c={C} k="note_color" /></Row>
-              <Row label="테두리"><NumField c={C} k="note_stroke" step={0.01} min={0} max={0.3} /></Row>
+              <Row label="외곽선"><StrokeField c={C} k="note" /></Row>
+              <Row label="그림자"><ShadowField c={C} k="note" /></Row>
               <PosField c={C} xk="note_cx" yk="note_cy" />
             </>}
             {tab === "card" && <>
@@ -438,7 +443,8 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               <Row label="배경 불투명"><input type="range" min={0} max={1} step={0.05} value={num("sub_alpha")} onChange={(e) => liveSet((d) => { d.preset.sub_alpha = Number(e.target.value); })} /><code>{num("sub_alpha").toFixed(2)}</code></Row>
               <Row label="여백"><NumField c={C} k="sub_pad_y" step={0.02} min={0} max={1} /><NumField c={C} k="sub_pad_x" step={0.02} min={0} max={2} /><small className="vx-hint">상하 · 좌우 (글자 크기 배수)</small></Row>
               <Row label="모서리"><NumField c={C} k="sub_radius" step={0.02} min={0} max={1} /></Row>
-              <Row label="테두리"><NumField c={C} k="sub_stroke" step={0.01} min={0} max={0.2} /></Row>
+              <Row label="외곽선"><StrokeField c={C} k="sub" /></Row>
+              <Row label="그림자"><ShadowField c={C} k="sub" /></Row>
               <Row label="행간"><NumField c={C} k="sub_lh" step={0.05} min={0.8} max={2.5} /></Row>
               <Row label="자간"><NumField c={C} k="sub_ls" step={0.1} unit="px" /></Row>
               <PosField c={C} xk="sub_cx" yk="sub_cy" />
@@ -459,6 +465,8 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               <Row label="폰트"><FontField c={C} k="cta_font" /></Row>
               <Row label="사이즈"><NumField c={C} k="cta_size" scale={H_REF} step={1} unit="px" /></Row>
               <Row label="색상"><ColorField c={C} k="cta_color" /></Row>
+              <Row label="외곽선"><StrokeField c={C} k="cta" /></Row>
+              <Row label="그림자"><ShadowField c={C} k="cta" /></Row>
               <PosField c={C} yk="cta_cy" />
               <Row label="로고 크기"><NumField c={C} k="logo_w" step={0.01} min={0.05} max={0.6} /></Row>
             </>}
