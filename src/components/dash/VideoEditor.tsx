@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { Player, type PlayerRef } from "@remotion/player";
 import { ChevronLeft, Pause, Play, Redo2, RotateCcw, SkipBack, Trash2, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import { COMPOSITIONS } from "@/remotion/registry";
-import { BGTALK_DEFAULTS, cardBox } from "@/remotion/compositions/BgTalk";
+import { BGTALK_DEFAULTS } from "@/remotion/compositions/BgTalk";
 import type { ProjectData } from "@/remotion/compositions/types";
 import type { CardSpec, EditAsset, EditData, EditScene, ProjectEdit } from "@/lib/dash/editor-types";
 import { requestRender, resetProjectEdit, saveProjectEdit } from "@/app/app/editor-actions";
@@ -119,21 +119,30 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     for (let i = 0; i < peaks.length; i++) { const x = (i / 50) * zoom; const a = peaks[i] * h * 0.95; g.fillRect(x, h / 2 - a / 2, Math.max(1, zoom / 50 - 0.5), a); }
   }, [peaks, total, zoom]);
 
-  // ---- 캔버스 요소 박스(화면 비율) ----
+  // ---- 캔버스 요소 박스: Player 안에 실제로 그려진 DOM(data-el) 을 측정 → 글자와 정확히 일치 ----
   type Box = { id: ElemId; x: number; y: number; w: number; h: number; sizeKey?: string; posKeys?: [string, string] };
-  const boxes: Box[] = useMemo(() => {
-    if (!scene) return [];
-    const W = data.width, Hh = data.height, out: Box[] = [];
-    const textBox = (id: ElemId, text: string, cxK: string, cyK: string, sizeK: string, padX = 0.4): Box => { const fs = num(sizeK); const w = Math.min(0.96, fs * (Hh / W) * (text.length * 0.56 + padX * 2)); return { id, x: num(cxK), y: num(cyK), w, h: fs * 1.5, sizeKey: sizeK, posKeys: [cxK, cyK] }; };
-    if (scene.ending) { out.push({ id: "cta", x: 0.5, y: num("cta_cy"), w: 0.8, h: num("cta_size") * 3.2, sizeKey: "cta_size", posKeys: ["", "cta_cy"] }); return out; }
-    out.push({ id: "bg", x: 0.5, y: 0.5, w: 1, h: 1 });
-    if (scene.intro) { out.push({ id: "intro", x: num("intro_x") + 0.2, y: num("intro_y") + num("intro_size") * 2.2, w: 0.4, h: num("intro_size") * 4.6, sizeKey: "intro_size", posKeys: ["intro_x", "intro_y"] }); return out; }
-    if (live.label) out.push(textBox("label", live.label, "label_cx", "label_cy", "label_size"));
-    if (live.note) out.push(textBox("note", live.note, "note_cx", "note_cy", "note_size"));
-    if (liveCard) { const b = cardBox(liveCard as CardSpec, W, Hh, P); out.push({ id: "card", x: b.cx / W, y: b.cy / Hh, w: b.w / W, h: b.h / Hh, sizeKey: "card_h", posKeys: ["card_cx", "card_cy"] }); }
-    if (curChunk) out.push(scene.hookFire ? textBox("sub", curChunk.t, "fire_cx", "fire_cy", "fire_size") : textBox("sub", curChunk.t, "sub_cx", "sub_cy", "sub_size", 0.32));
-    return out;
-  }, [scene, live, liveCard, curChunk, num, P, data.width, data.height]);
+  const KEYS: Record<ElemId, { sizeKey?: string; posKeys?: [string, string] }> = {
+    label: { sizeKey: "label_size", posKeys: ["label_cx", "label_cy"] }, note: { sizeKey: "note_size", posKeys: ["note_cx", "note_cy"] },
+    card: { sizeKey: "card_h", posKeys: ["card_cx", "card_cy"] }, sub: { sizeKey: "sub_size", posKeys: ["sub_cx", "sub_cy"] },
+    cta: { sizeKey: "cta_size", posKeys: ["", "cta_cy"] }, intro: { sizeKey: "intro_size", posKeys: ["intro_x", "intro_y"] }, bg: {},
+  };
+  const [boxes, setBoxes] = useState<Box[]>([]);
+  const measure = useCallback(() => {
+    const cv = canvasRef.current; if (!cv) return;
+    const R = cv.getBoundingClientRect(); if (!R.width) return;
+    const out: Box[] = [];
+    if (!scene?.ending) out.push({ id: "bg", x: 0.5, y: 0.5, w: 1, h: 1 });
+    cv.querySelectorAll<HTMLElement>("[data-el]").forEach((el) => {
+      const id = el.dataset.el as ElemId; const b = el.getBoundingClientRect(); if (!b.width) return;
+      const k = { ...KEYS[id] };
+      if (id === "sub" && scene?.hookFire) { k.sizeKey = "fire_size"; k.posKeys = ["fire_cx", "fire_cy"]; }
+      const pad = 4 / R.width;   // 살짝 여유
+      out.push({ id, x: (b.left + b.width / 2 - R.left) / R.width, y: (b.top + b.height / 2 - R.top) / R.height, w: b.width / R.width + pad * 2, h: b.height / R.height + pad * 2, ...k });
+    });
+    setBoxes((prev) => (JSON.stringify(prev) === JSON.stringify(out) ? prev : out));
+  }, [scene]);   // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { const id = requestAnimationFrame(measure); return () => cancelAnimationFrame(id); }, [measure, frame, data]);
+  useEffect(() => { const id = setInterval(measure, 250); window.addEventListener("resize", measure); return () => { clearInterval(id); window.removeEventListener("resize", measure); }; }, [measure]);
 
   const [sel, setSel] = useState<ElemId | null>(null);
   const [guides, setGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
@@ -174,6 +183,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
             nd.preset[d.box.posKeys[1]] = +sn.y.toFixed(3);
             setGuides({ x: d.box.posKeys[0] ? sn.gx : [], y: sn.gy });
           }
+          requestAnimationFrame(measure);
         } else {
           if (d.box.id === "bg") nd.preset.bg_scale = +Math.max(0.5, Math.min(3, d.s0 * (1 + dy * 2))).toFixed(3);
           else if (d.box.sizeKey) nd.preset[d.box.sizeKey] = +Math.max(0.01, Math.min(0.6, d.s0 * (1 + dy * 3))).toFixed(4);

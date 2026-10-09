@@ -54,7 +54,7 @@ const SubBox: React.FC<{ text: string; H: number; W: number; P: P }> = ({ text, 
   const fs = H * n(P, "sub_size"), st = n(P, "sub_stroke");
   return (
     <div style={{ position: "absolute", left: W * n(P, "sub_cx"), top: H * n(P, "sub_cy"), transform: "translate(-50%,-50%)" }}>
-      <div style={{ background: rgba(s(P, "sub_bg"), n(P, "sub_alpha")), color: s(P, "sub_color"), fontFamily: fam(P.sub_font, "Pretendard"), fontWeight: n(P, "sub_weight"), fontSize: fs, lineHeight: n(P, "sub_lh"), padding: `${fs * n(P, "sub_pad_y")}px ${fs * n(P, "sub_pad_x")}px`, borderRadius: fs * n(P, "sub_radius"), whiteSpace: "pre", letterSpacing: n(P, "sub_ls"), WebkitTextStroke: st ? `${fs * st}px #000` : undefined, paintOrder: "stroke fill", textAlign: "center" }}>{text}</div>
+      <div data-el="sub" style={{ background: rgba(s(P, "sub_bg"), n(P, "sub_alpha")), color: s(P, "sub_color"), fontFamily: fam(P.sub_font, "Pretendard"), fontWeight: n(P, "sub_weight"), fontSize: fs, lineHeight: n(P, "sub_lh"), padding: `${fs * n(P, "sub_pad_y")}px ${fs * n(P, "sub_pad_x")}px`, borderRadius: fs * n(P, "sub_radius"), whiteSpace: "pre", letterSpacing: n(P, "sub_ls"), WebkitTextStroke: st ? `${fs * st}px #000` : undefined, paintOrder: "stroke fill", textAlign: "center" }}>{text}</div>
     </div>
   );
 };
@@ -63,8 +63,8 @@ const Label: React.FC<{ text: string; note?: string; H: number; W: number; P: P 
   const fs = H * n(P, "label_size"), ns = H * n(P, "note_size");
   return (
     <>
-      <div style={{ position: "absolute", left: W * n(P, "label_cx"), top: H * n(P, "label_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.label_font, "BMJUA"), fontSize: fs, color: s(P, "label_color"), WebkitTextStroke: `${fs * n(P, "label_stroke")}px ${s(P, "label_stroke_color")}`, paintOrder: "stroke fill", textShadow: "0 2px 6px rgba(0,0,0,0.35)", whiteSpace: "pre", letterSpacing: n(P, "label_ls") }}>{text}</div>
-      {note && <div style={{ position: "absolute", left: W * n(P, "note_cx"), top: H * n(P, "note_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.note_font, "BMJUA"), fontSize: ns, color: s(P, "note_color"), WebkitTextStroke: `${ns * n(P, "note_stroke")}px ${s(P, "label_stroke_color")}`, paintOrder: "stroke fill", whiteSpace: "pre" }}>{note}</div>}
+      <div data-el="label" style={{ position: "absolute", left: W * n(P, "label_cx"), top: H * n(P, "label_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.label_font, "BMJUA"), fontSize: fs, color: s(P, "label_color"), WebkitTextStroke: `${fs * n(P, "label_stroke")}px ${s(P, "label_stroke_color")}`, paintOrder: "stroke fill", textShadow: "0 2px 6px rgba(0,0,0,0.35)", whiteSpace: "pre", letterSpacing: n(P, "label_ls") }}>{text}</div>
+      {note && <div data-el="note" style={{ position: "absolute", left: W * n(P, "note_cx"), top: H * n(P, "note_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.note_font, "BMJUA"), fontSize: ns, color: s(P, "note_color"), WebkitTextStroke: `${ns * n(P, "note_stroke")}px ${s(P, "label_stroke_color")}`, paintOrder: "stroke fill", whiteSpace: "pre" }}>{note}</div>}
     </>
   );
 };
@@ -79,7 +79,7 @@ export const cardBox = (c: CardSpec, W: number, H: number, P: P) => {
 const Card: React.FC<{ c: CardSpec; H: number; W: number; P: P }> = ({ c, H, W, P }) => {
   const { w, h, cx, cy } = cardBox(c, W, H, P);
   return (
-    <div style={{ position: "absolute", left: cx - w / 2, top: cy - h / 2, width: w, height: h, borderRadius: h * n(P, "card_radius"), overflow: "hidden", boxShadow: n(P, "card_shadow") ? "0 8px 22px rgba(0,0,0,0.35)" : undefined, background: "#fff" }}>
+    <div data-el="card" style={{ position: "absolute", left: cx - w / 2, top: cy - h / 2, width: w, height: h, borderRadius: h * n(P, "card_radius"), overflow: "hidden", boxShadow: n(P, "card_shadow") ? "0 8px 22px rgba(0,0,0,0.35)" : undefined, background: "#fff" }}>
       <Img src={src(c.file)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
     </div>
   );
@@ -89,7 +89,7 @@ const FireText: React.FC<{ text: string; H: number; W: number; P: P }> = ({ text
   const fs = H * n(P, "fire_size");
   return (
     <div style={{ position: "absolute", left: W * n(P, "fire_cx"), top: H * n(P, "fire_cy"), transform: `translate(-50%,-50%) rotate(${n(P, "fire_rot")}deg)` }}>
-      <div style={{ fontFamily: FAM.Pretendard, fontWeight: 900, fontSize: fs, color: "#fff", letterSpacing: 1, background: "linear-gradient(180deg,#fff2a8 0%,#ffb000 45%,#ff3d00 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 10px rgba(255,120,0,0.9)) drop-shadow(0 0 22px rgba(255,60,0,0.6))", padding: "0 10px", whiteSpace: "pre" }}>{text}</div>
+      <div data-el="sub" style={{ fontFamily: FAM.Pretendard, fontWeight: 900, fontSize: fs, color: "#fff", letterSpacing: 1, background: "linear-gradient(180deg,#fff2a8 0%,#ffb000 45%,#ff3d00 100%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 10px rgba(255,120,0,0.9)) drop-shadow(0 0 22px rgba(255,60,0,0.6))", padding: "0 10px", whiteSpace: "pre" }}>{text}</div>
     </div>
   );
 };
@@ -107,7 +107,7 @@ const IntroCard: React.FC<{ it: Intro; H: number; W: number; P: P; fps: number }
         const sz = W * n(P, "intro_logo_w"); const x = W * (n(P, "intro_logo_x") + (i % 2) * 0.16), y = H * (n(P, "intro_logo_y") + Math.floor(i / 2) * 0.1 - (i % 2) * 0.05);
         return <div key={i} style={{ position: "absolute", left: x, top: y, width: sz, height: sz, borderRadius: sz * 0.22, background: "#fff", boxShadow: "0 8px 20px rgba(0,0,0,0.3)", overflow: "hidden" }}><Img src={src(lg)} style={{ width: "100%", height: "100%", objectFit: "contain", padding: sz * 0.12 }} /></div>;
       })}
-      <div style={{ position: "absolute", left: W * n(P, "intro_x"), top: H * n(P, "intro_y"), display: "flex", flexDirection: "column", gap: 4 }}>
+      <div data-el="intro" style={{ position: "absolute", left: W * n(P, "intro_x"), top: H * n(P, "intro_y"), display: "flex", flexDirection: "column", gap: 4 }}>
         {it.lines.map((l, i) => <div key={i} style={{ background: "#000", color: "#fff", fontFamily: fam(P.sub_font, "Pretendard"), fontWeight: 500, fontSize: fs, padding: `${fs * 0.15}px ${fs * 0.4}px`, whiteSpace: "pre", alignSelf: "flex-start" }}>{l}</div>)}
       </div>
     </>
@@ -126,7 +126,7 @@ const SceneView: React.FC<{ sc: BScene; data: BData; label?: string; note?: stri
       <AbsoluteFill style={{ background: "#000" }}>
         <div style={{ position: "absolute", left: 0, right: 0, top: H * n(P, "cta_cy"), transform: "translateY(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
           {data.logo && <Img src={src(data.logo)} style={{ width: lw, height: lw, borderRadius: "50%", objectFit: "cover", marginBottom: H * 0.02 }} />}
-          <div style={{ fontFamily: fam(P.cta_font, "Pretendard"), fontWeight: 800, fontSize: H * n(P, "cta_size"), color: s(P, "cta_color"), textAlign: "center", whiteSpace: "pre-line", padding: "0 60px" }}>{sc.cta ?? data.cta ?? ""}</div>
+          <div data-el="cta" style={{ fontFamily: fam(P.cta_font, "Pretendard"), fontWeight: 800, fontSize: H * n(P, "cta_size"), color: s(P, "cta_color"), textAlign: "center", whiteSpace: "pre-line", padding: "0 60px" }}>{sc.cta ?? data.cta ?? ""}</div>
         </div>
       </AbsoluteFill>
     );
