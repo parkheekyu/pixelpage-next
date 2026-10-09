@@ -136,8 +136,8 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
       const id = el.dataset.el as ElemId; const b = el.getBoundingClientRect(); if (!b.width) return;
       const k = { ...KEYS[id] };
       if (id === "sub" && scene?.hookFire) { k.sizeKey = "fire_size"; k.posKeys = ["fire_cx", "fire_cy"]; }
-      const pad = 4 / R.width;   // 살짝 여유
-      out.push({ id, x: (b.left + b.width / 2 - R.left) / R.width, y: (b.top + b.height / 2 - R.top) / R.height, w: b.width / R.width + pad * 2, h: b.height / R.height + pad * 2, ...k });
+      const px = 3 / R.width, py = 3 / R.height;   // 살짝 여유(3px)
+      out.push({ id, x: (b.left + b.width / 2 - R.left) / R.width, y: (b.top + b.height / 2 - R.top) / R.height, w: b.width / R.width + px * 2, h: b.height / R.height + py * 2, ...k });
     });
     setBoxes((prev) => (JSON.stringify(prev) === JSON.stringify(out) ? prev : out));
   }, [scene]);   // eslint-disable-line react-hooks/exhaustive-deps
