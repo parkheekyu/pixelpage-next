@@ -41,7 +41,7 @@ export const BGTALK_DEFAULTS: Record<string, number | string> = {
   note_cx: 0.5, note_cy: 0.335, note_size: 0.03, note_font: "BMJUA", note_color: "#ffffff", note_stroke: 0.035,
   card_radius: 0, card_shadow: 0,
   fire_cx: 0.5, fire_cy: 0.55, fire_size: 0.05, fire_rot: -2,
-  cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", logo_w: 0.22,
+  cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", cta_stroke: 0.08, logo_w: 0.22, ending_dim: 0,
   intro_x: 0.08, intro_y: 0.50, intro_size: 0.03, intro_logo_x: 0.6, intro_logo_y: 0.36, intro_logo_w: 0.17,
   bg_x: 0, bg_y: 0, bg_scale: 1,
   zone_x: 0.2, zone_y: 0.36, zone_w: 0.6, zone_h: 0.16,   // 요소(이미지) 세이프존(화면 비율): 이미지는 비율을 유지한 채 이 박스 안에 맞춰(contain) 가운데 놓인다. 씬별 x/y/w 가 있으면 그걸 우선
@@ -127,13 +127,13 @@ const SceneView: React.FC<{ sc: BScene; data: BData; label?: string; note?: stri
   const cur = sc.chunks.find((c) => frame >= c.s * fps && frame < c.e * fps) ?? (frame >= (sc.chunks.at(-1)?.e ?? 0) * fps ? sc.chunks.at(-1) : undefined);
   // 인트로 카드: 제목 3줄이 자막 역할 → 자막 박스 없음. intro.bg 가 없으면 메인 배경 유지
   if (sc.intro) return <AbsoluteFill><IntroCard it={sc.intro} H={H} W={W} P={P} fps={fps} /></AbsoluteFill>;
-  if (sc.ending) {
-    const lw = W * n(P, "logo_w");
+  if (sc.ending) {   // 엔딩: 배경 영상 유지(검정 화면 없음, 2026-10-09 사용자 지시) + 선택적 어둡게(ending_dim) + CTA
+    const lw = W * n(P, "logo_w"), dim = n(P, "ending_dim");
     return (
-      <AbsoluteFill style={{ background: "#000" }}>
+      <AbsoluteFill style={{ background: dim ? `rgba(0,0,0,${dim})` : "transparent" }}>
         <div style={{ position: "absolute", left: 0, right: 0, top: H * n(P, "cta_cy"), transform: "translateY(-50%)", display: "flex", flexDirection: "column", alignItems: "center" }}>
           {data.logo && <Img src={src(data.logo)} style={{ width: lw, height: lw, borderRadius: "50%", objectFit: "cover", marginBottom: H * 0.02 }} />}
-          <div data-el="cta" style={{ fontFamily: fam(P.cta_font, "Pretendard"), fontWeight: 800, fontSize: H * n(P, "cta_size"), color: s(P, "cta_color"), textAlign: "center", whiteSpace: "pre-line", padding: "0 60px" }}>{sc.cta ?? data.cta ?? ""}</div>
+          <div data-el="cta" style={{ fontFamily: fam(P.cta_font, "Pretendard"), fontWeight: 800, fontSize: H * n(P, "cta_size"), color: s(P, "cta_color"), textAlign: "center", whiteSpace: "pre-line", padding: "0 60px", WebkitTextStroke: `${H * n(P, "cta_size") * n(P, "cta_stroke")}px #000`, paintOrder: "stroke fill", textShadow: "0 2px 10px rgba(0,0,0,0.6)" }}>{sc.cta ?? data.cta ?? ""}</div>
         </div>
       </AbsoluteFill>
     );
