@@ -55,6 +55,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
   const [peaks, setPeaks] = useState<Float32Array | null>(null);
 
   const fps = data.fps, total = data.total, durF = Math.ceil(total * fps);
+  const inputProps = useMemo(() => ({ data: data as unknown as ProjectData }), [data]);   // 프레임 변화로는 컴포지션을 다시 그리지 않음(재생 끊김 방지)
   const t = frame / fps;
   const P = data.preset as Params;
   const num = useCallback((k: string) => Number(P[k] ?? BGTALK_DEFAULTS[k] ?? 0), [P]);
@@ -145,6 +146,23 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
   useEffect(() => { const id = setInterval(measure, 250); window.addEventListener("resize", measure); return () => { clearInterval(id); window.removeEventListener("resize", measure); }; }, [measure]);
 
   const [sel, setSel] = useState<ElemId | null>(null);
+  // 더블클릭 인라인 텍스트 편집: 어떤 요소의 어떤 텍스트를 고치는지 결정
+  type Inline = { id: ElemId; box: Box; value: string; apply: (d: EditData, v: string) => void };
+  const [inline, setInline] = useState<Inline | null>(null);
+  const definingScene = (key: "label" | "note") => { for (let i = si; i >= 0; i--) { if (data.scenes[i][key] !== undefined) return i; if (data.scenes[i].intro || data.scenes[i].ending) break; } return si; };
+  const startInline = (box: Box) => {
+    if (!scene) return;
+    let value = "", apply: Inline["apply"] | null = null;
+    if (box.id === "sub") { const ci = scene.chunks.findIndex((c) => c === curChunk); if (ci < 0) return; value = curChunk!.t; apply = (d, v) => { d.scenes[si].chunks[ci].t = v; }; }
+    else if (box.id === "label") { const di = definingScene("label"); value = live.label ?? ""; apply = (d, v) => { d.scenes[di].label = v; }; }
+    else if (box.id === "note") { const di = definingScene("note"); value = live.note ?? ""; apply = (d, v) => { d.scenes[di].note = v; }; }
+    else if (box.id === "cta") { value = data.cta ?? ""; apply = (d, v) => { d.cta = v; }; }
+    else if (box.id === "intro" && scene.intro) { value = scene.intro.lines.join("\n"); apply = (d, v) => { d.scenes[si].intro!.lines = v.split("\n"); }; }
+    if (!apply) return;
+    player.current?.pause();
+    setInline({ id: box.id, box, value, apply });
+  };
+  const finishInline = (commitIt: boolean) => { if (!inline) return; const { apply, value } = inline; setInline(null); if (commitIt) commit((d) => apply(d, value)); };
   const [guides, setGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const SNAP = 0.012;   // 스냅 거리(화면 비율)
   /** 마그넷: 캔버스 중앙·3등분·안전 여백 + 다른 요소의 중심/가장자리에 붙인다 */
@@ -246,13 +264,21 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
         {/* 캔버스 */}
         <div className="vx-stage">
           <div className="vx-canvas" ref={canvasRef} onMouseDown={(e) => e.stopPropagation()}>
-            <Player ref={player} component={Comp} inputProps={{ data: data as unknown as ProjectData }} durationInFrames={durF} fps={fps} compositionWidth={data.width} compositionHeight={data.height}
-              style={{ width: "100%", height: "100%" }} controls={false} clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} />
+            <Player ref={player} component={Comp} inputProps={inputProps} durationInFrames={durF} fps={fps} compositionWidth={data.width} compositionHeight={data.height}
+              style={{ width: "100%", height: "100%" }} controls={false} clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} acknowledgeRemotionLicense />
             <div className="vx-overlay" onMouseDown={() => setSel(null)}>
               {guides.x.map((g) => <div key={`gx${g}`} className="vx-snap v" style={{ left: `${g * 100}%` }} />)}
               {guides.y.map((g) => <div key={`gy${g}`} className="vx-snap h" style={{ top: `${g * 100}%` }} />)}
-              {boxes.map((b) => (
-                <div key={b.id} className={`vx-box ${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} title={TABS.find(([id]) => id === b.id)?.[1]}>
+              {inline && (
+                <textarea className="vx-inline-edit" autoFocus value={inline.value} spellCheck={false}
+                  style={{ left: `${(inline.box.x - inline.box.w / 2) * 100}%`, top: `${(inline.box.y - inline.box.h / 2) * 100}%`, minWidth: `${inline.box.w * 100}%`, minHeight: `${inline.box.h * 100}%`, fontSize: `${(inline.box.h / (inline.value.split("\n").length || 1)) * 0.55 * 100}cqh` }}
+                  onChange={(e) => setInline((s) => (s ? { ...s, value: e.target.value } : s))}
+                  onMouseDown={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && inline.id !== "intro") { e.preventDefault(); finishInline(true); } if (e.key === "Escape") finishInline(false); }}
+                  onBlur={() => finishInline(true)} />
+              )}
+              {boxes.filter((b) => !inline || b.id !== inline.id).map((b) => (
+                <div key={b.id} className={`vx-box ${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} onDoubleClick={(e) => { e.stopPropagation(); startInline(b); }} title={`${TABS.find(([id]) => id === b.id)?.[1]} · 더블클릭으로 글자 수정`}>
                   {(b.sizeKey || b.id === "bg") && <i className="vx-handle" onMouseDown={onBoxDown(b, "size")} />}
                   <em>{TABS.find(([id]) => id === b.id)?.[1]}</em>
                 </div>
