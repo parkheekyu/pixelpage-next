@@ -124,7 +124,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
   type Box = { id: ElemId; x: number; y: number; w: number; h: number; sizeKey?: string; posKeys?: [string, string] };
   const KEYS: Record<ElemId, { sizeKey?: string; posKeys?: [string, string] }> = {
     label: { sizeKey: "label_size", posKeys: ["label_cx", "label_cy"] }, note: { sizeKey: "note_size", posKeys: ["note_cx", "note_cy"] },
-    card: { sizeKey: "card_h", posKeys: ["card_cx", "card_cy"] }, sub: { sizeKey: "sub_size", posKeys: ["sub_cx", "sub_cy"] },
+    card: { sizeKey: "zone_w" }, sub: { sizeKey: "sub_size", posKeys: ["sub_cx", "sub_cy"] },
     cta: { sizeKey: "cta_size", posKeys: ["", "cta_cy"] }, intro: { sizeKey: "intro_size", posKeys: ["intro_x", "intro_y"] }, bg: {}, zone: {},
   };
   const [boxes, setBoxes] = useState<Box[]>([]);
@@ -180,19 +180,12 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
   const finishInline = (commitIt: boolean) => { if (!inline) return; const { apply, value } = inline; setInline(null); if (commitIt) commit((d) => apply(d, value)); };
   const [guides, setGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const SNAP = 0.012;   // 스냅 거리(화면 비율)
-  const zone = { x: num("zone_x"), y: num("zone_y"), w: num("zone_w"), h: num("zone_h"), lock: !!num("zone_lock") };
-  /** 요소 노출 영역 안으로 중심 좌표 제한 */
-  const clampZone = useCallback((box: Box, nx: number, ny: number) => {
-    const z = { x: Number(P.zone_x ?? 0.05), y: Number(P.zone_y ?? 0.15), w: Number(P.zone_w ?? 0.9), h: Number(P.zone_h ?? 0.55), lock: Number(P.zone_lock ?? 1) };
-    if (!z.lock) return { x: nx, y: ny };
-    const x = box.w <= z.w ? Math.min(Math.max(nx, z.x + box.w / 2), z.x + z.w - box.w / 2) : nx;
-    const y = box.h <= z.h ? Math.min(Math.max(ny, z.y + box.h / 2), z.y + z.h - box.h / 2) : ny;
-    return { x, y };
-  }, [P]);
+  const zone = { x: num("zone_x"), y: num("zone_y"), w: num("zone_w"), h: num("zone_h") };   // 요소(이미지) 세이프존
+  const clampZone = useCallback((_box: Box, nx: number, ny: number) => ({ x: nx, y: ny }), []);
   /** 마그넷: 캔버스 중앙·3등분·안전 여백 + 다른 요소의 중심/가장자리에 붙인다 */
   const snapTo = useCallback((box: Box, nx: number, ny: number, others: Box[], off: boolean) => {
     if (off) return { x: nx, y: ny, gx: [] as number[], gy: [] as number[] };
-    const z = { x: Number(P.zone_x ?? 0.05), y: Number(P.zone_y ?? 0.15), w: Number(P.zone_w ?? 0.9), h: Number(P.zone_h ?? 0.55) };
+    const z = { x: Number(P.zone_x ?? 0.2), y: Number(P.zone_y ?? 0.36), w: Number(P.zone_w ?? 0.6), h: Number(P.zone_h ?? 0.16) };
     const tx: number[] = [0.5, 1 / 3, 2 / 3, 0.05 + box.w / 2, 0.95 - box.w / 2, z.x + z.w / 2, z.x + box.w / 2, z.x + z.w - box.w / 2];
     const ty: number[] = [0.5, 1 / 3, 2 / 3, 0.05 + box.h / 2, 0.95 - box.h / 2, z.y + z.h / 2, z.y + box.h / 2, z.y + z.h - box.h / 2];
     for (const o of others) {
@@ -218,7 +211,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     const rect = canvasRef.current!.getBoundingClientRect();
     const ck: "card" | "card2" = card2On ? "card2" : "card";
     const cardNow = scene?.[ck];
-    const v0: [number, number] = box.id === "bg" ? [num("bg_x"), num("bg_y")] : box.id === "card" ? [cardNow?.x ?? num("card_cx"), cardNow?.y ?? num("card_cy")] : box.posKeys ? [num(box.posKeys[0]), num(box.posKeys[1])] : [0, 0];
+    const v0: [number, number] = box.id === "bg" ? [num("bg_x"), num("bg_y")] : box.id === "card" ? [cardNow?.x ?? zone.x + zone.w / 2, cardNow?.y ?? zone.y + zone.h / 2] : box.posKeys ? [num(box.posKeys[0]), num(box.posKeys[1])] : [0, 0];
     const s0 = box.id === "bg" ? num("bg_scale") : box.id === "card" ? box.w : box.sizeKey ? num(box.sizeKey) : 0;
     dragRef.current = { box, mode, x0: e.clientX, y0: e.clientY, v0, s0, snap: data };
     const move = (ev: MouseEvent) => {
@@ -253,7 +246,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
   };
   const boxesRef = useRef<Box[]>([]); useEffect(() => { boxesRef.current = boxes; }, [boxes]);
   const onZoneDown = (mode: "move" | "size") => (e: React.MouseEvent) => {
-    e.stopPropagation(); e.preventDefault(); setTab("zone"); setSel("zone");
+    e.stopPropagation(); e.preventDefault(); setTab("card"); setSel("zone");
     const rect = canvasRef.current!.getBoundingClientRect(); const z0 = { ...zone }; const x0 = e.clientX, y0 = e.clientY; const snap = data;
     const move = (ev: MouseEvent) => {
       const dx = (ev.clientX - x0) / rect.width, dy = (ev.clientY - y0) / rect.height;
@@ -294,7 +287,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
 
   const C: Ctl = { num, str, setP };
 
-  const TABS: [Tab, string][] = [["scene", "씬·자막 내용"], ["label", "라벨"], ["note", "메모"], ["card", "요소"], ["sub", "자막"], ["bg", "배경"], ["zone", "영역"], ["cta", "엔딩"]];
+  const TABS: [Tab, string][] = [["scene", "씬·자막 내용"], ["label", "라벨"], ["note", "메모"], ["card", "요소"], ["sub", "자막"], ["bg", "배경"], ["cta", "엔딩"]];
   const chunkTotal = data.scenes.reduce((a, s) => a + s.chunks.length, 0);
 
   return (
@@ -322,9 +315,9 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
             <div className="vx-overlay" onMouseDown={() => setSel(null)}>
               {guides.x.map((g) => <div key={`gx${g}`} className="vx-snap v" style={{ left: `${g * 100}%` }} />)}
               {guides.y.map((g) => <div key={`gy${g}`} className="vx-snap h" style={{ top: `${g * 100}%` }} />)}
-              <div className={`vx-zone ${tab === "zone" ? "on" : ""} ${zone.lock ? "" : "off"}`} style={{ left: `${zone.x * 100}%`, top: `${zone.y * 100}%`, width: `${zone.w * 100}%`, height: `${zone.h * 100}%` }} onMouseDown={tab === "zone" ? onZoneDown("move") : undefined}>
-                <em>요소 노출 영역{zone.lock ? "" : " (제한 꺼짐)"}</em>
-                {tab === "zone" && <i className="vx-handle" onMouseDown={onZoneDown("size")} />}
+              <div className={`vx-zone ${tab === "card" ? "on" : ""}`} style={{ left: `${zone.x * 100}%`, top: `${zone.y * 100}%`, width: `${zone.w * 100}%`, height: `${zone.h * 100}%` }} onMouseDown={tab === "card" ? onZoneDown("move") : undefined}>
+                <em>요소 세이프존</em>
+                {tab === "card" && <i className="vx-handle" onMouseDown={onZoneDown("size")} />}
               </div>
               {inline && (
                 <textarea className="vx-inline-edit" autoFocus value={inline.value} spellCheck={false} onFocus={(e) => e.target.select()}
@@ -334,7 +327,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
                   onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey && inline.id !== "intro") { e.preventDefault(); finishInline(true); } if (e.key === "Escape") finishInline(false); }}
                   onBlur={() => finishInline(true)} />
               )}
-              {boxes.filter((b) => (!inline || b.id !== inline.id) && !(tab === "zone" && b.id !== "bg")).map((b) => (
+              {boxes.filter((b) => (!inline || b.id !== inline.id) && true).map((b) => (
                 <div key={b.id} className={`vx-box el-${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} onDoubleClick={(e) => { e.stopPropagation(); startInline(b); }} title={`${TABS.find(([id]) => id === b.id)?.[1]} · 더블클릭으로 글자 수정`}>
                   {(b.sizeKey || b.id === "bg") && <i className="vx-handle" onMouseDown={onBoxDown(b, "size")} />}
                   {b.id !== "bg" && (sel === b.id || tab === b.id) && <button type="button" className="vx-del" title="삭제 (Delete)" onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }} onClick={(e) => { e.stopPropagation(); setSel(b.id); deleteSelected(); }}>✕</button>}
@@ -364,7 +357,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
                           <button type="button" className={`vx-cardpick ${!scene[ck] ? "on" : ""}`} onClick={() => commit((d) => { delete d.scenes[si][ck]; })}>없음</button>
                           {edit.assets.map((a: EditAsset) => <button type="button" key={a.url} className={`vx-cardpick ${scene[ck]?.file === a.url ? "on" : ""}`} title={a.label ?? ""} onClick={() => commit((d) => { const cur = (d.scenes[si][ck] ?? {}) as Partial<CardSpec>; d.scenes[si][ck] = { ...cur, file: a.url, aspect: a.aspect, ...(ck === "card2" && cur.at == null ? { at: 0.5 } : {}) }; })}><img src={a.url} alt="" /></button>)}
                         </div>
-                        {scene[ck] && <div className="vx-inline"><small>폭</small><input type="range" min={0.2} max={0.95} step={0.01} value={scene[ck]!.w ?? num("card_w")} onChange={(e) => liveSet((d) => { d.scenes[si][ck]!.w = Number(e.target.value); })} />{ck === "card2" && <><small>시점</small><input type="range" min={0.1} max={0.9} step={0.05} value={scene.card2!.at ?? 0.5} onChange={(e) => liveSet((d) => { d.scenes[si].card2!.at = Number(e.target.value); })} /></>}</div>}
+                        {scene[ck] && <div className="vx-inline"><small>폭</small><input type="range" min={0.2} max={0.95} step={0.01} value={scene[ck]!.w ?? zone.w} onChange={(e) => liveSet((d) => { d.scenes[si][ck]!.w = Number(e.target.value); })} />{ck === "card2" && <><small>시점</small><input type="range" min={0.1} max={0.9} step={0.05} value={scene.card2!.at ?? 0.5} onChange={(e) => liveSet((d) => { d.scenes[si].card2!.at = Number(e.target.value); })} /></>}</div>}
                       </Row>
                     ))}
                   </>
@@ -402,20 +395,20 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               <PosField c={C} xk="note_cx" yk="note_cy" />
             </>}
             {tab === "card" && <>
-              <h3>요소 <small>캡처·로고를 날것 그대로 배치. 캔버스에서 끌어 위치, 모서리 핸들로 크기 (씬마다 따로)</small></h3>
+              <h3>요소 <small>이 씬의 이미지. 기본은 세이프존에 맞춰지고, 캔버스에서 끌거나 핸들로 키우면 이 씬만 수동값이 됩니다</small></h3>
               {liveCard ? (
                 <>
-                  <Row label="이 씬 폭"><input type="range" min={0.05} max={1} step={0.005} value={(liveCard as CardSpec).w ?? num("card_w")} onChange={(e) => liveSet((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) c.w = Number(e.target.value); })} /><code>{((liveCard as CardSpec).w ?? num("card_w")).toFixed(3)}</code></Row>
-                  <Row label="이 씬 위치"><NumField c={{ num: (k) => Number((liveCard as CardSpec)[k === "x" ? "x" : "y"] ?? num(k === "x" ? "card_cx" : "card_cy")), str, setP: (k, v) => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) (c as Record<string, unknown>)[k] = v; }) }} k="x" step={0.005} min={0} max={1} /><NumField c={{ num: (k) => Number((liveCard as CardSpec)[k === "x" ? "x" : "y"] ?? num(k === "x" ? "card_cx" : "card_cy")), str, setP: (k, v) => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) (c as Record<string, unknown>)[k] = v; }) }} k="y" step={0.005} min={0} max={1} /><small className="vx-hint">X · Y</small></Row>
-                  <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) { delete c.x; delete c.y; delete c.w; } })}>기본 크기·위치로</button></Row>
+                  <Row label="이 씬 폭"><input type="range" min={0.05} max={1} step={0.005} value={(liveCard as CardSpec).w ?? zone.w} onChange={(e) => liveSet((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) c.w = Number(e.target.value); })} /><code>{((liveCard as CardSpec).w ?? zone.w).toFixed(3)}</code></Row>
+                  <Row label="이 씬 위치"><NumField c={{ num: (k) => Number((liveCard as CardSpec)[k === "x" ? "x" : "y"] ?? (k === "x" ? zone.x + zone.w / 2 : zone.y + zone.h / 2)), str, setP: (k, v) => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) (c as Record<string, unknown>)[k] = v; }) }} k="x" step={0.005} min={0} max={1} /><NumField c={{ num: (k) => Number((liveCard as CardSpec)[k === "x" ? "x" : "y"] ?? (k === "x" ? zone.x + zone.w / 2 : zone.y + zone.h / 2)), str, setP: (k, v) => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) (c as Record<string, unknown>)[k] = v; }) }} k="y" step={0.005} min={0} max={1} /><small className="vx-hint">X · Y</small></Row>
+                  <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) { delete c.x; delete c.y; delete c.w; } })}>세이프존에 맞추기</button></Row>
                 </>
               ) : <p className="vx-hint">이 씬에는 요소가 없습니다. 씬·자막 내용 탭에서 넣으세요.</p>}
-              <h3>기본값 <small>씬별 값이 없을 때</small></h3>
-              <Row label="기본 높이"><NumField c={C} k="card_h" scale={H_REF} step={5} unit="px" /></Row>
-              <Row label="기본 폭"><NumField c={C} k="card_w" step={0.01} min={0.1} max={1} /></Row>
+              <h3>요소 세이프존 <small>이미지는 비율을 유지한 채 이 박스 안에 꽉 맞게 들어갑니다. 캔버스의 하늘색 박스를 끌어 이동, 모서리로 크기</small></h3>
+              <Row label="위치"><NumField c={C} k="zone_x" step={0.01} min={0} max={1} /><NumField c={C} k="zone_y" step={0.01} min={0} max={1} /><small className="vx-hint">왼쪽 · 위 (0~1)</small></Row>
+              <Row label="크기"><NumField c={C} k="zone_w" step={0.01} min={0.05} max={1} /><NumField c={C} k="zone_h" step={0.01} min={0.05} max={1} /><small className="vx-hint">너비 · 높이 (0~1)</small></Row>
+              <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { d.preset.zone_x = 0.2; d.preset.zone_y = 0.36; d.preset.zone_w = 0.6; d.preset.zone_h = 0.16; })}>기본 세이프존</button><button type="button" className="vx-btn" onClick={() => commit((d) => { for (const s of d.scenes) for (const k of ["card", "card2"] as const) { const c = s[k]; if (c) { delete c.x; delete c.y; delete c.w; } } })}>모든 씬 수동값 지우기</button></Row>
               <Row label="모서리"><NumField c={C} k="card_radius" step={0.01} min={0} max={0.5} /></Row>
               <Row label="그림자"><label className="vx-chk"><input type="checkbox" checked={!!num("card_shadow")} onChange={(e) => setP("card_shadow", e.target.checked ? 1 : 0)} /> 표시</label></Row>
-              <PosField c={C} xk="card_cx" yk="card_cy" />
             </>}
             {tab === "sub" && <>
               <h3>자막 <small>말하는 구절 박스</small></h3>
@@ -441,14 +434,6 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               <Row label="확대"><input type="range" min={0.5} max={3} step={0.01} value={num("bg_scale")} onChange={(e) => liveSet((d) => { d.preset.bg_scale = Number(e.target.value); })} /><code>{num("bg_scale").toFixed(2)}×</code></Row>
               <Row label="이동"><NumField c={C} k="bg_x" step={0.01} min={-1} max={1} /><NumField c={C} k="bg_y" step={0.01} min={-1} max={1} /><small className="vx-hint">X · Y (화면 비율)</small></Row>
               <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { d.preset.bg_x = 0; d.preset.bg_y = 0; d.preset.bg_scale = 1; })}>원위치</button></Row>
-            </>}
-            {tab === "zone" && <>
-              <h3>요소 노출 영역 <small>라벨·메모·요소·자막이 이 안에서만 배치됩니다. 캔버스에서 끌어 이동, 모서리로 크기</small></h3>
-              <Row label="제한"><label className="vx-chk"><input type="checkbox" checked={zone.lock} onChange={(e) => setP("zone_lock", e.target.checked ? 1 : 0)} /> 영역 밖으로 못 나가게</label></Row>
-              <Row label="위치"><NumField c={C} k="zone_x" step={0.01} min={0} max={1} /><NumField c={C} k="zone_y" step={0.01} min={0} max={1} /><small className="vx-hint">왼쪽 · 위 (0~1)</small></Row>
-              <Row label="크기"><NumField c={C} k="zone_w" step={0.01} min={0.1} max={1} /><NumField c={C} k="zone_h" step={0.01} min={0.1} max={1} /><small className="vx-hint">너비 · 높이 (0~1)</small></Row>
-              <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { d.preset.zone_x = 0.05; d.preset.zone_y = 0.15; d.preset.zone_w = 0.9; d.preset.zone_h = 0.55; })}>기본 영역</button><button type="button" className="vx-btn" onClick={() => commit((d) => { d.preset.zone_x = 0; d.preset.zone_y = 0; d.preset.zone_w = 1; d.preset.zone_h = 1; })}>전체 화면</button></Row>
-              <p className="vx-hint">요소 기본 크기도 이 영역 안에 맞춰지고, 드래그할 때 영역 가장자리·중심에 스냅됩니다.</p>
             </>}
             {tab === "cta" && <>
               <h3>엔딩 <small>검정 화면 + CTA</small></h3>

@@ -39,12 +39,12 @@ export const BGTALK_DEFAULTS: Record<string, number | string> = {
   sub_cx: 0.5, sub_cy: 0.60, sub_size: 0.031, sub_alpha: 0.8, sub_font: "Pretendard", sub_weight: 400, sub_color: "#ffffff", sub_bg: "#000000", sub_lh: 1.25, sub_ls: -0.3, sub_pad_y: 0.12, sub_pad_x: 0.32, sub_radius: 0.12, sub_stroke: 0,
   label_cx: 0.5, label_cy: 0.26, label_size: 0.048, label_font: "BMJUA", label_color: "#ffffff", label_stroke: 0.06, label_stroke_color: "#222222", label_ls: 0,
   note_cx: 0.5, note_cy: 0.335, note_size: 0.03, note_font: "BMJUA", note_color: "#ffffff", note_stroke: 0.035,
-  card_cx: 0.5, card_cy: 0.44, card_h: 0.13, card_w: 0.6, card_radius: 0, card_shadow: 0,
+  card_radius: 0, card_shadow: 0,
   fire_cx: 0.5, fire_cy: 0.55, fire_size: 0.05, fire_rot: -2,
   cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", logo_w: 0.22,
   intro_x: 0.08, intro_y: 0.50, intro_size: 0.03, intro_logo_x: 0.6, intro_logo_y: 0.36, intro_logo_w: 0.17,
   bg_x: 0, bg_y: 0, bg_scale: 1,
-  zone_x: 0.05, zone_y: 0.15, zone_w: 0.9, zone_h: 0.55, zone_lock: 1,   // 요소 노출 영역(화면 비율). 편집기 드래그가 이 안으로 제한되고, 요소 기본 크기도 이 안에 맞춘다
+  zone_x: 0.2, zone_y: 0.36, zone_w: 0.6, zone_h: 0.16,   // 요소(이미지) 세이프존(화면 비율): 이미지는 비율을 유지한 채 이 박스 안에 맞춰(contain) 가운데 놓인다. 씬별 x/y/w 가 있으면 그걸 우선
 };
 const D = BGTALK_DEFAULTS;
 const n = (P: P, k: string) => Number(P[k] ?? D[k]);
@@ -74,14 +74,11 @@ const Label: React.FC<{ text: string; note?: string; H: number; W: number; P: P 
  *  c.w 가 있으면 그 폭(화면 비율)으로 고정하고 높이는 원본 비율. 없으면 card_w×card_h 안에 맞춘 기본 크기. 위치는 씬별 c.x/c.y, 없으면 card_cx/card_cy. */
 export const cardBox = (c: CardSpec, W: number, H: number, P: P) => {
   const asp = c.aspect ?? 1;
+  const zx = W * n(P, "zone_x"), zy = H * n(P, "zone_y"), zw = W * n(P, "zone_w"), zh = H * n(P, "zone_h");
   let w: number, h: number;
-  if (c.w != null) { w = W * c.w; h = w / asp; }
-  else { const maxH = H * Math.min(n(P, "card_h"), n(P, "zone_h")), maxW = W * Math.min(n(P, "card_w"), n(P, "zone_w")); h = maxH; w = h * asp; if (w > maxW) { w = maxW; h = w / asp; } }
-  let cx = W * (c.x ?? n(P, "card_cx")), cy = H * (c.y ?? n(P, "card_cy"));
-  if (n(P, "zone_lock")) {   // 영역 안으로 클램프
-    const zx = W * n(P, "zone_x"), zy = H * n(P, "zone_y"), zw = W * n(P, "zone_w"), zh = H * n(P, "zone_h");
-    if (w <= zw) cx = Math.min(Math.max(cx, zx + w / 2), zx + zw - w / 2); if (h <= zh) cy = Math.min(Math.max(cy, zy + h / 2), zy + zh - h / 2);
-  }
+  if (c.w != null) { w = W * c.w; h = w / asp; }                       // 씬별 수동 크기
+  else { w = zw; h = w / asp; if (h > zh) { h = zh; w = h * asp; } }   // 세이프존 안에 contain
+  const cx = c.x != null ? W * c.x : zx + zw / 2, cy = c.y != null ? H * c.y : zy + zh / 2;
   return { w, h, cx, cy };
 };
 
