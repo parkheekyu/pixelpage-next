@@ -92,7 +92,6 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     const k = (e: KeyboardEvent) => {
       const tag = (e.target as HTMLElement)?.tagName; if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
       if (e.code === "Space") { e.preventDefault(); player.current?.toggle(); }
-      if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); delRef.current?.(); }
       if ((e.metaKey || e.ctrlKey) && e.key === "z") { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
       if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); saveRef.current?.(); }
     };
@@ -164,7 +163,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     setInline({ id: box.id, box, value, apply });
   };
   /** 선택 요소 삭제: 요소(이미지)는 이 씬에서 제거, 라벨/메모는 이 씬부터 끔, 자막은 현재 청크 삭제, CTA 는 비움 */
-  const deleteSelected = useCallback(() => {
+  const deleteSelected = () => {
     if (!sel || !scene) return;
     const ck: "card" | "card2" = card2On ? "card2" : "card";
     if (sel === "card") commit((d) => { delete d.scenes[si][ck]; });
@@ -174,8 +173,11 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     else if (sel === "cta") commit((d) => { d.cta = ""; });
     else if (sel === "intro") commit((d) => { if (d.scenes[si].intro) d.scenes[si].intro!.lines = []; });
     setSel(null); setMsg("삭제됨 (⌘Z 로 되돌리기)");
-  }, [sel, scene, si, card2On, curChunk, commit]);
-  const delRef = useRef<() => void>(null); useEffect(() => { delRef.current = deleteSelected; });
+  };
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => { const tag = (e.target as HTMLElement)?.tagName; if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return; if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); deleteSelected(); } };
+    window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k);
+  });
   const finishInline = (commitIt: boolean) => { if (!inline) return; const { apply, value } = inline; setInline(null); if (commitIt) commit((d) => apply(d, value)); };
   const [guides, setGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
   const SNAP = 0.012;   // 스냅 거리(화면 비율)
@@ -309,7 +311,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               {boxes.filter((b) => !inline || b.id !== inline.id).map((b) => (
                 <div key={b.id} className={`vx-box ${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} onDoubleClick={(e) => { e.stopPropagation(); startInline(b); }} title={`${TABS.find(([id]) => id === b.id)?.[1]} · 더블클릭으로 글자 수정`}>
                   {(b.sizeKey || b.id === "bg") && <i className="vx-handle" onMouseDown={onBoxDown(b, "size")} />}
-                  {b.id !== "bg" && (sel === b.id || tab === b.id) && <button type="button" className="vx-del" title="삭제 (Delete)" onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }} onClick={(e) => { e.stopPropagation(); setSel(b.id); delRef.current?.(); }}>✕</button>}
+                  {b.id !== "bg" && (sel === b.id || tab === b.id) && <button type="button" className="vx-del" title="삭제 (Delete)" onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }} onClick={(e) => { e.stopPropagation(); setSel(b.id); deleteSelected(); }}>✕</button>}
                   <em>{TABS.find(([id]) => id === b.id)?.[1]}</em>
                 </div>
               ))}
