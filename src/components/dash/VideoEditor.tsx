@@ -266,9 +266,6 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     const up = () => { hist.current.past.push(snap); hist.current.future = []; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
     window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
   };
-    const up = () => { hist.current.past.push(snap); hist.current.future = []; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
-    window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
-  };
 
   // ---- 타임라인 청크 드래그 ----
   const cdrag = useRef<{ si: number; ci: number; edge: "s" | "e"; x0: number; s0: number; e0: number; snap: EditData } | null>(null);
