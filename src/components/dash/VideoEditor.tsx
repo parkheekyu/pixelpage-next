@@ -1,41 +1,76 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
-import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Player, type PlayerRef } from "@remotion/player";
-import { ArrowLeft, Clapperboard, Pause, Play, RotateCcw, Save, SkipBack, Trash2 } from "lucide-react";
+import { ChevronLeft, Pause, Play, Redo2, RotateCcw, SkipBack, Trash2, Undo2, ZoomIn, ZoomOut } from "lucide-react";
 import { COMPOSITIONS } from "@/remotion/registry";
+import { BGTALK_DEFAULTS, cardBox } from "@/remotion/compositions/BgTalk";
 import type { ProjectData } from "@/remotion/compositions/types";
 import type { CardSpec, EditAsset, EditData, EditScene, ProjectEdit } from "@/lib/dash/editor-types";
 import { requestRender, resetProjectEdit, saveProjectEdit } from "@/app/app/editor-actions";
 
 /**
- * 소재 편집기 (캡컷식): 실제 Remotion 컴포지션을 Player 로 재생하며
- *  - 타임라인: 씬 → 자막 청크 블록. 클릭 선택, 가장자리 드래그로 청크 시각 조절, 클릭으로 탐색
- *  - 캔버스: 자막·라벨·카드 세로 위치를 드래그로 이동(프리셋 값 수정)
- *  - 인스펙터: 청크 텍스트, 씬 라벨·메모·훅·카드(교체/폭/삭제), 전역 크기·투명도
- * 저장 → dash.project_edits.data. 렌더는 광고제작 머신이 editor_pull.py 로 받아 수행.
+ * 소재 편집기 (캡컷식, 전체화면 다크):
+ *  - 가운데 캔버스 = 실제 Remotion 컴포지션(Player). 요소(라벨·메모·카드·자막·배경·CTA)를 **직접 드래그**해 위치 이동, 모서리 핸들로 크기.
+ *  - 오른쪽 패널 = 탭(씬 / 라벨 / 메모 / 카드 / 자막 / 배경 / 엔딩): 폰트·사이즈·색상·배경색·테두리·행간·자간·위치 숫자.
+ *  - 아래 = 재생 컨트롤 + 파형 타임라인(자막 청크 블록, 가장자리 드래그로 시각).
+ *  저장 → dash.project_edits.data (프리셋 스칼라 + 씬 데이터). 최종 저장 = 저장 + 렌더 요청.
  */
 
-const fmt = (s: number) => `${Math.floor(s / 60)}:${(s % 60).toFixed(1).padStart(4, "0")}`;
-const PX_PER_SEC = 90;
-
-type Sel = { scene: number; chunk?: number } | null;
+type Params = Record<string, unknown>;
+type ElemId = "label" | "note" | "card" | "sub" | "bg" | "cta" | "intro";
+type Tab = "scene" | ElemId;
+const fmt = (sec: number) => `${String(Math.floor(sec / 60)).padStart(2, "0")}:${String(Math.floor(sec % 60)).padStart(2, "0")}.${String(Math.floor((sec % 1) * 10))}`;
+const FONTS: [string, string][] = [["Pretendard", "프리텐다드"], ["BMJUA", "배민 주아"], ["Jalnan2", "잘난체"], ["GumiRomance", "낭만있구미체"], ["BMYEONSUNG", "배민 연성"], ["BMEULJIRO", "배민 을지로"]];
+const SWATCH = ["#ffffff", "#ff3b30", "#ffcc00", "#34c759", "#5ac8fa", "#000000", "#FFE600", "#ff2d55"];
+const H_REF = 1920;
 
 export default function VideoEditor({ edit, projectId, projectName }: { edit: ProjectEdit; projectId: string; projectName: string }) {
+  const router = useRouter();
   const Comp = COMPOSITIONS[edit.composition];
   const [data, setData] = useState<EditData>(edit.data);
-  const [sel, setSel] = useState<Sel>(null);
+  const hist = useRef<{ past: EditData[]; future: EditData[] }>({ past: [], future: [] });
+  const [tab, setTab] = useState<Tab>("scene");
+  const [selChunk, setSelChunk] = useState<number | null>(null);
   const [frame, setFrame] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [zoom, setZoom] = useState(70);   // px/초
   const [pending, start] = useTransition();
   const player = useRef<PlayerRef>(null);
-  const tl = useRef<HTMLDivElement>(null);
-  const fps = data.fps, total = data.total, durF = Math.ceil(total * fps);
+  const saveRef = useRef<() => void>(null);
+  const canvasRef = useRef<HTMLDivElement>(null);
+  const tlRef = useRef<HTMLDivElement>(null);
+  const waveRef = useRef<HTMLCanvasElement>(null);
+  const [peaks, setPeaks] = useState<Float32Array | null>(null);
 
-  // Player 이벤트
+  const fps = data.fps, total = data.total, durF = Math.ceil(total * fps);
+  const t = frame / fps;
+  const P = data.preset as Params;
+  const num = useCallback((k: string) => Number(P[k] ?? BGTALK_DEFAULTS[k] ?? 0), [P]);
+  const str = (k: string) => String(P[k] ?? BGTALK_DEFAULTS[k] ?? "");
+  const si = useMemo(() => Math.max(0, data.scenes.findIndex((s) => t >= s.start && t < s.start + s.dur)), [data.scenes, t]);
+  const scene: EditScene | undefined = data.scenes[si];
+  // 현재 유효 라벨/메모(이전 씬에서 이어짐)
+  const live = useMemo(() => { let label: string | undefined, note: string | undefined; for (let i = 0; i <= si; i++) { const s = data.scenes[i]; if (s.label !== undefined) { label = s.label || undefined; note = s.note; } else if (s.note !== undefined) note = s.note; if (s.intro || s.ending) { label = undefined; note = undefined; } } return { label, note }; }, [data.scenes, si]);
+  const curChunk = scene?.chunks.find((c) => t - scene.start >= c.s && t - scene.start < c.e) ?? scene?.chunks.at(-1);
+  const card2On = scene?.card2 && t - scene.start >= (scene.card2.at ?? 0.5) * scene.dur;
+  const liveCard = card2On ? scene?.card2 : scene?.card;
+
+  // ---- 상태 변경(히스토리) ----
+  const commit = useCallback((fn: (d: EditData) => void) => {
+    setData((d) => { const nd = structuredClone(d); fn(nd); hist.current.past.push(d); if (hist.current.past.length > 80) hist.current.past.shift(); hist.current.future = []; return nd; });
+    setDirty(true);
+  }, []);
+  /** 드래그 중 연속 갱신(히스토리 1회만) */
+  const liveSet = useCallback((fn: (d: EditData) => void) => { setData((d) => { const nd = structuredClone(d); fn(nd); return nd; }); setDirty(true); }, []);
+  const undo = () => { const p = hist.current.past.pop(); if (!p) return; setData((d) => { hist.current.future.push(d); return p; }); };
+  const redo = () => { const f = hist.current.future.pop(); if (!f) return; setData((d) => { hist.current.past.push(d); return f; }); };
+  const setP = (k: string, v: unknown) => commit((d) => { d.preset[k] = v; });
+
+  // ---- Player ----
   useEffect(() => {
     const p = player.current; if (!p) return;
     const onF = (e: { detail: { frame: number } }) => setFrame(e.detail.frame);
@@ -43,166 +78,291 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     p.addEventListener("frameupdate", onF); p.addEventListener("play", onPlay); p.addEventListener("pause", onPause); p.addEventListener("ended", onPause);
     return () => { p.removeEventListener("frameupdate", onF); p.removeEventListener("play", onPlay); p.removeEventListener("pause", onPause); p.removeEventListener("ended", onPause); };
   }, []);
-  const seek = useCallback((sec: number) => { player.current?.seekTo(Math.max(0, Math.min(durF - 1, Math.round(sec * fps)))); }, [durF, fps]);
-  const t = frame / fps;
+  const seek = useCallback((sec: number) => player.current?.seekTo(Math.max(0, Math.min(durF - 1, Math.round(sec * fps)))), [durF, fps]);
+  useEffect(() => {
+    const k = (e: KeyboardEvent) => {
+      const tag = (e.target as HTMLElement)?.tagName; if (tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT") return;
+      if (e.code === "Space") { e.preventDefault(); player.current?.toggle(); }
+      if ((e.metaKey || e.ctrlKey) && e.key === "z") { e.preventDefault(); if (e.shiftKey) redo(); else undo(); }
+      if ((e.metaKey || e.ctrlKey) && e.key === "s") { e.preventDefault(); saveRef.current?.(); }
+    };
+    window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k);
+  });
+  useEffect(() => { const h = (e: BeforeUnloadEvent) => { if (dirty) e.preventDefault(); }; window.addEventListener("beforeunload", h); return () => window.removeEventListener("beforeunload", h); }, [dirty]);
 
-  // 재생 위치에 따라 선택 자동 추적(드래그 중 아님)
-  const curScene = useMemo(() => data.scenes.findIndex((s) => t >= s.start && t < s.start + s.dur), [data.scenes, t]);
+  // ---- 파형 ----
+  useEffect(() => {
+    let dead = false;
+    (async () => {
+      try {
+        const buf = await (await fetch(data.audio)).arrayBuffer();
+        const ctx = new AudioContext(); const ab = await ctx.decodeAudioData(buf); ctx.close();
+        const ch = ab.getChannelData(0); const N = Math.ceil(ab.duration * 50); const out = new Float32Array(N); const step = Math.floor(ch.length / N);
+        for (let i = 0; i < N; i++) { let m = 0; for (let j = i * step; j < (i + 1) * step; j += 4) { const v = Math.abs(ch[j] ?? 0); if (v > m) m = v; } out[i] = m; }
+        if (!dead) setPeaks(out);
+      } catch { /* 파형 없이 진행 */ }
+    })();
+    return () => { dead = true; };
+  }, [data.audio]);
+  useEffect(() => {
+    const cv = waveRef.current; if (!cv || !peaks) return;
+    const w = Math.ceil(total * zoom), h = 56; cv.width = w; cv.height = h;
+    const g = cv.getContext("2d")!; g.clearRect(0, 0, w, h); g.fillStyle = "rgba(120,130,255,0.55)";
+    for (let i = 0; i < peaks.length; i++) { const x = (i / 50) * zoom; const a = peaks[i] * h * 0.95; g.fillRect(x, h / 2 - a / 2, Math.max(1, zoom / 50 - 0.5), a); }
+  }, [peaks, total, zoom]);
 
-  const update = (fn: (d: EditData) => void) => { setData((d) => { const n = structuredClone(d); fn(n); return n; }); setDirty(true); };
-  const setParam = (k: string, v: unknown) => update((d) => { d.preset[k] = v; });
-  const num = (k: string, dflt: number) => Number(data.preset[k] ?? dflt);
+  // ---- 캔버스 요소 박스(화면 비율) ----
+  type Box = { id: ElemId; x: number; y: number; w: number; h: number; sizeKey?: string; posKeys?: [string, string] };
+  const boxes: Box[] = useMemo(() => {
+    if (!scene) return [];
+    const W = data.width, Hh = data.height, out: Box[] = [];
+    const textBox = (id: ElemId, text: string, cxK: string, cyK: string, sizeK: string, padX = 0.4): Box => { const fs = num(sizeK); const w = Math.min(0.96, fs * (Hh / W) * (text.length * 0.56 + padX * 2)); return { id, x: num(cxK), y: num(cyK), w, h: fs * 1.5, sizeKey: sizeK, posKeys: [cxK, cyK] }; };
+    if (scene.ending) { out.push({ id: "cta", x: 0.5, y: num("cta_cy"), w: 0.8, h: num("cta_size") * 3.2, sizeKey: "cta_size", posKeys: ["", "cta_cy"] }); return out; }
+    out.push({ id: "bg", x: 0.5, y: 0.5, w: 1, h: 1 });
+    if (scene.intro) { out.push({ id: "intro", x: num("intro_x") + 0.2, y: num("intro_y") + num("intro_size") * 2.2, w: 0.4, h: num("intro_size") * 4.6, sizeKey: "intro_size", posKeys: ["intro_x", "intro_y"] }); return out; }
+    if (live.label) out.push(textBox("label", live.label, "label_cx", "label_cy", "label_size"));
+    if (live.note) out.push(textBox("note", live.note, "note_cx", "note_cy", "note_size"));
+    if (liveCard) { const b = cardBox(liveCard as CardSpec, W, Hh, P); out.push({ id: "card", x: b.cx / W, y: b.cy / Hh, w: b.w / W, h: b.h / Hh, sizeKey: "card_h", posKeys: ["card_cx", "card_cy"] }); }
+    if (curChunk) out.push(scene.hookFire ? textBox("sub", curChunk.t, "fire_cx", "fire_cy", "fire_size") : textBox("sub", curChunk.t, "sub_cx", "sub_cy", "sub_size", 0.32));
+    return out;
+  }, [scene, live, liveCard, curChunk, num, P, data.width, data.height]);
 
-  // ---- 타임라인 드래그(청크 경계) ----
-  const drag = useRef<{ si: number; ci: number; edge: "s" | "e"; x0: number; s0: number; e0: number } | null>(null);
-  const onEdgeDown = (si: number, ci: number, edge: "s" | "e") => (e: React.MouseEvent) => {
+  const [sel, setSel] = useState<ElemId | null>(null);
+  const dragRef = useRef<{ box: Box; mode: "move" | "size"; x0: number; y0: number; v0: [number, number]; s0: number; snap: EditData } | null>(null);
+  const onBoxDown = (box: Box, mode: "move" | "size") => (e: React.MouseEvent) => {
     e.stopPropagation(); e.preventDefault();
-    const c = data.scenes[si].chunks[ci]; drag.current = { si, ci, edge, x0: e.clientX, s0: c.s, e0: c.e }; setSel({ scene: si, chunk: ci });
+    setSel(box.id); setTab(box.id);
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const v0: [number, number] = box.id === "bg" ? [num("bg_x"), num("bg_y")] : box.posKeys ? [num(box.posKeys[0]), num(box.posKeys[1])] : [0, 0];
+    dragRef.current = { box, mode, x0: e.clientX, y0: e.clientY, v0, s0: box.id === "bg" ? num("bg_scale") : box.sizeKey ? num(box.sizeKey) : 0, snap: data };
     const move = (ev: MouseEvent) => {
-      const d = drag.current; if (!d) return;
-      const dt = (ev.clientX - d.x0) / PX_PER_SEC;
-      update((nd) => {
-        const sc = nd.scenes[d.si], ch = sc.chunks, c = ch[d.ci];
-        if (d.edge === "e") { const nv = Math.max(d.s0 + 0.1, Math.min(sc.dur, d.e0 + dt)); c.e = +nv.toFixed(2); if (ch[d.ci + 1]) ch[d.ci + 1].s = c.e; }
-        else { const prev = ch[d.ci - 1]; const lo = prev ? prev.s + 0.1 : 0; const nv = Math.max(lo, Math.min(d.e0 - 0.1, d.s0 + dt)); c.s = +nv.toFixed(2); if (prev) prev.e = c.s; }
+      const d = dragRef.current; if (!d) return;
+      const dx = (ev.clientX - d.x0) / rect.width, dy = (ev.clientY - d.y0) / rect.height;
+      liveSet((nd) => {
+        if (d.mode === "move") {
+          if (d.box.id === "bg") { nd.preset.bg_x = +(d.v0[0] + dx).toFixed(3); nd.preset.bg_y = +(d.v0[1] + dy).toFixed(3); }
+          else if (d.box.posKeys) { if (d.box.posKeys[0]) nd.preset[d.box.posKeys[0]] = +Math.min(0.98, Math.max(0.02, d.v0[0] + dx)).toFixed(3); nd.preset[d.box.posKeys[1]] = +Math.min(0.98, Math.max(0.02, d.v0[1] + dy)).toFixed(3); }
+        } else {
+          if (d.box.id === "bg") nd.preset.bg_scale = +Math.max(0.5, Math.min(3, d.s0 * (1 + dy * 2))).toFixed(3);
+          else if (d.box.sizeKey) nd.preset[d.box.sizeKey] = +Math.max(0.01, Math.min(0.6, d.s0 * (1 + dy * 3))).toFixed(4);
+        }
       });
     };
-    const up = () => { drag.current = null; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+    const up = () => { const d = dragRef.current; if (d) { hist.current.past.push(d.snap); hist.current.future = []; } dragRef.current = null; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
     window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
   };
 
-  // ---- 캔버스 드래그(세로 위치) ----
-  const canvas = useRef<HTMLDivElement>(null);
-  const cdrag = useRef<{ key: string; y0: number; v0: number; h: number } | null>(null);
-  const onCanvasDown = (e: React.MouseEvent) => {
-    const box = canvas.current?.getBoundingClientRect(); if (!box) return;
-    const y = (e.clientY - box.top) / box.height;
-    const cands: [string, number][] = [["sub_cy", num("sub_cy", 0.6)], ["label_cy", num("label_cy", 0.26)], ["note_cy", num("note_cy", 0.335)], ["card_cy", num("card_cy", 0.44)]];
-    const [key, v0] = cands.reduce((a, b) => (Math.abs(b[1] - y) < Math.abs(a[1] - y) ? b : a));
-    if (Math.abs(v0 - y) > 0.08) return;
-    e.preventDefault(); cdrag.current = { key, y0: e.clientY, v0, h: box.height }; setMsg(`${LABELS[key] ?? key} 이동 중`);
-    const move = (ev: MouseEvent) => { const d = cdrag.current; if (!d) return; const nv = Math.max(0.02, Math.min(0.98, d.v0 + (ev.clientY - d.y0) / d.h)); setParam(d.key, +nv.toFixed(3)); };
-    const up = () => { cdrag.current = null; setMsg(null); window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+  // ---- 타임라인 청크 드래그 ----
+  const cdrag = useRef<{ si: number; ci: number; edge: "s" | "e"; x0: number; s0: number; e0: number; snap: EditData } | null>(null);
+  const onEdgeDown = (sIdx: number, ci: number, edge: "s" | "e") => (e: React.MouseEvent) => {
+    e.stopPropagation(); e.preventDefault();
+    const c = data.scenes[sIdx].chunks[ci]; cdrag.current = { si: sIdx, ci, edge, x0: e.clientX, s0: c.s, e0: c.e, snap: data }; setSelChunk(ci); setTab("scene");
+    const move = (ev: MouseEvent) => {
+      const d = cdrag.current; if (!d) return; const dt = (ev.clientX - d.x0) / zoom;
+      liveSet((nd) => {
+        const sc = nd.scenes[d.si], ch = sc.chunks, cc = ch[d.ci];
+        if (d.edge === "e") { const nv = Math.max(d.s0 + 0.1, Math.min(sc.dur, d.e0 + dt)); cc.e = +nv.toFixed(2); if (ch[d.ci + 1]) ch[d.ci + 1].s = cc.e; }
+        else { const prev = ch[d.ci - 1]; const lo = prev ? prev.s + 0.1 : 0; const nv = Math.max(lo, Math.min(d.e0 - 0.1, d.s0 + dt)); cc.s = +nv.toFixed(2); if (prev) prev.e = cc.s; }
+      });
+    };
+    const up = () => { const d = cdrag.current; if (d) { hist.current.past.push(d.snap); hist.current.future = []; } cdrag.current = null; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
     window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
   };
 
-  // ---- 저장/렌더 ----
-  const save = () => start(async () => { const r = await saveProjectEdit(edit.id, data); setMsg(r.ok ? "저장됨" : r.error); if (r.ok) setDirty(false); });
-  const reset = () => { if (!confirm("모든 편집을 버리고 원본으로 되돌릴까요?")) return; start(async () => { const r = await resetProjectEdit(edit.id); if (r.ok && r.data) { setData(r.data); setDirty(false); } setMsg(r.ok ? r.message ?? null : r.error); }); };
-  const render = () => start(async () => { if (dirty) { const r = await saveProjectEdit(edit.id, data); if (!r.ok) { setMsg(r.error); return; } setDirty(false); } const r = await requestRender(edit.id); setMsg(r.ok ? r.message ?? null : r.error); });
+  // ---- 저장 ----
+  const save = () => start(async () => { const r = await saveProjectEdit(edit.id, data); setMsg(r.ok ? "임시 저장됨" : r.error); if (r.ok) setDirty(false); });
+  useEffect(() => { saveRef.current = save; });
+  const finalSave = () => start(async () => { const r = await saveProjectEdit(edit.id, data); if (!r.ok) { setMsg(r.error); return; } setDirty(false); const r2 = await requestRender(edit.id); setMsg(r2.ok ? "최종 저장 · 렌더 요청됨" : r2.error); });
+  const reset = () => { if (!confirm("모든 편집을 버리고 머신이 올린 원본으로 되돌릴까요?")) return; start(async () => { const r = await resetProjectEdit(edit.id); if (r.ok && r.data) { setData(r.data); setDirty(false); hist.current = { past: [], future: [] }; } setMsg(r.ok ? r.message ?? null : r.error); }); };
+  useEffect(() => { if (!msg) return; const id = setTimeout(() => setMsg(null), 2500); return () => clearTimeout(id); }, [msg]);
 
-  useEffect(() => { const h = (e: BeforeUnloadEvent) => { if (dirty) e.preventDefault(); }; window.addEventListener("beforeunload", h); return () => window.removeEventListener("beforeunload", h); }, [dirty]);
-  useEffect(() => { const k = (e: KeyboardEvent) => { if ((e.target as HTMLElement)?.tagName === "INPUT" || (e.target as HTMLElement)?.tagName === "TEXTAREA") return; if (e.code === "Space") { e.preventDefault(); player.current?.toggle(); } }; window.addEventListener("keydown", k); return () => window.removeEventListener("keydown", k); }, []);
+  if (!Comp) return <div className="vx"><div className="vx-top">편집기가 지원하지 않는 컴포지션: {edit.composition}</div></div>;
 
-  if (!Comp) return <div className="cpz-err">편집기가 아직 지원하지 않는 컴포지션: {edit.composition}</div>;
-  const selScene: EditScene | undefined = sel ? data.scenes[sel.scene] : undefined;
-  const selChunk = sel && sel.chunk != null ? selScene?.chunks[sel.chunk] : undefined;
+  // ---- 패널 컨트롤 헬퍼 ----
+  const px = (k: string) => Math.round(num(k) * H_REF);
+  const Row = ({ label, children }: { label: string; children: React.ReactNode }) => <div className="vx-row"><span>{label}</span><div>{children}</div></div>;
+  const Num = ({ k, step = 1, min, max, scale = 1, unit }: { k: string; step?: number; min?: number; max?: number; scale?: number; unit?: string }) => <label className="vx-num"><input type="number" step={step} min={min} max={max} value={+(num(k) * scale).toFixed(scale === 1 ? 3 : 0)} onChange={(e) => setP(k, Number(e.target.value) / scale)} />{unit && <small>{unit}</small>}</label>;
+  const Color = ({ k }: { k: string }) => <div className="vx-colors">{SWATCH.map((c) => <button key={c} type="button" className={`vx-sw ${str(k).toLowerCase() === c.toLowerCase() ? "on" : ""}`} style={{ background: c }} onClick={() => setP(k, c)} />)}<label className="vx-sw custom" title="직접 선택"><input type="color" value={/^#[0-9a-f]{6}$/i.test(str(k)) ? str(k) : "#ffffff"} onChange={(e) => setP(k, e.target.value)} />+</label></div>;
+  const Font = ({ k }: { k: string }) => <select className="vx-sel" value={str(k).replace(/ .*/, "")} onChange={(e) => setP(k, e.target.value)}>{FONTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>;
+  const Pos = ({ xk, yk }: { xk?: string; yk: string }) => <Row label="위치">{xk && <Num k={xk} step={0.005} min={0} max={1} />}<Num k={yk} step={0.005} min={0} max={1} /><small className="vx-hint">X · Y (0~1, 캔버스에서 드래그 가능)</small></Row>;
+
+  const TABS: [Tab, string][] = [["scene", "씬·자막 내용"], ["label", "라벨"], ["note", "메모"], ["card", "카드"], ["sub", "자막"], ["bg", "배경"], ["cta", "엔딩"]];
+  const chunkTotal = data.scenes.reduce((a, s) => a + s.chunks.length, 0);
 
   return (
-    <section className="ve">
-      <div className="cpz-head">
-        <div className="pa-title">
-          <Link href={`/app/presets/${projectId}`} className="btn" title="프리셋 목록"><ArrowLeft className="ico" aria-hidden /></Link>
-          <div><h2>{edit.name} <code>{edit.preset_key} · {edit.composition}</code></h2><div className="hint">{projectName} · {fmt(total)} · {data.scenes.length}씬 · 스페이스 = 재생/정지 · 캔버스에서 자막·라벨·카드를 위아래로 끌어 위치 조정</div></div>
-        </div>
-        <div className="controls">
-          <button type="button" className="btn" onClick={reset} disabled={pending}><RotateCcw className="ico" aria-hidden /> 원본</button>
-          <button type="button" className="btn" onClick={save} disabled={pending || !dirty}><Save className="ico" aria-hidden /> 저장{dirty ? " *" : ""}</button>
-          <button type="button" className="btn primary" onClick={render} disabled={pending}><Clapperboard className="ico" aria-hidden /> 렌더 요청</button>
+    <div className="vx" onMouseDown={() => setSel(null)}>
+      {/* 상단 바 */}
+      <div className="vx-top" onMouseDown={(e) => e.stopPropagation()}>
+        <button type="button" className="vx-back" onClick={() => { if (!dirty || confirm("저장하지 않은 편집이 있습니다. 나갈까요?")) router.push(`/app/presets/${projectId}`); }}><ChevronLeft className="ico" aria-hidden /> 뒤로가기</button>
+        <div className="vx-title"><b>{edit.name}</b><span>{projectName} · {edit.preset_key} · {fmt(total)} · {data.scenes.length}씬 {chunkTotal}청크</span></div>
+        <div className="vx-actions">
+          {msg && <span className="vx-msg">{msg}</span>}
+          <button type="button" className="vx-btn" onClick={undo} title="실행 취소 ⌘Z"><Undo2 className="ico" aria-hidden /></button>
+          <button type="button" className="vx-btn" onClick={redo} title="다시 실행 ⇧⌘Z"><Redo2 className="ico" aria-hidden /></button>
+          <button type="button" className="vx-btn" onClick={reset} disabled={pending}><RotateCcw className="ico" aria-hidden /> 원본</button>
+          <button type="button" className="vx-btn" onClick={save} disabled={pending || !dirty}>임시 저장{dirty ? " *" : ""}</button>
+          <button type="button" className="vx-btn primary" onClick={finalSave} disabled={pending}>최종 저장</button>
         </div>
       </div>
-      {msg && <div className={`cpz-err ${/저장됨|요청됨|되돌림|이동 중/.test(msg) ? "ok" : ""}`}>{msg}</div>}
 
-      <div className="ve-body">
-        <div className="ve-stage">
-          <div className="ve-canvas" ref={canvas} onMouseDown={onCanvasDown}>
+      <div className="vx-mid">
+        {/* 캔버스 */}
+        <div className="vx-stage">
+          <div className="vx-canvas" ref={canvasRef} onMouseDown={(e) => e.stopPropagation()}>
             <Player ref={player} component={Comp} inputProps={{ data: data as unknown as ProjectData }} durationInFrames={durF} fps={fps} compositionWidth={data.width} compositionHeight={data.height}
               style={{ width: "100%", height: "100%" }} controls={false} clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} />
-            <div className="ve-guide" style={{ top: `${num("label_cy", 0.26) * 100}%` }} data-k="라벨" />
-            <div className="ve-guide" style={{ top: `${num("card_cy", 0.44) * 100}%` }} data-k="카드" />
-            <div className="ve-guide" style={{ top: `${num("sub_cy", 0.6) * 100}%` }} data-k="자막" />
-          </div>
-          <div className="ve-transport">
-            <button type="button" className="btn" onClick={() => seek(0)} title="처음"><SkipBack className="ico" aria-hidden /></button>
-            <button type="button" className="btn primary" onClick={() => player.current?.toggle()}>{playing ? <Pause className="ico" aria-hidden /> : <Play className="ico" aria-hidden />}</button>
-            <span className="ve-time">{fmt(t)} / {fmt(total)}</span>
-            <input type="range" min={0} max={durF - 1} value={frame} onChange={(e) => player.current?.seekTo(Number(e.target.value))} />
+            <div className="vx-overlay" onMouseDown={() => setSel(null)}>
+              {boxes.map((b) => (
+                <div key={b.id} className={`vx-box ${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} title={TABS.find(([id]) => id === b.id)?.[1]}>
+                  {(b.sizeKey || b.id === "bg") && <i className="vx-handle" onMouseDown={onBoxDown(b, "size")} />}
+                  <em>{TABS.find(([id]) => id === b.id)?.[1]}</em>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
-        <aside className="ve-inspector">
-          {selScene ? (
-            <>
-              <h3>씬 {selScene.idx} <small>{fmt(selScene.start)} ~ {fmt(selScene.start + selScene.dur)}</small></h3>
-              <p className="hint">{selScene.text}</p>
-              {selChunk && (
-                <label className="ve-f"><b>자막 청크</b>
-                  <input value={selChunk.t} onChange={(e) => update((d) => { d.scenes[sel!.scene].chunks[sel!.chunk!].t = e.target.value; })} />
-                  <small>{selChunk.s.toFixed(2)}s ~ {selChunk.e.toFixed(2)}s · 타임라인 블록 가장자리를 끌어 시각 조절</small>
-                  <div className="controls">
-                    <button type="button" className="btn" onClick={() => update((d) => { const ch = d.scenes[sel!.scene].chunks, c = ch[sel!.chunk!]; const mid = +((c.s + c.e) / 2).toFixed(2); const words = c.t.split(" "); const a = words.slice(0, Math.ceil(words.length / 2)).join(" "), b = words.slice(Math.ceil(words.length / 2)).join(" ") || "…"; ch.splice(sel!.chunk!, 1, { t: a, s: c.s, e: mid }, { t: b, s: mid, e: c.e }); })}>둘로 나누기</button>
-                    {selScene.chunks.length > 1 && <button type="button" className="btn danger" onClick={() => update((d) => { const ch = d.scenes[sel!.scene].chunks, i = sel!.chunk!; const c = ch[i]; if (ch[i + 1]) ch[i + 1].s = c.s; else if (ch[i - 1]) ch[i - 1].e = c.e; ch.splice(i, 1); setSel({ scene: sel!.scene }); })}><Trash2 className="ico" aria-hidden /> 청크 삭제</button>}
-                  </div>
-                </label>
-              )}
-              {!selScene.intro && !selScene.ending && (
-                <>
-                  <label className="ve-f"><b>섹션 라벨</b><input value={selScene.label ?? ""} placeholder="(이전 라벨 유지) · 빈 문자열로 해제하려면 '-' 입력" onChange={(e) => update((d) => { const v = e.target.value; if (v === "") delete d.scenes[sel!.scene].label; else d.scenes[sel!.scene].label = v === "-" ? "" : v; })} /></label>
-                  <label className="ve-f"><b>보조 메모</b><input value={selScene.note ?? ""} onChange={(e) => update((d) => { const v = e.target.value; if (v === "") delete d.scenes[sel!.scene].note; else d.scenes[sel!.scene].note = v; })} /></label>
-                  <label className="ve-f ve-row"><input type="checkbox" checked={!!selScene.hookFire} onChange={(e) => update((d) => { d.scenes[sel!.scene].hookFire = e.target.checked || undefined; })} /> <b>훅 불글자</b></label>
-                  {(["card", "card2"] as const).map((ck) => (
-                    <div key={ck} className="ve-f">
-                      <b>{ck === "card" ? "요소 카드" : "카드 2 (문장 중간 교체)"}</b>
-                      <div className="ve-cards">
-                        <button type="button" className={`ve-cardpick ${!selScene[ck] ? "on" : ""}`} onClick={() => update((d) => { delete d.scenes[sel!.scene][ck]; })}>없음</button>
-                        {edit.assets.map((a: EditAsset) => (
-                          <button type="button" key={a.url} className={`ve-cardpick ${selScene[ck]?.file === a.url ? "on" : ""}`} title={a.label ?? ""} onClick={() => update((d) => { const cur = (d.scenes[sel!.scene][ck] ?? {}) as Partial<CardSpec>; d.scenes[sel!.scene][ck] = { ...cur, file: a.url, aspect: a.aspect, ...(ck === "card2" && cur.at == null ? { at: 0.5 } : {}) }; })}>
-                            <img src={a.url} alt={a.label ?? ""} />
-                          </button>
-                        ))}
-                      </div>
-                      {selScene[ck] && (
-                        <div className="ve-row">
-                          <small>폭</small><input type="range" min={0.2} max={0.95} step={0.01} value={selScene[ck]!.w ?? num("card_w", 0.6)} onChange={(e) => update((d) => { d.scenes[sel!.scene][ck]!.w = Number(e.target.value); })} />
-                          {ck === "card2" && <><small>시점</small><input type="range" min={0.1} max={0.9} step={0.05} value={selScene.card2!.at ?? 0.5} onChange={(e) => update((d) => { d.scenes[sel!.scene].card2!.at = Number(e.target.value); })} /></>}
+        {/* 오른쪽 패널 */}
+        <aside className="vx-panel" onMouseDown={(e) => e.stopPropagation()}>
+          <div className="vx-tabs">{TABS.map(([id, l]) => <button key={id} type="button" className={tab === id ? "on" : ""} onClick={() => setTab(id)}>{l}</button>)}</div>
+          <div className="vx-panel-body">
+            {tab === "scene" && scene && (
+              <>
+                <h3>씬 {scene.idx} <small>{fmt(scene.start)} ~ {fmt(scene.start + scene.dur)}</small></h3>
+                <p className="vx-hint">{scene.text}</p>
+                {!scene.intro && !scene.ending && (
+                  <>
+                    <Row label="섹션 라벨"><input className="vx-in" value={scene.label ?? ""} placeholder="(이전 라벨 유지) · '-' 입력하면 라벨 끔" onChange={(e) => commit((d) => { const v = e.target.value; if (v === "") delete d.scenes[si].label; else d.scenes[si].label = v === "-" ? "" : v; })} /></Row>
+                    <Row label="보조 메모"><input className="vx-in" value={scene.note ?? ""} onChange={(e) => commit((d) => { const v = e.target.value; if (v === "") delete d.scenes[si].note; else d.scenes[si].note = v; })} /></Row>
+                    <Row label="훅 불글자"><label className="vx-chk"><input type="checkbox" checked={!!scene.hookFire} onChange={(e) => commit((d) => { d.scenes[si].hookFire = e.target.checked || undefined; })} /> 첫 훅 문장을 불타는 글자로</label></Row>
+                    {(["card", "card2"] as const).map((ck) => (
+                      <Row key={ck} label={ck === "card" ? "요소 카드" : "카드 2 (중간 교체)"}>
+                        <div className="vx-cards">
+                          <button type="button" className={`vx-cardpick ${!scene[ck] ? "on" : ""}`} onClick={() => commit((d) => { delete d.scenes[si][ck]; })}>없음</button>
+                          {edit.assets.map((a: EditAsset) => <button type="button" key={a.url} className={`vx-cardpick ${scene[ck]?.file === a.url ? "on" : ""}`} title={a.label ?? ""} onClick={() => commit((d) => { const cur = (d.scenes[si][ck] ?? {}) as Partial<CardSpec>; d.scenes[si][ck] = { ...cur, file: a.url, aspect: a.aspect, ...(ck === "card2" && cur.at == null ? { at: 0.5 } : {}) }; })}><img src={a.url} alt="" /></button>)}
                         </div>
-                      )}
+                        {scene[ck] && <div className="vx-inline"><small>폭</small><input type="range" min={0.2} max={0.95} step={0.01} value={scene[ck]!.w ?? num("card_w")} onChange={(e) => liveSet((d) => { d.scenes[si][ck]!.w = Number(e.target.value); })} />{ck === "card2" && <><small>시점</small><input type="range" min={0.1} max={0.9} step={0.05} value={scene.card2!.at ?? 0.5} onChange={(e) => liveSet((d) => { d.scenes[si].card2!.at = Number(e.target.value); })} /></>}</div>}
+                      </Row>
+                    ))}
+                  </>
+                )}
+                {scene.intro && <Row label="인트로 3줄">{scene.intro.lines.map((l, i) => <input key={i} className="vx-in" value={l} onChange={(e) => commit((d) => { d.scenes[si].intro!.lines[i] = e.target.value; })} />)}</Row>}
+                {scene.ending && <Row label="엔딩 CTA"><textarea className="vx-in" rows={2} value={data.cta ?? ""} onChange={(e) => commit((d) => { d.cta = e.target.value; })} /></Row>}
+                <h3>자막 청크 <small>{scene.chunks.length}개 · 블록 가장자리를 끌어 시각 조절</small></h3>
+                <div className="vx-chunks">
+                  {scene.chunks.map((c, ci) => (
+                    <div key={ci} className={`vx-chunk ${selChunk === ci ? "sel" : ""} ${curChunk === c ? "cur" : ""}`} onClick={() => { setSelChunk(ci); seek(scene.start + c.s + 0.01); }}>
+                      <input value={c.t} onChange={(e) => commit((d) => { d.scenes[si].chunks[ci].t = e.target.value; })} />
+                      <small>{c.s.toFixed(2)}–{c.e.toFixed(2)}s</small>
+                      <button type="button" title="둘로 나누기" onClick={(e) => { e.stopPropagation(); commit((d) => { const ch = d.scenes[si].chunks, cc = ch[ci]; const mid = +((cc.s + cc.e) / 2).toFixed(2); const w = cc.t.split(" "); const a = w.slice(0, Math.ceil(w.length / 2)).join(" "), b = w.slice(Math.ceil(w.length / 2)).join(" ") || "…"; ch.splice(ci, 1, { t: a, s: cc.s, e: mid }, { t: b, s: mid, e: cc.e }); }); }}>⫶</button>
+                      {scene.chunks.length > 1 && <button type="button" title="삭제" className="del" onClick={(e) => { e.stopPropagation(); commit((d) => { const ch = d.scenes[si].chunks, cc = ch[ci]; if (ch[ci + 1]) ch[ci + 1].s = cc.s; else if (ch[ci - 1]) ch[ci - 1].e = cc.e; ch.splice(ci, 1); }); setSelChunk(null); }}><Trash2 className="ico" aria-hidden /></button>}
                     </div>
                   ))}
-                </>
-              )}
-              {selScene.ending && <label className="ve-f"><b>엔딩 CTA</b><textarea rows={2} value={data.cta ?? ""} onChange={(e) => update((d) => { d.cta = e.target.value; })} /></label>}
-            </>
-          ) : <p className="hint">타임라인에서 씬이나 자막 청크를 선택하세요.</p>}
-
-          <h3>전역</h3>
-          {([["sub_cy", 0.6], ["sub_size", 0.031], ["sub_alpha", 0.8], ["label_cy", 0.26], ["label_size", 0.048], ["note_cy", 0.335], ["card_cy", 0.44], ["card_h", 0.13], ["card_w", 0.6]] as [string, number][]).map(([k, d]) => (
-            <label key={k} className="ve-f ve-row"><small className="ve-k">{LABELS[k] ?? k}</small><input type="range" min={0} max={1} step={0.005} value={num(k, d)} onChange={(e) => setParam(k, Number(e.target.value))} /><code>{num(k, d).toFixed(3)}</code></label>
-          ))}
+                </div>
+              </>
+            )}
+            {tab === "label" && <>
+              <h3>섹션 라벨 <small>상단 제목 (예: 1. 부동산만 돌아요)</small></h3>
+              <Row label="폰트"><Font k="label_font" /></Row>
+              <Row label="사이즈"><Num k="label_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="색상"><Color k="label_color" /></Row>
+              <Row label="테두리"><Num k="label_stroke" step={0.01} min={0} max={0.3} /><Color k="label_stroke_color" /></Row>
+              <Row label="자간"><Num k="label_ls" step={0.5} unit="px" /></Row>
+              <Pos xk="label_cx" yk="label_cy" />
+            </>}
+            {tab === "note" && <>
+              <h3>보조 메모 <small>⚠ 라벨 아래 작은 글</small></h3>
+              <Row label="폰트"><Font k="note_font" /></Row>
+              <Row label="사이즈"><Num k="note_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="색상"><Color k="note_color" /></Row>
+              <Row label="테두리"><Num k="note_stroke" step={0.01} min={0} max={0.3} /></Row>
+              <Pos xk="note_cx" yk="note_cy" />
+            </>}
+            {tab === "card" && <>
+              <h3>요소 카드 <small>캡처·로고 카드 공통 설정 (씬별 교체는 씬 탭)</small></h3>
+              <Row label="최대 높이"><Num k="card_h" scale={H_REF} step={5} unit="px" /></Row>
+              <Row label="최대 폭"><Num k="card_w" step={0.01} min={0.1} max={1} /></Row>
+              <Row label="모서리"><Num k="card_radius" step={0.01} min={0} max={0.5} /></Row>
+              <Row label="그림자"><label className="vx-chk"><input type="checkbox" checked={!!num("card_shadow")} onChange={(e) => setP("card_shadow", e.target.checked ? 1 : 0)} /> 표시</label></Row>
+              <Pos xk="card_cx" yk="card_cy" />
+            </>}
+            {tab === "sub" && <>
+              <h3>자막 <small>말하는 구절 박스</small></h3>
+              <Row label="폰트"><Font k="sub_font" /></Row>
+              <Row label="굵기"><select className="vx-sel" value={num("sub_weight")} onChange={(e) => setP("sub_weight", Number(e.target.value))}><option value={400}>Regular</option><option value={500}>Medium</option><option value={800}>ExtraBold</option><option value={900}>Black</option></select></Row>
+              <Row label="사이즈"><Num k="sub_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="글자색"><Color k="sub_color" /></Row>
+              <Row label="배경색"><Color k="sub_bg" /></Row>
+              <Row label="배경 불투명"><input type="range" min={0} max={1} step={0.05} value={num("sub_alpha")} onChange={(e) => liveSet((d) => { d.preset.sub_alpha = Number(e.target.value); })} /><code>{num("sub_alpha").toFixed(2)}</code></Row>
+              <Row label="여백"><Num k="sub_pad_y" step={0.02} min={0} max={1} /><Num k="sub_pad_x" step={0.02} min={0} max={2} /><small className="vx-hint">상하 · 좌우 (글자 크기 배수)</small></Row>
+              <Row label="모서리"><Num k="sub_radius" step={0.02} min={0} max={1} /></Row>
+              <Row label="테두리"><Num k="sub_stroke" step={0.01} min={0} max={0.2} /></Row>
+              <Row label="행간"><Num k="sub_lh" step={0.05} min={0.8} max={2.5} /></Row>
+              <Row label="자간"><Num k="sub_ls" step={0.1} unit="px" /></Row>
+              <Pos xk="sub_cx" yk="sub_cy" />
+              <h3>훅 불글자</h3>
+              <Row label="사이즈"><Num k="fire_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="기울기"><Num k="fire_rot" step={1} unit="°" /></Row>
+              <Pos xk="fire_cx" yk="fire_cy" />
+            </>}
+            {tab === "bg" && <>
+              <h3>배경 영상 <small>캔버스에서 끌어 이동, 모서리로 확대</small></h3>
+              <Row label="확대"><input type="range" min={0.5} max={3} step={0.01} value={num("bg_scale")} onChange={(e) => liveSet((d) => { d.preset.bg_scale = Number(e.target.value); })} /><code>{num("bg_scale").toFixed(2)}×</code></Row>
+              <Row label="이동"><Num k="bg_x" step={0.01} min={-1} max={1} /><Num k="bg_y" step={0.01} min={-1} max={1} /><small className="vx-hint">X · Y (화면 비율)</small></Row>
+              <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { d.preset.bg_x = 0; d.preset.bg_y = 0; d.preset.bg_scale = 1; })}>원위치</button></Row>
+            </>}
+            {tab === "cta" && <>
+              <h3>엔딩 <small>검정 화면 + CTA</small></h3>
+              <Row label="CTA 문구"><textarea className="vx-in" rows={2} value={data.cta ?? ""} onChange={(e) => commit((d) => { d.cta = e.target.value; })} /></Row>
+              <Row label="폰트"><Font k="cta_font" /></Row>
+              <Row label="사이즈"><Num k="cta_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="색상"><Color k="cta_color" /></Row>
+              <Pos yk="cta_cy" />
+              <Row label="로고 크기"><Num k="logo_w" step={0.01} min={0.05} max={0.6} /></Row>
+            </>}
+            {tab === "intro" && scene?.intro && <>
+              <h3>인트로 카드</h3>
+              <Row label="사이즈"><Num k="intro_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Pos xk="intro_x" yk="intro_y" />
+              <Row label="로고 위치"><Num k="intro_logo_x" step={0.01} min={0} max={1} /><Num k="intro_logo_y" step={0.01} min={0} max={1} /></Row>
+              <Row label="로고 크기"><Num k="intro_logo_w" step={0.01} min={0.05} max={0.5} /></Row>
+            </>}
+          </div>
         </aside>
       </div>
 
-      <div className="ve-timeline" ref={tl} onClick={(e) => { const box = tl.current!.getBoundingClientRect(); seek((e.clientX - box.left + tl.current!.scrollLeft) / PX_PER_SEC); }}>
-        <div className="ve-track" style={{ width: total * PX_PER_SEC }}>
-          {data.scenes.map((s, si) => (
-            <div key={s.idx} className={`ve-scene ${si === curScene ? "cur" : ""} ${sel?.scene === si && sel.chunk == null ? "sel" : ""}`} style={{ left: s.start * PX_PER_SEC, width: s.dur * PX_PER_SEC }}
-              onClick={(e) => { e.stopPropagation(); setSel({ scene: si }); seek(s.start); }}>
-              <div className="ve-scene-head">{s.idx}{s.label ? ` · ${s.label}` : ""}{s.intro ? " · 인트로" : ""}{s.ending ? " · 엔딩" : ""}{s.card ? " 🖼" : ""}</div>
-              <div className="ve-chunks">
-                {s.chunks.map((c, ci) => (
-                  <div key={ci} className={`ve-chunk ${sel?.scene === si && sel.chunk === ci ? "sel" : ""} ${t >= s.start + c.s && t < s.start + c.e ? "cur" : ""}`} style={{ left: c.s * PX_PER_SEC, width: Math.max(4, (c.e - c.s) * PX_PER_SEC) }}
-                    onClick={(e) => { e.stopPropagation(); setSel({ scene: si, chunk: ci }); seek(s.start + c.s + 0.01); }}>
-                    <i className="h l" onMouseDown={onEdgeDown(si, ci, "s")} /><span>{c.t}</span><i className="h r" onMouseDown={onEdgeDown(si, ci, "e")} />
-                  </div>
-                ))}
-              </div>
+      {/* 하단: 컨트롤 + 타임라인 */}
+      <div className="vx-bottom" onMouseDown={(e) => e.stopPropagation()}>
+        <div className="vx-transport">
+          <button type="button" className="vx-btn" onClick={() => seek(0)} title="처음으로"><SkipBack className="ico" aria-hidden /></button>
+          <button type="button" className="vx-btn play" onClick={() => player.current?.toggle()}>{playing ? <><Pause className="ico" aria-hidden /> 정지</> : <><Play className="ico" aria-hidden /> 재생</>}</button>
+          <button type="button" className="vx-btn" onClick={() => scene && seek(scene.start + 0.01)}>씬 시작으로</button>
+          <span className="vx-time">{fmt(t)} <i>|</i> {fmt(total)}</span>
+          <span className="vx-zoom"><ZoomOut className="ico" aria-hidden /><input type="range" min={30} max={240} value={zoom} onChange={(e) => setZoom(Number(e.target.value))} /><ZoomIn className="ico" aria-hidden /></span>
+        </div>
+        <div className="vx-timeline" ref={tlRef} onClick={(e) => { const box = tlRef.current!.getBoundingClientRect(); seek((e.clientX - box.left + tlRef.current!.scrollLeft - 8) / zoom); }}>
+          <div className="vx-track" style={{ width: total * zoom + 16 }}>
+            <div className="vx-ruler">{Array.from({ length: Math.floor(total / 5) + 1 }).map((_, i) => <span key={i} style={{ left: i * 5 * zoom }}>{fmt(i * 5).slice(0, 5)}</span>)}</div>
+            <canvas ref={waveRef} className="vx-wave" style={{ width: total * zoom, height: 56 }} />
+            <div className="vx-scenes">
+              {data.scenes.map((s, i) => (
+                <div key={s.idx} className={`vx-scene ${i === si ? "cur" : ""}`} style={{ left: s.start * zoom, width: s.dur * zoom }} onClick={(e) => { e.stopPropagation(); seek(s.start + 0.01); setTab("scene"); setSelChunk(null); }}>
+                  <span>{s.idx}{s.label ? ` · ${s.label}` : ""}{s.intro ? " · 인트로" : ""}{s.ending ? " · 엔딩" : ""}{s.hookFire ? " 🔥" : ""}{s.card ? " 🖼" : ""}</span>
+                </div>
+              ))}
             </div>
-          ))}
-          <div className="ve-playhead" style={{ left: t * PX_PER_SEC }} />
+            <div className="vx-chunktrack">
+              {data.scenes.map((s, i) => s.chunks.map((c, ci) => (
+                <div key={`${i}-${ci}`} className={`vx-cblock ${i === si && selChunk === ci ? "sel" : ""} ${i === si && curChunk === c ? "cur" : ""}`} style={{ left: (s.start + c.s) * zoom, width: Math.max(6, (c.e - c.s) * zoom) }}
+                  onClick={(e) => { e.stopPropagation(); setSelChunk(ci); setTab("scene"); seek(s.start + c.s + 0.01); }}>
+                  <i className="h l" onMouseDown={onEdgeDown(i, ci, "s")} /><span>{c.t}</span><i className="h r" onMouseDown={onEdgeDown(i, ci, "e")} />
+                </div>
+              )))}
+            </div>
+            <div className="vx-playhead" style={{ left: t * zoom }} />
+          </div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }
-
-const LABELS: Record<string, string> = { sub_cy: "자막 위치", sub_size: "자막 크기", sub_alpha: "자막 박스 불투명", label_cy: "라벨 위치", label_size: "라벨 크기", note_cy: "메모 위치", card_cy: "카드 위치", card_h: "카드 높이", card_w: "카드 폭" };

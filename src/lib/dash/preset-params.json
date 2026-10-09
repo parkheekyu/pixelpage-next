@@ -1,7 +1,7 @@
 {
  "bg_talk": {
   "composition": "BgTalk",
-  "doc": "배경 토크(bg_talk): 컷 없는 한 장면 배경 영상(사람이 작업하는 측면 샷 등) 위에 화면 가운데 띠(라벨 y0.22 ~ 자막 y0.55)만 쓰는 정보형 릴스. 레퍼런스 AI 목소리 툴 모음 42s(references_inbox/ref_AQMf) 프레임 분석 presets/_analysis/bg_talk.md. 섹션 라벨(배민 주아 흰+검정 외곽 y0.22) / 보조 메모(⚠ 작게 y0.29) / 요소 카드(캡처·로고 중심 y0.40, 높이≤0.13H, 그림자, 애니메이션 없음) / 자막(검정 박스+흰 배민 주아 0.034H, y0.55(중앙 살짝 아래), 구절 즉시 교체). 폰트는 라벨·자막 모두 BMJUA(기랑해랑·Pretendard 금지, 2026-10-09 재측정) / 훅 첫 1초 불타는 글자(고정) / 인트로 카드(다른 컷+검정 박스 제목 3줄+로고 팝) / 엔딩 검정+CTA. 여성 TTS 속도감(나긋 여성, 1.1배, 간격 0.03). BGM 낮게.",
+  "doc": "배경 토크(bg_talk): 컷 없는 한 장면 배경 영상(사람이 작업하는 측면 샷 등) 위에 화면 가운데 띠(라벨 y0.22 ~ 자막 y0.55)만 쓰는 정보형 릴스. 레퍼런스 AI 목소리 툴 모음 42s(references_inbox/ref_AQMf) 프레임 분석 presets/_analysis/bg_talk.md. 섹션 라벨(배민 주아 흰+검정 외곽 y0.22) / 보조 메모(⚠ 작게 y0.29) / 요소 카드(캡처·로고 중심 y0.40, 높이≤0.13H, 그림자, 애니메이션 없음) / 자막(검정 박스+흰 배민 주아 0.034H, y0.55(중앙 살짝 아래), 구절 즉시 교체). 폰트는 라벨·자막 모두 BMJUA(기랑해랑·Pretendard 금지, 2026-10-09 재측정) / 훅 첫 1초 불타는 글자(고정) / 인트로 카드(다른 컷+검정 박스 제목 3줄+로고 팝) / 엔딩 검정+CTA. 여성 TTS 속도감(나긋 여성, 1.1배, 간격 0.03). BGM 낮게. 요소 위치는 *_cx/*_cy, 폰트 *_font(Pretendard|BMJUA|Jalnan2|GumiRomance|BMYEONSUNG|BMEULJIRO), 색 *_color, 배경 bg_x/bg_y/bg_scale — 대시보드 소재 편집기에서 드래그·설정(2026-10-09).",
   "defaults": {
    "voice_id": "4e118bfbb83e401c84699c09b5f08257",
    "speed": 1.1,
@@ -24,7 +24,26 @@
    "bgm": "assets/bgm/lyria_bright_vlog_pop.mp3",
    "font": "BMJUA",
    "sub_alpha": 0.8,
-   "sub_font": "Pretendard Regular"
+   "sub_font": "Pretendard",
+   "sub_cx": 0.5,
+   "sub_color": "#ffffff",
+   "sub_bg": "#000000",
+   "sub_weight": 400,
+   "label_cx": 0.5,
+   "label_font": "BMJUA",
+   "label_color": "#ffffff",
+   "label_stroke": 0.06,
+   "note_cx": 0.5,
+   "note_size": 0.03,
+   "card_cx": 0.5,
+   "fire_cx": 0.5,
+   "fire_cy": 0.55,
+   "fire_size": 0.05,
+   "cta_cy": 0.5,
+   "cta_size": 0.034,
+   "bg_x": 0,
+   "bg_y": 0,
+   "bg_scale": 1
   }
  },
  "clean_ui": {
