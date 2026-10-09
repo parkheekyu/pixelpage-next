@@ -671,3 +671,8 @@ textarea.vx-in { resize: vertical; }
 .vx-inline-edit { position: absolute; z-index: 6; font: inherit; color: #fff; background: rgba(0,0,0,.75); border: 1.5px solid #ff3fa4; border-radius: 4px; padding: 2px 6px; resize: none; outline: 0; line-height: 1.25; white-space: pre; overflow: hidden; text-align: center; box-shadow: 0 0 0 3px rgba(255,63,164,.25); }
 .vx-del { position: absolute; right: -10px; top: -10px; width: 20px; height: 20px; border-radius: 50%; border: 0; background: #ff5b5b; color: #fff; font-size: 11px; line-height: 20px; padding: 0; cursor: pointer; box-shadow: 0 1px 4px rgba(0,0,0,.5); z-index: 7; }
 .vx-del:hover { background: #ff2d2d; }
+.vx-zone { position: absolute; border: 1px dashed rgba(0,229,255,.35); pointer-events: none; z-index: 2; }
+.vx-zone em { position: absolute; left: 4px; top: 3px; font-style: normal; font-size: 10px; color: rgba(0,229,255,.75); text-shadow: 0 1px 2px #000; }
+.vx-zone.off { border-color: rgba(255,255,255,.2); } .vx-zone.off em { color: rgba(255,255,255,.5); }
+.vx-zone.on { pointer-events: auto; cursor: move; border: 1.5px dashed #00e5ff; background: rgba(0,229,255,.06); z-index: 4; }
+.vx-zone.on .vx-handle { opacity: 1; border-color: #00e5ff; }
