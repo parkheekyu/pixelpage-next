@@ -26,6 +26,14 @@ const FONTS: [string, string][] = [["Pretendard", "프리텐다드"], ["BMJUA", 
 const SWATCH = ["#ffffff", "#ff3b30", "#ffcc00", "#34c759", "#5ac8fa", "#000000", "#FFE600", "#ff2d55"];
 const H_REF = 1920;
 
+type Ctl = { num: (k: string) => number; str: (k: string) => string; setP: (k: string, v: unknown) => void };
+type NumProps = { c: Ctl; k: string; step?: number; min?: number; max?: number; scale?: number; unit?: string };
+const Row = ({ label, children }: { label: string; children: React.ReactNode }) => <div className="vx-row"><span>{label}</span><div>{children}</div></div>;
+const NumField = ({ c, k, step = 1, min, max, scale = 1, unit }: NumProps) => <label className="vx-num"><input type="number" step={step} min={min} max={max} value={+(c.num(k) * scale).toFixed(scale === 1 ? 3 : 0)} onChange={(e) => c.setP(k, Number(e.target.value) / scale)} />{unit && <small>{unit}</small>}</label>;
+const ColorField = ({ c, k }: { c: Ctl; k: string }) => <div className="vx-colors">{SWATCH.map((col) => <button key={col} type="button" className={`vx-sw ${c.str(k).toLowerCase() === col.toLowerCase() ? "on" : ""}`} style={{ background: col }} onClick={() => c.setP(k, col)} />)}<label className="vx-sw custom" title="직접 선택"><input type="color" value={/^#[0-9a-f]{6}$/i.test(c.str(k)) ? c.str(k) : "#ffffff"} onChange={(e) => c.setP(k, e.target.value)} />+</label></div>;
+const PosField = ({ c, xk, yk }: { c: Ctl; xk?: string; yk: string }) => <Row label="위치">{xk && <NumField c={c} k={xk} step={0.005} min={0} max={1} />}<NumField c={c} k={yk} step={0.005} min={0} max={1} /><small className="vx-hint">X · Y (0~1, 캔버스에서 드래그 가능)</small></Row>;
+const FontField = ({ c, k }: { c: Ctl; k: string }) => <select className="vx-sel" value={c.str(k).replace(/ .*/, "")} onChange={(e) => c.setP(k, e.target.value)}>{FONTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>;
+
 export default function VideoEditor({ edit, projectId, projectName }: { edit: ProjectEdit; projectId: string; projectName: string }) {
   const router = useRouter();
   const Comp = COMPOSITIONS[edit.composition];
@@ -178,13 +186,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
 
   if (!Comp) return <div className="vx"><div className="vx-top">편집기가 지원하지 않는 컴포지션: {edit.composition}</div></div>;
 
-  // ---- 패널 컨트롤 헬퍼 ----
-  const px = (k: string) => Math.round(num(k) * H_REF);
-  const Row = ({ label, children }: { label: string; children: React.ReactNode }) => <div className="vx-row"><span>{label}</span><div>{children}</div></div>;
-  const Num = ({ k, step = 1, min, max, scale = 1, unit }: { k: string; step?: number; min?: number; max?: number; scale?: number; unit?: string }) => <label className="vx-num"><input type="number" step={step} min={min} max={max} value={+(num(k) * scale).toFixed(scale === 1 ? 3 : 0)} onChange={(e) => setP(k, Number(e.target.value) / scale)} />{unit && <small>{unit}</small>}</label>;
-  const Color = ({ k }: { k: string }) => <div className="vx-colors">{SWATCH.map((c) => <button key={c} type="button" className={`vx-sw ${str(k).toLowerCase() === c.toLowerCase() ? "on" : ""}`} style={{ background: c }} onClick={() => setP(k, c)} />)}<label className="vx-sw custom" title="직접 선택"><input type="color" value={/^#[0-9a-f]{6}$/i.test(str(k)) ? str(k) : "#ffffff"} onChange={(e) => setP(k, e.target.value)} />+</label></div>;
-  const Font = ({ k }: { k: string }) => <select className="vx-sel" value={str(k).replace(/ .*/, "")} onChange={(e) => setP(k, e.target.value)}>{FONTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}</select>;
-  const Pos = ({ xk, yk }: { xk?: string; yk: string }) => <Row label="위치">{xk && <Num k={xk} step={0.005} min={0} max={1} />}<Num k={yk} step={0.005} min={0} max={1} /><small className="vx-hint">X · Y (0~1, 캔버스에서 드래그 가능)</small></Row>;
+  const C: Ctl = { num, str, setP };
 
   const TABS: [Tab, string][] = [["scene", "씬·자막 내용"], ["label", "라벨"], ["note", "메모"], ["card", "카드"], ["sub", "자막"], ["bg", "배경"], ["cta", "엔딩"]];
   const chunkTotal = data.scenes.reduce((a, s) => a + s.chunks.length, 0);
@@ -263,69 +265,69 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
             )}
             {tab === "label" && <>
               <h3>섹션 라벨 <small>상단 제목 (예: 1. 부동산만 돌아요)</small></h3>
-              <Row label="폰트"><Font k="label_font" /></Row>
-              <Row label="사이즈"><Num k="label_size" scale={H_REF} step={1} unit="px" /></Row>
-              <Row label="색상"><Color k="label_color" /></Row>
-              <Row label="테두리"><Num k="label_stroke" step={0.01} min={0} max={0.3} /><Color k="label_stroke_color" /></Row>
-              <Row label="자간"><Num k="label_ls" step={0.5} unit="px" /></Row>
-              <Pos xk="label_cx" yk="label_cy" />
+              <Row label="폰트"><FontField c={C} k="label_font" /></Row>
+              <Row label="사이즈"><NumField c={C} k="label_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="색상"><ColorField c={C} k="label_color" /></Row>
+              <Row label="테두리"><NumField c={C} k="label_stroke" step={0.01} min={0} max={0.3} /><ColorField c={C} k="label_stroke_color" /></Row>
+              <Row label="자간"><NumField c={C} k="label_ls" step={0.5} unit="px" /></Row>
+              <PosField c={C} xk="label_cx" yk="label_cy" />
             </>}
             {tab === "note" && <>
               <h3>보조 메모 <small>⚠ 라벨 아래 작은 글</small></h3>
-              <Row label="폰트"><Font k="note_font" /></Row>
-              <Row label="사이즈"><Num k="note_size" scale={H_REF} step={1} unit="px" /></Row>
-              <Row label="색상"><Color k="note_color" /></Row>
-              <Row label="테두리"><Num k="note_stroke" step={0.01} min={0} max={0.3} /></Row>
-              <Pos xk="note_cx" yk="note_cy" />
+              <Row label="폰트"><FontField c={C} k="note_font" /></Row>
+              <Row label="사이즈"><NumField c={C} k="note_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="색상"><ColorField c={C} k="note_color" /></Row>
+              <Row label="테두리"><NumField c={C} k="note_stroke" step={0.01} min={0} max={0.3} /></Row>
+              <PosField c={C} xk="note_cx" yk="note_cy" />
             </>}
             {tab === "card" && <>
               <h3>요소 카드 <small>캡처·로고 카드 공통 설정 (씬별 교체는 씬 탭)</small></h3>
-              <Row label="최대 높이"><Num k="card_h" scale={H_REF} step={5} unit="px" /></Row>
-              <Row label="최대 폭"><Num k="card_w" step={0.01} min={0.1} max={1} /></Row>
-              <Row label="모서리"><Num k="card_radius" step={0.01} min={0} max={0.5} /></Row>
+              <Row label="최대 높이"><NumField c={C} k="card_h" scale={H_REF} step={5} unit="px" /></Row>
+              <Row label="최대 폭"><NumField c={C} k="card_w" step={0.01} min={0.1} max={1} /></Row>
+              <Row label="모서리"><NumField c={C} k="card_radius" step={0.01} min={0} max={0.5} /></Row>
               <Row label="그림자"><label className="vx-chk"><input type="checkbox" checked={!!num("card_shadow")} onChange={(e) => setP("card_shadow", e.target.checked ? 1 : 0)} /> 표시</label></Row>
-              <Pos xk="card_cx" yk="card_cy" />
+              <PosField c={C} xk="card_cx" yk="card_cy" />
             </>}
             {tab === "sub" && <>
               <h3>자막 <small>말하는 구절 박스</small></h3>
-              <Row label="폰트"><Font k="sub_font" /></Row>
+              <Row label="폰트"><FontField c={C} k="sub_font" /></Row>
               <Row label="굵기"><select className="vx-sel" value={num("sub_weight")} onChange={(e) => setP("sub_weight", Number(e.target.value))}><option value={400}>Regular</option><option value={500}>Medium</option><option value={800}>ExtraBold</option><option value={900}>Black</option></select></Row>
-              <Row label="사이즈"><Num k="sub_size" scale={H_REF} step={1} unit="px" /></Row>
-              <Row label="글자색"><Color k="sub_color" /></Row>
-              <Row label="배경색"><Color k="sub_bg" /></Row>
+              <Row label="사이즈"><NumField c={C} k="sub_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="글자색"><ColorField c={C} k="sub_color" /></Row>
+              <Row label="배경색"><ColorField c={C} k="sub_bg" /></Row>
               <Row label="배경 불투명"><input type="range" min={0} max={1} step={0.05} value={num("sub_alpha")} onChange={(e) => liveSet((d) => { d.preset.sub_alpha = Number(e.target.value); })} /><code>{num("sub_alpha").toFixed(2)}</code></Row>
-              <Row label="여백"><Num k="sub_pad_y" step={0.02} min={0} max={1} /><Num k="sub_pad_x" step={0.02} min={0} max={2} /><small className="vx-hint">상하 · 좌우 (글자 크기 배수)</small></Row>
-              <Row label="모서리"><Num k="sub_radius" step={0.02} min={0} max={1} /></Row>
-              <Row label="테두리"><Num k="sub_stroke" step={0.01} min={0} max={0.2} /></Row>
-              <Row label="행간"><Num k="sub_lh" step={0.05} min={0.8} max={2.5} /></Row>
-              <Row label="자간"><Num k="sub_ls" step={0.1} unit="px" /></Row>
-              <Pos xk="sub_cx" yk="sub_cy" />
+              <Row label="여백"><NumField c={C} k="sub_pad_y" step={0.02} min={0} max={1} /><NumField c={C} k="sub_pad_x" step={0.02} min={0} max={2} /><small className="vx-hint">상하 · 좌우 (글자 크기 배수)</small></Row>
+              <Row label="모서리"><NumField c={C} k="sub_radius" step={0.02} min={0} max={1} /></Row>
+              <Row label="테두리"><NumField c={C} k="sub_stroke" step={0.01} min={0} max={0.2} /></Row>
+              <Row label="행간"><NumField c={C} k="sub_lh" step={0.05} min={0.8} max={2.5} /></Row>
+              <Row label="자간"><NumField c={C} k="sub_ls" step={0.1} unit="px" /></Row>
+              <PosField c={C} xk="sub_cx" yk="sub_cy" />
               <h3>훅 불글자</h3>
-              <Row label="사이즈"><Num k="fire_size" scale={H_REF} step={1} unit="px" /></Row>
-              <Row label="기울기"><Num k="fire_rot" step={1} unit="°" /></Row>
-              <Pos xk="fire_cx" yk="fire_cy" />
+              <Row label="사이즈"><NumField c={C} k="fire_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="기울기"><NumField c={C} k="fire_rot" step={1} unit="°" /></Row>
+              <PosField c={C} xk="fire_cx" yk="fire_cy" />
             </>}
             {tab === "bg" && <>
               <h3>배경 영상 <small>캔버스에서 끌어 이동, 모서리로 확대</small></h3>
               <Row label="확대"><input type="range" min={0.5} max={3} step={0.01} value={num("bg_scale")} onChange={(e) => liveSet((d) => { d.preset.bg_scale = Number(e.target.value); })} /><code>{num("bg_scale").toFixed(2)}×</code></Row>
-              <Row label="이동"><Num k="bg_x" step={0.01} min={-1} max={1} /><Num k="bg_y" step={0.01} min={-1} max={1} /><small className="vx-hint">X · Y (화면 비율)</small></Row>
+              <Row label="이동"><NumField c={C} k="bg_x" step={0.01} min={-1} max={1} /><NumField c={C} k="bg_y" step={0.01} min={-1} max={1} /><small className="vx-hint">X · Y (화면 비율)</small></Row>
               <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { d.preset.bg_x = 0; d.preset.bg_y = 0; d.preset.bg_scale = 1; })}>원위치</button></Row>
             </>}
             {tab === "cta" && <>
               <h3>엔딩 <small>검정 화면 + CTA</small></h3>
               <Row label="CTA 문구"><textarea className="vx-in" rows={2} value={data.cta ?? ""} onChange={(e) => commit((d) => { d.cta = e.target.value; })} /></Row>
-              <Row label="폰트"><Font k="cta_font" /></Row>
-              <Row label="사이즈"><Num k="cta_size" scale={H_REF} step={1} unit="px" /></Row>
-              <Row label="색상"><Color k="cta_color" /></Row>
-              <Pos yk="cta_cy" />
-              <Row label="로고 크기"><Num k="logo_w" step={0.01} min={0.05} max={0.6} /></Row>
+              <Row label="폰트"><FontField c={C} k="cta_font" /></Row>
+              <Row label="사이즈"><NumField c={C} k="cta_size" scale={H_REF} step={1} unit="px" /></Row>
+              <Row label="색상"><ColorField c={C} k="cta_color" /></Row>
+              <PosField c={C} yk="cta_cy" />
+              <Row label="로고 크기"><NumField c={C} k="logo_w" step={0.01} min={0.05} max={0.6} /></Row>
             </>}
             {tab === "intro" && scene?.intro && <>
               <h3>인트로 카드</h3>
-              <Row label="사이즈"><Num k="intro_size" scale={H_REF} step={1} unit="px" /></Row>
-              <Pos xk="intro_x" yk="intro_y" />
-              <Row label="로고 위치"><Num k="intro_logo_x" step={0.01} min={0} max={1} /><Num k="intro_logo_y" step={0.01} min={0} max={1} /></Row>
-              <Row label="로고 크기"><Num k="intro_logo_w" step={0.01} min={0.05} max={0.5} /></Row>
+              <Row label="사이즈"><NumField c={C} k="intro_size" scale={H_REF} step={1} unit="px" /></Row>
+              <PosField c={C} xk="intro_x" yk="intro_y" />
+              <Row label="로고 위치"><NumField c={C} k="intro_logo_x" step={0.01} min={0} max={1} /><NumField c={C} k="intro_logo_y" step={0.01} min={0} max={1} /></Row>
+              <Row label="로고 크기"><NumField c={C} k="intro_logo_w" step={0.01} min={0.05} max={0.5} /></Row>
             </>}
           </div>
         </aside>
