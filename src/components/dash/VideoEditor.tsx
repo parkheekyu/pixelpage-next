@@ -335,7 +335,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
                   onBlur={() => finishInline(true)} />
               )}
               {boxes.filter((b) => (!inline || b.id !== inline.id) && !(tab === "zone" && b.id !== "bg")).map((b) => (
-                <div key={b.id} className={`vx-box ${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} onDoubleClick={(e) => { e.stopPropagation(); startInline(b); }} title={`${TABS.find(([id]) => id === b.id)?.[1]} · 더블클릭으로 글자 수정`}>
+                <div key={b.id} className={`vx-box el-${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} onDoubleClick={(e) => { e.stopPropagation(); startInline(b); }} title={`${TABS.find(([id]) => id === b.id)?.[1]} · 더블클릭으로 글자 수정`}>
                   {(b.sizeKey || b.id === "bg") && <i className="vx-handle" onMouseDown={onBoxDown(b, "size")} />}
                   {b.id !== "bg" && (sel === b.id || tab === b.id) && <button type="button" className="vx-del" title="삭제 (Delete)" onMouseDown={(e) => { e.stopPropagation(); e.preventDefault(); }} onClick={(e) => { e.stopPropagation(); setSel(b.id); deleteSelected(); }}>✕</button>}
                   <em>{TABS.find(([id]) => id === b.id)?.[1]}</em>
