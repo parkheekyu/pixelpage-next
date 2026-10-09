@@ -1,6 +1,6 @@
 /** 소재 편집기 데이터 (dash.project_edits) — 광고제작 data.json 과 같은 구조 */
 export type Chunk = { t: string; s: number; e: number };
-export type CardSpec = { file: string; aspect?: number; w?: number; y?: number; at?: number };
+export type CardSpec = { file: string; aspect?: number; w?: number; x?: number; y?: number; at?: number };
 export type EditScene = {
   idx: number; text?: string; start: number; dur: number; chunks: Chunk[];
   label?: string; note?: string; card?: CardSpec; card2?: CardSpec;

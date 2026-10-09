@@ -186,14 +186,23 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     e.stopPropagation(); e.preventDefault();
     setSel(box.id); setTab(box.id);
     const rect = canvasRef.current!.getBoundingClientRect();
-    const v0: [number, number] = box.id === "bg" ? [num("bg_x"), num("bg_y")] : box.posKeys ? [num(box.posKeys[0]), num(box.posKeys[1])] : [0, 0];
-    dragRef.current = { box, mode, x0: e.clientX, y0: e.clientY, v0, s0: box.id === "bg" ? num("bg_scale") : box.sizeKey ? num(box.sizeKey) : 0, snap: data };
+    const ck: "card" | "card2" = card2On ? "card2" : "card";
+    const cardNow = scene?.[ck];
+    const v0: [number, number] = box.id === "bg" ? [num("bg_x"), num("bg_y")] : box.id === "card" ? [cardNow?.x ?? num("card_cx"), cardNow?.y ?? num("card_cy")] : box.posKeys ? [num(box.posKeys[0]), num(box.posKeys[1])] : [0, 0];
+    const s0 = box.id === "bg" ? num("bg_scale") : box.id === "card" ? box.w : box.sizeKey ? num(box.sizeKey) : 0;
+    dragRef.current = { box, mode, x0: e.clientX, y0: e.clientY, v0, s0, snap: data };
     const move = (ev: MouseEvent) => {
       const d = dragRef.current; if (!d) return;
       const dx = (ev.clientX - d.x0) / rect.width, dy = (ev.clientY - d.y0) / rect.height;
       liveSet((nd) => {
         if (d.mode === "move") {
           if (d.box.id === "bg") { nd.preset.bg_x = +(d.v0[0] + dx).toFixed(3); nd.preset.bg_y = +(d.v0[1] + dy).toFixed(3); }
+          else if (d.box.id === "card") {   // 날것 요소: 그 씬의 카드 위치를 직접
+            const nx = Math.min(0.98, Math.max(0.02, d.v0[0] + dx)), ny = Math.min(0.98, Math.max(0.02, d.v0[1] + dy));
+            const sn = snapTo(d.box, nx, ny, boxesRef.current, ev.altKey);
+            const c = nd.scenes[si][ck]; if (c) { c.x = +sn.x.toFixed(3); c.y = +sn.y.toFixed(3); }
+            setGuides({ x: sn.gx, y: sn.gy });
+          }
           else if (d.box.posKeys) {
             const nx = Math.min(0.98, Math.max(0.02, d.v0[0] + dx)), ny = Math.min(0.98, Math.max(0.02, d.v0[1] + dy));
             const sn = snapTo(d.box, nx, ny, boxesRef.current, ev.altKey);
@@ -204,6 +213,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
           requestAnimationFrame(measure);
         } else {
           if (d.box.id === "bg") nd.preset.bg_scale = +Math.max(0.5, Math.min(3, d.s0 * (1 + dy * 2))).toFixed(3);
+          else if (d.box.id === "card") { const c = nd.scenes[si][ck]; if (c) c.w = +Math.max(0.05, Math.min(1, d.s0 * (1 + dx * 2))).toFixed(3); }   // 폭 기준, 비율 유지
           else if (d.box.sizeKey) nd.preset[d.box.sizeKey] = +Math.max(0.01, Math.min(0.6, d.s0 * (1 + dy * 3))).toFixed(4);
         }
       });
@@ -344,9 +354,17 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               <PosField c={C} xk="note_cx" yk="note_cy" />
             </>}
             {tab === "card" && <>
-              <h3>요소 카드 <small>캡처·로고 카드 공통 설정 (씬별 교체는 씬 탭)</small></h3>
-              <Row label="최대 높이"><NumField c={C} k="card_h" scale={H_REF} step={5} unit="px" /></Row>
-              <Row label="최대 폭"><NumField c={C} k="card_w" step={0.01} min={0.1} max={1} /></Row>
+              <h3>요소 <small>캡처·로고를 날것 그대로 배치. 캔버스에서 끌어 위치, 모서리 핸들로 크기 (씬마다 따로)</small></h3>
+              {liveCard ? (
+                <>
+                  <Row label="이 씬 폭"><input type="range" min={0.05} max={1} step={0.005} value={(liveCard as CardSpec).w ?? num("card_w")} onChange={(e) => liveSet((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) c.w = Number(e.target.value); })} /><code>{((liveCard as CardSpec).w ?? num("card_w")).toFixed(3)}</code></Row>
+                  <Row label="이 씬 위치"><NumField c={{ num: (k) => Number((liveCard as CardSpec)[k === "x" ? "x" : "y"] ?? num(k === "x" ? "card_cx" : "card_cy")), str, setP: (k, v) => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) (c as Record<string, unknown>)[k] = v; }) }} k="x" step={0.005} min={0} max={1} /><NumField c={{ num: (k) => Number((liveCard as CardSpec)[k === "x" ? "x" : "y"] ?? num(k === "x" ? "card_cx" : "card_cy")), str, setP: (k, v) => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) (c as Record<string, unknown>)[k] = v; }) }} k="y" step={0.005} min={0} max={1} /><small className="vx-hint">X · Y</small></Row>
+                  <Row label=""><button type="button" className="vx-btn" onClick={() => commit((d) => { const c = d.scenes[si][card2On ? "card2" : "card"]; if (c) { delete c.x; delete c.y; delete c.w; } })}>기본 크기·위치로</button></Row>
+                </>
+              ) : <p className="vx-hint">이 씬에는 요소가 없습니다. 씬·자막 내용 탭에서 넣으세요.</p>}
+              <h3>기본값 <small>씬별 값이 없을 때</small></h3>
+              <Row label="기본 높이"><NumField c={C} k="card_h" scale={H_REF} step={5} unit="px" /></Row>
+              <Row label="기본 폭"><NumField c={C} k="card_w" step={0.01} min={0.1} max={1} /></Row>
               <Row label="모서리"><NumField c={C} k="card_radius" step={0.01} min={0} max={0.5} /></Row>
               <Row label="그림자"><label className="vx-chk"><input type="checkbox" checked={!!num("card_shadow")} onChange={(e) => setP("card_shadow", e.target.checked ? 1 : 0)} /> 표시</label></Row>
               <PosField c={C} xk="card_cx" yk="card_cy" />

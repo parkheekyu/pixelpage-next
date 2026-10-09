@@ -39,7 +39,7 @@ export const BGTALK_DEFAULTS: Record<string, number | string> = {
   sub_cx: 0.5, sub_cy: 0.60, sub_size: 0.031, sub_alpha: 0.8, sub_font: "Pretendard", sub_weight: 400, sub_color: "#ffffff", sub_bg: "#000000", sub_lh: 1.25, sub_ls: -0.3, sub_pad_y: 0.12, sub_pad_x: 0.32, sub_radius: 0.12, sub_stroke: 0,
   label_cx: 0.5, label_cy: 0.26, label_size: 0.048, label_font: "BMJUA", label_color: "#ffffff", label_stroke: 0.06, label_stroke_color: "#222222", label_ls: 0,
   note_cx: 0.5, note_cy: 0.335, note_size: 0.03, note_font: "BMJUA", note_color: "#ffffff", note_stroke: 0.035,
-  card_cx: 0.5, card_cy: 0.44, card_h: 0.13, card_w: 0.6, card_radius: 0.08, card_shadow: 1,
+  card_cx: 0.5, card_cy: 0.44, card_h: 0.13, card_w: 0.6, card_radius: 0, card_shadow: 0,
   fire_cx: 0.5, fire_cy: 0.55, fire_size: 0.05, fire_rot: -2,
   cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", logo_w: 0.22,
   intro_x: 0.08, intro_y: 0.50, intro_size: 0.03, intro_logo_x: 0.6, intro_logo_y: 0.36, intro_logo_w: 0.17,
@@ -69,18 +69,22 @@ const Label: React.FC<{ text: string; note?: string; H: number; W: number; P: P 
   );
 };
 
-/** 카드 실제 크기(편집기 오버레이도 같은 계산을 쓴다) */
+/** 요소(카드) 실제 크기 — 날것 이미지를 그대로 배치(흰 카드 틀 없음, 2026-10-09 사용자 지시).
+ *  c.w 가 있으면 그 폭(화면 비율)으로 고정하고 높이는 원본 비율. 없으면 card_w×card_h 안에 맞춘 기본 크기. 위치는 씬별 c.x/c.y, 없으면 card_cx/card_cy. */
 export const cardBox = (c: CardSpec, W: number, H: number, P: P) => {
-  const maxH = H * n(P, "card_h"), maxW = W * (c.w ?? n(P, "card_w")); const asp = c.aspect ?? 1;
-  let h = maxH, w = h * asp; if (w > maxW) { w = maxW; h = w / asp; }
+  const asp = c.aspect ?? 1;
+  let w: number, h: number;
+  if (c.w != null) { w = W * c.w; h = w / asp; }
+  else { const maxH = H * n(P, "card_h"), maxW = W * n(P, "card_w"); h = maxH; w = h * asp; if (w > maxW) { w = maxW; h = w / asp; } }
   return { w, h, cx: W * (c.x ?? n(P, "card_cx")), cy: H * (c.y ?? n(P, "card_cy")) };
 };
 
 const Card: React.FC<{ c: CardSpec; H: number; W: number; P: P }> = ({ c, H, W, P }) => {
   const { w, h, cx, cy } = cardBox(c, W, H, P);
+  const r = n(P, "card_radius"), sh = n(P, "card_shadow");
   return (
-    <div data-el="card" style={{ position: "absolute", left: cx - w / 2, top: cy - h / 2, width: w, height: h, borderRadius: h * n(P, "card_radius"), overflow: "hidden", boxShadow: n(P, "card_shadow") ? "0 8px 22px rgba(0,0,0,0.35)" : undefined, background: "#fff" }}>
-      <Img src={src(c.file)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+    <div data-el="card" style={{ position: "absolute", left: cx - w / 2, top: cy - h / 2, width: w, height: h, borderRadius: r ? h * r : 0, overflow: "hidden", boxShadow: sh ? "0 8px 22px rgba(0,0,0,0.35)" : undefined }}>
+      <Img src={src(c.file)} style={{ width: "100%", height: "100%", objectFit: "fill", display: "block" }} />
     </div>
   );
 };
