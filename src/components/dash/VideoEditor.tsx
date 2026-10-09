@@ -182,8 +182,13 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     return { x: bx, y: by, gx, gy };
   }, []);
   const dragRef = useRef<{ box: Box; mode: "move" | "size"; x0: number; y0: number; v0: [number, number]; s0: number; snap: EditData } | null>(null);
+  const lastDown = useRef<{ id: ElemId; at: number }>({ id: "bg", at: 0 });
   const onBoxDown = (box: Box, mode: "move" | "size") => (e: React.MouseEvent) => {
     e.stopPropagation(); e.preventDefault();
+    // 더블클릭 직접 감지(브라우저 dblclick 에 의존하지 않음): 같은 요소를 350ms 안에 두 번 누르면 인라인 글자 편집
+    const now = Date.now();
+    if (mode === "move" && lastDown.current.id === box.id && now - lastDown.current.at < 350) { lastDown.current = { id: box.id, at: 0 }; startInline(box); return; }
+    lastDown.current = { id: box.id, at: now };
     setSel(box.id); setTab(box.id);
     const rect = canvasRef.current!.getBoundingClientRect();
     const ck: "card" | "card2" = card2On ? "card2" : "card";
@@ -280,7 +285,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               {guides.x.map((g) => <div key={`gx${g}`} className="vx-snap v" style={{ left: `${g * 100}%` }} />)}
               {guides.y.map((g) => <div key={`gy${g}`} className="vx-snap h" style={{ top: `${g * 100}%` }} />)}
               {inline && (
-                <textarea className="vx-inline-edit" autoFocus value={inline.value} spellCheck={false}
+                <textarea className="vx-inline-edit" autoFocus value={inline.value} spellCheck={false} onFocus={(e) => e.target.select()}
                   style={{ left: `${(inline.box.x - inline.box.w / 2) * 100}%`, top: `${(inline.box.y - inline.box.h / 2) * 100}%`, minWidth: `${inline.box.w * 100}%`, minHeight: `${inline.box.h * 100}%`, fontSize: `${(inline.box.h / (inline.value.split("\n").length || 1)) * 0.55 * 100}cqh` }}
                   onChange={(e) => setInline((s) => (s ? { ...s, value: e.target.value } : s))}
                   onMouseDown={(e) => e.stopPropagation()}
