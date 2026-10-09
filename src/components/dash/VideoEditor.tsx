@@ -136,6 +136,24 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
   }, [scene, live, liveCard, curChunk, num, P, data.width, data.height]);
 
   const [sel, setSel] = useState<ElemId | null>(null);
+  const [guides, setGuides] = useState<{ x: number[]; y: number[] }>({ x: [], y: [] });
+  const SNAP = 0.012;   // 스냅 거리(화면 비율)
+  /** 마그넷: 캔버스 중앙·3등분·안전 여백 + 다른 요소의 중심/가장자리에 붙인다 */
+  const snapTo = useCallback((box: Box, nx: number, ny: number, others: Box[], off: boolean) => {
+    if (off) return { x: nx, y: ny, gx: [] as number[], gy: [] as number[] };
+    const tx: number[] = [0.5, 1 / 3, 2 / 3, 0.05 + box.w / 2, 0.95 - box.w / 2];
+    const ty: number[] = [0.5, 1 / 3, 2 / 3, 0.05 + box.h / 2, 0.95 - box.h / 2];
+    for (const o of others) {
+      if (o.id === box.id || o.id === "bg") continue;
+      tx.push(o.x, o.x - o.w / 2 + box.w / 2, o.x + o.w / 2 - box.w / 2);
+      ty.push(o.y, o.y - o.h / 2 + box.h / 2, o.y + o.h / 2 - box.h / 2, o.y + o.h / 2 + box.h / 2 + 0.01, o.y - o.h / 2 - box.h / 2 - 0.01);
+    }
+    let bx = nx, by = ny, dx = SNAP, dy = SNAP; const gx: number[] = [], gy: number[] = [];
+    for (const t of tx) { const d = Math.abs(t - nx); if (d < dx) { dx = d; bx = t; } }
+    for (const t of ty) { const d = Math.abs(t - ny); if (d < dy) { dy = d; by = t; } }
+    if (bx !== nx) gx.push(bx); if (by !== ny) gy.push(by);
+    return { x: bx, y: by, gx, gy };
+  }, []);
   const dragRef = useRef<{ box: Box; mode: "move" | "size"; x0: number; y0: number; v0: [number, number]; s0: number; snap: EditData } | null>(null);
   const onBoxDown = (box: Box, mode: "move" | "size") => (e: React.MouseEvent) => {
     e.stopPropagation(); e.preventDefault();
@@ -149,16 +167,23 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
       liveSet((nd) => {
         if (d.mode === "move") {
           if (d.box.id === "bg") { nd.preset.bg_x = +(d.v0[0] + dx).toFixed(3); nd.preset.bg_y = +(d.v0[1] + dy).toFixed(3); }
-          else if (d.box.posKeys) { if (d.box.posKeys[0]) nd.preset[d.box.posKeys[0]] = +Math.min(0.98, Math.max(0.02, d.v0[0] + dx)).toFixed(3); nd.preset[d.box.posKeys[1]] = +Math.min(0.98, Math.max(0.02, d.v0[1] + dy)).toFixed(3); }
+          else if (d.box.posKeys) {
+            const nx = Math.min(0.98, Math.max(0.02, d.v0[0] + dx)), ny = Math.min(0.98, Math.max(0.02, d.v0[1] + dy));
+            const sn = snapTo(d.box, nx, ny, boxesRef.current, ev.altKey);
+            if (d.box.posKeys[0]) nd.preset[d.box.posKeys[0]] = +sn.x.toFixed(3);
+            nd.preset[d.box.posKeys[1]] = +sn.y.toFixed(3);
+            setGuides({ x: d.box.posKeys[0] ? sn.gx : [], y: sn.gy });
+          }
         } else {
           if (d.box.id === "bg") nd.preset.bg_scale = +Math.max(0.5, Math.min(3, d.s0 * (1 + dy * 2))).toFixed(3);
           else if (d.box.sizeKey) nd.preset[d.box.sizeKey] = +Math.max(0.01, Math.min(0.6, d.s0 * (1 + dy * 3))).toFixed(4);
         }
       });
     };
-    const up = () => { const d = dragRef.current; if (d) { hist.current.past.push(d.snap); hist.current.future = []; } dragRef.current = null; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+    const up = () => { const d = dragRef.current; if (d) { hist.current.past.push(d.snap); hist.current.future = []; } dragRef.current = null; setGuides({ x: [], y: [] }); window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
     window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
   };
+  const boxesRef = useRef<Box[]>([]); useEffect(() => { boxesRef.current = boxes; }, [boxes]);
 
   // ---- 타임라인 청크 드래그 ----
   const cdrag = useRef<{ si: number; ci: number; edge: "s" | "e"; x0: number; s0: number; e0: number; snap: EditData } | null>(null);
@@ -214,6 +239,8 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
             <Player ref={player} component={Comp} inputProps={{ data: data as unknown as ProjectData }} durationInFrames={durF} fps={fps} compositionWidth={data.width} compositionHeight={data.height}
               style={{ width: "100%", height: "100%" }} controls={false} clickToPlay={false} doubleClickToFullscreen={false} spaceKeyToPlayOrPause={false} />
             <div className="vx-overlay" onMouseDown={() => setSel(null)}>
+              {guides.x.map((g) => <div key={`gx${g}`} className="vx-snap v" style={{ left: `${g * 100}%` }} />)}
+              {guides.y.map((g) => <div key={`gy${g}`} className="vx-snap h" style={{ top: `${g * 100}%` }} />)}
               {boxes.map((b) => (
                 <div key={b.id} className={`vx-box ${b.id} ${sel === b.id || tab === b.id ? "sel" : ""}`} style={{ left: `${(b.x - b.w / 2) * 100}%`, top: `${(b.y - b.h / 2) * 100}%`, width: `${b.w * 100}%`, height: `${b.h * 100}%` }} onMouseDown={onBoxDown(b, "move")} title={TABS.find(([id]) => id === b.id)?.[1]}>
                   {(b.sizeKey || b.id === "bg") && <i className="vx-handle" onMouseDown={onBoxDown(b, "size")} />}

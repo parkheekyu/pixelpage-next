@@ -665,3 +665,6 @@ textarea.vx-in { resize: vertical; }
 .vx-cblock .h:hover { background: var(--vx-acc); }
 .vx-playhead { position: absolute; top: 14px; bottom: 0; width: 2px; background: #ff5b5b; pointer-events: none; }
 .vx-playhead::before { content: ""; position: absolute; top: -6px; left: -5px; border: 6px solid transparent; border-top-color: #ff5b5b; }
+.vx-snap { position: absolute; pointer-events: none; z-index: 5; background: #ff3fa4; box-shadow: 0 0 6px rgba(255,63,164,.8); }
+.vx-snap.v { top: 0; bottom: 0; width: 1px; transform: translateX(-.5px); }
+.vx-snap.h { left: 0; right: 0; height: 1px; transform: translateY(-.5px); }
