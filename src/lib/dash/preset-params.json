@@ -1,0 +1,241 @@
+{
+ "bg_talk": {
+  "composition": "BgTalk",
+  "doc": "배경 토크(bg_talk): 컷 없는 한 장면 배경 영상(사람이 작업하는 측면 샷 등) 위에 화면 가운데 띠(라벨 y0.22 ~ 자막 y0.55)만 쓰는 정보형 릴스. 레퍼런스 AI 목소리 툴 모음 42s(references_inbox/ref_AQMf) 프레임 분석 presets/_analysis/bg_talk.md. 섹션 라벨(배민 주아 흰+검정 외곽 y0.22) / 보조 메모(⚠ 작게 y0.29) / 요소 카드(캡처·로고 중심 y0.40, 높이≤0.13H, 그림자, 애니메이션 없음) / 자막(검정 박스+흰 배민 주아 0.034H, y0.55(중앙 살짝 아래), 구절 즉시 교체). 폰트는 라벨·자막 모두 BMJUA(기랑해랑·Pretendard 금지, 2026-10-09 재측정) / 훅 첫 1초 불타는 글자(고정) / 인트로 카드(다른 컷+검정 박스 제목 3줄+로고 팝) / 엔딩 검정+CTA. 여성 TTS 속도감(나긋 여성, 1.1배, 간격 0.03). BGM 낮게.",
+  "defaults": {
+   "voice_id": "4e118bfbb83e401c84699c09b5f08257",
+   "speed": 1.1,
+   "gap": 0.03,
+   "sil_min": 0.25,
+   "sil_keep": 0.08,
+   "sub_source": "narration",
+   "chunk_words": 3,
+   "strip_punct": false,
+   "align": true,
+   "sub_cy": 0.6,
+   "sub_size": 0.031,
+   "label_cy": 0.26,
+   "label_size": 0.048,
+   "note_cy": 0.335,
+   "card_cy": 0.44,
+   "card_h": 0.13,
+   "card_w": 0.6,
+   "bgm_volume": 0.08,
+   "bgm": "assets/bgm/lyria_bright_vlog_pop.mp3",
+   "font": "BMJUA",
+   "sub_alpha": 0.8,
+   "sub_font": "Pretendard Regular"
+  }
+ },
+ "clean_ui": {
+  "composition": null,
+  "doc": "크림 배경 + 중앙 UI 카드 순차 팝인 + 큰 숫자 + 하단 작은 검정 자막. 레퍼런스2.",
+  "defaults": {
+   "speed": 1.15,
+   "gap": 0.1,
+   "bg": "0xF3EFE6",
+   "card_cy": 0.42,
+   "sub_cy": 0.74,
+   "sub_size": 0.034,
+   "sfx_volume": 0.3,
+   "sub_bottom": 0.2,
+   "number_size": 0.11,
+   "card_w": 0.8
+  }
+ },
+ "depth_doc": {
+  "composition": "DepthDoc",
+  "doc": "다큐 설명형(한강 레퍼런스): 3D 조감도 이미지 + Depth Anything 3레이어 패럴랙스 카메라(zoom/pan/drone_push/pull_out/flyover/parallax) + 빨간 주석(title/label/measure/polygon/pulse) + 흰 자막. 영상 생성 0.",
+  "defaults": {
+   "speed": 1.0,
+   "gap": 0.15,
+   "chunk_words": 4,
+   "sub_source": "narration",
+   "strip_punct": true,
+   "sub_y": 0.7,
+   "sub_size": 0.034,
+   "sfx_volume": 0.0
+  }
+ },
+ "doodle": {
+  "composition": null,
+  "doc": "두들툰 프리셋. 값은 H(1920) 비율. clients/<slug>/presets/doodle.json 또는 script.json 의 preset_overrides 로 덮어쓸 수 있음.",
+  "defaults": {
+   "stamp": false,
+   "stamp_text": "",
+   "text_cy": 0.3,
+   "text_size": 0.031,
+   "text_font_index": 6,
+   "art_cy": 0.58,
+   "art_w": 0.6,
+   "art_w_with_big": 0.42,
+   "big_size": 0.062,
+   "big_font": "/Users/heekyu/Library/Fonts/BMYEONSUNG_otf.otf",
+   "end_card": true,
+   "end_text": "끝",
+   "end_seconds": 1.0,
+   "gap": 0.12,
+   "speed": 1.15,
+   "sfx_volume": 0.35,
+   "pop_in": true
+  }
+ },
+ "doodle_talk": {
+  "composition": "DoodleTalk",
+  "doc": "하찮은 두들 토크(레퍼런스 2): 흰 배경 / 위 오브젝트 그림(구절마다 교체, 팝) / 중간 손글씨 자막 1~3단어(키워드 빨강) / 아래 고정 화자 포즈 교체. Remotion DoodleTalk.",
+  "defaults": {
+   "speed": 1.15,
+   "gap": 0.1,
+   "chunk_words": 2,
+   "obj_cy": 0.27,
+   "obj_w": 0.5,
+   "sub_cy": 0.47,
+   "sub_size": 0.04,
+   "char_cy": 0.735,
+   "char_w": 0.4,
+   "hl": "#E5342B",
+   "sfx_volume": 0.3,
+   "character_dir": "presets/doodle_talk_character"
+  }
+ },
+ "giphy_meme": {
+  "composition": "GiphyMeme",
+  "doc": "크몽 레퍼런스 01: 파스텔 핑크 배경+꽃 블롭, 상단 고정 타이틀(핑크 볼드+부제), 가운데 Giphy 밈 gif(단독/VS 2개, 흰 테두리 라운드), 누적 자막(손글씨 or 고딕, 키워드 핑크), 하단 '출처: GIPHY'. 20~25초, 영상 생성 0원.",
+  "defaults": {
+   "speed": 1.06,
+   "gap": 0.06,
+   "sub_source": "chunks",
+   "chunk_words": 3,
+   "strip_punct": false,
+   "align": true,
+   "bg": "#FBD5E5",
+   "pink": "#FF3E9A",
+   "ink": "#1f1f1f",
+   "flower": "#F7B9D4",
+   "gif_cy": 0.42,
+   "gif_w": 0.86,
+   "sub_top": 0.6,
+   "sub_size": 0.042,
+   "sfx_volume": 0.45,
+   "sil_min": 0.22,
+   "sil_keep": 0.08,
+   "bgm_volume": 0.16
+  }
+ },
+ "letterbox": {
+  "composition": null,
+  "doc": "레터박스 프리셋(assemble_v3). 위아래 검정, 상단 카피 2줄(흰/초록), 하단 CTA, 영상 안 작은 자막 박스.",
+  "defaults": {
+   "vid_y0": 0.284,
+   "vid_y1": 0.719,
+   "copy_size": 0.0375,
+   "sub_y": 0.674,
+   "sub_size": 0.021,
+   "cta_y": 0.744,
+   "cta_size": 0.026,
+   "gap": 0.05,
+   "speed": 1.2
+  }
+ },
+ "screen_story": {
+  "composition": "ScreenStory",
+  "doc": "레퍼런스(OmniRoute) 스타일: 캡처 블러 앰비언트 배경 + 맥 브라우저 카드 슬로우 줌/팬 + 2~4단어 큰 자막(흰/오렌지) + 인트로/아웃트로 카드",
+  "defaults": {
+   "speed": 1.08,
+   "gap": 0.18,
+   "sub_size": 0.046,
+   "sub_y": 0.66,
+   "card_cy": 0.4,
+   "ambient": "#1c1f2e",
+   "sfx_volume": 0.3,
+   "sub_source": "narration",
+   "chunk_words": 1
+  }
+ },
+ "stock_cinematic": {
+  "composition": null,
+  "doc": "풀스크린 스톡 영상 + 중앙 큰 자막(노란 키워드) + 오버레이 카드. 레퍼런스1.",
+  "defaults": {
+   "speed": 1.15,
+   "gap": 0.08,
+   "grade": "eq=brightness=-0.12:saturation=0.9",
+   "sub_cy": 0.55,
+   "sub_size": 0.042,
+   "card_cy": 0.36,
+   "sfx_volume": 0.4
+  }
+ },
+ "vlog_cut": {
+  "composition": "VlogCut",
+  "doc": "브이로그 컷: 핸드헬드 일상·여행 B-roll 하드컷 1.3s + 정중앙 자막(훅 손글씨 라벨 타이핑 → 고딕 흰/노랑/핑크 → 엔딩 둥근 핑크+하트) + 증거 캡처 풀스크린 + 밈 스티커 + 초록 화살표 CTA. 분석 presets/_analysis/vlog_cut.md. 영상은 **1인칭 POV 날것 느낌이 핵심** → Omni t2v(프롬프트에 'shot on iPhone by the person themselves, first-person POV, my hands/feet, no cinematic') 720p. 360p 는 흐려서 AI 티 남. Pexels 스톡은 다듬어져서 안 맞음(사용자 반려 2026-10-05).",
+  "defaults": {
+   "voice_id": "4e118bfbb83e401c84699c09b5f08257",
+   "speed": 1.1,
+   "gap": 0.03,
+   "sil_min": 0.2,
+   "sil_keep": 0.06,
+   "sub_source": "narration",
+   "chunk_words": 3,
+   "strip_punct": false,
+   "align": true,
+   "sub_cy": 0.5,
+   "sub_size": 0.032,
+   "hand_size": 0.052,
+   "end_size": 0.05,
+   "white": "#FFFFFF",
+   "yellow": "#F3CF4F",
+   "pink": "#F06CAC",
+   "ink": "#111111",
+   "green": "#39E639",
+   "stroke_ratio": 0.04,
+   "sfx_volume": 0.4,
+   "bgm_volume": 0.09,
+   "bgm": "assets/bgm/lyria_bright_vlog_pop.mp3",
+   "omni_res_test": "720p",
+   "omni_res_final": "720p",
+   "clip_seconds": 4,
+   "lime": "#B5F2A8",
+   "pink_light": "#FFA3DD",
+   "magenta": "#8A0F4C",
+   "broll_source": "omni_camcorder_720p",
+   "broll_fallback": "grok(동작 없는 컷·한도 초과 시)",
+   "omni_look": "camcorder",
+   "text_colors": "흰색만(강조 연두 #B5F2A8 허용, 핑크 금지 — 사용자 2026-10-05). 훅 라벨은 검정 글자+흰 종이.",
+   "text_motion": "없음(팝·기울기·흔들림 금지 — 사용자 2026-10-05). 훅 라벨 글자 타이핑만 허용.",
+   "shot_card_w": 0.8,
+   "meme_y": 0.74,
+   "evidence": "기본 공백(실제 인증 캡처 받으면 넣는다)",
+   "broll_library": "presets/vlog_cut_broll/ (index.json)"
+  }
+ },
+ "youtube_dhc": {
+  "composition": "ClipAd",
+  "doc": "유튜브-디하클 프리셋: 강사 유튜브 롱폼 인터뷰(1080p) → 재키 계정 9:16 숏폼. 2026-09-30 월억남 10편으로 확정. 스펙 JSON(headline/segments/hook)과 함께 pipeline/clip_ad.py 가 사용. 채널별 zoom: 휴먼인사이드 등 1.3 / 원더휴먼 1.0(원본 그대로).",
+  "defaults": {
+   "zoom": 1.3,
+   "bottom_margin": 0.05,
+   "orig_subs": true,
+   "subs": false,
+   "speed": 1.25,
+   "gap": 0.6,
+   "keep": 0.25,
+   "hook_xfade": 0.3,
+   "target_sec": 60,
+   "square": true,
+   "square_y0": 388,
+   "cta": "월억로드 공략집 받기👇",
+   "head_font": "GumiRomance",
+   "head_size": 0.039,
+   "head_line_height": 1.08,
+   "yellow": "#E8F800",
+   "video_y": 0.342,
+   "video_w": 1.0,
+   "cta_size": 0.03,
+   "headline_formula": "1줄 과거 고난 숫자 / 2줄 유튜브로+금액+나이·정체성. 방법론 헤드라인 금지",
+   "deliver_dir": "~/Desktop/YYMMDD_강사명",
+   "hook_transition": "fadeblack",
+   "hook_black_hold": 0.25,
+   "money_wording": "원 단위 생략: 월 천 / 월 1000 / 2천 달성 / 1억 ㄷㄷ / 월 8천 찍은 / 억대 — 동사는 찍다·벌다·달성·갚다·뒤집다. 추상 표현(그거 보고, 이렇게만) 금지, 숫자+대상(채널 150개, 폰 60대, 영상 3개)으로."
+  }
+ }
+}

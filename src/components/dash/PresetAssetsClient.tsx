@@ -3,7 +3,7 @@
 import { useCallback, useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Bot, Check, Copy, Download, Pencil, Trash2, Upload } from "lucide-react";
+import { ArrowLeft, Bot, Check, Copy, Download, Pencil, SlidersHorizontal, Trash2, Upload } from "lucide-react";
 import type { Project } from "@/lib/dash/types";
 import { ASSET_KINDS, KIND_LABEL, type AssetKind, type ClientPreset, type PresetAsset } from "@/lib/dash/preset-types";
 import { deleteAsset, getUploadUrl, registerAsset, relabelAsset, renameClientPreset } from "@/app/app/preset-actions";
@@ -107,7 +107,10 @@ export default function PresetAssetsClient({ project, preset, assets, catalog, b
             </div>
           )}
         </div>
-        <a className="btn" href={`${base}/${preset.preset_key}.mp4`} target="_blank" rel="noreferrer">프리셋 샘플 보기</a>
+        <div className="controls">
+          <Link href={`/app/presets/${project.id}/${preset.id}/settings`} className="btn primary"><SlidersHorizontal className="ico" aria-hidden /> 세팅{Object.keys(preset.params ?? {}).length ? ` (${Object.keys(preset.params).length})` : ""}</Link>
+          <a className="btn" href={`${base}/${preset.preset_key}.mp4`} target="_blank" rel="noreferrer">프리셋 샘플 보기</a>
+        </div>
       </div>
       {err && <div className="cpz-err">{err}</div>}
       <p className="hint pa-help">파일을 아래 칸에 끌어다 놓거나 칸을 눌러 고릅니다. <Bot className="ico" aria-hidden /> 표시는 광고제작 머신이 생성해 넣은 에셋입니다. 소재 제작 시 이 프리셋의 에셋을 우선 씁니다. (파일당 50MB)</p>

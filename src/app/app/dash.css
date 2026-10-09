@@ -525,3 +525,34 @@ table.sheet { border-collapse: separate; border-spacing: 0; font-size: 14px; min
 .pp-dash .pa-item.up.bad .pa-media { color: var(--bad); }
 .pp-dash .pa-prog { width: 80%; height: 6px; background: var(--line); border-radius: 999px; overflow: hidden; }
 .pp-dash .pa-prog i { display: block; height: 100%; background: var(--s1); }
+
+/* ---------- 프리셋 설정 편집기 ---------- */
+.pp-dash .pe { display: grid; gap: 16px; }
+.pp-dash .pe-scope { font-size: 12px; font-weight: 500; color: var(--s1); background: color-mix(in srgb, var(--s1) 10%, var(--card)); padding: 2px 8px; border-radius: 999px; }
+.pp-dash .cpz-err.ok { background: color-mix(in srgb, var(--good) 10%, var(--card)); color: var(--good); border-color: color-mix(in srgb, var(--good) 30%, var(--line)); }
+.pp-dash .pe-body { display: grid; grid-template-columns: 340px 1fr; gap: 20px; align-items: start; }
+@media (max-width: 900px) { .pp-dash .pe-body { grid-template-columns: 1fr; } }
+.pp-dash .pe-preview { display: grid; gap: 10px; position: sticky; top: 16px; }
+.pp-dash .pe-canvas { position: relative; aspect-ratio: 9/16; width: 100%; background: #111 center/cover no-repeat; border-radius: 14px; overflow: hidden; container-type: size; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+.pp-dash .pe-label { position: absolute; left: 0; right: 0; transform: translateY(-50%); text-align: center; color: #fff; font-weight: 800; -webkit-text-stroke: .6px #222; paint-order: stroke fill; text-shadow: 0 2px 6px rgba(0,0,0,.35); }
+.pp-dash .pe-note { position: absolute; left: 0; right: 0; transform: translateY(-50%); text-align: center; color: #fff; -webkit-text-stroke: .4px #222; paint-order: stroke fill; }
+.pp-dash .pe-card { position: absolute; left: 50%; transform: translate(-50%, -50%); background: #fff; border-radius: 8px; box-shadow: 0 8px 22px rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; color: var(--muted); font-size: 12px; }
+.pp-dash .pe-sub { position: absolute; left: 0; right: 0; transform: translateY(-50%); display: flex; justify-content: center; }
+.pp-dash .pe-sub span { color: #fff; padding: .12em .32em; border-radius: .12em; white-space: nowrap; }
+.pp-dash .pe-guide { position: absolute; left: 0; right: 0; border-top: 1.5px dashed #ffe600; }
+.pp-dash .pe-guide span { position: absolute; left: 6px; top: -18px; font-size: 11px; color: #ffe600; text-shadow: 0 1px 3px #000; }
+.pp-dash .pe-noguide { position: absolute; inset: auto 12px 12px; background: rgba(0,0,0,.6); color: #fff; font-size: 12px; padding: 8px 10px; border-radius: 8px; }
+.pp-dash .pe-sample { width: 100%; aspect-ratio: 9/16; background: #000; border-radius: 12px; }
+.pp-dash .pe-fields { display: grid; gap: 14px; }
+.pp-dash .pe-group { border: 1px solid var(--line); border-radius: 12px; background: var(--card); padding: 8px 14px 12px; display: grid; gap: 6px; }
+.pp-dash .pe-group legend { font-weight: 600; font-size: 13px; color: var(--text-2); padding: 0 6px; }
+.pp-dash .pe-field { display: grid; grid-template-columns: 260px 1fr auto; gap: 12px; align-items: center; padding: 6px 4px; border-radius: 8px; }
+.pp-dash .pe-field.dirty { background: color-mix(in srgb, var(--s1) 6%, var(--card)); }
+.pp-dash .pe-field label { display: grid; gap: 1px; font-size: 13px; }
+.pp-dash .pe-field label code { font-size: 11px; color: var(--muted); }
+.pp-dash .pe-field label small { color: var(--muted); font-size: 11px; }
+.pp-dash .pe-field input[type="text"], .pp-dash .pe-field input[type="number"] { font: inherit; font-size: 13px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 8px; width: 100%; }
+.pp-dash .pe-slider { display: grid; grid-template-columns: 1fr 86px; gap: 8px; align-items: center; }
+.pp-dash .pe-slider input[type="range"] { width: 100%; accent-color: var(--s1); }
+.pp-dash .pe-reset { font: inherit; font-size: 11px; color: var(--s1); background: none; border: 1px solid color-mix(in srgb, var(--s1) 40%, var(--line)); border-radius: 6px; padding: 3px 7px; cursor: pointer; white-space: nowrap; }
+@media (max-width: 700px) { .pp-dash .pe-field { grid-template-columns: 1fr; } }

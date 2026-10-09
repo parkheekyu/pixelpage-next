@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 
 type Item = { key: string; name: string; tag: string; desc: string; fit: string; cost: string; clients: string[] };
 
@@ -37,7 +38,7 @@ export default function PresetGallery({ items, base }: { items: Item[]; base: st
               <h4>비용 · 시간</h4><p>{open.cost}</p>
               <h4>써본 고객사</h4><p>{open.clients.join(", ")}</p>
               <p className="hint">광고제작/presets/{open.key}.json · 실행법은 CLAUDE.md 프리셋 항목</p>
-              <button type="button" className="btn" onClick={() => setOpen(null)}>닫기</button>
+              <div className="controls"><Link href={`/app/presets/edit/${open.key}`} className="btn primary">설정 편집</Link><button type="button" className="btn" onClick={() => setOpen(null)}>닫기</button></div>
             </div>
           </div>
         </div>
