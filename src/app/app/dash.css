@@ -676,3 +676,10 @@ textarea.vx-in { resize: vertical; }
 .vx-zone.off { border-color: rgba(255,255,255,.2); } .vx-zone.off em { color: rgba(255,255,255,.5); }
 .vx-zone.on { pointer-events: auto; cursor: move; border: 1.5px dashed #00e5ff; background: rgba(0,229,255,.06); z-index: 4; }
 .vx-zone.on .vx-handle { opacity: 1; border-color: #00e5ff; }
+.vx-zh { position: absolute; width: 10px; height: 10px; background: #fff; border: 2px solid #00e5ff; border-radius: 2px; z-index: 5; }
+.vx-zh.n { top: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; width: 26px; height: 8px; }
+.vx-zh.s { bottom: -6px; left: 50%; transform: translateX(-50%); cursor: ns-resize; width: 26px; height: 8px; }
+.vx-zh.e { right: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; width: 8px; height: 26px; }
+.vx-zh.w { left: -6px; top: 50%; transform: translateY(-50%); cursor: ew-resize; width: 8px; height: 26px; }
+.vx-zh.ne { right: -6px; top: -6px; cursor: nesw-resize; } .vx-zh.sw { left: -6px; bottom: -6px; cursor: nesw-resize; }
+.vx-zh.nw { left: -6px; top: -6px; cursor: nwse-resize; } .vx-zh.se { right: -6px; bottom: -6px; cursor: nwse-resize; }

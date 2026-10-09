@@ -245,16 +245,27 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
     window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
   };
   const boxesRef = useRef<Box[]>([]); useEffect(() => { boxesRef.current = boxes; }, [boxes]);
-  const onZoneDown = (mode: "move" | "size") => (e: React.MouseEvent) => {
+  type ZMode = "move" | "n" | "s" | "e" | "w" | "ne" | "nw" | "se" | "sw";
+  const onZoneDown = (mode: ZMode) => (e: React.MouseEvent) => {
     e.stopPropagation(); e.preventDefault(); setTab("card"); setSel("zone");
-    const rect = canvasRef.current!.getBoundingClientRect(); const z0 = { ...zone }; const x0 = e.clientX, y0 = e.clientY; const snap = data;
+    const rect = canvasRef.current!.getBoundingClientRect(); const z0 = { ...zone }; const x0 = e.clientX, y0 = e.clientY; const snap = data; const MIN = 0.05;
     const move = (ev: MouseEvent) => {
       const dx = (ev.clientX - x0) / rect.width, dy = (ev.clientY - y0) / rect.height;
       liveSet((nd) => {
-        if (mode === "move") { nd.preset.zone_x = +Math.min(1 - z0.w, Math.max(0, z0.x + dx)).toFixed(3); nd.preset.zone_y = +Math.min(1 - z0.h, Math.max(0, z0.y + dy)).toFixed(3); }
-        else { nd.preset.zone_w = +Math.min(1 - z0.x, Math.max(0.1, z0.w + dx)).toFixed(3); nd.preset.zone_h = +Math.min(1 - z0.y, Math.max(0.1, z0.h + dy)).toFixed(3); }
+        let { x, y, w, h } = z0;
+        if (mode === "move") { x = Math.min(1 - w, Math.max(0, x + dx)); y = Math.min(1 - h, Math.max(0, y + dy)); }
+        else {
+          if (mode.includes("e")) w = Math.min(1 - x, Math.max(MIN, z0.w + dx));
+          if (mode.includes("s")) h = Math.min(1 - y, Math.max(MIN, z0.h + dy));
+          if (mode.includes("w")) { const nx = Math.min(z0.x + z0.w - MIN, Math.max(0, z0.x + dx)); w = z0.x + z0.w - nx; x = nx; }
+          if (mode.includes("n")) { const ny = Math.min(z0.y + z0.h - MIN, Math.max(0, z0.y + dy)); h = z0.y + z0.h - ny; y = ny; }
+        }
+        nd.preset.zone_x = +x.toFixed(3); nd.preset.zone_y = +y.toFixed(3); nd.preset.zone_w = +w.toFixed(3); nd.preset.zone_h = +h.toFixed(3);
       });
     };
+    const up = () => { hist.current.past.push(snap); hist.current.future = []; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+    window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
+  };
     const up = () => { hist.current.past.push(snap); hist.current.future = []; window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
     window.addEventListener("mousemove", move); window.addEventListener("mouseup", up);
   };
@@ -317,7 +328,7 @@ export default function VideoEditor({ edit, projectId, projectName }: { edit: Pr
               {guides.y.map((g) => <div key={`gy${g}`} className="vx-snap h" style={{ top: `${g * 100}%` }} />)}
               <div className={`vx-zone ${tab === "card" ? "on" : ""}`} style={{ left: `${zone.x * 100}%`, top: `${zone.y * 100}%`, width: `${zone.w * 100}%`, height: `${zone.h * 100}%` }} onMouseDown={tab === "card" ? onZoneDown("move") : undefined}>
                 <em>요소 세이프존</em>
-                {tab === "card" && <i className="vx-handle" onMouseDown={onZoneDown("size")} />}
+                {tab === "card" && (["n", "s", "e", "w", "ne", "nw", "se", "sw"] as const).map((m) => <i key={m} className={`vx-zh ${m}`} onMouseDown={onZoneDown(m)} />)}
               </div>
               {inline && (
                 <textarea className="vx-inline-edit" autoFocus value={inline.value} spellCheck={false} onFocus={(e) => e.target.select()}
