@@ -209,7 +209,7 @@ const Stats: React.FC<{ el: El; frame: number; fps: number; H: number; W: number
         return (
           <div key={i} style={{ width: tw, height: th, borderRadius: th * 0.14, background: dark ? "rgba(255,255,255,0.05)" : "#F5F6F8", border: `1px solid ${dark ? "rgba(255,255,255,0.12)" : "#E6E8EC"}`, padding: th * 0.14, boxSizing: "border-box", fontFamily: FONT, color: dark ? "#fff" : "#111", ...popStyle(p) }}>
             <div style={{ fontSize: fs * 0.8, color: dark ? "#aaa" : "#777", fontWeight: 500 }}>{it.label}</div>
-            <div style={{ fontSize: fs * 2.1, fontWeight: 700, marginTop: th * 0.08, letterSpacing: -1, display: "flex", alignItems: "baseline", gap: fs * 0.4 }}>{val}<span style={{ fontSize: fs * 1.1, color: trendCol }}>{it.trend === "up" ? "↑" : it.trend === "down" ? "↓" : "→"}</span></div>
+            <div style={{ fontSize: Math.min(fs * 2.1, (tw - th * 0.28) / Math.max(4, val.length + 1.2) * 1.75), fontWeight: 700, marginTop: th * 0.08, letterSpacing: -1, display: "flex", alignItems: "baseline", gap: fs * 0.4, whiteSpace: "nowrap" }}>{val}<span style={{ fontSize: fs * 1.1, color: trendCol }}>{it.trend === "up" ? "↑" : it.trend === "down" ? "↓" : "→"}</span></div>
           </div>
         );
       })}
@@ -224,7 +224,7 @@ const Chart: React.FC<{ el: El; frame: number; fps: number; H: number; W: number
     <div data-el="card" style={{ position: "absolute", left: W / 2 - cw / 2, top: H * cy - ch / 2, width: cw, height: ch }}>
       <div style={{ position: "absolute", left: 0, right: 0, bottom: fs * 1.6, borderBottom: `1px solid ${dark ? "#333" : "#ddd"}` }} />
       {bars.map((v, i) => { const p = enterP(frame, fps, 0.35, 0.08 + i * 0.09); const hgt = (ch - fs * 1.6) * (v / mx) * p; const last = i === bars.length - 1;
-        return <div key={i} style={{ position: "absolute", left: i * bw + bw * 0.2, width: bw * 0.6, bottom: fs * 1.6, height: hgt, borderRadius: bw * 0.12, background: last ? accent : (dark ? "rgba(255,255,255,0.22)" : "#D9DDE3") }}>{last && <div style={{ position: "absolute", top: -fs * 1.5, left: "50%", transform: "translateX(-50%)", fontFamily: FONT, fontWeight: 700, fontSize: fs, color: accent, opacity: p }}>{el.bar_labels?.[i] ?? `${v}`}</div>}</div>; })}
+        return <div key={i} style={{ position: "absolute", left: i * bw + bw * 0.2, width: bw * 0.6, bottom: fs * 1.6, height: hgt, borderRadius: bw * 0.12, background: last ? accent : (dark ? "rgba(255,255,255,0.22)" : "#D9DDE3") }}>{last && <div style={{ position: "absolute", top: -fs * 1.5, left: "50%", transform: "translateX(-50%)", fontFamily: FONT, fontWeight: 700, fontSize: fs, color: accent, opacity: p, whiteSpace: "nowrap" }}>{el.bar_labels?.[i] ?? `${v}`}</div>}</div>; })}
       {el.bar_labels && el.bar_labels.map((l, i) => i < bars.length - 1 ? <div key={i} style={{ position: "absolute", left: i * bw, width: bw, bottom: 0, textAlign: "center", fontFamily: FONT, fontSize: fs * 0.8, color: dark ? "#888" : "#999" }}>{l}</div> : null)}
     </div>
   );
