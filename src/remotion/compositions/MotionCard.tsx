@@ -31,7 +31,7 @@ export const MOTION_DEFAULTS: Record<string, number | string> = {
   accent: "#07C65F", light_bg: "#FFFFFF", dark_bg: "#101010", light_text: "#111111", dark_text: "#FFFFFF",
   el_cy: 0.40, el_h: 0.22, text_cy: 0.63, text_size: 0.031, text_lh: 1.35, hook_el_cy: 0.367, hook_text_cy: 0.46, hook_text_size: 0.036,
   top_text_cy: 0.25, top_el_cy: 0.46, top_el_h: 0.27, top_chip_cy: 0.645, cta_icon_cy: 0.335, cta_text_cy: 0.43, cta_btn_cy: 0.546, cta_btn_w: 0.72,
-  brand_cy: 0.751, brand_size: 0.02, enter: 0.3, swap: 0.2, wipe: 0.37, chip_w: 0.76, chip_h: 0.045,
+  brand_cy: 0.751, brand_size: 0.02, enter: 0.22, swap: 0.15, wipe: 0.3, chip_every: 1.0, chip_w: 0.76, chip_h: 0.045,
 };
 const D = MOTION_DEFAULTS;
 const n = (P: P, k: string) => Number(P[k] ?? D[k]);
@@ -71,7 +71,7 @@ const Logo: React.FC<{ el: El; p: number; H: number; W: number; cy: number }> = 
 };
 
 const Chip: React.FC<{ el: El; frame: number; fps: number; dark: boolean; H: number; W: number; P: P; cy: number }> = ({ el, frame, fps, dark, H, W, P, cy }) => {
-  const enter = n(P, "enter"), every = el.every ?? 1.3; const t = frame / fps;
+  const enter = n(P, "enter"), every = el.every ?? n(P, "chip_every"); const t = frame / fps;
   const p = enterP(frame, fps, enter);
   const cw = W * n(P, "chip_w"), ch = H * n(P, "chip_h"); const fs = ch * 0.4;
   const labels = el.labels ?? []; const li = labels.length ? Math.min(labels.length - 1, Math.floor(Math.max(0, t - 0.1) / every)) : -1;

@@ -171,14 +171,14 @@
  },
  "motion_card": {
   "composition": "MotionCard",
-  "doc": "모션 카드(motion_card): 배경 영상 없이 단색 배경(흰/검정) 위에 요소 1개 + 헤드라인 2줄 + 브랜드 로고 줄만 두는 B2B 세일즈 모션그래픽. 레퍼런스 Onthe AI 39s 분석 presets/_analysis/motion_card.md. 씬=문장, 92% 정지, 모션은 등장 0.3s/교체 0.2s/전환 0.37s. 요소 logo·chip·pins·phone·card·toggle·device·cta·image, 전환 wipe·flash·fade. 폰트 Pretendard 만, 강조 #07C65F. 남성 저음 TTS 1.0배, 문장 간격 0.6, BGM 없음, 효과음 pop/click/swipe 교대.",
+  "doc": "모션 카드(motion_card): 배경 영상 없이 단색 배경(흰/검정) 위에 요소 1개 + 헤드라인 2줄 + 브랜드 로고 줄만 두는 B2B 세일즈 모션그래픽. 레퍼런스 Onthe AI 39s 분석 presets/_analysis/motion_card.md. 씬=문장, 92% 정지, 모션은 등장 0.3s/교체 0.2s/전환 0.37s. 요소 logo·chip·pins·phone·card·toggle·device·cta·image, 전환 wipe·flash·fade. 폰트 Pretendard 만, 강조 #07C65F. 남성 저음 TTS 1.0배, 문장 간격 0.6, BGM 없음, 효과음 pop/click/swipe 교대. 2026-10-10 속도감 ↑: Typecast 필제 tempo 1.15 + toneup, 후처리 1.12배, 간격 0.35, 등장 0.22s/교체 0.15s/와이프 0.3s, 라벨 순환 1.0s.",
   "defaults": {
    "tts": "typecast",
    "voice_id": "tc_68257f68bc6e3c161ab5078d",
-   "speed": 1.0,
-   "gap": 0.6,
-   "sil_min": 0.4,
-   "sil_keep": 0.28,
+   "speed": 1.12,
+   "gap": 0.35,
+   "sil_min": 0.3,
+   "sil_keep": 0.15,
    "sub_source": "narration",
    "chunk_words": 99,
    "align": false,
@@ -205,14 +205,17 @@
    "cta_btn_w": 0.72,
    "brand_cy": 0.751,
    "brand_size": 0.02,
-   "enter": 0.3,
-   "swap": 0.2,
-   "wipe": 0.37,
+   "enter": 0.22,
+   "swap": 0.15,
+   "wipe": 0.3,
    "chip_w": 0.76,
    "chip_h": 0.045,
    "bgm": "",
    "bgm_volume": 0,
-   "sfx_volume": 0.22
+   "sfx_volume": 0.22,
+   "tts_tempo": 1.15,
+   "emotion": "toneup",
+   "chip_every": 1.0
   }
  },
  "screen_story": {
