@@ -16,7 +16,9 @@ type Chunk = { t: string; s: number; e: number };
 type Label = { name: string; icon?: string };
 type Shot = { file: string; step?: number; label?: string; at?: number };
 type El = {
-  type: "logo" | "chip" | "pins" | "phone" | "card" | "toggle" | "device" | "cta" | "image";
+  type: "logo" | "chip" | "pins" | "phone" | "card" | "toggle" | "device" | "cta" | "image" | "stats" | "chart" | "flow";
+  stats?: { label: string; value: string; to?: number; prefix?: string; suffix?: string; trend?: "up" | "flat" | "down" }[];
+  bars?: number[]; bar_labels?: string[]; nodes?: string[]; notes?: string[];
   file?: string; w?: number; text?: string; labels?: Label[]; every?: number; map?: string; pins?: [number, number][];
   screen?: string; blob?: [string, string]; title?: string; lines?: number; left?: string; right?: string; on_at?: number;
   shots?: Shot[]; face?: string; icon?: string; button?: string; aspect?: number;
@@ -101,6 +103,7 @@ const Pins: React.FC<{ el: El; frame: number; fps: number; H: number; W: number;
         return (
           <div key={i} style={{ position: "absolute", left: x * w - sz / 2, top: y * h - sz, width: sz, height: sz, opacity: pp, transform: `translateY(${(1 - pp) * -20}px)` }}>
             <div style={{ position: "absolute", inset: -sz * 0.6, borderRadius: "50%", background: accent, opacity: 0.22 * breathe, filter: `blur(${sz * 0.35}px)` }} />
+            {[0, 1].map((k) => { const ph = ((frame / fps) * 0.6 + i * 0.17 + k * 0.5) % 1; return <div key={k} style={{ position: "absolute", left: sz / 2 - sz * (0.3 + ph * 1.6), top: sz * 1.1 - sz * (0.3 + ph * 1.6) * 0.45, width: sz * (0.6 + ph * 3.2), height: sz * (0.6 + ph * 3.2) * 0.45, borderRadius: "50%", border: `1.5px solid ${accent}`, opacity: (1 - ph) * 0.5 * pp }} />; })}
             <svg viewBox="0 0 24 32" width={sz} height={sz * 1.33} style={{ position: "absolute", left: 0, top: 0 }}><path d="M12 0C5.4 0 0 5.4 0 12c0 9 12 20 12 20s12-11 12-20C24 5.4 18.6 0 12 0z" fill={accent} /><circle cx="12" cy="12" r="5" fill="#fff" /></svg>
           </div>
         );
@@ -115,7 +118,10 @@ const Phone: React.FC<{ el: El; frame: number; fps: number; H: number; W: number
   return (
     <div data-el="card" style={{ position: "absolute", left: 0, width: W, top: H * cy - h / 2, height: h }}>
       <div style={{ position: "absolute", left: W / 2 - w / 2, top: (1 - p) * h * 0.6, width: w, height: h, borderRadius: w * 0.14, background: "#1c1c1e", padding: w * 0.035, boxSizing: "border-box", opacity: p, boxShadow: "0 20px 60px rgba(0,0,0,0.45)" }}>
-        <div style={{ width: "100%", height: "100%", borderRadius: w * 0.11, overflow: "hidden", background: "linear-gradient(180deg,#ffffff 0%,#e9f1ff 70%,#cfe0ff 100%)" }}>{el.screen && <Img src={src(el.screen)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}</div>
+        <div style={{ width: "100%", height: "100%", borderRadius: w * 0.11, overflow: "hidden", background: "linear-gradient(180deg,#ffffff 0%,#e9f1ff 70%,#cfe0ff 100%)", position: "relative" }}>
+          {el.screen && <Img src={src(el.screen)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+          {(el.notes ?? []).map((nt, i) => { const np = enterP(frame, fps, 0.25, 0.35 + i * 0.45); const fs2 = w * 0.055; return <div key={i} style={{ position: "absolute", left: w * 0.06, right: w * 0.06, top: w * 0.18 + i * fs2 * 3.1, padding: `${fs2 * 0.6}px ${fs2 * 0.8}px`, borderRadius: fs2, background: "rgba(255,255,255,0.96)", boxShadow: "0 6px 16px rgba(0,0,0,0.18)", fontFamily: FONT, fontSize: fs2, color: "#111", opacity: np, transform: `translateY(${(1 - np) * -14}px) scale(${0.96 + 0.04 * np})`, display: "flex", gap: fs2 * 0.5, alignItems: "center" }}><span style={{ width: fs2 * 1.3, height: fs2 * 1.3, borderRadius: fs2 * 0.35, background: "#07C65F", flex: "none" }} /><span style={{ fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{nt}</span></div>; })}
+        </div>
       </div>
       {el.text && <div style={{ position: "absolute", left: W / 2 - W * 0.4, width: W * 0.8, top: h * 0.5 - ch / 2, height: ch, borderRadius: ch / 2, background: dark ? "rgba(20,20,20,0.92)" : "#F2F4F7", border: `1px solid ${dark ? "#3a3a3a" : "#E2E5EA"}`, display: "flex", alignItems: "center", gap: fs * 0.9, paddingLeft: ch * 0.5, boxSizing: "border-box", opacity: cp, transform: `translateY(${(1 - cp) * 10}px)` }}><span style={{ color: "#eee", fontSize: fs * 1.3, fontWeight: 300 }}>+</span><span style={{ fontFamily: FONT, fontSize: fs, color: "#eee", whiteSpace: "nowrap" }}>{el.text}</span></div>}
     </div>
@@ -177,6 +183,7 @@ const Cta: React.FC<{ el: El; frame: number; fps: number; H: number; W: number; 
   return (
     <>
       <div data-el="card" style={{ position: "absolute", left: W / 2 - ic / 2, top: H * n(P, "cta_icon_cy") - ic / 2, width: ic, height: ic, borderRadius: ic * 0.24, background: dark ? "#fff" : "#181818", overflow: "hidden", ...popStyle(p) }}>{el.icon && <Img src={src(el.icon)} style={{ width: "100%", height: "100%", objectFit: "contain", padding: ic * 0.2, boxSizing: "border-box", filter: dark ? undefined : "invert(1)" }} />}</div>
+      {[0, 1].map((k) => { const ph = ((frame / fps) * 0.7 + k * 0.5) % 1; return <div key={k} style={{ position: "absolute", left: W / 2 - bw / 2 - ph * 18, top: H * n(P, "cta_btn_cy") - bh / 2 - ph * 18, width: bw + ph * 36, height: bh + ph * 36, borderRadius: (bh + ph * 36) / 2, border: `2px solid ${dark ? "#fff" : "#181818"}`, opacity: (1 - ph) * 0.35 * bp }} />; })}
       <div data-el="cta" style={{ position: "absolute", left: W / 2 - bw / 2, top: H * n(P, "cta_btn_cy") - bh / 2, width: bw, height: bh, borderRadius: bh / 2, background: dark ? "#fff" : "#181818", color: dark ? "#111" : "#fff", display: "flex", alignItems: "center", justifyContent: "space-between", padding: `0 ${bh * 0.55}px`, boxSizing: "border-box", fontFamily: FONT, fontWeight: 700, fontSize: fs, ...popStyle(bp) }}>
         <span style={{ flex: 1, textAlign: "center" }}>{el.button}</span><span>→</span>
       </div>
@@ -188,6 +195,56 @@ const Picture: React.FC<{ el: El; frame: number; fps: number; H: number; W: numb
   const maxH = H * n(P, "el_h"), maxW = W * (el.w ?? 0.82); const asp = el.aspect ?? 1.6; let h = maxH, w = h * asp; if (w > maxW) { w = maxW; h = w / asp; }
   const p = enterP(frame, fps, n(P, "enter"));
   return <div data-el="card" style={{ position: "absolute", left: W / 2 - w / 2, top: H * cy - h / 2, width: w, height: h, borderRadius: h * 0.06, overflow: "hidden", boxShadow: "0 18px 50px rgba(0,0,0,0.2)", ...popStyle(p) }}>{el.file && <Img src={src(el.file)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}</div>;
+};
+
+const Stats: React.FC<{ el: El; frame: number; fps: number; H: number; W: number; P: P; cy: number; dark: boolean; accent: string }> = ({ el, frame, fps, H, W, P, cy, dark, accent }) => {
+  const items = el.stats ?? []; const gap = W * 0.03; const tw = (W * 0.84 - gap * (items.length - 1)) / items.length, th = H * n(P, "el_h") * 0.62;
+  const fs = th * 0.16;
+  return (
+    <div data-el="card" style={{ position: "absolute", left: W * 0.08, top: H * cy - th / 2, width: W * 0.84, height: th, display: "flex", gap }}>
+      {items.map((it, i) => {
+        const p = enterP(frame, fps, n(P, "enter"), i * 0.1); const cp = enterP(frame, fps, 0.9, 0.15 + i * 0.1);
+        const val = it.to != null ? `${it.prefix ?? ""}${Math.round(it.to * cp).toLocaleString()}${it.suffix ?? ""}` : it.value;
+        const trendCol = it.trend === "up" ? "#FF4D4D" : it.trend === "down" ? accent : (dark ? "#aaa" : "#888");
+        return (
+          <div key={i} style={{ width: tw, height: th, borderRadius: th * 0.14, background: dark ? "rgba(255,255,255,0.05)" : "#F5F6F8", border: `1px solid ${dark ? "rgba(255,255,255,0.12)" : "#E6E8EC"}`, padding: th * 0.14, boxSizing: "border-box", fontFamily: FONT, color: dark ? "#fff" : "#111", ...popStyle(p) }}>
+            <div style={{ fontSize: fs * 0.8, color: dark ? "#aaa" : "#777", fontWeight: 500 }}>{it.label}</div>
+            <div style={{ fontSize: fs * 2.1, fontWeight: 700, marginTop: th * 0.08, letterSpacing: -1, display: "flex", alignItems: "baseline", gap: fs * 0.4 }}>{val}<span style={{ fontSize: fs * 1.1, color: trendCol }}>{it.trend === "up" ? "↑" : it.trend === "down" ? "↓" : "→"}</span></div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+const Chart: React.FC<{ el: El; frame: number; fps: number; H: number; W: number; P: P; cy: number; dark: boolean; accent: string }> = ({ el, frame, fps, H, W, P, cy, dark, accent }) => {
+  const bars = el.bars ?? [20, 35, 30, 55, 70, 100]; const cw = W * 0.7, ch = H * n(P, "el_h") * 0.75; const bw = cw / bars.length; const mx = Math.max(...bars);
+  const fs = ch * 0.09;
+  return (
+    <div data-el="card" style={{ position: "absolute", left: W / 2 - cw / 2, top: H * cy - ch / 2, width: cw, height: ch }}>
+      <div style={{ position: "absolute", left: 0, right: 0, bottom: fs * 1.6, borderBottom: `1px solid ${dark ? "#333" : "#ddd"}` }} />
+      {bars.map((v, i) => { const p = enterP(frame, fps, 0.35, 0.08 + i * 0.09); const hgt = (ch - fs * 1.6) * (v / mx) * p; const last = i === bars.length - 1;
+        return <div key={i} style={{ position: "absolute", left: i * bw + bw * 0.2, width: bw * 0.6, bottom: fs * 1.6, height: hgt, borderRadius: bw * 0.12, background: last ? accent : (dark ? "rgba(255,255,255,0.22)" : "#D9DDE3") }}>{last && <div style={{ position: "absolute", top: -fs * 1.5, left: "50%", transform: "translateX(-50%)", fontFamily: FONT, fontWeight: 700, fontSize: fs, color: accent, opacity: p }}>{el.bar_labels?.[i] ?? `${v}`}</div>}</div>; })}
+      {el.bar_labels && el.bar_labels.map((l, i) => i < bars.length - 1 ? <div key={i} style={{ position: "absolute", left: i * bw, width: bw, bottom: 0, textAlign: "center", fontFamily: FONT, fontSize: fs * 0.8, color: dark ? "#888" : "#999" }}>{l}</div> : null)}
+    </div>
+  );
+};
+
+const Flow: React.FC<{ el: El; frame: number; fps: number; H: number; W: number; P: P; cy: number; dark: boolean; accent: string }> = ({ el, frame, fps, H, W, P, cy, dark, accent }) => {
+  const nodes = el.nodes ?? ["광고", "클릭", "신청"]; const cw = W * 0.8, nh = H * 0.05; const nw = cw / nodes.length; const fs = nh * 0.42;
+  return (
+    <div data-el="card" style={{ position: "absolute", left: W / 2 - cw / 2, top: H * cy - nh / 2, width: cw, height: nh }}>
+      {nodes.map((nd, i) => { const p = enterP(frame, fps, 0.25, i * 0.3); const lp = enterP(frame, fps, 0.3, i * 0.3 + 0.12); const last = i === nodes.length - 1;
+        return (
+          <div key={i} style={{ position: "absolute", left: i * nw, width: nw, height: nh }}>
+            <div style={{ position: "absolute", left: nw * 0.1, width: nw * 0.8, height: nh, borderRadius: nh / 2, background: last ? accent : (dark ? "rgba(255,255,255,0.08)" : "#F2F4F7"), border: `1px solid ${last ? accent : (dark ? "rgba(255,255,255,0.18)" : "#E2E5EA")}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: FONT, fontWeight: 700, fontSize: fs, color: last ? "#fff" : (dark ? "#eee" : "#222"), ...popStyle(p) }}>{nd}</div>
+            {!last && <div style={{ position: "absolute", left: nw * 0.9, top: nh / 2 - 1, width: nw * 0.2 * lp, height: 2, background: accent }} />}
+            {!last && <div style={{ position: "absolute", left: nw * 0.9 + nw * 0.2 * lp - 5, top: nh / 2 - 5, width: 0, height: 0, borderTop: "5px solid transparent", borderBottom: "5px solid transparent", borderLeft: `7px solid ${accent}`, opacity: lp }} />}
+          </div>
+        );
+      })}
+    </div>
+  );
 };
 
 // ---------- 씬 ----------
@@ -227,6 +284,9 @@ const SceneView: React.FC<{ sc: MScene; data: MData; prevDark: boolean }> = ({ s
         {el?.type === "toggle" && <Toggle el={el} frame={frame} fps={fps} H={H} W={W} P={P} cy={elCy} dark={dark} accent={accent} />}
         {el?.type === "device" && <Device el={el} frame={frame} fps={fps} dur={sc.dur} H={H} W={W} P={P} dark={dark} />}
         {el?.type === "cta" && <Cta el={el} frame={frame} fps={fps} H={H} W={W} P={P} dark={dark} />}
+        {el?.type === "stats" && <Stats el={el} frame={frame} fps={fps} H={H} W={W} P={P} cy={elCy} dark={dark} accent={accent} />}
+        {el?.type === "chart" && <Chart el={el} frame={frame} fps={fps} H={H} W={W} P={P} cy={elCy} dark={dark} accent={accent} />}
+        {el?.type === "flow" && <Flow el={el} frame={frame} fps={fps} H={H} W={W} P={P} cy={elCy} dark={dark} accent={accent} />}
         {el?.type === "image" && <Picture el={el} frame={frame} fps={fps} H={H} W={W} P={P} cy={elCy} />}
         {lines.length > 0 && <Headline lines={lines} cy={textCy} size={textSize} color={fg} accent={accent} H={H} W={W} P={P} />}
         <Brand data={data} dark={dark} H={H} W={W} P={P} />
