@@ -14,14 +14,14 @@ import type { ProjectData } from "./types";
 
 type Chunk = { t: string; s: number; e: number };
 type Label = { name: string; icon?: string };
-type Shot = { file: string; step?: number; label?: string; at?: number };
+type Shot = { file?: string; mock?: "chart" | "list" | "plan"; title?: string; items?: string[]; kpi?: string; step?: number; label?: string; at?: number };
 type El = {
   type: "logo" | "chip" | "pins" | "phone" | "card" | "toggle" | "device" | "cta" | "image" | "stats" | "chart" | "flow";
   stats?: { label: string; value: string; to?: number; prefix?: string; suffix?: string; trend?: "up" | "flat" | "down" }[];
   bars?: number[]; bar_labels?: string[]; nodes?: string[]; notes?: string[];
   file?: string; w?: number; text?: string; labels?: Label[]; every?: number; map?: string; pins?: [number, number][];
   screen?: string; blob?: [string, string]; title?: string; lines?: number; left?: string; right?: string; on_at?: number;
-  shots?: Shot[]; face?: string; icon?: string; button?: string; aspect?: number;
+  shots?: Shot[]; face?: string; icon?: string; button?: string; aspect?: number; greeting?: string;
 };
 type MScene = { idx: number; start: number; dur: number; chunks: Chunk[]; headline?: string[]; theme?: "light" | "dark"; layout?: "bottom" | "hook" | "top" | "cta"; el?: El; transition?: "wipe" | "flash" | "fade" | "none"; blob?: [string, string] };
 type MData = Omit<ProjectData, "scenes"> & { scenes: MScene[]; brand?: { icon?: string; name?: string } };
@@ -119,7 +119,13 @@ const Phone: React.FC<{ el: El; frame: number; fps: number; H: number; W: number
     <div data-el="card" style={{ position: "absolute", left: 0, width: W, top: H * cy - h / 2, height: h }}>
       <div style={{ position: "absolute", left: W / 2 - w / 2, top: (1 - p) * h * 0.6, width: w, height: h, borderRadius: w * 0.14, background: "#1c1c1e", padding: w * 0.035, boxSizing: "border-box", opacity: p, boxShadow: "0 20px 60px rgba(0,0,0,0.45)" }}>
         <div style={{ width: "100%", height: "100%", borderRadius: w * 0.11, overflow: "hidden", background: "linear-gradient(180deg,#ffffff 0%,#e9f1ff 70%,#cfe0ff 100%)", position: "relative" }}>
-          {el.screen && <Img src={src(el.screen)} style={{ width: "100%", height: "100%", objectFit: "cover" }} />}
+          {el.screen ? <Img src={src(el.screen)} style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : (
+            <div style={{ position: "absolute", inset: 0, fontFamily: FONT }}>
+              <div style={{ position: "absolute", top: w * 0.05, left: 0, right: 0, textAlign: "center", fontSize: w * 0.055, fontWeight: 600, color: "#111" }}>9:41</div>
+              <div style={{ position: "absolute", top: w * 0.62, left: "50%", transform: "translateX(-50%)", width: w * 0.16, height: w * 0.16, background: "conic-gradient(from 180deg, #3A8DFF, #9B5CFF, #FF4D6D, #3A8DFF)", clipPath: "polygon(50% 0%, 61% 39%, 100% 50%, 61% 61%, 50% 100%, 39% 61%, 0% 50%, 39% 39%)" }} />
+              <div style={{ position: "absolute", top: w * 0.86, left: 0, right: 0, textAlign: "center", fontSize: w * 0.05, color: "#555", lineHeight: 1.4, whiteSpace: "pre-line" }}>{el.greeting ?? "대표님, 안녕하세요.\n오늘 들어온 상담을 확인하세요"}</div>
+            </div>
+          )}
           {(el.notes ?? []).map((nt, i) => { const np = enterP(frame, fps, 0.25, 0.35 + i * 0.45); const fs2 = w * 0.055; return <div key={i} style={{ position: "absolute", left: w * 0.06, right: w * 0.06, top: w * 0.18 + i * fs2 * 3.1, padding: `${fs2 * 0.6}px ${fs2 * 0.8}px`, borderRadius: fs2, background: "rgba(255,255,255,0.96)", boxShadow: "0 6px 16px rgba(0,0,0,0.18)", fontFamily: FONT, fontSize: fs2, color: "#111", opacity: np, transform: `translateY(${(1 - np) * -14}px) scale(${0.96 + 0.04 * np})`, display: "flex", gap: fs2 * 0.5, alignItems: "center" }}><span style={{ width: fs2 * 1.3, height: fs2 * 1.3, borderRadius: fs2 * 0.35, background: "#07C65F", flex: "none" }} /><span style={{ fontWeight: 600, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{nt}</span></div>; })}
         </div>
       </div>
@@ -152,7 +158,36 @@ const Toggle: React.FC<{ el: El; frame: number; fps: number; H: number; W: numbe
   );
 };
 
+/** 캡처 대신 코드로 그린 대시보드 모형: chart(KPI+선 그래프) / list(순위 바) / plan(체크리스트) */
+const Mock: React.FC<{ shot: Shot; w: number; h: number; p: number; frame: number; fps: number; t0: number; accent: string }> = ({ shot, w, h, p, frame, fps, t0, accent }) => {
+  const fs = h * 0.055; const pad = w * 0.05; const tl = frame / fps - t0; const g = (d: number, dl = 0) => Math.max(0, Math.min(1, (tl - dl) / d));
+  const title = shot.title ?? shot.label ?? "";
+  return (
+    <div style={{ position: "absolute", inset: 0, fontFamily: FONT, color: "#111", opacity: p }}>
+      <div style={{ height: h * 0.11, background: "#F6F7F9", borderBottom: "1px solid #E6E8EC", display: "flex", alignItems: "center", gap: fs * 0.35, padding: `0 ${pad}px` }}>{["#FF5F57", "#FEBC2E", "#28C840"].map((c) => <span key={c} style={{ width: fs * 0.5, height: fs * 0.5, borderRadius: "50%", background: c }} />)}<span style={{ marginLeft: fs * 0.6, fontSize: fs * 0.7, color: "#888", background: "#fff", borderRadius: fs * 0.3, padding: `${fs * 0.12}px ${fs * 0.6}px`, border: "1px solid #E6E8EC" }}>app.pixelpage.co.kr</span></div>
+      <div style={{ position: "absolute", top: h * 0.11, bottom: 0, left: 0, width: w * 0.2, background: "#FAFBFC", borderRight: "1px solid #EEF0F3", padding: pad * 0.8, boxSizing: "border-box" }}>{[0.9, 0.6, 0.75, 0.5, 0.7].map((x, i) => <div key={i} style={{ height: fs * 0.5, width: `${x * 100}%`, background: i === 0 ? accent : "#E3E6EB", borderRadius: fs * 0.25, marginBottom: fs * 0.7, opacity: g(0.2, i * 0.04) }} />)}</div>
+      <div style={{ position: "absolute", top: h * 0.11, left: w * 0.2, right: 0, bottom: 0, padding: pad, boxSizing: "border-box" }}>
+        <div style={{ fontSize: fs * 1.05, fontWeight: 700, opacity: g(0.2) }}>{title}</div>
+        {shot.mock === "chart" && (
+          <>
+            <div style={{ display: "flex", gap: pad * 0.6, marginTop: fs * 0.6 }}>{[shot.kpi ?? "62.0%", "₩1,120", "4건"].map((k, i) => <div key={i} style={{ flex: 1, background: "#F6F7F9", borderRadius: fs * 0.5, padding: fs * 0.5, opacity: g(0.25, 0.1 + i * 0.07) }}><div style={{ fontSize: fs * 0.6, color: "#888" }}>{["노출 점유율", "클릭당 비용", "오늘 상담"][i]}</div><div style={{ fontSize: fs * 1.2, fontWeight: 700, color: i === 0 ? accent : "#111" }}>{k}</div></div>)}</div>
+            <svg viewBox="0 0 100 40" preserveAspectRatio="none" style={{ position: "absolute", left: pad, right: pad, bottom: pad, height: h * 0.34, width: w * 0.8 - pad * 2 }}>
+              <polyline points="0,36 12,33 24,34 36,28 48,30 60,22 72,20 84,12 100,6" fill="none" stroke={accent} strokeWidth="1.6" strokeDasharray="200" strokeDashoffset={200 * (1 - g(0.9, 0.2))} />
+              <polyline points="0,36 12,33 24,34 36,28 48,30 60,22 72,20 84,12 100,6 100,40 0,40" fill={accent} opacity={0.12 * g(0.9, 0.2)} />
+            </svg>
+          </>
+        )}
+        {shot.mock === "list" && (shot.items ?? ["강남 A 치과", "역삼 B 치과", "우리 병원", "삼성 C 치과", "선릉 D 치과"]).map((it, i) => { const pct = [62, 25, 17, 15, 9][i] ?? 8; const me = it.includes("우리"); return (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: fs * 0.5, marginTop: fs * 0.55, opacity: g(0.25, 0.1 + i * 0.08) }}><span style={{ width: fs * 1.1, height: fs * 1.1, borderRadius: fs * 0.3, background: me ? accent : "#111", color: "#fff", fontSize: fs * 0.65, fontWeight: 700, display: "inline-flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span><span style={{ width: w * 0.22, fontSize: fs * 0.72, fontWeight: me ? 700 : 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{it}</span><div style={{ flex: 1, height: fs * 0.55, background: "#EEF0F3", borderRadius: fs * 0.3, overflow: "hidden" }}><div style={{ width: `${pct * g(0.6, 0.15 + i * 0.08)}%`, height: "100%", background: me ? accent : "#C9CED6" }} /></div><span style={{ width: fs * 2.4, textAlign: "right", fontSize: fs * 0.7, fontWeight: 700 }}>{pct}%</span></div>); })}
+        {shot.mock === "plan" && (shot.items ?? ["소재 3종 교체", "리드 품질 낮은 세트 OFF", "전환 캠페인 예산 +30%", "랜딩 상담 폼 2단계로"]).map((it, i) => { const on = g(0.2, 0.25 + i * 0.3); return (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: fs * 0.6, marginTop: fs * 0.7, opacity: g(0.2, 0.05 + i * 0.08) }}><span style={{ width: fs * 1.1, height: fs * 1.1, borderRadius: fs * 0.3, border: `2px solid ${on > 0.5 ? accent : "#C9CED6"}`, background: on > 0.5 ? accent : "#fff", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: fs * 0.7, fontWeight: 700 }}>{on > 0.5 ? "✓" : ""}</span><span style={{ fontSize: fs * 0.78, fontWeight: 500, textDecoration: on > 0.5 ? "none" : "none" }}>{it}</span></div>); })}
+      </div>
+    </div>
+  );
+};
+
 const Device: React.FC<{ el: El; frame: number; fps: number; dur: number; H: number; W: number; P: P; dark: boolean }> = ({ el, frame, fps, dur, H, W, P, dark }) => {
+  const accent = s(P, "accent");
   const h = H * n(P, "top_el_h"), w = Math.min(W * 0.86, h * 1.5); const left = W / 2 - w / 2, top = H * n(P, "top_el_cy") - h / 2;
   const p = enterP(frame, fps, n(P, "enter")); const t = frame / fps;
   const shots = el.shots ?? []; let si = 0; shots.forEach((sh, i) => { if (t >= (sh.at ?? 0) * (sh.at != null && sh.at <= 1 ? dur : 1)) si = i; });
@@ -162,7 +197,8 @@ const Device: React.FC<{ el: El; frame: number; fps: number; dur: number; H: num
     <>
       <div data-el="card" style={{ position: "absolute", left, top, width: w, height: h, opacity: p, transform: `translateX(${(1 - p) * 40}px)` }}>
         <div style={{ position: "absolute", inset: 0, borderRadius: h * 0.06, background: "#fff", boxShadow: "0 18px 50px rgba(0,0,0,0.18)", border: "1px solid #E6E8EC", overflow: "hidden" }}>
-          {cur && <Img src={src(cur.file)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", opacity: sp }} />}
+          {cur?.file && <Img src={src(cur.file)} style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top", opacity: sp }} />}
+          {cur && !cur.file && <Mock shot={cur} w={w} h={h} p={sp} frame={frame} fps={fps} t0={swapT} accent={accent} />}
         </div>
         {el.face && <div style={{ position: "absolute", right: -face * 0.15, bottom: -face * 0.2, width: face, height: face, borderRadius: "50%", overflow: "hidden", border: "4px solid #fff", boxShadow: "0 6px 18px rgba(0,0,0,0.25)" }}><Img src={src(el.face)} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>}
       </div>
