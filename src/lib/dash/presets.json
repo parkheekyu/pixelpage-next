@@ -3,6 +3,17 @@
  "base": "https://xsauwnhouvphsfsynprb.supabase.co/storage/v1/object/public/presets",
  "items": [
   {
+   "key": "motion_card",
+   "name": "모션 카드",
+   "tag": "B2B 모션그래픽",
+   "desc": "배경 영상 없이 흰·검정 단색 위에 요소 하나(로고·검색 칩·지도 핀·폰 목업·응답 카드·토글·대시보드 단계·CTA 버튼)와 헤드라인 2줄, 브랜드 로고 줄만. 모션은 씬이 바뀌는 0.3초에만(원형 와이프·플래시), 나머지는 정지. Pretendard, 녹색 강조, 남성 저음 나레이션.",
+   "fit": "B2B·전문직 대상 서비스 세일즈(병원 마케팅, 리드 광고, SaaS). 증거 캡처가 1~3장 있을 때.",
+   "cost": "영상 생성 0원 · 5분",
+   "clients": [
+    "pixelpage"
+   ]
+  },
+  {
    "key": "bg_talk",
    "name": "배경 토크",
    "tag": "고정 배경 토크",
