@@ -21,7 +21,7 @@ type BScene = {
   label?: string; note?: string; card?: CardSpec; card2?: CardSpec;
   hookFire?: boolean; intro?: Intro; ending?: boolean; cta?: string;
 };
-type BData = Omit<ProjectData, "scenes"> & { scenes: BScene[]; bg?: string; bgDur?: number; bgStill?: string; cta?: string; logo?: string };
+type BData = Omit<ProjectData, "scenes"> & { scenes: BScene[]; bg?: string; bgDur?: number; bgStill?: string; cta?: string; logo?: string; top_copy?: string[] };
 type P = Record<string, unknown>;
 
 /** 대시보드 편집기(Remotion Player)에서는 미디어가 절대 URL 로 온다 → 그대로, 아니면 public/ 기준 */
@@ -44,6 +44,7 @@ export const BGTALK_DEFAULTS: Record<string, number | string> = {
   cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", cta_stroke: 0.08, cta_stroke_color: "#000000", cta_shadow: 0.6, cta_shadow_color: "#000000", logo_w: 0.22, ending_dim: 0,
   intro_x: 0.08, intro_y: 0.50, intro_size: 0.03, intro_logo_x: 0.6, intro_logo_y: 0.36, intro_logo_w: 0.17,
   bg_x: 0, bg_y: 0, bg_scale: 1,
+  top_cx: 0.5, top_cy: 0.11, top_size: 0.03, top_font: "GumiRomance", top_color: "#ffffff", top_color2: "#E8F800", top_stroke: 0.06, top_stroke_color: "#111111", top_shadow: 0.5, top_shadow_color: "#000000", top_lh: 1.3,   // 고정 상단 카피 2줄(1줄 흰, 2줄 상품명 노랑) — data.top_copy 가 있을 때만
   zone_x: 0.2, zone_y: 0.36, zone_w: 0.6, zone_h: 0.16,   // 요소(이미지) 세이프존(화면 비율): 이미지는 비율을 유지한 채 이 박스 안에 맞춰(contain) 가운데 놓인다. 씬별 x/y/w 가 있으면 그걸 우선
 };
 const D = BGTALK_DEFAULTS;
@@ -152,6 +153,16 @@ const SceneView: React.FC<{ sc: BScene; data: BData; label?: string; note?: stri
   );
 };
 
+/** 고정 상단 카피: 영상 내내 떠 있는 2줄(1줄 훅 흰, 2줄 상품명 노랑). 상품명이 보자마자 보이게(2026-10-12) */
+const TopCopy: React.FC<{ lines: string[]; H: number; W: number; P: P }> = ({ lines, H, W, P }) => {
+  const fs = H * n(P, "top_size");
+  return (
+    <div data-el="top" style={{ position: "absolute", left: W * n(P, "top_cx"), top: H * n(P, "top_cy"), transform: "translate(-50%,-50%)", textAlign: "center", fontFamily: fam(P.top_font, "GumiRomance"), fontSize: fs, lineHeight: n(P, "top_lh"), whiteSpace: "normal", wordBreak: "keep-all", width: W * 0.94, letterSpacing: -1, WebkitTextStroke: stroke(P, "top", fs), paintOrder: "stroke fill", textShadow: shadow(P, "top", fs) }}>
+      {lines.map((l, i) => <div key={i} style={{ color: i === 0 ? s(P, "top_color") : s(P, "top_color2") }}>{l}</div>)}
+    </div>
+  );
+};
+
 export const BgTalk: React.FC<{ data: ProjectData }> = ({ data: raw }) => {
   const data = raw as unknown as BData;
   const { fps, width: W, height: H } = useVideoConfig();
@@ -190,6 +201,7 @@ export const BgTalk: React.FC<{ data: ProjectData }> = ({ data: raw }) => {
       )}
       {!data.bg && data.bgStill && <Img src={src(data.bgStill)} style={bgStyle} />}
       {data.audio && <Audio src={src(data.audio)} />}
+      {data.top_copy && data.top_copy.length > 0 && <TopCopy lines={data.top_copy} H={H} W={W} P={P} />}
       {labeled.map(({ sc, label, note }) => (
         <Sequence key={sc.idx} from={Math.round(sc.start * fps)} durationInFrames={Math.round(sc.dur * fps)} layout="none">
           <SceneView sc={sc} data={data} label={label} note={note} />
