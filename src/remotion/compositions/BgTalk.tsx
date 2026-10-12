@@ -44,7 +44,7 @@ export const BGTALK_DEFAULTS: Record<string, number | string> = {
   cta_cy: 0.5, cta_size: 0.034, cta_font: "Pretendard", cta_color: "#ffffff", cta_stroke: 0.08, cta_stroke_color: "#000000", cta_shadow: 0.6, cta_shadow_color: "#000000", logo_w: 0.22, ending_dim: 0,
   intro_x: 0.08, intro_y: 0.50, intro_size: 0.03, intro_logo_x: 0.6, intro_logo_y: 0.36, intro_logo_w: 0.17,
   bg_x: 0, bg_y: 0, bg_scale: 1,
-  top_cx: 0.5, top_cy: 0.11, top_size: 0.03, top_font: "GumiRomance", top_color: "#ffffff", top_color2: "#E8F800", top_stroke: 0.06, top_stroke_color: "#111111", top_shadow: 0.5, top_shadow_color: "#000000", top_lh: 1.3,   // 고정 상단 카피 2줄(1줄 흰, 2줄 상품명 노랑) — data.top_copy 가 있을 때만
+  top_cx: 0.5, top_cy: 0.165, top_size: 0.036, top_font: "GumiRomance", top_color: "#ffffff", top_color2: "#E8F800", top_stroke: 0.06, top_stroke_color: "#111111", top_shadow: 0.5, top_shadow_color: "#000000", top_lh: 1.3,   // 고정 상단 카피 2줄(1줄 흰, 2줄 상품명 노랑) — data.top_copy 가 있을 때만
   zone_x: 0.2, zone_y: 0.36, zone_w: 0.6, zone_h: 0.16,   // 요소(이미지) 세이프존(화면 비율): 이미지는 비율을 유지한 채 이 박스 안에 맞춰(contain) 가운데 놓인다. 씬별 x/y/w 가 있으면 그걸 우선
 };
 const D = BGTALK_DEFAULTS;
