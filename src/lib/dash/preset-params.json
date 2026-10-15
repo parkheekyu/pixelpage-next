@@ -56,7 +56,18 @@
    "cta_shadow": 0.65,
    "note_font": "BMJUA",
    "cta_shadow_color": "#000000",
-   "label_stroke_color": "#000000"
+   "label_stroke_color": "#000000",
+   "top_cx": 0.5,
+   "top_cy": 0.165,
+   "top_size": 0.036,
+   "top_font": "GumiRomance",
+   "top_color": "#ffffff",
+   "top_color2": "#E8F800",
+   "top_stroke": 0.06,
+   "top_stroke_color": "#111111",
+   "top_shadow": 0.5,
+   "top_shadow_color": "#000000",
+   "top_lh": 1.3
   }
  },
  "clean_ui": {
@@ -216,6 +227,32 @@
    "tts_tempo": 1.15,
    "emotion": "toneup",
    "chip_every": 1.0
+  }
+ },
+ "post_card": {
+  "composition": "PostCard",
+  "doc": "포스트 카드(post_card): 마케터제이J 쇼츠 14편 프레임 분석(presets/_analysis/post_card.md). 흰 배경 + 프로필 줄 + 고정 헤드라인(빨강 강조) + 둥근 영상 카드(y0.27~0.66) + 한 줄 자막(y0.72, 컷마다 0.3s 페이드인). 나레이션 없음, BGM 만. 판 말투 자막 7~13문장, 20~35초. 데이터는 pipeline/post_card.py 가 만든다(TTS 없이 씬 dur 로 타임라인).",
+  "defaults": {
+   "bg": "#FFFFFF",
+   "accent": "#E0242B",
+   "profile_cy": 0.16,
+   "avatar_r": 0.03,
+   "name_size": 0.022,
+   "handle_size": 0.014,
+   "head_cy": 0.235,
+   "head_size": 0.024,
+   "card_x": 0.02,
+   "card_y": 0.27,
+   "card_w": 0.96,
+   "card_h": 0.39,
+   "card_radius": 24,
+   "cap_cy": 0.72,
+   "cap_size": 0.024,
+   "cap_fade": 0.3,
+   "bgm_volume": 0.9,
+   "bgm_fade": 1.0,
+   "clip_zoom": 1.0,
+   "clip_shift_y": 0.0
   }
  },
  "screen_story": {

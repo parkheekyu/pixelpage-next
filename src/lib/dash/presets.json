@@ -1,7 +1,17 @@
 {
- "updated": "2026-10-10",
+ "updated": "2026-10-15",
  "base": "https://xsauwnhouvphsfsynprb.supabase.co/storage/v1/object/public/presets",
  "items": [
+  {
+   "key": "post_card",
+   "name": "포스트 카드",
+   "desc": "인스타 게시글처럼 보이는 흰 프레임: 프로필 줄 + 고정 헤드라인(빨강 강조) + 둥근 영상 카드 + 판 말투 한 줄 자막. 나레이션 없이 BGM 만, 컷마다 자막 교체. 마케터제이 쇼츠 14편 분석.",
+   "tags": [
+    "숏폼",
+    "게시글",
+    "BGM"
+   ]
+  },
   {
    "key": "motion_card",
    "name": "모션 카드",
