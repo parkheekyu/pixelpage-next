@@ -86,7 +86,7 @@ function Bar({ h, label, dim }: { h: number; label: string; dim?: boolean }) {
   );
 }
 
-const Connector = () => { const [ref, on] = useInView<HTMLDivElement>(0.6); return <div ref={ref} className="flex flex-col items-center my-9" aria-hidden><div className="w-px bg-white/70 transition-[height] duration-500 ease-out" style={{ height: on ? 38 : 0 }} /><div className="w-[10px] h-[10px] rounded-full bg-white -mt-px transition-transform duration-300 delay-500" style={{ transform: on ? "scale(1)" : "scale(0)" }} /></div>; };
+const Connector = () => { const [ref, on] = useInView<HTMLDivElement>(0.6); return <div ref={ref} className="flex flex-col items-center my-[72px] md:my-[88px]" aria-hidden><div className="w-px bg-white/70 transition-[height] duration-500 ease-out" style={{ height: on ? 56 : 0 }} /><div className="w-[10px] h-[10px] rounded-full bg-white -mt-px transition-transform duration-300 delay-500" style={{ transform: on ? "scale(1)" : "scale(0)" }} /></div>; };
 const Light = ({ children }: { children: React.ReactNode }) => <p className="text-center text-[19px] md:text-[24px] font-light leading-[1.5] text-white/90 break-keep">{children}</p>;
 const Head = ({ children, size = "md" }: { children: React.ReactNode; size?: "sm" | "md" | "lg" }) => <h2 className={`text-center break-keep font-extrabold leading-[1.3] tracking-[-0.03em] ${size === "lg" ? "text-[30px] md:text-[39px]" : size === "sm" ? "text-[22.5px] md:text-[29px]" : "text-[26px] md:text-[34px]"}`}>{children}</h2>;
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <div className={`rounded-[15px] bg-[#292929] ${className}`}>{children}</div>;
@@ -105,7 +105,7 @@ function CreativeStrip() {
     </div>
   );
   return (
-    <div className="mt-6 -mx-[25px] space-y-[8px]" style={{ maskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)" }}>
+    <div className="mt-10 -mx-[25px] space-y-[8px]" style={{ maskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)" }}>
       {rows.map((row, r) => (
         <div key={r} className="overflow-hidden">
           <div className="flex w-max gap-[8px] animate-marquee" style={{ animationDuration: `${row.length * 6}s`, animationDirection: r === 1 ? "reverse" : "normal" }}>
@@ -120,7 +120,7 @@ function CreativeStrip() {
 function PainCard() {
   const [ref, on] = useInView<HTMLDivElement>(0.5);
   return (
-    <div ref={ref}><Card className="mt-7 mx-auto w-[88%] px-[18px] md:px-[24px] py-[6px]">
+    <div ref={ref}><Card className="mt-10 mx-auto w-[88%] px-[18px] md:px-[24px] py-[6px]">
       {PAINS.map((p, i) => (
         <div key={i} className="flex gap-[14px] items-start py-[14px] border-t border-white/40 first:border-0 text-[15.5px] md:text-[19.5px] leading-[1.55] text-white/90 break-keep">
           <span className="mt-[5px] w-[14px] h-[14px] md:w-[16px] md:h-[16px] border border-white/80 shrink-0 flex items-center justify-center transition-colors duration-300" style={{ transitionDelay: `${300 + i * 350}ms`, background: on ? A : "transparent", borderColor: on ? A : undefined }} aria-hidden>
@@ -152,7 +152,7 @@ export default function DbClient() {
   return (
     <div className="min-h-screen bg-[#101010] text-white" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
       <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db .bubble b{color:#1f6fd6} .db input::placeholder{color:rgba(255,255,255,.3)} @keyframes dbUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} .db-up{opacity:0;animation:dbUp .7s cubic-bezier(.2,.7,.2,1) forwards}`}</style>
-      <div className="db mx-auto w-full max-w-[420px] md:max-w-[540px] px-[25px] pt-[60px] pb-[120px]">
+      <div className="db mx-auto w-full max-w-[420px] md:max-w-[540px] px-[25px] pt-[72px] pb-[140px]">
 
 
         {/* 01 HERO — 로드 시 순차 페이드업 */}
@@ -173,7 +173,7 @@ export default function DbClient() {
 
         {/* 03 PERFORMANCE — 운영 전/후 막대 */}
         <Reveal><Head size="sm"><span className="font-light">우리는 이 고민을</span> 숫자로 바꿉니다.</Head></Reveal>
-        <div className="mt-7 grid grid-cols-2 gap-[10px]">
+        <div className="mt-10 grid grid-cols-2 gap-[12px]">
           {PERF.map((p) => (
             <div key={p.c} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] p-[12px] md:p-[14px]">
               <p className="text-[14px] md:text-[16px] font-semibold text-white/90 mb-1 break-keep leading-[1.3]">{p.c}</p>
@@ -193,7 +193,7 @@ export default function DbClient() {
         {/* 04 WHY */}
         <Reveal><Light>DB 마케팅에 특화된 전문팀</Light>
         <Head>픽셀페이지가 직접 합니다</Head></Reveal>
-        <div className="mt-8 space-y-[34px]">
+        <div className="mt-12 space-y-[44px]">
           {WHY.map((w, i) => (
             <Reveal key={i} className="relative pt-[14px]" delay={i * 80}>
               <div className="absolute left-1/2 -translate-x-1/2 top-0 w-[28px] h-[28px] md:w-[34px] md:h-[34px] rounded-full bg-[#3a3a3a] flex items-center justify-center text-[16px] md:text-[20px] font-bold z-10">{i + 1}</div>
@@ -206,12 +206,12 @@ export default function DbClient() {
           ))}
         </div>
 
-        <div className="mt-[60px]">
+        <div className="mt-[96px]">
           <Light>광고는 누구나 할 수 있지만</Light>
           <Head size="lg">성과를 키우는 건<br />아무나 못합니다</Head>
           <p className="mt-3 text-center text-[15.5px] md:text-[19px] text-white/60 leading-[1.6]">같은 광고비, 다른 결과.<br />차이는 운영하는 사람에게 있습니다.</p>
         </div>
-        <div className="mt-7 grid grid-cols-3 gap-[8px]">
+        <div className="mt-10 grid grid-cols-3 gap-[10px]">
           {[["누적 DB 수", <CountUp key="a" to={10} suffix="만 건" />], ["평균 DB 단가 개선", <CountUp key="b" to={48} suffix="%" />], ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />]].map(([k, v]) => (
             <div key={String(k)} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] py-[14px] px-[6px] text-center">
               <p className="text-[12px] md:text-[14px] text-white/55 mb-[6px] break-keep leading-[1.3]">{k as string}</p>
@@ -224,9 +224,9 @@ export default function DbClient() {
 
         {/* 05 PROCESS */}
         <Reveal><Head>픽셀페이지는 이렇게 접근합니다</Head></Reveal>
-        <div className="mt-8 relative">
+        <div className="mt-12 relative">
           <div className="absolute left-[5px] top-[10px] bottom-[14px] border-l-2 border-dotted" style={{ borderColor: A }} aria-hidden />
-          <div className="space-y-[26px]">
+          <div className="space-y-[36px]">
             {STEPS.map((s, i) => (
               <Reveal key={s.t} className="relative pl-[24px]" delay={i * 120}>
                 <span className="absolute left-0 top-[5px] w-[12px] h-[12px] rounded-full" style={{ background: A }} aria-hidden />
@@ -239,7 +239,7 @@ export default function DbClient() {
           </div>
         </div>
 
-        <div className="mt-[60px]"><Head size="sm">터지는 광고 소재가 <span className="font-light">나올 때까지</span></Head></div>
+        <div className="mt-[96px]"><Head size="sm">터지는 광고 소재가 <span className="font-light">나올 때까지</span></Head></div>
 
         {/* 06 CREATIVE — 실제 집행 소재, 2단 무한 스와이프(로드마다 랜덤 순서) */}
         <CreativeStrip />
@@ -248,7 +248,7 @@ export default function DbClient() {
 
         {/* 07 SUCCESS STORY — 말풍선 */}
         <Head size="sm"><span>다양한 성공 레퍼런스</span><span className="font-light">를 바탕으로</span><br /><span className="font-light">기업의 성장을 </span>함께 만듭니다.</Head>
-        <div className="mt-8 space-y-[18px]">
+        <div className="mt-12 space-y-[26px]">
           {STORIES.map((s, i) => (
             <Reveal key={s.c} className={`flex items-center gap-[10px] ${s.side === "r" ? "flex-row-reverse" : ""}`} delay={i * 120}>
               <div className="w-[84px] md:w-[96px] shrink-0 text-center break-keep">
@@ -263,15 +263,15 @@ export default function DbClient() {
         </div>
         <p className="mt-3 text-[12.5px] text-white/35 text-center">실제 고객이 남긴 후기만 사용합니다.</p>
 
-        <div className="mt-[60px]"><Head>성과로 증명한<br />고객사의 생생한 목소리입니다</Head></div>
-        <div className="mt-7 grid grid-cols-2 gap-[8px]">
+        <div className="mt-[96px]"><Head>성과로 증명한<br />고객사의 생생한 목소리입니다</Head></div>
+        <div className="mt-10 grid grid-cols-2 gap-[10px]">
           {["[카카오톡 대화 캡처 1]", "[카카오톡 대화 캡처 2]", "[광고 성과 개선 사례]", "[예산 증액 사례]"].map((p) => (
             <div key={p} className="aspect-[4/5] rounded-[6px] bg-[#b7c7d9] flex items-center justify-center text-[14px] text-[#223] text-center px-3">{p}</div>
           ))}
         </div>
 
         {/* 파트너 로고 — 메인 랜딩과 동일한 마키 */}
-        <div className="mt-[60px]">
+        <div className="mt-[96px]">
           <p className="text-center text-[14px] md:text-[16px] text-white/50 mb-5">픽셀페이지와 함께하는 파트너사</p>
           <div className="relative -mx-[25px]" style={{ maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)" }}>
             <div className="flex w-max animate-marquee gap-8 md:gap-10">
@@ -291,7 +291,7 @@ export default function DbClient() {
         <div id="form" className="scroll-mt-6">
           <Head size="sm">DB 마케팅,<br />이제 <em>제대로 된 팀</em>과 함께하세요.</Head>
           <p className="mt-3 text-center text-[15.5px] md:text-[19px] text-white/60 leading-[1.6]">우리 회사의 DB 마케팅팀.<br />픽셀페이지가 함께합니다.</p>
-          <form onSubmit={onSubmit} className="mt-10">
+          <form onSubmit={onSubmit} className="mt-14">
             <p className="text-[30px] font-semibold leading-[1.25] mb-[30px]">📝DB 마케팅 상담하기</p>
             {[["company", "회사명", "text", true], ["name", "성함/직함", "text", true], ["phone", "전화번호", "tel", true], ["email", "이메일", "email", true], ["site", "사이트 주소", "url", false]].map(([k, label, type, req]) => (
               <label key={String(k)} className="block mb-[36px]">
@@ -320,7 +320,7 @@ export default function DbClient() {
           </form>
         </div>
 
-        <p className="mt-[80px] text-[12.5px] text-white/30 text-center leading-[1.8]">픽셀페이지 · 대표 박희규 · 사업자등록번호 477-11-01530<br />contact@pixelpage.co.kr</p>
+        <p className="mt-[110px] text-[12.5px] text-white/30 text-center leading-[1.8]">픽셀페이지 · 대표 박희규 · 사업자등록번호 477-11-01530<br />contact@pixelpage.co.kr</p>
       </div>
       <a href="#form" className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 h-[40px] px-[16px] rounded-[8px] text-[17.5px] font-semibold text-white shadow-[0_8px_30px_rgba(0,0,0,0.5)]" style={{ background: A }}>DB 마케팅 상담하기 →</a>
     </div>
