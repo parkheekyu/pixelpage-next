@@ -176,7 +176,7 @@ export default function DbClient() {
           <p className="mt-3 text-center text-[15.5px] md:text-[19px] text-white/60 leading-[1.6]">같은 광고비, 다른 결과.<br />차이는 운영하는 사람에게 있습니다.</p>
         </div>
         <div className="mt-7 grid grid-cols-3 gap-[8px]">
-          {[["누적 광고 취급액", <span key="a" className="text-white/35 text-[16px]">[금액]억+</span>], ["평균 DB 단가 개선", <CountUp key="b" to={48} suffix="%" />], ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />]].map(([k, v]) => (
+          {[["누적 DB 수", <CountUp key="a" to={10} suffix="만 건" />], ["평균 DB 단가 개선", <CountUp key="b" to={48} suffix="%" />], ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />]].map(([k, v]) => (
             <div key={String(k)} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] py-[14px] px-[6px] text-center">
               <p className="text-[12px] md:text-[14px] text-white/55 mb-[6px] break-keep leading-[1.3]">{k as string}</p>
               <p className="text-[25px] md:text-[32.5px] font-extrabold tabular-nums tracking-[-0.02em]" style={{ color: A }}>{v as React.ReactNode}</p>
