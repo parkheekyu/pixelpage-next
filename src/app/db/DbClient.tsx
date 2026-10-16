@@ -172,7 +172,7 @@ export default function DbClient() {
         <Connector />
 
         {/* 03 PERFORMANCE — 운영 전/후 막대 */}
-        <Reveal><Head size="sm"><span className="font-light">우리는 이 고민을</span> 숫자로 바꿉니다.</Head></Reveal>
+        <Reveal><Head size="sm"><span className="font-light">우리는 이 고민을</span> 매출로 바꿉니다.</Head></Reveal>
         <div className="mt-10 grid grid-cols-2 gap-[12px]">
           {PERF.map((p) => (
             <div key={p.c} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] p-[12px] md:p-[14px]">
