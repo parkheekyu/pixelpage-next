@@ -3,34 +3,47 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowRight, Check, Square, CheckSquare } from "lucide-react";
 import { captureAttribution, submitInquiry } from "@/lib/attribution";
 import logoWhite from "@/assets/logo-white.png";
+import charMale from "@/assets/char-male.png";
+import charFemale from "@/assets/char-female.png";
+import charCurly from "@/assets/char-curly.png";
 
-/* 광고용 랜딩 — 레퍼런스(CCFM 구독 문의 페이지) 구조: 검정 배경 위 480px 한 열, 강조색 하나, 섹션 사이 세로선 */
+/*
+ * 광고용 랜딩 — CCFM 구독 문의 페이지(탈리 폼) 프레임을 분절해 그대로 옮김.
+ * 레퍼런스 원본 폭 1337px → 모바일 340px 렌더(×0.254) 기준으로 잰 값:
+ *   서브 15px/300 · 메인 헤드 21px/800 · 섹션 헤드 18~21px/700 · 본문 12.5~13px · 라벨 11px
+ *   카드 bg #292929 r15 · 번호 원 28px #3a3a3a · 세로선 38px + 점 10px · 강조 1색
+ * 데스크톱은 같은 프레임을 1.3배로 키운다(컬럼 440px).
+ */
 
-const ACCENT = "#4396F8";
+const A = "#4396F8"; // 강조색 (레퍼런스 핑크 자리)
 const PAINS = [
-  <>DB 마케팅을 <b>시작하거나 확대</b>하고 싶은데, 믿고 맡길 팀이 마땅치 않습니다.</>,
-  <>광고비는 계속 쓰는데, <b>기대했던 만큼 성과</b>가 나오지 않습니다.</>,
-  <>새로운 소재나 랜딩페이지 개선이 필요할 때마다 <b>진행이 더딥니다.</b></>,
-  <>광고 예산을 더 늘리고 싶은데, <b>지금 효율로는 확신</b>이 서지 않습니다.</>,
+  <>DB 마케팅을 시작하거나 확대하고 싶은데, <b>믿고 맡길 팀이 마땅치 않아요.</b></>,
+  <>광고비는 계속 쓰는데, 기대했던 만큼 <b>성과가 안 나와요.</b></>,
+  <>새 소재나 랜딩 개선이 필요할 때마다 <b>진행이 더뎌요.</b></>,
+  <>예산을 더 늘리고 싶은데, 지금 효율로는 <b>확신이 안 서요.</b></>,
 ];
 const PERF = [
-  ["성인 교육 플랫폼 D사", "42%↓", "3.1배↑", "2배↑"],
-  ["태양광 시공·분양 G사", "55%↓", "20배↑", "1.5배↑"],
-  ["코칭·컨설팅 P사", "35%↓", "3.8배↑", "4배↑"],
-  ["가맹 프랜차이즈 L사", "58%↓", "2.4배↑", "3배↑"],
+  { c: "성인 교육 플랫폼 D사", cpl: "DB 단가 42%↓", before: 1, after: 3.1, label: "3.1배", rev: "매출 2배" },
+  { c: "태양광 시공·분양 G사", cpl: "DB 단가 55%↓", before: 1, after: 20, label: "20배", rev: "매출 1.5배" },
+  { c: "코칭·컨설팅 P사", cpl: "DB 단가 35%↓", before: 1, after: 3.8, label: "3.8배", rev: "매출 4배" },
+  { c: "가맹 프랜차이즈 L사", cpl: "DB 단가 58%↓", before: 1, after: 2.4, label: "2.4배", rev: "매출 3배" },
 ];
 const WHY = [
-  { n: "1", t: <><em>대표가 직접</em> 운영하는<br />DB 마케팅</>, s: "계약만 대표가 하고, 운영은 직원에게 넘기지 않습니다.", items: ["대표 직접 전략 수립 및 운영", "광고 성과 분석과 개선", "고객사별 맞춤 전략 수립"] },
-  { n: "2", t: <><em>[마케팅 + 디자인 + 개발]</em><br />한 팀으로 실행</>, s: "기획부터 제작까지, 기다릴 이유가 없습니다.", items: ["광고 소재 기획 및 제작", "랜딩페이지 디자인·개발", "전환 추적 및 CRM 자동화"] },
-  { n: "3", t: <><em>인하우스처럼 움직이는</em><br />DB 마케팅 파트너</>, s: "시키는 일만 하는 대행사가 아닙니다.", items: ["새로운 광고 소구점 제안", "성과에 따른 소재·랜딩 개선", "지속적인 테스트와 예산 확대"] },
+  { t: <><em>대표가 직접</em> 운영하는<br />DB 마케팅</>, s: "계약만 대표가 하고, 운영은 직원에게 넘기지 않습니다.", items: ["대표 직접 전략 수립 및 운영", "광고 성과 분석과 개선", "고객사별 맞춤 전략 수립"] },
+  { t: <><em>[ 마케팅 + 디자인 + 개발 ]</em><br />한 팀으로 실행</>, s: "기획부터 제작까지, 기다릴 이유가 없습니다.", items: ["광고 소재 기획 및 제작", "랜딩페이지 디자인·개발", "전환 추적 및 CRM 자동화"] },
+  { t: <><em>인하우스처럼 움직이는</em><br />DB 마케팅 파트너</>, s: "시키는 일만 하는 대행사가 아닙니다.", items: ["새로운 광고 소구점 제안", "성과에 따른 소재·랜딩 개선", "지속적인 테스트와 예산 확대"] },
 ];
 const STEPS = [
-  { t: "사업 분석 & DB 마케팅 전략 수립", items: ["상품·서비스 USP 및 경쟁사 분석", "고객 타겟·광고 매체·랜딩페이지 점검", "고객 확보 목표에 맞춘 광고 전략 설계"] },
-  { t: "광고 콘텐츠 제작 & 집행", items: ["DB 신청을 유도하는 이미지·영상 소재 제작", "성과에 따른 소재 교체 및 반복 테스트", "Meta·Google 등 주요 광고 매체 운영"] },
-  { t: "성과 분석 & 최적화", items: ["광고별 DB 단가 및 수량 분석", "랜딩페이지 전환율 개선", "CRM 자동화 및 영업 데이터 연동", "성과에 따른 타겟·소재·예산 최적화"] },
+  { t: "사업 분석 & DB 마케팅 전략 수립", items: ["상품·서비스 USP 및 경쟁사 분석", "고객 타겟 / 광고 매체 / 랜딩페이지 등 DB 수집 컨디션 전반 점검", "고객 확보 목표에 맞춘 광고 전략 설계"] },
+  { t: "광고 콘텐츠 제작 & 집행", items: ["DB 신청을 유도하는 이미지 / 영상 소재 기획 및 제작", "효율 저하 시 즉시 신규 소재 투입, 소재 반복 테스트", "Meta / Google 등 주요 매체 광고 집행"] },
+  { t: "성과 분석 & 최적화", items: ["광고별 DB 단가 및 수량 분석", "랜딩페이지 전환율 개선", "CRM 자동화 및 영업 데이터 연동", "성과에 따른 타겟 / 소재 / 예산 최적화"] },
+];
+const STORIES = [
+  { chip: "운영 [N]개월 차", c: "태양광 시공·분양\nG사", img: charMale, side: "l", q: "[실제 고객사 후기 삽입 — 두세 문장, 핵심 숫자는 강조]" },
+  { chip: "운영 [N]개월 차", c: "성인 교육 플랫폼\nD사", img: charFemale, side: "r", q: "[실제 고객사 후기 삽입]" },
+  { chip: "운영 [N]개월 차", c: "코칭·컨설팅\nP사", img: charCurly, side: "l", q: "[실제 고객사 후기 삽입]" },
 ];
 const BUDGETS = ["아직 집행하지 않음", "500만원 미만", "500만~1,000만원", "1,000만~3,000만원", "3,000만원 이상"];
 
@@ -38,21 +51,29 @@ function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: strin
   const ref = useRef<HTMLSpanElement | null>(null); const [v, setV] = useState(0);
   useEffect(() => {
     const el = ref.current; if (!el) return;
-    const io = new IntersectionObserver(([e]) => { if (!e.isIntersecting) return; io.disconnect(); const t0 = performance.now(); const dur = 1200;
-      const tick = (t: number) => { const p = Math.min(1, (t - t0) / dur); setV(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }, { threshold: 0.4 });
-    io.observe(el); const fb = setTimeout(() => setV(to), 2500);
-    return () => { io.disconnect(); clearTimeout(fb); };
+    const io = new IntersectionObserver(([e]) => { if (!e.isIntersecting) return; io.disconnect(); const t0 = performance.now();
+      const tick = (t: number) => { const p = Math.min(1, (t - t0) / 1200); setV(to * (1 - Math.pow(1 - p, 3))); if (p < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }, { threshold: 0.4 });
+    io.observe(el); const fb = setTimeout(() => setV(to), 2500); return () => { io.disconnect(); clearTimeout(fb); };
   }, [to]);
   return <span ref={ref}>{v.toFixed(decimals)}{suffix}</span>;
 }
+function Bar({ h, label, dim }: { h: number; label: string; dim?: boolean }) {
+  const ref = useRef<HTMLDivElement | null>(null); const [on, setOn] = useState(false);
+  useEffect(() => { const el = ref.current; if (!el) return; const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.3 }); io.observe(el); const fb = setTimeout(() => setOn(true), 2500); return () => { io.disconnect(); clearTimeout(fb); }; }, []);
+  return (
+    <div ref={ref} className="flex flex-col items-center justify-end h-full gap-1 flex-1">
+      <span className="text-[10px] text-white/70 tabular-nums">{label}</span>
+      <div className="w-[60%] rounded-t-[2px] transition-[height] duration-1000 ease-out" style={{ height: on ? `${h}%` : "4%", background: dim ? "rgba(255,255,255,0.25)" : A }} />
+    </div>
+  );
+}
 
-const Line = () => <div className="mx-auto w-px h-14 bg-white/20" aria-hidden />;
-const H = ({ children, small }: { children: React.ReactNode; small?: boolean }) => <h2 className={`text-center break-keep font-bold leading-[1.3] tracking-[-0.03em] ${small ? "text-[20px]" : "text-[24px] md:text-[26px]"}`}>{children}</h2>;
-const Sub = ({ children }: { children: React.ReactNode }) => <p className="text-center text-[14px] text-white/55 leading-[1.7] break-keep">{children}</p>;
-const Cta = ({ children = "DB 마케팅 상담하기" }: { children?: React.ReactNode }) => (
-  <a href="#form" className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-[15px] font-bold text-white shadow-[0_8px_30px_rgba(67,150,248,0.35)]" style={{ background: ACCENT }}>{children} <ArrowRight className="w-4 h-4" /></a>
-);
-const Placeholder = ({ label, ratio = "aspect-[3/4]" }: { label: string; ratio?: string }) => <div className={`${ratio} rounded-lg border border-dashed border-white/15 bg-white/[0.03] flex items-center justify-center text-[11px] text-white/35 text-center px-2`}>{label}</div>;
+const Connector = () => <div className="flex flex-col items-center my-9" aria-hidden><div className="w-px h-[38px] bg-white/70" /><div className="w-[10px] h-[10px] rounded-full bg-white -mt-px" /></div>;
+const Light = ({ children }: { children: React.ReactNode }) => <p className="text-center text-[15px] md:text-[19px] font-light leading-[1.5] text-white/90 break-keep">{children}</p>;
+const Head = ({ children, size = "md" }: { children: React.ReactNode; size?: "sm" | "md" | "lg" }) => <h2 className={`text-center break-keep font-extrabold leading-[1.3] tracking-[-0.03em] ${size === "lg" ? "text-[24px] md:text-[31px]" : size === "sm" ? "text-[18px] md:text-[23px]" : "text-[21px] md:text-[27px]"}`}>{children}</h2>;
+const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <div className={`rounded-[15px] bg-[#292929] ${className}`}>{children}</div>;
+const Dot = () => <span className="mt-[8px] w-[4px] h-[4px] rounded-full bg-white shrink-0" />;
+const Cta = ({ children }: { children: React.ReactNode }) => <a href="#form" className="inline-flex items-center gap-2 h-[36px] md:h-[44px] px-[14px] md:px-[18px] rounded-[8px] text-[15px] md:text-[17px] font-semibold text-white" style={{ background: A }}>{children} <span aria-hidden>→</span></a>;
 
 export default function DbClient() {
   const router = useRouter();
@@ -71,159 +92,196 @@ export default function DbClient() {
   };
 
   return (
-    <div className="min-h-screen bg-[#101010] text-white selection:bg-sky-500/30" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
-      <style>{`.db em{font-style:normal;color:${ACCENT}} .db b{font-weight:700;color:#fff}`}</style>
-      <div className="db mx-auto w-full max-w-[480px] px-6 pt-10 pb-24">
-        {/* 로고 */}
-        <div className="flex justify-center mb-10"><div className="w-11 h-11 rounded-full border border-white/25 flex items-center justify-center"><Image src={logoWhite} alt="픽셀페이지" width={26} height={26} className="w-6 h-auto" priority /></div></div>
+    <div className="min-h-screen bg-[#101010] text-white" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
+      <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db input::placeholder{color:rgba(255,255,255,.3)}`}</style>
+      <div className="db mx-auto w-full max-w-[390px] md:max-w-[490px] px-[25px] pt-[50px] pb-[120px]">
+
+        {/* 로고 (원형 100px) */}
+        <div className="w-[100px] h-[100px] rounded-full bg-[#1c1c1c] border border-white/10 flex items-center justify-center mb-[50px]"><Image src={logoWhite} alt="픽셀페이지" width={56} height={14} className="w-[56px] h-auto" priority /></div>
+        <h1 className="text-[32px] font-extrabold leading-[1.2] tracking-[-0.02em] mb-8">📝DB 마케팅 문의하기</h1>
 
         {/* 01 HERO */}
-        <p className="text-[13px] text-white/60 mb-4 flex items-center gap-1.5"><span>📝</span>DB 마케팅 전문팀, 픽셀페이지</p>
-        <div className="text-center">
-          <p className="text-[15px] text-white/80 leading-[1.7] break-keep">성과 내는 기업엔 공통점이 있습니다.<br /><em>DB 마케팅</em>을 제대로 한다는 것</p>
-          <h1 className="mt-5 text-[28px] md:text-[30px] font-extrabold leading-[1.25] tracking-[-0.03em] break-keep">다음은 대표님 차례입니다.</h1>
-          <div className="mt-6"><Cta /></div>
-        </div>
+        <Light>성과 내는 기업엔 공통점이 있습니다.</Light>
+        <p className="text-center text-[15px] md:text-[19px] font-bold leading-[1.5] break-keep"><em>DB 마케팅</em>을 제대로 한다는 것</p>
+        <h2 className="mt-7 text-center text-[21px] md:text-[27px] font-extrabold leading-[1.3] tracking-[-0.03em]">다음은 대표님 차례입니다.</h2>
+        <div className="mt-6 flex justify-center"><Cta>DB 마케팅 상담하기</Cta></div>
 
-        <Line />
+        <Connector />
 
         {/* 02 PAIN POINT */}
-        <H>혹시 이런 고민 중이신가요?</H>
-        <div className="mt-6 rounded-2xl bg-[#1c1c1c] border border-white/10 p-5 space-y-4">
-          {PAINS.map((p, i) => <div key={i} className="flex gap-3 items-start text-[14px] leading-[1.7] text-white/80 break-keep"><Square className="w-4 h-4 mt-1 shrink-0 text-white/50" /><span>{p}</span></div>)}
-        </div>
+        <Head size="sm">혹시 이런 고민 중이신가요?</Head>
+        <Card className="mt-7 mx-auto w-[88%] px-[18px] md:px-[24px] py-[6px]">
+          {PAINS.map((p, i) => (
+            <div key={i} className="flex gap-[14px] items-start py-[14px] border-t border-white/40 first:border-0 text-[12.5px] md:text-[15.5px] leading-[1.55] text-white/90 break-keep">
+              <span className="mt-[2px] w-[12px] h-[12px] md:w-[14px] md:h-[14px] border border-white/80 shrink-0" aria-hidden />
+              <span>{p}</span>
+            </div>
+          ))}
+        </Card>
 
-        <Line />
+        <Connector />
 
-        {/* 03 PERFORMANCE */}
-        <H>우리는 이 고민을 <em>숫자로 바꿉니다.</em></H>
-        <div className="mt-2"><Sub>말보다 확실한 건 실제 성과입니다.</Sub></div>
-        <div className="mt-6 grid grid-cols-2 gap-2.5">
-          {PERF.map(([c, a, b, d]) => (
-            <div key={c} className="rounded-xl bg-[#1c1c1c] border border-white/10 p-4">
-              <p className="text-[12px] text-white/60 mb-3 break-keep leading-[1.4]">{c}</p>
-              {[["DB 단가", a], ["DB 수량", b], ["매출", d]].map(([k, v]) => (
-                <div key={k} className="flex items-baseline justify-between py-1 border-t border-white/[0.06] first:border-0"><span className="text-[11px] text-white/45">{k}</span><span className="text-[15px] font-bold tabular-nums" style={{ color: ACCENT }}>{v}</span></div>
-              ))}
+        {/* 03 PERFORMANCE — 운영 전/후 막대 */}
+        <Head size="sm"><span className="font-light">우리는 이 고민을</span> 숫자로 바꿉니다.</Head>
+        <div className="mt-7 grid grid-cols-2 gap-[10px]">
+          {PERF.map((p) => (
+            <div key={p.c} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] p-[12px] md:p-[14px]">
+              <p className="text-[11px] md:text-[13px] font-semibold text-white/90 mb-1 break-keep leading-[1.3]">{p.c}</p>
+              <p className="text-[10px] md:text-[12px] text-white/50 mb-3">{p.cpl} · {p.rev}</p>
+              <div className="relative h-[72px] md:h-[88px] border-b border-white/30">
+                <div className="absolute inset-x-0 top-[22%] border-t border-dashed border-white/15" /><div className="absolute inset-x-0 top-[61%] border-t border-dashed border-white/15" />
+                <div className="flex h-full items-end gap-2 px-1"><Bar h={(p.before / p.after) * 100} label="운영 전" dim /><Bar h={100} label={p.label} /></div>
+              </div>
+              <div className="flex justify-around mt-1 text-[9px] md:text-[11px] text-white/45"><span>운영 전</span><span>운영 후 DB 수량</span></div>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[11px] text-white/35 text-center">Meta·Google 광고 계정 기준 · 측정 기간과 비교 기준은 상담 시 계정 화면으로 확인</p>
+        <p className="mt-3 text-[10px] md:text-[12px] text-white/35 text-center leading-[1.6]">Meta·Google 광고 계정 기준. 측정 기간과 비교 기준은 상담 시 계정 화면으로 확인하실 수 있습니다.</p>
 
-        <Line />
+        <Connector />
 
         {/* 04 WHY */}
-        <Sub>DB 마케팅에 특화된 전문팀</Sub>
-        <div className="mt-1"><H>픽셀페이지가 <em>직접</em> 합니다.</H></div>
-        <div className="mt-8 space-y-8">
-          {WHY.map((w) => (
-            <div key={w.n} className="text-center">
-              <div className="mx-auto w-9 h-9 rounded-full flex items-center justify-center text-[15px] font-bold" style={{ background: ACCENT }}>{w.n}</div>
-              <p className="mt-4 text-[19px] font-bold leading-[1.35] tracking-[-0.02em] break-keep">{w.t}</p>
-              <p className="mt-2 text-[13px] text-white/55 break-keep">{w.s}</p>
-              <ul className="mt-4 inline-block text-left space-y-1.5">{w.items.map((i) => <li key={i} className="flex gap-2 text-[14px] text-white/80"><span className="mt-[9px] w-1 h-1 rounded-full bg-white/60 shrink-0" />{i}</li>)}</ul>
+        <Light>DB 마케팅에 특화된 전문팀</Light>
+        <Head>픽셀페이지가 직접 합니다</Head>
+        <div className="mt-8 space-y-[34px]">
+          {WHY.map((w, i) => (
+            <div key={i} className="relative pt-[14px]">
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-[28px] h-[28px] md:w-[34px] md:h-[34px] rounded-full bg-[#3a3a3a] flex items-center justify-center text-[13px] md:text-[16px] font-bold z-10">{i + 1}</div>
+              <Card className="mx-auto w-[92%] pt-[34px] pb-[24px] px-[22px] md:px-[28px] text-center">
+                <p className="text-[19px] md:text-[23px] font-bold leading-[1.35] tracking-[-0.02em] break-keep">{w.t}</p>
+                <p className="mt-[6px] text-[11.5px] md:text-[13.5px] text-white/55 break-keep">{w.s}</p>
+                <ul className="mt-[18px] inline-block text-left space-y-[6px]">{w.items.map((it) => <li key={it} className="flex gap-[10px] text-[13px] md:text-[15px] text-white/90 leading-[1.5]"><Dot />{it}</li>)}</ul>
+              </Card>
             </div>
           ))}
         </div>
 
-        <Line />
-
-        {/* 05 BRAND MESSAGE */}
-        <Sub>광고는 누구나 할 수 있지만</Sub>
-        <div className="mt-1"><H>성과를 키우는 건<br />아무나 못합니다.</H></div>
-        <div className="mt-3"><Sub>같은 광고비, 다른 결과.<br />차이는 운영하는 사람에게 있습니다.</Sub></div>
-        <div className="mt-7 grid grid-cols-3 gap-2 text-center">
-          {[["누적 광고 취급액", <span key="a" className="text-white/30 text-[16px]">[금액]억+</span>], ["평균 DB 단가 개선율", <CountUp key="b" to={48} suffix="%" />], ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />]].map(([k, v]) => (
-            <div key={String(k)} className="rounded-xl bg-[#1c1c1c] border border-white/10 py-5 px-2">
-              <p className="text-[11px] text-white/50 mb-2 break-keep">{k as string}</p>
-              <p className="text-[24px] font-extrabold tabular-nums tracking-[-0.02em]" style={{ color: ACCENT }}>{v as React.ReactNode}</p>
+        <div className="mt-[60px]">
+          <Light>광고는 누구나 할 수 있지만</Light>
+          <Head size="lg">성과를 키우는 건<br />아무나 못합니다</Head>
+          <p className="mt-3 text-center text-[12.5px] md:text-[15px] text-white/60 leading-[1.6]">같은 광고비, 다른 결과.<br />차이는 운영하는 사람에게 있습니다.</p>
+        </div>
+        <div className="mt-7 grid grid-cols-3 gap-[8px]">
+          {[["누적 광고 취급액", <span key="a" className="text-white/35 text-[13px]">[금액]억+</span>], ["평균 DB 단가 개선", <CountUp key="b" to={48} suffix="%" />], ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />]].map(([k, v]) => (
+            <div key={String(k)} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] py-[14px] px-[6px] text-center">
+              <p className="text-[9.5px] md:text-[11px] text-white/55 mb-[6px] break-keep leading-[1.3]">{k as string}</p>
+              <p className="text-[20px] md:text-[26px] font-extrabold tabular-nums tracking-[-0.02em]" style={{ color: A }}>{v as React.ReactNode}</p>
             </div>
           ))}
         </div>
 
-        <Line />
+        <Connector />
 
-        {/* 06 PROCESS */}
-        <H>픽셀페이지는 <em>이렇게</em> 접근합니다</H>
-        <div className="mt-8 relative pl-6">
-          <div className="absolute left-[7px] top-2 bottom-2 border-l border-dashed border-white/25" aria-hidden />
-          <div className="space-y-8">
+        {/* 05 PROCESS */}
+        <Head>픽셀페이지는 이렇게 접근합니다</Head>
+        <div className="mt-8 relative">
+          <div className="absolute left-[5px] top-[10px] bottom-[14px] border-l-2 border-dotted" style={{ borderColor: A }} aria-hidden />
+          <div className="space-y-[26px]">
             {STEPS.map((s, i) => (
-              <div key={s.t} className="relative">
-                <span className="absolute -left-6 top-[6px] w-[15px] h-[15px] rounded-full border-2 border-[#101010]" style={{ background: ACCENT }} aria-hidden />
-                <p className="text-[12px] font-bold tracking-wider" style={{ color: ACCENT }}>STEP. {i + 1}</p>
-                <p className="mt-1 text-[16px] font-bold break-keep">{s.t}</p>
-                <ul className="mt-3 space-y-1.5">{s.items.map((it) => <li key={it} className="flex gap-2 text-[13.5px] text-white/75 leading-[1.6] break-keep"><span className="mt-[9px] w-1 h-1 rounded-full bg-white/50 shrink-0" />{it}</li>)}</ul>
+              <div key={s.t} className="relative pl-[24px]">
+                <span className="absolute left-0 top-[5px] w-[12px] h-[12px] rounded-full" style={{ background: A }} aria-hidden />
+                <p className="text-[15px] md:text-[18px] font-extrabold leading-[1.3] break-keep"><span style={{ color: A }}>STEP. {i + 1}</span> <span className="ml-1">{s.t}</span></p>
+                <Card className="mt-[14px] ml-[6px] px-[18px] md:px-[22px] py-[16px] md:py-[20px]">
+                  <ul className="space-y-[8px]">{s.items.map((it) => <li key={it} className="flex gap-[10px] text-[12.5px] md:text-[14.5px] text-white/90 leading-[1.5] break-keep"><Dot />{it}</li>)}</ul>
+                </Card>
               </div>
             ))}
           </div>
         </div>
 
-        <Line />
+        <div className="mt-[60px]"><Head size="sm">터지는 광고 소재가 <span className="font-light">나올 때까지</span></Head></div>
 
-        {/* 07 CREATIVE */}
-        <H>터지는 광고 소재가 <em>나올 때까지.</em></H>
-        <div className="mt-2"><Sub>새로운 소재를 만들고, 테스트하고, 다시 만듭니다.</Sub></div>
-        <div className="mt-6 grid grid-cols-3 gap-2">
-          {["태양광", "교육", "컨설팅", "프랜차이즈", "부동산", "기타"].map((t) => <Placeholder key={t} label={`[광고 소재 · ${t}]`} />)}
+        {/* 06 CREATIVE — 실제 집행 릴스 */}
+        <div className="mt-6 grid grid-cols-3 gap-[8px]">
+          {[["/reels/1.mp4", "교육"], ["/reels/4.mp4", "컨설팅"], ["/reels/6.mp4", "프랜차이즈"]].map(([src, label]) => (
+            <div key={src} className="text-center">
+              <div className="aspect-square rounded-[6px] overflow-hidden bg-black"><video src={src} muted autoPlay loop playsInline className="w-full h-full object-cover" /></div>
+              <p className="mt-[6px] text-[11px] md:text-[13px] text-white/60">{label}</p>
+            </div>
+          ))}
         </div>
-
-        <Line />
-
-        {/* 08 SUCCESS STORY */}
-        <Sub>다양한 업종의 성공 경험으로</Sub>
-        <div className="mt-1"><H>기업의 성장을 함께 만듭니다.</H></div>
-        <div className="mt-6 space-y-3">
-          {["태양광 시공·분양 G사", "성인 교육 플랫폼 D사", "코칭·컨설팅 P사"].map((c) => (
-            <div key={c} className="rounded-xl bg-[#1c1c1c] border border-white/10 p-4 flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-white/10 shrink-0 flex items-center justify-center text-[10px] text-white/40">{c.slice(-2, -1)}사</div>
-              <div><p className="text-[12px] font-semibold text-white/80 mb-1">{c}</p><p className="text-[12.5px] text-white/40 leading-[1.6]">[실제 고객사 후기 삽입]</p></div>
+        <div className="mt-[8px] grid grid-cols-3 gap-[8px]">
+          {[["/reels/2.mp4", "태양광"], ["/reels/7.mp4", "부동산"], ["/reels/9.mp4", "기타"]].map(([src, label]) => (
+            <div key={src} className="text-center">
+              <div className="aspect-square rounded-[6px] overflow-hidden bg-black"><video src={src} muted autoPlay loop playsInline className="w-full h-full object-cover" /></div>
+              <p className="mt-[6px] text-[11px] md:text-[13px] text-white/60">{label}</p>
             </div>
           ))}
         </div>
 
-        <Line />
+        <Connector />
 
-        {/* 09 SOCIAL PROOF */}
-        <Sub>성과로 증명한</Sub>
-        <div className="mt-1"><H>고객사의 생생한 목소리입니다.</H></div>
-        <div className="mt-6 grid grid-cols-2 gap-2">
-          {["[카카오톡 대화 캡처]", "[광고 성과 개선 사례]", "[고객사 감사 메시지]", "[예산 증액 사례]"].map((p) => <Placeholder key={p} label={p} ratio="aspect-[4/5]" />)}
-        </div>
-
-        <Line />
-
-        {/* 10 FORM */}
-        <div id="form" className="scroll-mt-10">
-          <H>DB 마케팅,<br />이제 <em>제대로 된 팀</em>과 함께하세요.</H>
-          <div className="mt-3"><Sub>우리 회사의 DB 마케팅팀.<br />픽셀페이지가 함께합니다.</Sub></div>
-          <form onSubmit={onSubmit} className="mt-10 space-y-7">
-            <p className="text-[18px] font-bold flex items-center gap-1.5"><span>📝</span>DB 마케팅 상담하기</p>
-            {[["company", "회사명", "text"], ["name", "성함 / 직함", "text"], ["phone", "전화번호", "tel"], ["email", "이메일", "email"], ["site", "사이트 주소", "url"]].map(([k, label, type]) => (
-              <label key={k} className="block">
-                <span className="block text-[15px] font-semibold mb-2">{label}{k !== "site" && <span className="ml-1" style={{ color: ACCENT }}>*</span>}</span>
-                <input type={type} value={f[k as keyof typeof f] as string} onChange={(e) => setF({ ...f, [k]: e.target.value })} className="w-full bg-transparent border-0 border-b border-white/25 px-0 py-2.5 text-[15px] focus:outline-none focus:border-[#4396F8] transition" />
-              </label>
-            ))}
-            <div>
-              <span className="block text-[15px] font-semibold mb-3">현재 월 광고 예산</span>
-              <div className="space-y-2">
-                {BUDGETS.map((b) => <button type="button" key={b} onClick={() => setF({ ...f, budget: b })} className="flex items-center gap-2.5 text-[14px] text-white/85">{f.budget === b ? <span className="w-4 h-4 rounded-full border-[5px] shrink-0" style={{ borderColor: ACCENT }} /> : <span className="w-4 h-4 rounded-full border border-white/40 shrink-0" />}{b}</button>)}
+        {/* 07 SUCCESS STORY — 말풍선 */}
+        <Head size="sm"><span>다양한 성공 레퍼런스</span><span className="font-light">를 바탕으로</span><br /><span className="font-light">기업의 성장을 </span>함께 만듭니다.</Head>
+        <div className="mt-8 space-y-[18px]">
+          {STORIES.map((s) => (
+            <div key={s.c} className={`flex items-center gap-[10px] ${s.side === "r" ? "flex-row-reverse" : ""}`}>
+              <div className="w-[70px] md:w-[84px] shrink-0 text-center">
+                <span className="inline-block px-[8px] py-[3px] rounded-full bg-[#2a2a2a] text-[9px] md:text-[10.5px] font-semibold">{s.chip}</span>
+                <p className="mt-[4px] text-[11px] md:text-[13px] font-bold leading-[1.25] whitespace-pre-line">{s.c}</p>
+              </div>
+              <div className="relative flex-1 rounded-[10px] bg-[#e9e9e9] text-[#222] text-[11px] md:text-[13px] leading-[1.6] px-[14px] py-[12px] break-keep">
+                <span className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent ${s.side === "r" ? "-right-[6px] border-l-[7px] border-l-[#e9e9e9]" : "-left-[6px] border-r-[7px] border-r-[#e9e9e9]"}`} aria-hidden />
+                {s.q}
               </div>
             </div>
-            <div>
-              <span className="block text-[15px] font-semibold mb-3">개인정보 수집 및 이용 동의<span className="ml-1" style={{ color: ACCENT }}>*</span></span>
-              <button type="button" onClick={() => setF({ ...f, agree: !f.agree })} className="flex items-center gap-2.5 text-[14px] text-white/85">{f.agree ? <CheckSquare className="w-4 h-4" style={{ color: ACCENT }} /> : <Square className="w-4 h-4 text-white/50" />} 개인 정보 수집 및 이용에 동의합니다.</button>
+          ))}
+        </div>
+        <p className="mt-3 text-[10px] text-white/35 text-center">실제 고객이 남긴 후기만 사용합니다.</p>
+
+        <div className="mt-[60px]"><Head>성과로 증명한<br />고객사의 생생한 목소리입니다</Head></div>
+        <div className="mt-7 grid grid-cols-2 gap-[8px]">
+          {["[카카오톡 대화 캡처 1]", "[카카오톡 대화 캡처 2]", "[광고 성과 개선 사례]", "[예산 증액 사례]"].map((p) => (
+            <div key={p} className="aspect-[4/5] rounded-[6px] bg-[#b7c7d9] flex items-center justify-center text-[11px] text-[#223] text-center px-3">{p}</div>
+          ))}
+        </div>
+
+        {/* 파트너 로고 (기존 LP 에셋) */}
+        <div className="mt-[60px]">
+          <p className="text-center text-[11px] md:text-[13px] text-white/50 mb-4">픽셀페이지 파트너사</p>
+          <div className="grid grid-cols-4 gap-[6px]">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <div key={n} className="h-[36px] md:h-[44px] rounded-[6px] bg-white flex items-center justify-center p-[6px]"><Image src={`/lp-partners/${n}.webp`} alt="" width={120} height={40} className="max-h-full w-auto object-contain" /></div>)}
+          </div>
+        </div>
+
+        <Connector />
+
+        {/* 08 FORM — 탈리 폼 수치 그대로: 라벨 18/600, 입력 36px r8 bg white/5.5%, 버튼 36px r8 */}
+        <div id="form" className="scroll-mt-6">
+          <Head size="sm">DB 마케팅,<br />이제 <em>제대로 된 팀</em>과 함께하세요.</Head>
+          <p className="mt-3 text-center text-[12.5px] md:text-[15px] text-white/60 leading-[1.6]">우리 회사의 DB 마케팅팀.<br />픽셀페이지가 함께합니다.</p>
+          <form onSubmit={onSubmit} className="mt-10">
+            <p className="text-[24px] font-semibold leading-[1.25] mb-[30px]">📝DB 마케팅 상담하기</p>
+            {[["company", "회사명", "text", true], ["name", "성함/직함", "text", true], ["phone", "전화번호", "tel", true], ["email", "이메일", "email", true], ["site", "사이트 주소", "url", false]].map(([k, label, type, req]) => (
+              <label key={String(k)} className="block mb-[36px]">
+                <span className="block text-[18px] font-semibold leading-[1.25] pb-[5px]">{label as string}{req ? <span className="ml-[6px] text-[14px] font-black align-middle">*</span> : null}</span>
+                <input type={type as string} value={f[k as keyof typeof f] as string} onChange={(e) => setF({ ...f, [k as string]: e.target.value })} className="mt-[10px] w-full h-[36px] rounded-[8px] bg-white/[0.055] border border-white/10 px-[10px] text-[16px] focus:outline-none focus:border-white/40" />
+              </label>
+            ))}
+            <div className="mb-[36px]">
+              <span className="block text-[18px] font-semibold leading-[1.25] pb-[12px]">현재 월 광고 예산</span>
+              <div className="space-y-[10px]">
+                {BUDGETS.map((b) => (
+                  <button type="button" key={b} onClick={() => setF({ ...f, budget: b })} className="flex items-center gap-[10px] text-[16px]">
+                    <span className="w-[20px] h-[20px] rounded-full border border-white/60 flex items-center justify-center shrink-0">{f.budget === b && <span className="w-[10px] h-[10px] rounded-full" style={{ background: A }} />}</span>{b}
+                  </button>
+                ))}
+              </div>
             </div>
-            {err && <p className="text-[13px] text-red-300">{err}</p>}
-            <button type="submit" disabled={submitting} className="w-full py-4 rounded-full text-[16px] font-bold text-white disabled:opacity-60 shadow-[0_8px_30px_rgba(67,150,248,0.35)]" style={{ background: ACCENT }}>{submitting ? "전송 중…" : "DB 마케팅 상담 신청하기"}</button>
+            <div className="mb-[36px]">
+              <span className="block text-[18px] font-semibold leading-[1.25] pb-[12px]">개인정보 수집 및 이용 동의<span className="ml-[6px] text-[14px] font-black align-middle">*</span></span>
+              <button type="button" onClick={() => setF({ ...f, agree: !f.agree })} className="flex items-center gap-[10px] text-[16px]">
+                <span className="w-[20px] h-[20px] rounded-[4px] border border-white/60 flex items-center justify-center shrink-0" style={f.agree ? { background: A, borderColor: A } : undefined}>{f.agree && <span className="text-[13px] font-bold">✓</span>}</span>개인 정보 수집 및 이용에 동의합니다.
+              </button>
+            </div>
+            {err && <p className="mb-4 text-[13px] text-red-300">{err}</p>}
+            <div className="flex justify-center"><button type="submit" disabled={submitting} className="inline-flex items-center gap-2 h-[36px] px-[14px] rounded-[8px] text-[15px] font-semibold text-white disabled:opacity-60" style={{ background: A }}>{submitting ? "전송 중…" : "DB 마케팅 상담하기"} <span aria-hidden>→</span></button></div>
           </form>
         </div>
 
-        <p className="mt-16 text-[11px] text-white/30 text-center leading-[1.8]">픽셀페이지 · 대표 박희규 · 사업자등록번호 477-11-01530<br />contact@pixelpage.co.kr</p>
+        <p className="mt-[80px] text-[10px] text-white/30 text-center leading-[1.8]">픽셀페이지 · 대표 박희규 · 사업자등록번호 477-11-01530<br />contact@pixelpage.co.kr</p>
       </div>
-      {/* 떠 있는 CTA (모바일) */}
-      <a href="#form" className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 px-5 py-3 rounded-full text-[14px] font-bold text-white shadow-[0_8px_30px_rgba(0,0,0,0.5)]" style={{ background: ACCENT }}>DB 마케팅 상담하기 <ArrowRight className="w-4 h-4" /></a>
+      <a href="#form" className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 h-[40px] px-[16px] rounded-[8px] text-[14px] font-semibold text-white shadow-[0_8px_30px_rgba(0,0,0,0.5)]" style={{ background: A }}>DB 마케팅 상담하기 →</a>
     </div>
   );
 }
