@@ -4,7 +4,6 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { captureAttribution, submitInquiry } from "@/lib/attribution";
-import logoWhite from "@/assets/logo-white.png";
 import charMale from "@/assets/char-male.png";
 import charFemale from "@/assets/char-female.png";
 import charCurly from "@/assets/char-curly.png";
@@ -94,11 +93,8 @@ export default function DbClient() {
   return (
     <div className="min-h-screen bg-[#101010] text-white" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
       <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db input::placeholder{color:rgba(255,255,255,.3)}`}</style>
-      <div className="db mx-auto w-full max-w-[390px] md:max-w-[490px] px-[25px] pt-[50px] pb-[120px]">
+      <div className="db mx-auto w-full max-w-[390px] md:max-w-[490px] px-[25px] pt-[60px] pb-[120px]">
 
-        {/* 로고 (원형 100px) */}
-        <div className="w-[100px] h-[100px] rounded-full bg-[#1c1c1c] border border-white/10 flex items-center justify-center mb-[50px]"><Image src={logoWhite} alt="픽셀페이지" width={56} height={14} className="w-[56px] h-auto" priority /></div>
-        <h1 className="text-[32px] font-extrabold leading-[1.2] tracking-[-0.02em] mb-8">📝DB 마케팅 문의하기</h1>
 
         {/* 01 HERO */}
         <Light>성과 내는 기업엔 공통점이 있습니다.</Light>
