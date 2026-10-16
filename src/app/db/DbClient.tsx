@@ -61,18 +61,18 @@ function Bar({ h, label, dim }: { h: number; label: string; dim?: boolean }) {
   useEffect(() => { const el = ref.current; if (!el) return; const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } }, { threshold: 0.3 }); io.observe(el); const fb = setTimeout(() => setOn(true), 2500); return () => { io.disconnect(); clearTimeout(fb); }; }, []);
   return (
     <div ref={ref} className="flex flex-col items-center justify-end h-full gap-1 flex-1">
-      <span className="text-[10px] text-white/70 tabular-nums">{label}</span>
+      <span className="text-[12.5px] text-white/70 tabular-nums">{label}</span>
       <div className="w-[60%] rounded-t-[2px] transition-[height] duration-1000 ease-out" style={{ height: on ? `${h}%` : "4%", background: dim ? "rgba(255,255,255,0.25)" : A }} />
     </div>
   );
 }
 
 const Connector = () => <div className="flex flex-col items-center my-9" aria-hidden><div className="w-px h-[38px] bg-white/70" /><div className="w-[10px] h-[10px] rounded-full bg-white -mt-px" /></div>;
-const Light = ({ children }: { children: React.ReactNode }) => <p className="text-center text-[15px] md:text-[19px] font-light leading-[1.5] text-white/90 break-keep">{children}</p>;
-const Head = ({ children, size = "md" }: { children: React.ReactNode; size?: "sm" | "md" | "lg" }) => <h2 className={`text-center break-keep font-extrabold leading-[1.3] tracking-[-0.03em] ${size === "lg" ? "text-[24px] md:text-[31px]" : size === "sm" ? "text-[18px] md:text-[23px]" : "text-[21px] md:text-[27px]"}`}>{children}</h2>;
+const Light = ({ children }: { children: React.ReactNode }) => <p className="text-center text-[19px] md:text-[24px] font-light leading-[1.5] text-white/90 break-keep">{children}</p>;
+const Head = ({ children, size = "md" }: { children: React.ReactNode; size?: "sm" | "md" | "lg" }) => <h2 className={`text-center break-keep font-extrabold leading-[1.3] tracking-[-0.03em] ${size === "lg" ? "text-[30px] md:text-[39px]" : size === "sm" ? "text-[22.5px] md:text-[29px]" : "text-[26px] md:text-[34px]"}`}>{children}</h2>;
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <div className={`rounded-[15px] bg-[#292929] ${className}`}>{children}</div>;
 const Dot = () => <span className="mt-[8px] w-[4px] h-[4px] rounded-full bg-white shrink-0" />;
-const Cta = ({ children }: { children: React.ReactNode }) => <a href="#form" className="inline-flex items-center gap-2 h-[36px] md:h-[44px] px-[14px] md:px-[18px] rounded-[8px] text-[15px] md:text-[17px] font-semibold text-white" style={{ background: A }}>{children} <span aria-hidden>→</span></a>;
+const Cta = ({ children }: { children: React.ReactNode }) => <a href="#form" className="inline-flex items-center gap-2 h-[36px] md:h-[44px] px-[14px] md:px-[18px] rounded-[8px] text-[19px] md:text-[21px] font-semibold text-white" style={{ background: A }}>{children} <span aria-hidden>→</span></a>;
 
 export default function DbClient() {
   const router = useRouter();
@@ -93,13 +93,13 @@ export default function DbClient() {
   return (
     <div className="min-h-screen bg-[#101010] text-white" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
       <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db input::placeholder{color:rgba(255,255,255,.3)}`}</style>
-      <div className="db mx-auto w-full max-w-[390px] md:max-w-[490px] px-[25px] pt-[60px] pb-[120px]">
+      <div className="db mx-auto w-full max-w-[420px] md:max-w-[540px] px-[25px] pt-[60px] pb-[120px]">
 
 
         {/* 01 HERO */}
         <Light>성과 내는 기업엔 공통점이 있습니다.</Light>
-        <p className="text-center text-[15px] md:text-[19px] font-bold leading-[1.5] break-keep"><em>DB 마케팅</em>을 제대로 한다는 것</p>
-        <h2 className="mt-7 text-center text-[21px] md:text-[27px] font-extrabold leading-[1.3] tracking-[-0.03em]">다음은 대표님 차례입니다.</h2>
+        <p className="text-center text-[19px] md:text-[24px] font-bold leading-[1.5] break-keep"><em>DB 마케팅</em>을 제대로 한다는 것</p>
+        <h2 className="mt-7 text-center text-[26px] md:text-[34px] font-extrabold leading-[1.3] tracking-[-0.03em]">다음은 대표님 차례입니다.</h2>
         <div className="mt-6 flex justify-center"><Cta>DB 마케팅 상담하기</Cta></div>
 
         <Connector />
@@ -108,7 +108,7 @@ export default function DbClient() {
         <Head size="sm">혹시 이런 고민 중이신가요?</Head>
         <Card className="mt-7 mx-auto w-[88%] px-[18px] md:px-[24px] py-[6px]">
           {PAINS.map((p, i) => (
-            <div key={i} className="flex gap-[14px] items-start py-[14px] border-t border-white/40 first:border-0 text-[12.5px] md:text-[15.5px] leading-[1.55] text-white/90 break-keep">
+            <div key={i} className="flex gap-[14px] items-start py-[14px] border-t border-white/40 first:border-0 text-[15.5px] md:text-[19.5px] leading-[1.55] text-white/90 break-keep">
               <span className="mt-[2px] w-[12px] h-[12px] md:w-[14px] md:h-[14px] border border-white/80 shrink-0" aria-hidden />
               <span>{p}</span>
             </div>
@@ -122,17 +122,17 @@ export default function DbClient() {
         <div className="mt-7 grid grid-cols-2 gap-[10px]">
           {PERF.map((p) => (
             <div key={p.c} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] p-[12px] md:p-[14px]">
-              <p className="text-[11px] md:text-[13px] font-semibold text-white/90 mb-1 break-keep leading-[1.3]">{p.c}</p>
-              <p className="text-[10px] md:text-[12px] text-white/50 mb-3">{p.cpl} · {p.rev}</p>
+              <p className="text-[14px] md:text-[16px] font-semibold text-white/90 mb-1 break-keep leading-[1.3]">{p.c}</p>
+              <p className="text-[12.5px] md:text-[15px] text-white/50 mb-3">{p.cpl} · {p.rev}</p>
               <div className="relative h-[72px] md:h-[88px] border-b border-white/30">
                 <div className="absolute inset-x-0 top-[22%] border-t border-dashed border-white/15" /><div className="absolute inset-x-0 top-[61%] border-t border-dashed border-white/15" />
                 <div className="flex h-full items-end gap-2 px-1"><Bar h={(p.before / p.after) * 100} label="운영 전" dim /><Bar h={100} label={p.label} /></div>
               </div>
-              <div className="flex justify-around mt-1 text-[9px] md:text-[11px] text-white/45"><span>운영 전</span><span>운영 후 DB 수량</span></div>
+              <div className="flex justify-around mt-1 text-[11px] md:text-[14px] text-white/45"><span>운영 전</span><span>운영 후 DB 수량</span></div>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[10px] md:text-[12px] text-white/35 text-center leading-[1.6]">Meta·Google 광고 계정 기준. 측정 기간과 비교 기준은 상담 시 계정 화면으로 확인하실 수 있습니다.</p>
+        <p className="mt-3 text-[12.5px] md:text-[15px] text-white/35 text-center leading-[1.6]">Meta·Google 광고 계정 기준. 측정 기간과 비교 기준은 상담 시 계정 화면으로 확인하실 수 있습니다.</p>
 
         <Connector />
 
@@ -142,11 +142,11 @@ export default function DbClient() {
         <div className="mt-8 space-y-[34px]">
           {WHY.map((w, i) => (
             <div key={i} className="relative pt-[14px]">
-              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-[28px] h-[28px] md:w-[34px] md:h-[34px] rounded-full bg-[#3a3a3a] flex items-center justify-center text-[13px] md:text-[16px] font-bold z-10">{i + 1}</div>
+              <div className="absolute left-1/2 -translate-x-1/2 top-0 w-[28px] h-[28px] md:w-[34px] md:h-[34px] rounded-full bg-[#3a3a3a] flex items-center justify-center text-[16px] md:text-[20px] font-bold z-10">{i + 1}</div>
               <Card className="mx-auto w-[92%] pt-[34px] pb-[24px] px-[22px] md:px-[28px] text-center">
-                <p className="text-[19px] md:text-[23px] font-bold leading-[1.35] tracking-[-0.02em] break-keep">{w.t}</p>
-                <p className="mt-[6px] text-[11.5px] md:text-[13.5px] text-white/55 break-keep">{w.s}</p>
-                <ul className="mt-[18px] inline-block text-left space-y-[6px]">{w.items.map((it) => <li key={it} className="flex gap-[10px] text-[13px] md:text-[15px] text-white/90 leading-[1.5]"><Dot />{it}</li>)}</ul>
+                <p className="text-[24px] md:text-[29px] font-bold leading-[1.35] tracking-[-0.02em] break-keep">{w.t}</p>
+                <p className="mt-[6px] text-[14.5px] md:text-[17px] text-white/55 break-keep">{w.s}</p>
+                <ul className="mt-[18px] inline-block text-left space-y-[6px]">{w.items.map((it) => <li key={it} className="flex gap-[10px] text-[16px] md:text-[19px] text-white/90 leading-[1.5]"><Dot />{it}</li>)}</ul>
               </Card>
             </div>
           ))}
@@ -155,13 +155,13 @@ export default function DbClient() {
         <div className="mt-[60px]">
           <Light>광고는 누구나 할 수 있지만</Light>
           <Head size="lg">성과를 키우는 건<br />아무나 못합니다</Head>
-          <p className="mt-3 text-center text-[12.5px] md:text-[15px] text-white/60 leading-[1.6]">같은 광고비, 다른 결과.<br />차이는 운영하는 사람에게 있습니다.</p>
+          <p className="mt-3 text-center text-[15.5px] md:text-[19px] text-white/60 leading-[1.6]">같은 광고비, 다른 결과.<br />차이는 운영하는 사람에게 있습니다.</p>
         </div>
         <div className="mt-7 grid grid-cols-3 gap-[8px]">
-          {[["누적 광고 취급액", <span key="a" className="text-white/35 text-[13px]">[금액]억+</span>], ["평균 DB 단가 개선", <CountUp key="b" to={48} suffix="%" />], ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />]].map(([k, v]) => (
+          {[["누적 광고 취급액", <span key="a" className="text-white/35 text-[16px]">[금액]억+</span>], ["평균 DB 단가 개선", <CountUp key="b" to={48} suffix="%" />], ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />]].map(([k, v]) => (
             <div key={String(k)} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] py-[14px] px-[6px] text-center">
-              <p className="text-[9.5px] md:text-[11px] text-white/55 mb-[6px] break-keep leading-[1.3]">{k as string}</p>
-              <p className="text-[20px] md:text-[26px] font-extrabold tabular-nums tracking-[-0.02em]" style={{ color: A }}>{v as React.ReactNode}</p>
+              <p className="text-[12px] md:text-[14px] text-white/55 mb-[6px] break-keep leading-[1.3]">{k as string}</p>
+              <p className="text-[25px] md:text-[32.5px] font-extrabold tabular-nums tracking-[-0.02em]" style={{ color: A }}>{v as React.ReactNode}</p>
             </div>
           ))}
         </div>
@@ -176,9 +176,9 @@ export default function DbClient() {
             {STEPS.map((s, i) => (
               <div key={s.t} className="relative pl-[24px]">
                 <span className="absolute left-0 top-[5px] w-[12px] h-[12px] rounded-full" style={{ background: A }} aria-hidden />
-                <p className="text-[15px] md:text-[18px] font-extrabold leading-[1.3] break-keep"><span style={{ color: A }}>STEP. {i + 1}</span> <span className="ml-1">{s.t}</span></p>
+                <p className="text-[19px] md:text-[22.5px] font-extrabold leading-[1.3] break-keep"><span style={{ color: A }}>STEP. {i + 1}</span> <span className="ml-1">{s.t}</span></p>
                 <Card className="mt-[14px] ml-[6px] px-[18px] md:px-[22px] py-[16px] md:py-[20px]">
-                  <ul className="space-y-[8px]">{s.items.map((it) => <li key={it} className="flex gap-[10px] text-[12.5px] md:text-[14.5px] text-white/90 leading-[1.5] break-keep"><Dot />{it}</li>)}</ul>
+                  <ul className="space-y-[8px]">{s.items.map((it) => <li key={it} className="flex gap-[10px] text-[15.5px] md:text-[18px] text-white/90 leading-[1.5] break-keep"><Dot />{it}</li>)}</ul>
                 </Card>
               </div>
             ))}
@@ -189,18 +189,18 @@ export default function DbClient() {
 
         {/* 06 CREATIVE — 실제 집행 릴스 */}
         <div className="mt-6 grid grid-cols-3 gap-[8px]">
-          {[["/reels/1.mp4", "교육"], ["/reels/4.mp4", "컨설팅"], ["/reels/6.mp4", "프랜차이즈"]].map(([src, label]) => (
+          {[["/reels/1.mp4", "교육"], ["/reels/4.mp4", "컨설팅"], ["/reels/10.mp4", "지식 창업"]].map(([src, label]) => (
             <div key={src} className="text-center">
               <div className="aspect-square rounded-[6px] overflow-hidden bg-black"><video src={src} muted autoPlay loop playsInline className="w-full h-full object-cover" /></div>
-              <p className="mt-[6px] text-[11px] md:text-[13px] text-white/60">{label}</p>
+              <p className="mt-[6px] text-[14px] md:text-[16px] text-white/60">{label}</p>
             </div>
           ))}
         </div>
         <div className="mt-[8px] grid grid-cols-3 gap-[8px]">
-          {[["/reels/2.mp4", "태양광"], ["/reels/7.mp4", "부동산"], ["/reels/9.mp4", "기타"]].map(([src, label]) => (
+          {[["/reels/5.mp4", "AI 강의"], ["/reels/3.mp4", "레저·체험"], ["/reels/2.mp4", "부동산"]].map(([src, label]) => (
             <div key={src} className="text-center">
               <div className="aspect-square rounded-[6px] overflow-hidden bg-black"><video src={src} muted autoPlay loop playsInline className="w-full h-full object-cover" /></div>
-              <p className="mt-[6px] text-[11px] md:text-[13px] text-white/60">{label}</p>
+              <p className="mt-[6px] text-[14px] md:text-[16px] text-white/60">{label}</p>
             </div>
           ))}
         </div>
@@ -213,28 +213,28 @@ export default function DbClient() {
           {STORIES.map((s) => (
             <div key={s.c} className={`flex items-center gap-[10px] ${s.side === "r" ? "flex-row-reverse" : ""}`}>
               <div className="w-[70px] md:w-[84px] shrink-0 text-center">
-                <span className="inline-block px-[8px] py-[3px] rounded-full bg-[#2a2a2a] text-[9px] md:text-[10.5px] font-semibold">{s.chip}</span>
-                <p className="mt-[4px] text-[11px] md:text-[13px] font-bold leading-[1.25] whitespace-pre-line">{s.c}</p>
+                <span className="inline-block px-[8px] py-[3px] rounded-full bg-[#2a2a2a] text-[11px] md:text-[13px] font-semibold">{s.chip}</span>
+                <p className="mt-[4px] text-[14px] md:text-[16px] font-bold leading-[1.25] whitespace-pre-line">{s.c}</p>
               </div>
-              <div className="relative flex-1 rounded-[10px] bg-[#e9e9e9] text-[#222] text-[11px] md:text-[13px] leading-[1.6] px-[14px] py-[12px] break-keep">
+              <div className="relative flex-1 rounded-[10px] bg-[#e9e9e9] text-[#222] text-[14px] md:text-[16px] leading-[1.6] px-[14px] py-[12px] break-keep">
                 <span className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent ${s.side === "r" ? "-right-[6px] border-l-[7px] border-l-[#e9e9e9]" : "-left-[6px] border-r-[7px] border-r-[#e9e9e9]"}`} aria-hidden />
                 {s.q}
               </div>
             </div>
           ))}
         </div>
-        <p className="mt-3 text-[10px] text-white/35 text-center">실제 고객이 남긴 후기만 사용합니다.</p>
+        <p className="mt-3 text-[12.5px] text-white/35 text-center">실제 고객이 남긴 후기만 사용합니다.</p>
 
         <div className="mt-[60px]"><Head>성과로 증명한<br />고객사의 생생한 목소리입니다</Head></div>
         <div className="mt-7 grid grid-cols-2 gap-[8px]">
           {["[카카오톡 대화 캡처 1]", "[카카오톡 대화 캡처 2]", "[광고 성과 개선 사례]", "[예산 증액 사례]"].map((p) => (
-            <div key={p} className="aspect-[4/5] rounded-[6px] bg-[#b7c7d9] flex items-center justify-center text-[11px] text-[#223] text-center px-3">{p}</div>
+            <div key={p} className="aspect-[4/5] rounded-[6px] bg-[#b7c7d9] flex items-center justify-center text-[14px] text-[#223] text-center px-3">{p}</div>
           ))}
         </div>
 
         {/* 파트너 로고 (기존 LP 에셋) */}
         <div className="mt-[60px]">
-          <p className="text-center text-[11px] md:text-[13px] text-white/50 mb-4">픽셀페이지 파트너사</p>
+          <p className="text-center text-[14px] md:text-[16px] text-white/50 mb-4">픽셀페이지 파트너사</p>
           <div className="grid grid-cols-4 gap-[6px]">
             {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <div key={n} className="h-[36px] md:h-[44px] rounded-[6px] bg-white flex items-center justify-center p-[6px]"><Image src={`/lp-partners/${n}.webp`} alt="" width={120} height={40} className="max-h-full w-auto object-contain" /></div>)}
           </div>
@@ -245,39 +245,39 @@ export default function DbClient() {
         {/* 08 FORM — 탈리 폼 수치 그대로: 라벨 18/600, 입력 36px r8 bg white/5.5%, 버튼 36px r8 */}
         <div id="form" className="scroll-mt-6">
           <Head size="sm">DB 마케팅,<br />이제 <em>제대로 된 팀</em>과 함께하세요.</Head>
-          <p className="mt-3 text-center text-[12.5px] md:text-[15px] text-white/60 leading-[1.6]">우리 회사의 DB 마케팅팀.<br />픽셀페이지가 함께합니다.</p>
+          <p className="mt-3 text-center text-[15.5px] md:text-[19px] text-white/60 leading-[1.6]">우리 회사의 DB 마케팅팀.<br />픽셀페이지가 함께합니다.</p>
           <form onSubmit={onSubmit} className="mt-10">
-            <p className="text-[24px] font-semibold leading-[1.25] mb-[30px]">📝DB 마케팅 상담하기</p>
+            <p className="text-[30px] font-semibold leading-[1.25] mb-[30px]">📝DB 마케팅 상담하기</p>
             {[["company", "회사명", "text", true], ["name", "성함/직함", "text", true], ["phone", "전화번호", "tel", true], ["email", "이메일", "email", true], ["site", "사이트 주소", "url", false]].map(([k, label, type, req]) => (
               <label key={String(k)} className="block mb-[36px]">
-                <span className="block text-[18px] font-semibold leading-[1.25] pb-[5px]">{label as string}{req ? <span className="ml-[6px] text-[14px] font-black align-middle">*</span> : null}</span>
-                <input type={type as string} value={f[k as keyof typeof f] as string} onChange={(e) => setF({ ...f, [k as string]: e.target.value })} className="mt-[10px] w-full h-[36px] rounded-[8px] bg-white/[0.055] border border-white/10 px-[10px] text-[16px] focus:outline-none focus:border-white/40" />
+                <span className="block text-[22.5px] font-semibold leading-[1.25] pb-[5px]">{label as string}{req ? <span className="ml-[6px] text-[17.5px] font-black align-middle">*</span> : null}</span>
+                <input type={type as string} value={f[k as keyof typeof f] as string} onChange={(e) => setF({ ...f, [k as string]: e.target.value })} className="mt-[10px] w-full h-[36px] rounded-[8px] bg-white/[0.055] border border-white/10 px-[10px] text-[20px] focus:outline-none focus:border-white/40" />
               </label>
             ))}
             <div className="mb-[36px]">
-              <span className="block text-[18px] font-semibold leading-[1.25] pb-[12px]">현재 월 광고 예산</span>
+              <span className="block text-[22.5px] font-semibold leading-[1.25] pb-[12px]">현재 월 광고 예산</span>
               <div className="space-y-[10px]">
                 {BUDGETS.map((b) => (
-                  <button type="button" key={b} onClick={() => setF({ ...f, budget: b })} className="flex items-center gap-[10px] text-[16px]">
+                  <button type="button" key={b} onClick={() => setF({ ...f, budget: b })} className="flex items-center gap-[10px] text-[20px]">
                     <span className="w-[20px] h-[20px] rounded-full border border-white/60 flex items-center justify-center shrink-0">{f.budget === b && <span className="w-[10px] h-[10px] rounded-full" style={{ background: A }} />}</span>{b}
                   </button>
                 ))}
               </div>
             </div>
             <div className="mb-[36px]">
-              <span className="block text-[18px] font-semibold leading-[1.25] pb-[12px]">개인정보 수집 및 이용 동의<span className="ml-[6px] text-[14px] font-black align-middle">*</span></span>
-              <button type="button" onClick={() => setF({ ...f, agree: !f.agree })} className="flex items-center gap-[10px] text-[16px]">
-                <span className="w-[20px] h-[20px] rounded-[4px] border border-white/60 flex items-center justify-center shrink-0" style={f.agree ? { background: A, borderColor: A } : undefined}>{f.agree && <span className="text-[13px] font-bold">✓</span>}</span>개인 정보 수집 및 이용에 동의합니다.
+              <span className="block text-[22.5px] font-semibold leading-[1.25] pb-[12px]">개인정보 수집 및 이용 동의<span className="ml-[6px] text-[17.5px] font-black align-middle">*</span></span>
+              <button type="button" onClick={() => setF({ ...f, agree: !f.agree })} className="flex items-center gap-[10px] text-[20px]">
+                <span className="w-[20px] h-[20px] rounded-[4px] border border-white/60 flex items-center justify-center shrink-0" style={f.agree ? { background: A, borderColor: A } : undefined}>{f.agree && <span className="text-[16px] font-bold">✓</span>}</span>개인 정보 수집 및 이용에 동의합니다.
               </button>
             </div>
-            {err && <p className="mb-4 text-[13px] text-red-300">{err}</p>}
-            <div className="flex justify-center"><button type="submit" disabled={submitting} className="inline-flex items-center gap-2 h-[36px] px-[14px] rounded-[8px] text-[15px] font-semibold text-white disabled:opacity-60" style={{ background: A }}>{submitting ? "전송 중…" : "DB 마케팅 상담하기"} <span aria-hidden>→</span></button></div>
+            {err && <p className="mb-4 text-[16px] text-red-300">{err}</p>}
+            <div className="flex justify-center"><button type="submit" disabled={submitting} className="inline-flex items-center gap-2 h-[36px] px-[14px] rounded-[8px] text-[19px] font-semibold text-white disabled:opacity-60" style={{ background: A }}>{submitting ? "전송 중…" : "DB 마케팅 상담하기"} <span aria-hidden>→</span></button></div>
           </form>
         </div>
 
-        <p className="mt-[80px] text-[10px] text-white/30 text-center leading-[1.8]">픽셀페이지 · 대표 박희규 · 사업자등록번호 477-11-01530<br />contact@pixelpage.co.kr</p>
+        <p className="mt-[80px] text-[12.5px] text-white/30 text-center leading-[1.8]">픽셀페이지 · 대표 박희규 · 사업자등록번호 477-11-01530<br />contact@pixelpage.co.kr</p>
       </div>
-      <a href="#form" className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 h-[40px] px-[16px] rounded-[8px] text-[14px] font-semibold text-white shadow-[0_8px_30px_rgba(0,0,0,0.5)]" style={{ background: A }}>DB 마케팅 상담하기 →</a>
+      <a href="#form" className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 h-[40px] px-[16px] rounded-[8px] text-[17.5px] font-semibold text-white shadow-[0_8px_30px_rgba(0,0,0,0.5)]" style={{ background: A }}>DB 마케팅 상담하기 →</a>
     </div>
   );
 }
