@@ -98,7 +98,7 @@ function CreativeStrip() {
   const [rows, setRows] = useState<{ src: string; v?: boolean }[][]>([CREATIVES.slice(0, 7), CREATIVES.slice(7)]);
   useEffect(() => { const all = shuffle(CREATIVES); setRows([all.slice(0, Math.ceil(all.length / 2)), all.slice(Math.ceil(all.length / 2))]); }, []);
   const Tile = ({ c, k }: { c: { src: string; v?: boolean }; k: string }) => (
-    <div key={k} className="w-[150px] md:w-[180px] aspect-[4/5] rounded-[8px] overflow-hidden bg-[#1a1a1a] shrink-0">
+    <div key={k} className="w-[150px] md:w-[180px] aspect-square rounded-[8px] overflow-hidden bg-[#1a1a1a] shrink-0">
       {c.v ? <video src={c.src} muted autoPlay loop playsInline preload="metadata" className="w-full h-full object-cover" />
         /* eslint-disable-next-line @next/next/no-img-element */
         : <img src={c.src} alt="" decoding="async" loading="lazy" className="w-full h-full object-cover" />}
