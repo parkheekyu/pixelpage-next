@@ -42,7 +42,9 @@ function CountUp({ to, suffix = "", prefix = "" }: { to: number; suffix?: string
     const el = ref.current; if (!el) return;
     const io = new IntersectionObserver(([e]) => { if (!e.isIntersecting) return; io.disconnect(); const t0 = performance.now(); const dur = 1200;
       const tick = (t: number) => { const p = Math.min(1, (t - t0) / dur); setV(Math.round(to * (1 - Math.pow(1 - p, 3)))); if (p < 1) requestAnimationFrame(tick); }; requestAnimationFrame(tick); }, { threshold: 0.4 });
-    io.observe(el); return () => io.disconnect();
+    io.observe(el);
+    const fallback = setTimeout(() => setV(to), 2500); // 관찰이 안 되는 환경(캡처 등)에서도 최종 값 표시
+    return () => { io.disconnect(); clearTimeout(fallback); };
   }, [to]);
   return <span ref={ref}>{prefix}{v.toLocaleString()}{suffix}</span>;
 }
@@ -153,7 +155,7 @@ export default function DbClient() {
           <p className="mt-6 text-[17px] md:text-[19px] text-white/65 leading-[1.7]">같은 광고비, 다른 결과.<br />차이는 운영하는 사람에게 있습니다.</p>
           <div className="mt-14 grid sm:grid-cols-3 gap-5">
             {[
-              ["누적 광고 취급액", <><CountUp to={0} suffix="억+" />{/* [실제 금액] */}</>, "[실제 금액 입력]"],
+              ["누적 광고 취급액", <span key="a" className="text-white/30">[실제 금액]억+</span>, "확인 후 입력"],
               ["평균 DB 단가 개선율", <CountUp key="b" to={48} suffix="%" />, "4개 고객사 평균"],
               ["광고 예산 최대 확대", <CountUp key="c" to={20} suffix="배" />, "태양광 G사 기준"],
             ].map(([k, v, note]) => (
