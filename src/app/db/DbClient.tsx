@@ -46,6 +46,15 @@ const STORIES = [
 ];
 const BUDGETS = ["아직 집행하지 않음", "500만원 미만", "500만~1,000만원", "1,000만~3,000만원", "3,000만원 이상"];
 
+function useInView<T extends HTMLElement>(threshold = 0.25) {
+  const ref = useRef<T | null>(null); const [on, setOn] = useState(false);
+  useEffect(() => { const el = ref.current; if (!el) return; const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } }, { threshold }); io.observe(el); const fb = setTimeout(() => setOn(true), 3000); return () => { io.disconnect(); clearTimeout(fb); }; }, [threshold]);
+  return [ref, on] as const;
+}
+function Reveal({ children, className = "", delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
+  const [ref, on] = useInView<HTMLDivElement>(0.15);
+  return <div ref={ref} className={`transition-all duration-700 ease-out ${on ? "opacity-100 translate-y-0" : "opacity-0 translate-y-[14px]"} ${className}`} style={{ transitionDelay: `${delay}ms` }}>{children}</div>;
+}
 function CountUp({ to, suffix = "", decimals = 0 }: { to: number; suffix?: string; decimals?: number }) {
   const ref = useRef<HTMLSpanElement | null>(null); const [v, setV] = useState(0);
   useEffect(() => {
@@ -67,12 +76,28 @@ function Bar({ h, label, dim }: { h: number; label: string; dim?: boolean }) {
   );
 }
 
-const Connector = () => <div className="flex flex-col items-center my-9" aria-hidden><div className="w-px h-[38px] bg-white/70" /><div className="w-[10px] h-[10px] rounded-full bg-white -mt-px" /></div>;
+const Connector = () => { const [ref, on] = useInView<HTMLDivElement>(0.6); return <div ref={ref} className="flex flex-col items-center my-9" aria-hidden><div className="w-px bg-white/70 transition-[height] duration-500 ease-out" style={{ height: on ? 38 : 0 }} /><div className="w-[10px] h-[10px] rounded-full bg-white -mt-px transition-transform duration-300 delay-500" style={{ transform: on ? "scale(1)" : "scale(0)" }} /></div>; };
 const Light = ({ children }: { children: React.ReactNode }) => <p className="text-center text-[19px] md:text-[24px] font-light leading-[1.5] text-white/90 break-keep">{children}</p>;
 const Head = ({ children, size = "md" }: { children: React.ReactNode; size?: "sm" | "md" | "lg" }) => <h2 className={`text-center break-keep font-extrabold leading-[1.3] tracking-[-0.03em] ${size === "lg" ? "text-[30px] md:text-[39px]" : size === "sm" ? "text-[22.5px] md:text-[29px]" : "text-[26px] md:text-[34px]"}`}>{children}</h2>;
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <div className={`rounded-[15px] bg-[#292929] ${className}`}>{children}</div>;
 const Dot = () => <span className="mt-[8px] w-[4px] h-[4px] rounded-full bg-white shrink-0" />;
-const Cta = ({ children }: { children: React.ReactNode }) => <a href="#form" className="inline-flex items-center gap-2 h-[36px] md:h-[44px] px-[14px] md:px-[18px] rounded-[8px] text-[19px] md:text-[21px] font-semibold text-white" style={{ background: A }}>{children} <span aria-hidden>→</span></a>;
+const Cta = ({ children }: { children: React.ReactNode }) => <a href="#form" className="group inline-flex items-center gap-2 h-[36px] md:h-[44px] px-[14px] md:px-[18px] rounded-[8px] text-[19px] md:text-[21px] font-semibold text-white transition-transform duration-200 hover:-translate-y-[1px]" style={{ background: A }}>{children} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-[3px]">→</span></a>;
+
+function PainCard() {
+  const [ref, on] = useInView<HTMLDivElement>(0.5);
+  return (
+    <div ref={ref}><Card className="mt-7 mx-auto w-[88%] px-[18px] md:px-[24px] py-[6px]">
+      {PAINS.map((p, i) => (
+        <div key={i} className="flex gap-[14px] items-start py-[14px] border-t border-white/40 first:border-0 text-[15.5px] md:text-[19.5px] leading-[1.55] text-white/90 break-keep">
+          <span className="mt-[5px] w-[14px] h-[14px] md:w-[16px] md:h-[16px] border border-white/80 shrink-0 flex items-center justify-center transition-colors duration-300" style={{ transitionDelay: `${300 + i * 350}ms`, background: on ? A : "transparent", borderColor: on ? A : undefined }} aria-hidden>
+            <svg viewBox="0 0 12 12" className="w-[10px] h-[10px]"><path d="M2 6.5 5 9.5 10 3" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="14" strokeDashoffset={on ? 0 : 14} style={{ transition: "stroke-dashoffset .35s ease-out", transitionDelay: `${400 + i * 350}ms` }} /></svg>
+          </span>
+          <span>{p}</span>
+        </div>
+      ))}
+    </Card></div>
+  );
+}
 
 export default function DbClient() {
   const router = useRouter();
@@ -105,20 +130,13 @@ export default function DbClient() {
         <Connector />
 
         {/* 02 PAIN POINT */}
-        <Head size="sm">혹시 이런 고민 중이신가요?</Head>
-        <Card className="mt-7 mx-auto w-[88%] px-[18px] md:px-[24px] py-[6px]">
-          {PAINS.map((p, i) => (
-            <div key={i} className="flex gap-[14px] items-start py-[14px] border-t border-white/40 first:border-0 text-[15.5px] md:text-[19.5px] leading-[1.55] text-white/90 break-keep">
-              <span className="mt-[2px] w-[12px] h-[12px] md:w-[14px] md:h-[14px] border border-white/80 shrink-0" aria-hidden />
-              <span>{p}</span>
-            </div>
-          ))}
-        </Card>
+        <Reveal><Head size="sm">혹시 이런 고민 중이신가요?</Head></Reveal>
+        <PainCard />
 
         <Connector />
 
         {/* 03 PERFORMANCE — 운영 전/후 막대 */}
-        <Head size="sm"><span className="font-light">우리는 이 고민을</span> 숫자로 바꿉니다.</Head>
+        <Reveal><Head size="sm"><span className="font-light">우리는 이 고민을</span> 숫자로 바꿉니다.</Head></Reveal>
         <div className="mt-7 grid grid-cols-2 gap-[10px]">
           {PERF.map((p) => (
             <div key={p.c} className="rounded-[12px] bg-[#0d0d0d] border border-white/[0.08] p-[12px] md:p-[14px]">
@@ -137,18 +155,18 @@ export default function DbClient() {
         <Connector />
 
         {/* 04 WHY */}
-        <Light>DB 마케팅에 특화된 전문팀</Light>
-        <Head>픽셀페이지가 직접 합니다</Head>
+        <Reveal><Light>DB 마케팅에 특화된 전문팀</Light>
+        <Head>픽셀페이지가 직접 합니다</Head></Reveal>
         <div className="mt-8 space-y-[34px]">
           {WHY.map((w, i) => (
-            <div key={i} className="relative pt-[14px]">
+            <Reveal key={i} className="relative pt-[14px]" delay={i * 80}>
               <div className="absolute left-1/2 -translate-x-1/2 top-0 w-[28px] h-[28px] md:w-[34px] md:h-[34px] rounded-full bg-[#3a3a3a] flex items-center justify-center text-[16px] md:text-[20px] font-bold z-10">{i + 1}</div>
               <Card className="mx-auto w-[92%] pt-[34px] pb-[24px] px-[22px] md:px-[28px] text-center">
                 <p className="text-[24px] md:text-[29px] font-bold leading-[1.35] tracking-[-0.02em] break-keep">{w.t}</p>
                 <p className="mt-[6px] text-[14.5px] md:text-[17px] text-white/55 break-keep">{w.s}</p>
                 <ul className="mt-[18px] inline-block text-left space-y-[6px]">{w.items.map((it) => <li key={it} className="flex gap-[10px] text-[16px] md:text-[19px] text-white/90 leading-[1.5]"><Dot />{it}</li>)}</ul>
               </Card>
-            </div>
+            </Reveal>
           ))}
         </div>
 
@@ -169,18 +187,18 @@ export default function DbClient() {
         <Connector />
 
         {/* 05 PROCESS */}
-        <Head>픽셀페이지는 이렇게 접근합니다</Head>
+        <Reveal><Head>픽셀페이지는 이렇게 접근합니다</Head></Reveal>
         <div className="mt-8 relative">
           <div className="absolute left-[5px] top-[10px] bottom-[14px] border-l-2 border-dotted" style={{ borderColor: A }} aria-hidden />
           <div className="space-y-[26px]">
             {STEPS.map((s, i) => (
-              <div key={s.t} className="relative pl-[24px]">
+              <Reveal key={s.t} className="relative pl-[24px]" delay={i * 120}>
                 <span className="absolute left-0 top-[5px] w-[12px] h-[12px] rounded-full" style={{ background: A }} aria-hidden />
                 <p className="text-[19px] md:text-[22.5px] font-extrabold leading-[1.3] break-keep"><span style={{ color: A }}>STEP. {i + 1}</span> <span className="ml-1">{s.t}</span></p>
                 <Card className="mt-[14px] ml-[6px] px-[18px] md:px-[22px] py-[16px] md:py-[20px]">
                   <ul className="space-y-[8px]">{s.items.map((it) => <li key={it} className="flex gap-[10px] text-[15.5px] md:text-[18px] text-white/90 leading-[1.5] break-keep"><Dot />{it}</li>)}</ul>
                 </Card>
-              </div>
+              </Reveal>
             ))}
           </div>
         </div>
@@ -210,8 +228,8 @@ export default function DbClient() {
         {/* 07 SUCCESS STORY — 말풍선 */}
         <Head size="sm"><span>다양한 성공 레퍼런스</span><span className="font-light">를 바탕으로</span><br /><span className="font-light">기업의 성장을 </span>함께 만듭니다.</Head>
         <div className="mt-8 space-y-[18px]">
-          {STORIES.map((s) => (
-            <div key={s.c} className={`flex items-center gap-[10px] ${s.side === "r" ? "flex-row-reverse" : ""}`}>
+          {STORIES.map((s, i) => (
+            <Reveal key={s.c} className={`flex items-center gap-[10px] ${s.side === "r" ? "flex-row-reverse" : ""}`} delay={i * 120}>
               <div className="w-[70px] md:w-[84px] shrink-0 text-center">
                 <span className="inline-block px-[8px] py-[3px] rounded-full bg-[#2a2a2a] text-[11px] md:text-[13px] font-semibold">{s.chip}</span>
                 <p className="mt-[4px] text-[14px] md:text-[16px] font-bold leading-[1.25] whitespace-pre-line">{s.c}</p>
@@ -220,7 +238,7 @@ export default function DbClient() {
                 <span className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent ${s.side === "r" ? "-right-[6px] border-l-[7px] border-l-[#e9e9e9]" : "-left-[6px] border-r-[7px] border-r-[#e9e9e9]"}`} aria-hidden />
                 {s.q}
               </div>
-            </div>
+            </Reveal>
           ))}
         </div>
         <p className="mt-3 text-[12.5px] text-white/35 text-center">실제 고객이 남긴 후기만 사용합니다.</p>
