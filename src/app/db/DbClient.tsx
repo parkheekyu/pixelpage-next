@@ -44,6 +44,11 @@ const STORIES = [
   { chip: "운영 [N]개월 차", c: "성인 교육 플랫폼\nD사", img: charFemale, side: "r", q: "[실제 고객사 후기 삽입]" },
   { chip: "운영 [N]개월 차", c: "코칭·컨설팅\nP사", img: charCurly, side: "l", q: "[실제 고객사 후기 삽입]" },
 ];
+const PARTNERS = [
+  { src: "/lp-partners/1.webp", alt: "DIHABOOKS" }, { src: "/lp-partners/2.webp", alt: "안부스쿨" }, { src: "/lp-partners/3.webp", alt: "플러스스피치" }, { src: "/lp-partners/4.webp", alt: "GIM COMPANY" },
+  { src: "/lp-partners/5.webp", alt: "B:forest" }, { src: "/lp-partners/6.webp", alt: "빌리언 캠퍼스" }, { src: "/lp-partners/7.webp", alt: "BOOTSTRAPPER" }, { src: "/lp-partners/8.webp", alt: "디지털 노마드" },
+  { src: "/lp-partners/9.webp", alt: "RUNMOA" }, { src: "/lp-partners/10.webp", alt: "funnelmoa" }, { src: "/lp-partners/11.webp", alt: "Cosmosfarm" },
+];
 const BUDGETS = ["아직 집행하지 않음", "500만원 미만", "500만~1,000만원", "1,000만~3,000만원", "3,000만원 이상"];
 
 function useInView<T extends HTMLElement>(threshold = 0.25) {
@@ -250,11 +255,18 @@ export default function DbClient() {
           ))}
         </div>
 
-        {/* 파트너 로고 (기존 LP 에셋) */}
+        {/* 파트너 로고 — 메인 랜딩과 동일한 마키 */}
         <div className="mt-[60px]">
-          <p className="text-center text-[14px] md:text-[16px] text-white/50 mb-4">픽셀페이지 파트너사</p>
-          <div className="grid grid-cols-4 gap-[6px]">
-            {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => <div key={n} className="h-[36px] md:h-[44px] rounded-[6px] bg-white flex items-center justify-center p-[6px]"><Image src={`/lp-partners/${n}.webp`} alt="" width={120} height={40} className="max-h-full w-auto object-contain" /></div>)}
+          <p className="text-center text-[14px] md:text-[16px] text-white/50 mb-5">픽셀페이지와 함께하는 파트너사</p>
+          <div className="relative -mx-[25px]" style={{ maskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 10%, black 90%, transparent)" }}>
+            <div className="flex w-max animate-marquee gap-8 md:gap-10">
+              {[...PARTNERS, ...PARTNERS].map((p, i) => (
+                <div key={`${p.alt}-${i}`} className="h-12 flex items-center justify-center shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={p.src} alt={p.alt} decoding="async" className="h-10 md:h-12 w-auto object-contain opacity-90" />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
