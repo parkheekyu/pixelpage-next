@@ -122,15 +122,17 @@ export default function DbClient() {
 
   return (
     <div className="min-h-screen bg-[#101010] text-white" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
-      <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db input::placeholder{color:rgba(255,255,255,.3)}`}</style>
+      <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db input::placeholder{color:rgba(255,255,255,.3)} @keyframes dbUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} .db-up{opacity:0;animation:dbUp .7s cubic-bezier(.2,.7,.2,1) forwards}`}</style>
       <div className="db mx-auto w-full max-w-[420px] md:max-w-[540px] px-[25px] pt-[60px] pb-[120px]">
 
 
-        {/* 01 HERO */}
-        <Light>성과 내는 기업엔 공통점이 있습니다.</Light>
-        <p className="text-center text-[19px] md:text-[24px] font-bold leading-[1.5] break-keep"><em>DB 마케팅</em>을 제대로 한다는 것</p>
-        <h2 className="mt-7 text-center text-[26px] md:text-[34px] font-extrabold leading-[1.3] tracking-[-0.03em]">다음은 대표님 차례입니다.</h2>
-        <div className="mt-6 flex justify-center"><Cta>DB 마케팅 상담하기</Cta></div>
+        {/* 01 HERO — 로드 시 순차 페이드업 */}
+        <div className="pt-[10px] pb-[6px] text-center">
+          <p className="text-[17px] md:text-[21px] font-light leading-[1.5] text-white/80 break-keep db-up" style={{ animationDelay: "0ms" }}>성과 내는 기업엔 공통점이 있습니다.</p>
+          <p className="mt-[2px] text-[20px] md:text-[25px] font-bold leading-[1.45] break-keep db-up" style={{ animationDelay: "120ms" }}><em>DB 마케팅</em>을 제대로 한다는 것</p>
+          <h2 className="mt-8 text-[38px] md:text-[50px] font-extrabold leading-[1.15] tracking-[-0.04em] break-keep db-up" style={{ animationDelay: "260ms" }}>다음은<br />대표님 차례입니다.</h2>
+          <div className="mt-9 flex justify-center db-up" style={{ animationDelay: "420ms" }}><a href="#form" className="group inline-flex items-center gap-2 h-[50px] md:h-[56px] px-[26px] md:px-[30px] rounded-[10px] text-[18px] md:text-[20px] font-bold text-white transition-transform duration-200 hover:-translate-y-[1px] shadow-[0_10px_30px_rgba(67,150,248,0.35)]" style={{ background: A }}>DB 마케팅 상담하기 <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-[3px]">→</span></a></div>
+        </div>
 
         <Connector />
 
