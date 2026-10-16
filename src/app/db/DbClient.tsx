@@ -191,8 +191,8 @@ export default function DbClient() {
         <Connector />
 
         {/* 04 WHY */}
-        <Reveal><Light>DB 마케팅에 특화된 전문팀</Light>
-        <Head>픽셀페이지가 직접 합니다</Head></Reveal>
+        <Reveal><Light>DB 업종에 특화된 퍼포먼스 마케팅</Light>
+        <Head>픽셀페이지가 가장 잘합니다</Head></Reveal>
         <div className="mt-12 space-y-[44px]">
           {WHY.map((w, i) => (
             <Reveal key={i} className="relative pt-[14px]" delay={i * 80}>
