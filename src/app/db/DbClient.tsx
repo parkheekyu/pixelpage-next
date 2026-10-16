@@ -40,8 +40,8 @@ const STEPS = [
   { t: "성과 분석 & 최적화", items: ["광고별 DB 단가 및 수량 분석", "랜딩페이지 전환율 개선", "CRM 자동화 및 영업 데이터 연동", "성과에 따른 타겟 / 소재 / 예산 최적화"] },
 ];
 const STORIES = [
-  { c: "태양광 시공·분양\nG사", img: charMale, side: "l", q: <>그간 많은 대행사를 써봤지만, 이 정도로 폭발적인 경우는 처음이었습니다. 시공 문의가 <b>월 20건</b> 정도였는데 이젠 <b>하루에 20건씩</b> 문의가 오네요!</> },
-  { c: "성인 교육 플랫폼\nD사", img: charFemale, side: "r", q: <>저희 업종 특성상 이해도가 낮으면 힘든데도 하나하나 공부하시고 광고 해주셔서 너무 만족스럽습니다. 잘 될 때는 <b>83%나 효율이 좋게</b> 잘 해주십니다.</> },
+  { c: "태양광\n시공·분양 G사", img: charMale, side: "l", q: <>그간 많은 대행사를 써봤지만, 이 정도로 폭발적인 경우는 처음이었습니다. 시공 문의가 <b>월 20건</b> 정도였는데 이젠 <b>하루에 20건씩</b> 문의가 오네요!</> },
+  { c: "성인 교육\n플랫폼 D사", img: charFemale, side: "r", q: <>저희 업종 특성상 이해도가 낮으면 힘든데도 하나하나 공부하시고 광고 해주셔서 너무 만족스럽습니다. 잘 될 때는 <b>83%나 효율이 좋게</b> 잘 해주십니다.</> },
   { c: "코칭·컨설팅\nP사", img: charCurly, side: "l", q: <>벌써 <b>5년째</b> 함께하고 있습니다. 매출은 <b>5배</b>가 올랐고요. 덕분에 매년 성장하지 않은 때가 없습니다.</> },
 ];
 const CREATIVES: { src: string; v?: boolean }[] = [
@@ -151,7 +151,7 @@ export default function DbClient() {
 
   return (
     <div className="min-h-screen bg-[#101010] text-white" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
-      <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db input::placeholder{color:rgba(255,255,255,.3)} @keyframes dbUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} .db-up{opacity:0;animation:dbUp .7s cubic-bezier(.2,.7,.2,1) forwards}`}</style>
+      <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db .bubble b{color:#1f6fd6} .db input::placeholder{color:rgba(255,255,255,.3)} @keyframes dbUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} .db-up{opacity:0;animation:dbUp .7s cubic-bezier(.2,.7,.2,1) forwards}`}</style>
       <div className="db mx-auto w-full max-w-[420px] md:max-w-[540px] px-[25px] pt-[60px] pb-[120px]">
 
 
@@ -251,10 +251,10 @@ export default function DbClient() {
         <div className="mt-8 space-y-[18px]">
           {STORIES.map((s, i) => (
             <Reveal key={s.c} className={`flex items-center gap-[10px] ${s.side === "r" ? "flex-row-reverse" : ""}`} delay={i * 120}>
-              <div className="w-[70px] md:w-[84px] shrink-0 text-center">
+              <div className="w-[84px] md:w-[96px] shrink-0 text-center break-keep">
                 <p className="text-[14px] md:text-[16px] font-bold leading-[1.25] whitespace-pre-line">{s.c}</p>
               </div>
-              <div className="relative flex-1 rounded-[10px] bg-[#e9e9e9] text-[#222] text-[14px] md:text-[16px] leading-[1.6] px-[14px] py-[12px] break-keep">
+              <div className="bubble relative flex-1 rounded-[10px] bg-[#e9e9e9] text-[#222] text-[14px] md:text-[16px] leading-[1.6] px-[14px] py-[12px] break-keep">
                 <span className={`absolute top-1/2 -translate-y-1/2 w-0 h-0 border-y-[6px] border-y-transparent ${s.side === "r" ? "-right-[6px] border-l-[7px] border-l-[#e9e9e9]" : "-left-[6px] border-r-[7px] border-r-[#e9e9e9]"}`} aria-hidden />
                 {s.q}
               </div>
