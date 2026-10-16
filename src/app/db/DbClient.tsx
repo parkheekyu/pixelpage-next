@@ -46,8 +46,8 @@ const STORIES = [
 ];
 const CREATIVES: { src: string; v?: boolean }[] = [
   ...[1, 2, 3, 4, 5, 10].map((n) => ({ src: `/reels/${n}.mp4`, v: true })),
-  ...["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"].map((n) => ({ src: `/db-creatives/d${n}.webp` })),
-  { src: "/db-creatives/t03.mp4", v: true },
+  ...[1, 2, 3, 4, 5, 6].map((n) => ({ src: `/db-creatives/a${n}.webp` })),
+  { src: "/db-creatives/v1.mp4", v: true }, { src: "/db-creatives/v2.mp4", v: true },
 ];
 const PARTNERS = [
   { src: "/lp-partners/1.webp", alt: "DIHABOOKS" }, { src: "/lp-partners/2.webp", alt: "안부스쿨" }, { src: "/lp-partners/3.webp", alt: "플러스스피치" }, { src: "/lp-partners/4.webp", alt: "GIM COMPANY" },
@@ -95,7 +95,7 @@ const Cta = ({ children }: { children: React.ReactNode }) => <a href="#form" cla
 
 function shuffle<T>(arr: T[]) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
 function CreativeStrip() {
-  const [rows, setRows] = useState<{ src: string; v?: boolean }[][]>([CREATIVES.slice(0, 10), CREATIVES.slice(9)]);
+  const [rows, setRows] = useState<{ src: string; v?: boolean }[][]>([CREATIVES.slice(0, 7), CREATIVES.slice(7)]);
   useEffect(() => { const all = shuffle(CREATIVES); setRows([all.slice(0, Math.ceil(all.length / 2)), all.slice(Math.ceil(all.length / 2))]); }, []);
   const Tile = ({ c, k }: { c: { src: string; v?: boolean }; k: string }) => (
     <div key={k} className="w-[150px] md:w-[180px] aspect-[4/5] rounded-[8px] overflow-hidden bg-[#1a1a1a] shrink-0">
