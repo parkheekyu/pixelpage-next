@@ -44,6 +44,11 @@ const STORIES = [
   { chip: "운영 [N]개월 차", c: "성인 교육 플랫폼\nD사", img: charFemale, side: "r", q: "[실제 고객사 후기 삽입]" },
   { chip: "운영 [N]개월 차", c: "코칭·컨설팅\nP사", img: charCurly, side: "l", q: "[실제 고객사 후기 삽입]" },
 ];
+const CREATIVES: { src: string; v?: boolean }[] = [
+  ...[1, 2, 3, 4, 5, 10].map((n) => ({ src: `/reels/${n}.mp4`, v: true })),
+  ...["01", "02", "03", "04", "05", "06", "07", "08", "09", "10", "11", "12"].map((n) => ({ src: `/db-creatives/d${n}.webp` })),
+  { src: "/db-creatives/t03.mp4", v: true },
+];
 const PARTNERS = [
   { src: "/lp-partners/1.webp", alt: "DIHABOOKS" }, { src: "/lp-partners/2.webp", alt: "안부스쿨" }, { src: "/lp-partners/3.webp", alt: "플러스스피치" }, { src: "/lp-partners/4.webp", alt: "GIM COMPANY" },
   { src: "/lp-partners/5.webp", alt: "B:forest" }, { src: "/lp-partners/6.webp", alt: "빌리언 캠퍼스" }, { src: "/lp-partners/7.webp", alt: "BOOTSTRAPPER" }, { src: "/lp-partners/8.webp", alt: "디지털 노마드" },
@@ -87,6 +92,30 @@ const Head = ({ children, size = "md" }: { children: React.ReactNode; size?: "sm
 const Card = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => <div className={`rounded-[15px] bg-[#292929] ${className}`}>{children}</div>;
 const Dot = () => <span className="mt-[8px] w-[4px] h-[4px] rounded-full bg-white shrink-0" />;
 const Cta = ({ children }: { children: React.ReactNode }) => <a href="#form" className="group inline-flex items-center gap-2 h-[36px] md:h-[44px] px-[14px] md:px-[18px] rounded-[8px] text-[19px] md:text-[21px] font-semibold text-white transition-transform duration-200 hover:-translate-y-[1px]" style={{ background: A }}>{children} <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-[3px]">→</span></a>;
+
+function shuffle<T>(arr: T[]) { const a = [...arr]; for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function CreativeStrip() {
+  const [rows, setRows] = useState<{ src: string; v?: boolean }[][]>([CREATIVES.slice(0, 10), CREATIVES.slice(9)]);
+  useEffect(() => { const all = shuffle(CREATIVES); setRows([all.slice(0, Math.ceil(all.length / 2)), all.slice(Math.ceil(all.length / 2))]); }, []);
+  const Tile = ({ c, k }: { c: { src: string; v?: boolean }; k: string }) => (
+    <div key={k} className="w-[150px] md:w-[180px] aspect-[4/5] rounded-[8px] overflow-hidden bg-[#1a1a1a] shrink-0">
+      {c.v ? <video src={c.src} muted autoPlay loop playsInline preload="metadata" className="w-full h-full object-cover" />
+        /* eslint-disable-next-line @next/next/no-img-element */
+        : <img src={c.src} alt="" decoding="async" loading="lazy" className="w-full h-full object-cover" />}
+    </div>
+  );
+  return (
+    <div className="mt-6 -mx-[25px] space-y-[8px]" style={{ maskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)", WebkitMaskImage: "linear-gradient(to right, transparent, black 6%, black 94%, transparent)" }}>
+      {rows.map((row, r) => (
+        <div key={r} className="overflow-hidden">
+          <div className="flex w-max gap-[8px] animate-marquee" style={{ animationDuration: `${row.length * 6}s`, animationDirection: r === 1 ? "reverse" : "normal" }}>
+            {[...row, ...row].map((c, i) => <Tile key={`${r}-${i}`} c={c} k={`${r}-${i}`} />)}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 function PainCard() {
   const [ref, on] = useInView<HTMLDivElement>(0.5);
@@ -212,23 +241,8 @@ export default function DbClient() {
 
         <div className="mt-[60px]"><Head size="sm">터지는 광고 소재가 <span className="font-light">나올 때까지</span></Head></div>
 
-        {/* 06 CREATIVE — 실제 집행 릴스 */}
-        <div className="mt-6 grid grid-cols-3 gap-[8px]">
-          {[["/reels/1.mp4", "교육"], ["/reels/4.mp4", "컨설팅"], ["/reels/10.mp4", "지식 창업"]].map(([src, label]) => (
-            <div key={src} className="text-center">
-              <div className="aspect-square rounded-[6px] overflow-hidden bg-black"><video src={src} muted autoPlay loop playsInline className="w-full h-full object-cover" /></div>
-              <p className="mt-[6px] text-[14px] md:text-[16px] text-white/60">{label}</p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-[8px] grid grid-cols-3 gap-[8px]">
-          {[["/reels/5.mp4", "AI 강의"], ["/reels/3.mp4", "레저·체험"], ["/reels/2.mp4", "부동산"]].map(([src, label]) => (
-            <div key={src} className="text-center">
-              <div className="aspect-square rounded-[6px] overflow-hidden bg-black"><video src={src} muted autoPlay loop playsInline className="w-full h-full object-cover" /></div>
-              <p className="mt-[6px] text-[14px] md:text-[16px] text-white/60">{label}</p>
-            </div>
-          ))}
-        </div>
+        {/* 06 CREATIVE — 실제 집행 소재, 2단 무한 스와이프(로드마다 랜덤 순서) */}
+        <CreativeStrip />
 
         <Connector />
 
