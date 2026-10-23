@@ -264,11 +264,12 @@ export default function DbClient() {
         <p className="mt-3 text-[12.5px] text-white/35 text-center">실제 고객이 남긴 후기만 사용합니다.</p>
 
         <div className="mt-[96px]"><Head>성과로 증명한<br />고객사의 생생한 목소리입니다</Head></div>
-        <div className="mt-10 grid grid-cols-2 gap-[10px]">
-          {["[카카오톡 대화 캡처 1]", "[카카오톡 대화 캡처 2]", "[광고 성과 개선 사례]", "[예산 증액 사례]"].map((p) => (
-            <div key={p} className="aspect-[4/5] rounded-[6px] bg-[#b7c7d9] flex items-center justify-center text-[14px] text-[#223] text-center px-3">{p}</div>
+        <Reveal className="mt-10 columns-2 gap-[10px]">
+          {[1, 2, 3, 4].map((n) => (
+            /* eslint-disable-next-line @next/next/no-img-element */
+            <img key={n} src={`/db-proof/${n}.webp`} alt="고객사 카카오톡 대화 캡처" loading="lazy" decoding="async" className="w-full mb-[10px] rounded-[8px] break-inside-avoid border border-white/[0.06]" />
           ))}
-        </div>
+        </Reveal>
 
         {/* 파트너 로고 — 메인 랜딩과 동일한 마키 */}
         <div className="mt-[96px]">
