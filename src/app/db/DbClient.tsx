@@ -117,6 +117,23 @@ function CreativeStrip() {
   );
 }
 
+function FloatingCta() {
+  const [show, setShow] = useState(false);
+  useEffect(() => {
+    const onScroll = () => {
+      const form = document.getElementById("form");
+      const formTop = form ? form.getBoundingClientRect().top : Infinity;
+      setShow(window.scrollY > 480 && formTop > window.innerHeight * 0.6);
+    };
+    onScroll(); window.addEventListener("scroll", onScroll, { passive: true }); return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+  return (
+    <div className={`fixed inset-x-0 bottom-0 z-30 flex justify-center px-4 pb-[max(16px,env(safe-area-inset-bottom))] pt-6 pointer-events-none transition-all duration-300 ${show ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`} style={{ background: "linear-gradient(to top, rgba(16,16,16,0.95), rgba(16,16,16,0))" }} aria-hidden={!show}>
+      <a href="#form" tabIndex={show ? 0 : -1} className="pointer-events-auto group inline-flex items-center justify-center gap-2 w-full max-w-[440px] h-[52px] rounded-[10px] text-[17px] font-bold text-white shadow-[0_10px_30px_rgba(67,150,248,0.35)] transition-transform duration-200 hover:-translate-y-[1px]" style={{ background: A }}>DB 마케팅 상담하기 <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-[3px]">→</span></a>
+    </div>
+  );
+}
+
 function PainCard() {
   const [ref, on] = useInView<HTMLDivElement>(0.5);
   return (
@@ -323,7 +340,7 @@ export default function DbClient() {
 
         <p className="mt-[110px] text-[12.5px] text-white/30 text-center leading-[1.8]">픽셀페이지 · 대표 박희규 · 사업자등록번호 477-11-01530<br />contact@pixelpage.co.kr</p>
       </div>
-      <a href="#form" className="md:hidden fixed bottom-4 left-1/2 -translate-x-1/2 z-30 inline-flex items-center gap-2 h-[40px] px-[16px] rounded-[8px] text-[17.5px] font-semibold text-white shadow-[0_8px_30px_rgba(0,0,0,0.5)]" style={{ background: A }}>DB 마케팅 상담하기 →</a>
+      <FloatingCta />
     </div>
   );
 }
