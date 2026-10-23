@@ -265,7 +265,7 @@ export default function DbClient() {
 
         <div className="mt-[96px]"><Head>성과로 증명한<br />고객사의 생생한 목소리입니다</Head></div>
         <Reveal className="mt-10 columns-2 gap-[10px]">
-          {[1, 2, 3, 4].map((n) => (
+          {[1, 2, 3, 4, 5].map((n) => (
             /* eslint-disable-next-line @next/next/no-img-element */
             <img key={n} src={`/db-proof/${n}.webp`} alt="고객사 카카오톡 대화 캡처" loading="lazy" decoding="async" className="w-full mb-[10px] rounded-[8px] break-inside-avoid border border-white/[0.06]" />
           ))}
