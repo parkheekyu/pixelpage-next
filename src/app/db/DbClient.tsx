@@ -134,6 +134,35 @@ function FloatingCta() {
   );
 }
 
+/* CSS 3D 책 목업 — 표지 텍스트는 그대로 수정 가능 */
+function Book() {
+  return (
+    <div className="relative mt-[34px] mb-[6px] flex justify-center" style={{ perspective: "1100px" }}>
+      <div className="relative w-[170px] h-[236px] md:w-[200px] md:h-[278px] db-book" style={{ transformStyle: "preserve-3d", transform: "rotateY(-24deg) rotateX(4deg)" }}>
+        {/* 책등 */}
+        <div className="absolute top-[3px] bottom-[3px] -left-[16px] w-[18px] rounded-l-[3px]" style={{ background: "linear-gradient(90deg,#0a1322,#13233a)", transform: "rotateY(-90deg) translateX(-9px)", transformOrigin: "right" }} />
+        {/* 종이 단면 */}
+        <div className="absolute top-[5px] bottom-[5px] right-[-7px] w-[8px] rounded-r-[2px]" style={{ background: "repeating-linear-gradient(180deg,#e9e9e9 0 2px,#cfcfcf 2px 3px)", transform: "translateZ(-6px)" }} />
+        {/* 표지 */}
+        <div className="absolute inset-0 rounded-r-[6px] rounded-l-[3px] overflow-hidden flex flex-col px-[18px] md:px-[22px] pt-[22px] md:pt-[26px] pb-[16px] text-left" style={{ background: "linear-gradient(160deg,#152a47 0%,#0e1a2b 55%,#0a1322 100%)", boxShadow: "inset 2px 0 6px rgba(255,255,255,0.08), 12px 18px 40px rgba(0,0,0,0.6)" }}>
+          <div className="w-[34px] h-[3px] rounded-full" style={{ background: A }} />
+          <p className="mt-[16px] md:mt-[20px] text-[11px] md:text-[12px] font-semibold text-white/55 tracking-[0.04em]">상담 고객 전용</p>
+          <p className="mt-[6px] text-[22px] md:text-[26px] font-extrabold leading-[1.2] tracking-[-0.03em] text-white">DB 광고<br />세팅법</p>
+          <p className="mt-[10px] text-[11px] md:text-[12.5px] text-white/70 leading-[1.5]">80페이지<br />실전 가이드</p>
+          <div className="mt-auto flex items-center justify-between">
+            <span className="text-[10px] md:text-[11px] font-bold tracking-[0.06em] text-white/80">PIXELPAGE</span>
+            <span className="text-[9px] md:text-[10px] text-white/40">PDF</span>
+          </div>
+          <div className="absolute inset-y-0 left-0 w-[10px] pointer-events-none" style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.35), transparent)" }} />
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "linear-gradient(115deg, rgba(255,255,255,0.10) 0%, transparent 38%)" }} />
+        </div>
+      </div>
+      {/* 바닥 그림자 */}
+      <div className="absolute bottom-[-18px] left-1/2 -translate-x-1/2 w-[200px] h-[26px] rounded-full blur-[14px]" style={{ background: "rgba(67,150,248,0.25)" }} aria-hidden />
+    </div>
+  );
+}
+
 function PainCard() {
   const [ref, on] = useInView<HTMLDivElement>(0.5);
   return (
@@ -168,7 +197,7 @@ export default function DbClient() {
 
   return (
     <div className="min-h-screen bg-[#101010] text-white" style={{ fontFamily: "Pretendard, Inter, -apple-system, sans-serif" }}>
-      <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db .bubble b{color:#1f6fd6} .db input::placeholder{color:rgba(255,255,255,.3)} @keyframes dbUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} .db-up{opacity:0;animation:dbUp .7s cubic-bezier(.2,.7,.2,1) forwards}`}</style>
+      <style>{`.db em{font-style:normal;color:${A}} .db b{font-weight:700;color:#fff} .db .bubble b{color:#1f6fd6} .db input::placeholder{color:rgba(255,255,255,.3)} @keyframes dbFloat{0%,100%{transform:rotateY(-24deg) rotateX(4deg) translateY(0)}50%{transform:rotateY(-24deg) rotateX(4deg) translateY(-6px)}} .db-book{animation:dbFloat 5s ease-in-out infinite} @keyframes dbUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}} .db-up{opacity:0;animation:dbUp .7s cubic-bezier(.2,.7,.2,1) forwards}`}</style>
       <div className="db mx-auto w-full max-w-[420px] md:max-w-[540px] px-[25px] pt-[72px] pb-[140px]">
 
 
@@ -179,6 +208,19 @@ export default function DbClient() {
           <h2 className="mt-8 text-[38px] md:text-[50px] font-extrabold leading-[1.15] tracking-[-0.04em] break-keep db-up" style={{ animationDelay: "260ms" }}>다음은<br />대표님 차례입니다.</h2>
           <div className="mt-9 flex justify-center db-up" style={{ animationDelay: "420ms" }}><a href="#form" className="group inline-flex items-center gap-2 h-[50px] md:h-[56px] px-[26px] md:px-[30px] rounded-[10px] text-[18px] md:text-[20px] font-bold text-white transition-transform duration-200 hover:-translate-y-[1px] shadow-[0_10px_30px_rgba(67,150,248,0.35)]" style={{ background: A }}>DB 마케팅 상담하기 <span aria-hidden className="transition-transform duration-200 group-hover:translate-x-[3px]">→</span></a></div>
         </div>
+
+        <Connector />
+
+        {/* 01-2 PDF 증정 */}
+        <Reveal>
+          <div className="relative overflow-hidden rounded-[18px] bg-[#161616] border border-white/[0.07] px-[24px] md:px-[32px] pt-[34px] pb-[30px] text-center">
+            <div className="absolute -top-24 left-1/2 -translate-x-1/2 w-[320px] h-[320px] rounded-full pointer-events-none" style={{ background: "radial-gradient(circle, rgba(67,150,248,0.22), transparent 65%)" }} aria-hidden />
+            <p className="relative text-[13px] md:text-[15px] font-semibold tracking-[0.08em]" style={{ color: A }}>상담 신청 혜택</p>
+            <p className="relative mt-[10px] text-[24px] md:text-[30px] font-extrabold leading-[1.25] tracking-[-0.03em] break-keep">상담 후 DB 광고 세팅법<br /><span style={{ color: A }}>80페이지 PDF</span> 증정</p>
+            <p className="relative mt-[10px] text-[14px] md:text-[16px] text-white/55 leading-[1.6] break-keep">캠페인 구조부터 랜딩·신청 폼·시트 연동까지<br />저희가 실제로 쓰는 세팅 순서를 그대로 담았습니다.</p>
+            <Book />
+          </div>
+        </Reveal>
 
         <Connector />
 
