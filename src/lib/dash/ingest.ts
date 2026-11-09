@@ -28,9 +28,11 @@ export async function ingestLead(input: IngestInput): Promise<IngestResult> {
 
   const admin = createAdminClient();
   const { data: project } = input.project_id
-    ? await admin.from("projects").select("id").eq("id", input.project_id).maybeSingle()
-    : await admin.from("projects").select("id").eq("slug", client).maybeSingle();
+    ? await admin.from("projects").select("id,slug").eq("id", input.project_id).maybeSingle()
+    : await admin.from("projects").select("id,slug").eq("slug", client).maybeSingle();
   if (!project) return { ok: false, status: 404, error: `unknown client: ${client || input.project_id}` };
+  // 픽셀페이지 자체 리드만 DB에 쌓는다 (고객사 리드 수집 중단)
+  if (project.slug !== "pixelpage") return { ok: false, status: 403, error: "이 프로젝트는 리드 수집이 중단되었습니다." };
 
   const { data: original } = await admin
     .from("leads").select("id").eq("project_id", project.id).eq("phone_norm", phoneNorm)
