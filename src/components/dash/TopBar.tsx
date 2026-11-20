@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Bell, LogOut, Search } from "lucide-react";
 import { signOut } from "@/app/app/actions";
-import type { Profile, Project } from "@/lib/dash/types";
+import { projectHome, type Profile, type Project } from "@/lib/dash/types";
 
 /** 상단 바: 고객사 검색(⌘F), 알림 자리, 프로필 */
 export default function TopBar({ profile, projects }: { profile: Profile; projects: Project[] }) {
@@ -20,11 +20,11 @@ export default function TopBar({ profile, projects }: { profile: Profile; projec
       <div className="search" style={{ position: "relative" }}>
         <Search className="ico" aria-hidden />
         <input ref={ref} value={q} placeholder="고객사 검색" onChange={(e) => { setQ(e.target.value); setOpen(true); setSel(0); }} onFocus={() => setOpen(true)} onBlur={() => setTimeout(() => setOpen(false), 150)}
-          onKeyDown={(e) => { if (e.key === "ArrowDown") setSel((s) => Math.min(s + 1, hits.length - 1)); if (e.key === "ArrowUp") setSel((s) => Math.max(s - 1, 0)); if (e.key === "Enter" && hits[sel]) { router.push(`/app/projects/${hits[sel].id}`); setOpen(false); setQ(""); } }} />
+          onKeyDown={(e) => { if (e.key === "ArrowDown") setSel((s) => Math.min(s + 1, hits.length - 1)); if (e.key === "ArrowUp") setSel((s) => Math.max(s - 1, 0)); if (e.key === "Enter" && hits[sel]) { router.push(projectHome(hits[sel])); setOpen(false); setQ(""); } }} />
         <kbd>⌘ + F</kbd>
         {open && hits.length > 0 && (
           <div className="search-pop">
-            {hits.map((p, i) => <Link key={p.id} href={`/app/projects/${p.id}`} className={i === sel ? "sel" : ""} onMouseDown={(e) => e.preventDefault()} onClick={() => { setOpen(false); setQ(""); }}>{p.name}{p.is_own ? " · 자사" : ""}</Link>)}
+            {hits.map((p, i) => <Link key={p.id} href={projectHome(p)} className={i === sel ? "sel" : ""} onMouseDown={(e) => e.preventDefault()} onClick={() => { setOpen(false); setQ(""); }}>{p.name}{p.is_own ? " · 자사" : ""}</Link>)}
           </div>
         )}
       </div>

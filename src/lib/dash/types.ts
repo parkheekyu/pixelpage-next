@@ -37,6 +37,9 @@ export interface Project {
   webhook_token: string | null;
 }
 
+/** 리드 탭은 자사 프로젝트에만 있다 (고객사 리드 수집을 중단하면서 고객사 쪽 탭은 뺐다). 프로젝트를 열 때의 첫 화면. */
+export const projectHome = (p: Pick<Project, "id" | "is_own">) => `/app/${p.is_own ? "projects" : "research"}/${p.id}`;
+
 export interface ResearchInput {
   product?: string;      // 상품/서비스 설명
   target?: string;       // 타깃 고객

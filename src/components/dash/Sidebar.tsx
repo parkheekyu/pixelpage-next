@@ -10,6 +10,7 @@ import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
 import type { Profile, Project } from "@/lib/dash/types";
 import type { UnreadMap } from "@/lib/dash/auth";
 
+type SeenKindKey = "leads" | "research" | "ads" | "landing";
 const SECTIONS = ["projects", "research", "ads", "landing", "settings"] as const;
 
 /** 왼쪽: 고객사 목록. 고객사를 고르면 위쪽 탭(리드·리서치·광고·랜딩·설정)으로 이동. 안 본 항목은 빨간 배지. */
@@ -19,8 +20,8 @@ export default function Sidebar({ profile, projects, unread }: { profile: Profil
   // 현재 보고 있는 프로젝트·종류는 배지에서 제외 (열면 확인 처리됨)
   const m = pathname.match(/^\/app\/(projects|research|ads|landing|settings)\/([^/]+)/);
   const curProject = m?.[2], curKind = m?.[1] === "projects" ? "leads" : m?.[1];
-  const total = (id: string) => { const u = unread[id] ?? {}; return (["leads", "research", "ads", "landing"] as const).reduce((a, k) => a + (curProject === id && curKind === k ? 0 : (u[k] ?? 0)), 0); };
-  const hrefFor = (id: string) => { const sec = m?.[1] && (SECTIONS as readonly string[]).includes(m[1]) ? m[1] : "projects"; return `/app/${sec}/${id}`; };
+  const total = (id: string, own: boolean) => { const u = unread[id] ?? {}; return ((own ? ["leads", "research", "ads", "landing"] : ["research", "ads", "landing"]) as SeenKindKey[]).reduce((a, k) => a + (curProject === id && curKind === k ? 0 : (u[k] ?? 0)), 0); };
+  const hrefFor = (p: Project) => { const cur = m?.[1] && (SECTIONS as readonly string[]).includes(m[1]) ? m[1] : null; const sec = !cur || (cur === "projects" && !p.is_own) ? (p.is_own ? "projects" : "research") : cur; return `/app/${sec}/${p.id}`; };
 
   // 접기/펴기: 저장된 값은 마운트 후 DOM 에 바로 적용 (서버 렌더와 어긋나지 않게)
   const ref = useRef<HTMLElement | null>(null);
@@ -50,9 +51,9 @@ export default function Sidebar({ profile, projects, unread }: { profile: Profil
       <nav>
         {projects.length === 0 && <div className="hint" style={{ padding: "0 10px" }}>표시할 프로젝트가 없습니다</div>}
         {projects.map((p) => {
-          const n = total(p.id);
+          const n = total(p.id, p.is_own);
           return (
-            <Link key={p.id} className={`item ${curProject === p.id ? "on" : ""}`} href={hrefFor(p.id)} title={p.name}>
+            <Link key={p.id} className={`item ${curProject === p.id ? "on" : ""}`} href={hrefFor(p)} title={p.name}>
               <Building2 className="ico" aria-hidden />
               <span className="initial" aria-hidden>{p.name.slice(0, 1)}</span>
               <span className="lbl" style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</span>

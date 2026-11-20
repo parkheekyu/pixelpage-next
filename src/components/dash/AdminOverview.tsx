@@ -4,7 +4,7 @@ import { useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { fmtW, pct, ratio, type Agg } from "@/lib/dash/agg";
-import type { Project } from "@/lib/dash/types";
+import { projectHome, type Project } from "@/lib/dash/types";
 import { Spark, Tiles, Trend } from "./charts";
 import ProjectCreateForm from "./ProjectCreateForm";
 
@@ -52,7 +52,7 @@ export default function AdminOverview({ rows: input, days }: { rows: OverviewRow
             <thead><tr><th>고객사</th><th>광고비</th><th>리드</th><th>CPL</th><th>전환</th><th>전환율</th><th>확정매출</th><th>ROAS</th><th>24h 미처리</th><th>리드 추이</th><th></th></tr></thead>
             <tbody>
               {rows.map(({ project: p, A, P, spark }) => (
-                <tr key={p.id} className="row" onClick={() => router.push(`/app/projects/${p.id}/report`)}>
+                <tr key={p.id} className="row" onClick={() => router.push(p.is_own ? `/app/projects/${p.id}/report` : `/app/research/${p.id}`)}>
                   <td>{p.name}{p.is_own && <span className="pill" style={{ fontSize: 11.5, marginLeft: 6 }}>자사</span>}</td>
                   <td>{fmtW(A.cost)}</td>
                   <td>{A.leads} <Trend a={A.leads} b={P.leads} /></td>
@@ -63,7 +63,7 @@ export default function AdminOverview({ rows: input, days }: { rows: OverviewRow
                   <td>{(A.roas * 100).toFixed(0)}%</td>
                   <td><span className={`badge ${A.stale ? "" : "ok"}`}>{A.stale}</span></td>
                   <td><Spark pts={spark} /></td>
-                  <td onClick={(e) => e.stopPropagation()}><Link className="btn" href={`/app/projects/${p.id}`}>시트</Link></td>
+                  <td onClick={(e) => e.stopPropagation()}><Link className="btn" href={projectHome(p)}>열기</Link></td>
                 </tr>
               ))}
               {rows.length === 0 && <tr><td colSpan={11} style={{ color: "var(--muted)", textAlign: "left" }}>프로젝트가 없습니다. 아래에서 첫 프로젝트를 만들어 주세요.</td></tr>}

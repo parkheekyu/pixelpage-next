@@ -80,7 +80,7 @@ export default function ClientsAdmin({ clients, projects, loadError }: { clients
                     <td style={{ width: "34%" }}><input className="cell-in" defaultValue={c.revenue_model ?? ""} aria-label="수익구조" placeholder="예) 광고비의 15% / 건당 3만원" style={{ width: "100%", minWidth: 220 }} onBlur={(e) => { const v = e.target.value.trim(); if (v !== (c.revenue_model ?? "")) save(c.id, { revenue_model: v }); }} /></td>
                     <td>
                       {c.project_id
-                        ? <Link href={`/app/projects/${c.project_id}`} className="pill">열기 ›</Link>
+                        ? <Link href={`/app/research/${c.project_id}`} className="pill">열기 ›</Link>
                         : <select value="" aria-label="대시보드 연결" onChange={(e) => e.target.value && save(c.id, { project_id: e.target.value })}>
                             <option value="">연결 안 됨</option>
                             {freeProjects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
