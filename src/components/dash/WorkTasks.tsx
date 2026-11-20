@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { X } from "lucide-react";
 import { createTask, deleteTask, updateTask } from "@/app/app/work-actions";
 import type { ActionResult } from "@/app/app/actions";
@@ -15,16 +15,37 @@ const PRI_RANK: Record<Priority, number> = { high: 0, mid: 1, low: 2 };
 export const sortTasks = (a: WorkTask, b: WorkTask) =>
   PRI_RANK[a.priority] - PRI_RANK[b.priority] || (a.deadline ?? "9").localeCompare(b.deadline ?? "9") || a.created_at.localeCompare(b.created_at);
 
+/** 화면에 들어올 때 뒤에서 한 번 서버 값을 다시 받는다. 다른 화면에서 고친 업무가 캐시된 예전 값으로 보이지 않게 한다. */
+export function useFreshOnMount() {
+  const router = useRouter();
+  const [, start] = useTransition();
+  useEffect(() => { start(() => router.refresh()); }, [router]);
+}
+
 /** 할 일을 고치는 공통 훅: 화면을 먼저 바꾸고 서버에는 뒤에서 저장한다. 저장이 실패하면 서버 값으로 되돌린다. */
 export function useTaskEdits(tasks: WorkTask[]) {
   const router = useRouter();
   const [err, setErr] = useState<string | null>(null);
   const [view, setView] = useState(tasks);
   const [seen, setSeen] = useState(tasks);
-  if (seen !== tasks) { setSeen(tasks); setView(tasks); } // 서버에서 새 목록이 오면 그걸로 맞춘다
+  const [busy, setBusy] = useState(0); // 저장 중인 요청 수
+  // 서버에서 새 목록이 오면 그걸로 맞춘다. 저장 중일 때는 방금 고친 내용이 덮이지 않게 기다린다.
+  if (seen !== tasks && busy === 0) { setSeen(tasks); setView(tasks); }
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [, startRefresh] = useTransition();
   const send = (fn: () => Promise<ActionResult>) => {
     setErr(null);
-    fn().then((r) => { if (!r.ok) { setErr(r.error); router.refresh(); } }).catch(() => { setErr("저장하지 못했습니다. 다시 시도해 주세요."); router.refresh(); });
+    setBusy((n) => n + 1);
+    if (timer.current) clearTimeout(timer.current);
+    fn()
+      .then((r) => { if (!r.ok) setErr(r.error); })
+      .catch(() => setErr("저장하지 못했습니다. 다시 시도해 주세요."))
+      .finally(() => {
+        setBusy((n) => n - 1);
+        // 입력이 잠잠해지면 뒤에서 조용히 서버 값과 맞춘다 (다른 화면에 다녀와도 최신 상태가 보이게)
+        if (timer.current) clearTimeout(timer.current);
+        timer.current = setTimeout(() => startRefresh(() => router.refresh()), 1500);
+      });
   };
   return {
     view, err,
@@ -127,6 +148,7 @@ export function TaskAdd({ edits, fixed, context, placeholder }: { edits: Edits; 
 
 /** 전체 업무 리스트: 지연 / 오늘 / 이번 주 / 이후 / 기한 없음 / 보류 / 완료 로 묶어 보여 준다 */
 export default function WorkTaskBoard({ tasks, clients, projects, today }: { tasks: WorkTask[]; clients: Client[]; projects: WorkProject[]; today: string }) {
+  useFreshOnMount();
   const edits = useTaskEdits(tasks);
   const [showDone, setShowDone] = useState(false);
   const context = { clients, projects };

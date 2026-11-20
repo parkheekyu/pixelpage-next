@@ -6,6 +6,7 @@ import { createWorkProject } from "@/app/app/work-actions";
 import type { ActionResult } from "@/app/app/actions";
 import type { Client, WorkProject, WorkTask } from "@/lib/dash/types";
 import { ddayLabel, progress, risk, type Risk } from "@/lib/dash/work";
+import { useFreshOnMount } from "./WorkTasks";
 
 const RISK_LABEL: Record<Risk, string> = { ok: "", slow: "진행 느림", late: "마감 지남" };
 
@@ -15,6 +16,7 @@ export function Gauge({ pct, risk: r = "ok" }: { pct: number; risk?: Risk }) {
 
 export default function WorkProjects({ projects, tasks, clients, today }: { projects: WorkProject[]; tasks: WorkTask[]; clients: Client[]; today: string }) {
   const [state, action, pending] = useActionState<ActionResult | null, FormData>(createWorkProject, null);
+  useFreshOnMount();
   const [showDone, setShowDone] = useState(false);
   const active = projects.filter((p) => p.status === "active"), finished = projects.filter((p) => p.status === "done");
   const cards = (showDone ? finished : active).map((p) => {

@@ -29,12 +29,13 @@ async function fetchAll<T>(build: (from: number, to: number) => PromiseLike<{ da
   return out;
 }
 
-/** 프로젝트 1개의 리드·광고비·소재 (최근 days일 + 이전 비교 구간). RLS 적용 클라이언트로 호출. */
+/** 프로젝트 1개의 리드·광고비·소재 (최근 days일 + 이전 비교 구간). RLS 적용 클라이언트로 호출.
+ *  집계는 중복 리드를 세지 않으므로 처음부터 가져오지 않는다 (중복이 수만 건인 프로젝트에서 요청 수가 크게 준다). */
 export async function loadProjectData(supabase: DashClient, project: Project, days = 28, withPrevious = true): Promise<ProjectData> {
   const span = withPrevious ? days * 2 : days;
   const since = new Date(Date.now() - span * 86400000).toISOString();
   const [leads, spend, creatives] = await Promise.all([
-    fetchAll<Lead>((a, b) => supabase.from("leads").select(LEAD_COLS).eq("project_id", project.id).gte("submitted_at", since).order("submitted_at", { ascending: false }).range(a, b)),
+    fetchAll<Lead>((a, b) => supabase.from("leads").select(LEAD_COLS).eq("project_id", project.id).eq("is_duplicate", false).gte("submitted_at", since).order("submitted_at", { ascending: false }).range(a, b)),
     fetchAll<AdSpend>((a, b) => supabase.from("ad_spend").select(SPEND_COLS).eq("project_id", project.id).gte("date", since.slice(0, 10)).order("date").range(a, b)),
     supabase.from("creatives").select("*").eq("project_id", project.id).order("creative_id"),
   ]);

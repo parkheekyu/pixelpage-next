@@ -8,10 +8,11 @@ import type { ActionResult } from "@/app/app/actions";
 import type { Client, WorkMilestone, WorkProject, WorkProjectPatch, WorkTask } from "@/lib/dash/types";
 import { ddayLabel, progress, risk } from "@/lib/dash/work";
 import { Gauge } from "./WorkProjects";
-import { TaskAdd, TaskRow, sortTasks, useTaskEdits } from "./WorkTasks";
+import { TaskAdd, TaskRow, sortTasks, useFreshOnMount, useTaskEdits } from "./WorkTasks";
 
 export default function WorkProjectDetail({ project: p, milestones, tasks, clients, today }: { project: WorkProject; milestones: WorkMilestone[]; tasks: WorkTask[]; clients: Client[]; today: string }) {
   const router = useRouter();
+  useFreshOnMount();
   const edits = useTaskEdits(tasks);
   const [pending, start] = useTransition();
   const [err, setErr] = useState<string | null>(null);

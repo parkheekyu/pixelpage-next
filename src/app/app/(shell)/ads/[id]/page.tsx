@@ -20,7 +20,10 @@ export default async function AdsPage({ params, searchParams }: { params: Promis
   // 광고 계정 스냅샷: 직원에게만 실시간 표시 (고객사는 AI 리포트만)
   let snapshot: MetaAccountSnapshot | null = null, snapError: string | null = null, cachedAt: string | null = null;
   if (isStaff && integ?.meta_ad_account_id) {
-    try { const r = await getMetaSnapshot(supabase, project.id, integ.meta_ad_account_id, preset, sp.refresh === "1"); snapshot = { ...r.snapshot, winners: rankWinners(r.snapshot, goal) }; cachedAt = r.cached_at; } catch (e) { snapError = (e as Error).message; }
+    // 캐시가 오래됐어도 일단 그걸 보여 주고, 응답을 보낸 뒤에 Meta 에서 새로 받아 둔다 (다음에 열 때 반영)
+    const accountId = integ.meta_ad_account_id;
+    try { const r = await getMetaSnapshot(supabase, project.id, accountId, preset, sp.refresh === "1", true);
+      if (r.stale) after(() => getMetaSnapshot(supabase, project.id, accountId, preset, true).catch(() => {})); snapshot = { ...r.snapshot, winners: rankWinners(r.snapshot, goal) }; cachedAt = r.cached_at; } catch (e) { snapError = (e as Error).message; }
   }
   return <><ProjectNav project={project} isStaff={profile.role === "staff"} unread={unread} />
     <AdsClient project={project} isStaff={isStaff} adAccountId={integ?.meta_ad_account_id ?? null} preset={preset} snapshot={snapshot} snapError={snapError} cachedAt={cachedAt} goal={goal} analyses={analyses} tokenConfigured={!!process.env.META_ACCESS_TOKEN} /></>;

@@ -37,13 +37,17 @@ export const getMyProjects = cache(async (): Promise<Project[]> => {
   return (data ?? []) as Project[];
 });
 
-/** 프로젝트 접근 검증 — RLS로 안 보이면 not found 처리 */
-export async function requireProject(id: string) {
+/** 프로젝트 접근 검증 — RLS로 안 보이면 not found 처리. 이미 읽어 둔 프로젝트 목록에서 찾고, 없을 때(비활성 등)만 따로 조회한다. */
+export const requireProject = cache(async (id: string) => {
   const s = await requireSession();
-  const { data } = await s.supabase.from("projects").select("*").eq("id", id).maybeSingle();
-  if (!data) redirect("/app");
-  return { ...s, project: data as Project };
-}
+  let project = (await getMyProjects()).find((p) => p.id === id);
+  if (!project) {
+    const { data } = await s.supabase.from("projects").select("*").eq("id", id).maybeSingle();
+    project = (data as Project | null) ?? undefined;
+  }
+  if (!project) redirect("/app");
+  return { ...s, project };
+});
 
 export type SeenKind = "leads" | "research" | "ads" | "landing";
 export type UnreadMap = Record<string, Partial<Record<SeenKind, number>>>;

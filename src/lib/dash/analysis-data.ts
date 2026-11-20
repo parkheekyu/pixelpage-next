@@ -27,13 +27,16 @@ export async function loadAnalysis(supabase: DashClient, id: string): Promise<An
 
 const SNAPSHOT_TTL_MS = 30 * 60 * 1000;
 
-/** Meta 스냅샷: 30분 캐시. refresh=true 면 강제 재조회. 반환값에 캐시 시각 포함 */
-export async function getMetaSnapshot(supabase: DashClient, projectId: string, adAccountId: string, preset: string, refresh = false): Promise<{ snapshot: MetaAccountSnapshot; cached_at: string; fresh: boolean }> {
+/** Meta 스냅샷: 30분 캐시. refresh=true 면 강제 재조회. staleOk=true 면 오래된 캐시라도 일단 돌려주고(stale: true) 호출한 쪽이 뒤에서 갱신한다. */
+export async function getMetaSnapshot(supabase: DashClient, projectId: string, adAccountId: string, preset: string, refresh = false, staleOk = false): Promise<{ snapshot: MetaAccountSnapshot; cached_at: string; fresh: boolean; stale: boolean }> {
   if (!refresh) {
     const { data } = await supabase.from("meta_snapshots").select("fetched_at,data").eq("project_id", projectId).eq("date_preset", preset).maybeSingle();
-    if (data && Date.now() - new Date(data.fetched_at).getTime() < SNAPSHOT_TTL_MS) return { snapshot: data.data as MetaAccountSnapshot, cached_at: data.fetched_at, fresh: false };
+    if (data) {
+      const stale = Date.now() - new Date(data.fetched_at).getTime() >= SNAPSHOT_TTL_MS;
+      if (!stale || staleOk) return { snapshot: data.data as MetaAccountSnapshot, cached_at: data.fetched_at, fresh: false, stale };
+    }
   }
   const snapshot = await fetchMetaSnapshot(adAccountId, preset);
   await supabase.from("meta_snapshots").upsert({ project_id: projectId, date_preset: preset, fetched_at: new Date().toISOString(), data: snapshot }, { onConflict: "project_id,date_preset" });
-  return { snapshot, cached_at: new Date().toISOString(), fresh: true };
+  return { snapshot, cached_at: new Date().toISOString(), fresh: true, stale: false };
 }
