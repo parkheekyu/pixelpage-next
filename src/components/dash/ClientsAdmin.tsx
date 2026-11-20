@@ -60,7 +60,7 @@ export default function ClientsAdmin({ clients, projects, loadError }: { clients
                 const m = months(c.contract_date, c.end_date);
                 return (
                   <tr key={c.id} style={{ opacity: pending ? 0.6 : c.status === "ended" ? 0.6 : 1 }}>
-                    <td><input className="cell-in" defaultValue={c.name} aria-label="고객사 이름" style={{ fontWeight: 600, minWidth: 120 }} onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== c.name) save(c.id, { name: v }); else e.target.value = c.name; }} /></td>
+                    <td><span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>{c.logo_url ? <img className="c-logo" src={c.logo_url} alt="" /> : <span className="c-logo none" aria-hidden>{c.name.replace(/^\(주\)/, "").slice(0, 1)}</span>}<input className="cell-in" defaultValue={c.name} aria-label="고객사 이름" style={{ fontWeight: 600, minWidth: 120 }} onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== c.name) save(c.id, { name: v }); else e.target.value = c.name; }} /></span></td>
                     <td>
                       <select value={c.contract_type ?? ""} aria-label="계약 형태" className={c.contract_type ? `pill tag-${TYPE_TAG[c.contract_type]}` : ""} onChange={(e) => save(c.id, { contract_type: (e.target.value || null) as ContractType | null })}>
                         <option value="">미정</option>

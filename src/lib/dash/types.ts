@@ -188,6 +188,7 @@ export interface Client {
   contract_date: string | null;
   end_date: string | null;
   revenue_model: string | null;
+  logo_url: string | null;
   memo: string | null;
   created_at: string;
   updated_at: string;

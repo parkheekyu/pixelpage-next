@@ -14,7 +14,7 @@ type SeenKindKey = "leads" | "research" | "ads" | "landing";
 const SECTIONS = ["projects", "research", "ads", "landing", "settings"] as const;
 
 /** 왼쪽: 고객사 목록. 고객사를 고르면 위쪽 탭(리드·리서치·광고·랜딩·설정)으로 이동. 안 본 항목은 빨간 배지. */
-export default function Sidebar({ profile, projects, unread }: { profile: Profile; projects: Project[]; unread: UnreadMap }) {
+export default function Sidebar({ profile, projects, unread, logos = {} }: { profile: Profile; projects: Project[]; unread: UnreadMap; logos?: Record<string, string> }) {
   const pathname = usePathname() ?? "";
   const isStaff = profile.role === "staff";
   // 현재 보고 있는 프로젝트·종류는 배지에서 제외 (열면 확인 처리됨)
@@ -54,8 +54,9 @@ export default function Sidebar({ profile, projects, unread }: { profile: Profil
           const n = total(p.id, p.is_own);
           return (
             <Link key={p.id} className={`item ${curProject === p.id ? "on" : ""}`} href={hrefFor(p)} title={p.name}>
-              <Building2 className="ico" aria-hidden />
-              <span className="initial" aria-hidden>{p.name.slice(0, 1)}</span>
+              {logos[p.id]
+                ? <img className="c-logo" src={logos[p.id]} alt="" />
+                : <><Building2 className="ico" aria-hidden /><span className="initial" aria-hidden>{p.name.slice(0, 1)}</span></>}
               <span className="lbl" style={{ overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</span>
               {n > 0 ? <span className="badge-red" aria-label={`안 본 항목 ${n}`}>{n > 99 ? "99+" : n}</span> : p.is_own ? <small>자사</small> : null}
             </Link>
