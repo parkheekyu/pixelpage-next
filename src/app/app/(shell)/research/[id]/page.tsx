@@ -14,5 +14,5 @@ export default async function ResearchPage({ params }: { params: Promise<{ id: s
   after(() => markSeen(project.id, "research"));
   const [analyses, market] = await Promise.all([listAnalyses(supabase, project.id, "research"), listAnalyses(supabase, project.id, "market")]);
   return <><ProjectNav project={project} isStaff={profile.role === "staff"} unread={unread} />
-    <ResearchClient project={project} analyses={analyses} market={market} isStaff={profile.role === "staff"} /></>;
+    <div className="pg"><ResearchClient project={project} analyses={analyses} market={market} isStaff={profile.role === "staff"} /></div></>;
 }

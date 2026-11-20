@@ -26,5 +26,5 @@ export default async function AdsPage({ params, searchParams }: { params: Promis
       if (r.stale) after(() => getMetaSnapshot(supabase, project.id, accountId, preset, true).catch(() => {})); snapshot = { ...r.snapshot, winners: rankWinners(r.snapshot, goal) }; cachedAt = r.cached_at; } catch (e) { snapError = (e as Error).message; }
   }
   return <><ProjectNav project={project} isStaff={profile.role === "staff"} unread={unread} />
-    <AdsClient project={project} isStaff={isStaff} adAccountId={integ?.meta_ad_account_id ?? null} preset={preset} snapshot={snapshot} snapError={snapError} cachedAt={cachedAt} goal={goal} analyses={analyses} tokenConfigured={!!process.env.META_ACCESS_TOKEN} /></>;
+    <div className="pg"><AdsClient project={project} isStaff={isStaff} adAccountId={integ?.meta_ad_account_id ?? null} preset={preset} snapshot={snapshot} snapError={snapError} cachedAt={cachedAt} goal={goal} analyses={analyses} tokenConfigured={!!process.env.META_ACCESS_TOKEN} /></div></>;
 }

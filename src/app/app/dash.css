@@ -45,6 +45,8 @@
 .pp-side .me .role.staff { background: var(--tag-blue-bg); color: var(--tag-blue-fg); }
 .pp-side .me form { margin-left: auto; }
 .pp-main { min-width: 0; padding: 24px 28px 56px; }
+/* 리서치·광고·랜딩 본문: 넓은 화면에서 박스가 끝없이 늘어나지 않게 폭을 묶고 가운데 둔다. */
+.pp-dash .pg { max-width: 1080px; margin: 0 auto; }
 @media (max-width: 860px) {
   .pp-shell { grid-template-columns: 1fr; }
   .pp-side { position: static; height: auto; border-right: 0; border-bottom: 1px solid var(--line); }
