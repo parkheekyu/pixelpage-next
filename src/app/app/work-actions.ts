@@ -71,6 +71,7 @@ export async function deleteMilestone(id: string): Promise<ActionResult> {
 }
 
 // ---------- 할 일 ----------
+// 화면이 먼저 바뀌고 여기서는 저장만 한다. 페이지를 다시 그리지 않아야 입력이 빠르다.
 function cleanTask(p: WorkTaskPatch): WorkTaskPatch | string {
   const out: WorkTaskPatch = {};
   if (p.title !== undefined) { const v = String(p.title).trim().slice(0, 200); if (!v) return "할 일을 입력해 주세요."; out.title = v; }
@@ -82,7 +83,7 @@ function cleanTask(p: WorkTaskPatch): WorkTaskPatch | string {
   return out;
 }
 
-export async function createTask(input: WorkTaskPatch): Promise<ActionResult> {
+export async function createTask(input: WorkTaskPatch & { id?: string }): Promise<ActionResult> {
   const s = await requireStaff();
   const c = cleanTask({ ...input, title: input.title ?? "" });
   if (typeof c === "string") return fail(c);
@@ -91,8 +92,9 @@ export async function createTask(input: WorkTaskPatch): Promise<ActionResult> {
     const { data: p } = await s.supabase.from("work_projects").select("client_id").eq("id", c.project_id).maybeSingle();
     c.client_id = p?.client_id ?? null;
   }
-  const { error } = await s.supabase.from("work_tasks").insert(c);
-  return error ? fail(error.message) : done();
+  const id = input.id && /^[0-9a-f-]{36}$/.test(input.id) ? input.id : undefined;
+  const { error } = await s.supabase.from("work_tasks").insert({ ...c, ...(id ? { id } : {}) } as Record<string, unknown>);
+  return error ? fail(error.message) : { ok: true };
 }
 
 export async function updateTask(id: string, patch: WorkTaskPatch): Promise<ActionResult> {
@@ -103,11 +105,11 @@ export async function updateTask(id: string, patch: WorkTaskPatch): Promise<Acti
   if (c.status) { extra.done_at = c.status === "done" ? new Date().toISOString() : null; if (c.status !== "hold") c.hold_reason = null; }
   if (c.project_id !== undefined && c.milestone_id === undefined) c.milestone_id = null; // 프로젝트를 옮기면 마일스톤은 비운다
   const { error } = await s.supabase.from("work_tasks").update({ ...c, ...extra }).eq("id", id);
-  return error ? fail(error.message) : done();
+  return error ? fail(error.message) : { ok: true };
 }
 
 export async function deleteTask(id: string): Promise<ActionResult> {
   const s = await requireStaff();
   const { error } = await s.supabase.from("work_tasks").delete().eq("id", id);
-  return error ? fail(error.message) : done();
+  return error ? fail(error.message) : { ok: true };
 }

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useOptimistic, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { X } from "lucide-react";
 import { createTask, deleteTask, updateTask } from "@/app/app/work-actions";
 import type { ActionResult } from "@/app/app/actions";
@@ -14,19 +15,32 @@ const PRI_RANK: Record<Priority, number> = { high: 0, mid: 1, low: 2 };
 export const sortTasks = (a: WorkTask, b: WorkTask) =>
   PRI_RANK[a.priority] - PRI_RANK[b.priority] || (a.deadline ?? "9").localeCompare(b.deadline ?? "9") || a.created_at.localeCompare(b.created_at);
 
-/** 할 일을 고치는 공통 훅: 체크는 화면에 먼저 반영하고 서버에 저장한다 */
+/** 할 일을 고치는 공통 훅: 화면을 먼저 바꾸고 서버에는 뒤에서 저장한다. 저장이 실패하면 서버 값으로 되돌린다. */
 export function useTaskEdits(tasks: WorkTask[]) {
-  const [, start] = useTransition();
+  const router = useRouter();
   const [err, setErr] = useState<string | null>(null);
-  const [view, apply] = useOptimistic(tasks, (cur: WorkTask[], a: { id: string; patch: WorkTaskPatch | null }) =>
-    a.patch === null ? cur.filter((t) => t.id !== a.id) : cur.map((t) => (t.id === a.id ? { ...t, ...a.patch } : t)));
-  const run = (fn: () => Promise<ActionResult>, opt?: { id: string; patch: WorkTaskPatch | null }) =>
-    start(async () => { setErr(null); if (opt) apply(opt); const r = await fn(); if (!r.ok) setErr(r.error); });
+  const [view, setView] = useState(tasks);
+  const [seen, setSeen] = useState(tasks);
+  if (seen !== tasks) { setSeen(tasks); setView(tasks); } // 서버에서 새 목록이 오면 그걸로 맞춘다
+  const send = (fn: () => Promise<ActionResult>) => {
+    setErr(null);
+    fn().then((r) => { if (!r.ok) { setErr(r.error); router.refresh(); } }).catch(() => { setErr("저장하지 못했습니다. 다시 시도해 주세요."); router.refresh(); });
+  };
   return {
     view, err,
-    save: (id: string, patch: WorkTaskPatch) => run(() => updateTask(id, patch), { id, patch }),
-    remove: (id: string) => run(() => deleteTask(id), { id, patch: null }),
-    add: (input: WorkTaskPatch) => run(() => createTask(input)),
+    save: (id: string, patch: WorkTaskPatch) => {
+      const local: Partial<WorkTask> = { ...patch };
+      if (patch.status) { local.done_at = patch.status === "done" ? new Date().toISOString() : null; if (patch.status !== "hold") local.hold_reason = null; }
+      setView((cur) => cur.map((t) => (t.id === id ? { ...t, ...local } : t)));
+      send(() => updateTask(id, patch));
+    },
+    remove: (id: string) => { setView((cur) => cur.filter((t) => t.id !== id)); send(() => deleteTask(id)); },
+    add: (input: WorkTaskPatch) => {
+      const id = crypto.randomUUID();
+      const row: WorkTask = { id, title: (input.title ?? "").trim(), client_id: input.client_id ?? null, project_id: input.project_id ?? null, milestone_id: input.milestone_id ?? null, deadline: input.deadline ?? null, priority: input.priority ?? "mid", status: "todo", hold_reason: null, done_at: null, created_at: new Date().toISOString() };
+      setView((cur) => [...cur, row]);
+      send(() => createTask({ ...input, id }));
+    },
   };
 }
 type Edits = ReturnType<typeof useTaskEdits>;
