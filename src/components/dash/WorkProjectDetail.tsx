@@ -7,7 +7,7 @@ import { createMilestone, deleteMilestone, deleteWorkProject, renameMilestone, u
 import type { ActionResult } from "@/app/app/actions";
 import type { Client, WorkMilestone, WorkProject, WorkProjectPatch, WorkTask } from "@/lib/dash/types";
 import { ddayLabel, progress, risk } from "@/lib/dash/work";
-import { Check, Flag, Rocket } from "lucide-react";
+import { Check, Flag, Plane, Rocket, Send, Sparkles } from "lucide-react";
 import { Gauge } from "./WorkProjects";
 import { TaskAdd, TaskRow, sortTasks, useFreshOnMount, useTaskEdits } from "./WorkTasks";
 
@@ -85,6 +85,8 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
   );
 }
 
+const LEVELS = ["종이비행기", "비행기", "로켓", "불꽃 로켓", "반짝이는 로켓"];
+
 /** 마일스톤 여정 그림: 출발점에서 마일스톤을 차례로 지나 맨 끝 깃발(프로젝트 최종 목표)까지. 로켓은 진행 중인 마일스톤 구간 안에서 완료 비율만큼 나아가고, 마일스톤을 다 끝낸 뒤에는 남은 할 일 비율만큼 깃발로 다가간다. */
 function Roadmap({ steps, goal, overall, rest }: { steps: { id: string; title: string; done: number; base: number; pct: number }[]; goal: string; overall: number; rest: number }) {
   const n = steps.length, seg = n + 1; // 마지막 마일스톤에서 깃발까지가 한 구간 더 있다
@@ -92,6 +94,10 @@ function Roadmap({ steps, goal, overall, rest }: { steps: { id: string; title: s
   const cur = steps.findIndex((st) => !finished(st)); // 아직 안 끝난 첫 마일스톤
   const arrived = overall >= 100 && cur === -1;
   const pos = arrived ? 100 : cur === -1 ? ((n + Math.min(rest, 95) / 100) / seg) * 100 : ((cur + steps[cur].pct / 100) / seg) * 100;
+  // 마일스톤을 통과할 때마다 탈것이 한 단계씩 발전한다: 종이비행기 → 비행기 → 로켓 → 불꽃 로켓 → 반짝이는 로켓. 마일스톤이 4개보다 많으면 비율로 나눈다.
+  const passed = cur === -1 ? n : cur;
+  const lv = arrived ? 4 : n === 0 ? 2 : Math.min(4, n <= 4 ? passed : Math.floor((passed / n) * 4));
+  const Craft = lv === 0 ? Send : lv === 1 ? Plane : Rocket;
   return (
     <div className="roadmap-wrap">
       <div className="roadmap" style={{ minWidth: seg * 96 }}>
@@ -112,7 +118,11 @@ function Roadmap({ steps, goal, overall, rest }: { steps: { id: string; title: s
           <span className="rm-label">{goal || "최종 목표"}</span>
           <small>{overall}%</small>
         </span>
-        <span className={`rm-rocket ${arrived ? "arrived" : ""}`} style={{ left: `${pos}%` }} aria-hidden><Rocket size={19} /></span>
+        <span className={`rm-rocket lv${lv} ${arrived ? "arrived" : ""}`} style={{ left: `${pos}%` }} title={LEVELS[lv]} aria-hidden>
+          {lv >= 3 && <i className="rm-flame" />}
+          <Craft size={15 + lv * 2} />
+          {lv >= 4 && <Sparkles className="rm-spark" size={13} />}
+        </span>
       </div>
     </div>
   );
