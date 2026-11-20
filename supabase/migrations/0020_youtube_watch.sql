@@ -23,7 +23,7 @@ create table if not exists dash.yt_videos (
   published_at timestamptz,
   duration_s int,
   kind text,                            -- long | short | live | unknown
-  status text not null default 'seen',  -- seen | asked | approved | declined | producing | done | error
+  status text not null default 'seen',  -- seen | notified(알리기만 함) | asked | approved | declined | producing | done | error
   slack_channel text,
   slack_ts text,
   job_id uuid,

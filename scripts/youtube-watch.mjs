@@ -1,7 +1,7 @@
 /**
  * 유튜브 채널 모니터링 (워커에서 하루 두 번 호출).
- * 새 롱폼(라이브·쇼츠 제외)이 올라오면 담당 직원 봇이 고객사 채널에서 대표에게 "광고로 만들까요?" 라고 묻는다.
- * 대표가 스레드에서 승인하면(employees.mjs 에서 감지) video_ad 작업이 등록되고 광고제작 프로젝트가 실행된다.
+ * 새 롱폼(라이브·쇼츠 제외)이 올라오면 담당 직원 봇이 고객사 채널에 "새 영상 올라왔다" 고 알리기만 한다.
+ * 광고로 만들지 묻지 않는다 (2026-11-20 대표 지시). 상태는 notified 로 남겨 승인 답변 감지(employees.mjs, status=asked)에 걸리지 않는다.
  */
 import { spawn } from "node:child_process";
 
@@ -73,12 +73,12 @@ export async function checkYoutube(db, { log, bots, force = false }) {
         const bot = bots[w.employee_id];
         if (!bot?.bot_token) { await db.from("yt_videos").upsert(row); log(`유튜브 ${w.handle}: 봇 토큰 없음(${w.employee_id})`); continue; }
         const mins = c.duration ? `${Math.round(c.duration / 60)}분` : "";
-        const text = `대표님, ${row.channel_title} 채널에 새 영상 올라왔어요. ${mins ? `(${mins}) ` : ""}광고로 만들까요?\n${e.title}\n${url}`;
+        const text = `대표님, ${row.channel_title} 채널에 새 영상 올라왔어요. ${mins ? `(${mins})` : ""}\n${e.title}\n${url}`;
         const j = await slackApi("chat.postMessage", { channel: w.slack_channel, text, unfurl_links: true }, bot.bot_token);
         if (!j.ok) { await db.from("yt_videos").upsert(row); log(`유튜브 ${w.handle}: 슬랙 게시 실패 ${j.error}`); continue; }
-        await db.from("yt_videos").upsert({ ...row, status: "asked", slack_channel: w.slack_channel, slack_ts: j.ts });
+        await db.from("yt_videos").upsert({ ...row, status: "notified", slack_channel: w.slack_channel, slack_ts: j.ts });
         await db.from("agent_messages").upsert({ channel: w.slack_channel, thread_ts: null, ts: j.ts, employee_id: w.employee_id, user_name: w.employee_id, project_id: w.project_id, text }, { onConflict: "channel,ts" });
-        log(`유튜브 ${w.handle}: 새 롱폼 → 슬랙에 물음 · ${e.title}`);
+        log(`유튜브 ${w.handle}: 새 롱폼 → 슬랙에 알림 · ${e.title}`);
       }
       await db.from("yt_watch").update({ last_checked_at: new Date().toISOString() }).eq("id", w.id);
       if (firstRun) log(`유튜브 ${w.handle}(${channel_title}): 기존 영상 ${fresh.length}개 기록(질문 안 함), 다음부터 새 영상만`);
