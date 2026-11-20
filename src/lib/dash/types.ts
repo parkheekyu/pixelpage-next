@@ -190,3 +190,36 @@ export interface Client {
   updated_at: string;
 }
 export type ClientPatch = Partial<Pick<Client, "name" | "project_id" | "contract_type" | "status" | "contract_date" | "end_date" | "revenue_model" | "memo">>;
+
+// ---------- 업무 관리 (프로젝트 → 마일스톤 → 할 일) ----------
+export const PRIORITIES = ["high", "mid", "low"] as const;
+export type Priority = (typeof PRIORITIES)[number];
+export const PRIORITY_LABEL: Record<Priority, string> = { high: "높음", mid: "보통", low: "낮음" };
+export const TASK_STATUSES = ["todo", "done", "hold"] as const;
+export type TaskStatus = (typeof TASK_STATUSES)[number];
+export const TASK_STATUS_LABEL: Record<TaskStatus, string> = { todo: "진행", done: "완료", hold: "보류" };
+export interface WorkProject {
+  id: string;
+  name: string;
+  goal: string | null;
+  deadline: string | null;
+  client_id: string | null;
+  status: "active" | "done";
+  created_at: string;
+}
+export interface WorkMilestone { id: string; project_id: string; title: string; position: number }
+export interface WorkTask {
+  id: string;
+  title: string;
+  client_id: string | null;
+  project_id: string | null;
+  milestone_id: string | null;
+  deadline: string | null;
+  priority: Priority;
+  status: TaskStatus;
+  hold_reason: string | null;
+  done_at: string | null;
+  created_at: string;
+}
+export type WorkTaskPatch = Partial<Pick<WorkTask, "title" | "client_id" | "project_id" | "milestone_id" | "deadline" | "priority" | "status" | "hold_reason">>;
+export type WorkProjectPatch = Partial<Pick<WorkProject, "name" | "goal" | "deadline" | "client_id" | "status">>;
