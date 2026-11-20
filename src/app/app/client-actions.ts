@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { requireStaff } from "@/lib/dash/auth";
-import { CLIENT_STATUSES, CONTRACT_TYPES, type ClientPatch, type ClientStatus, type ContractType } from "@/lib/dash/types";
+import { CLIENT_CATEGORIES, CLIENT_STATUSES, CONTRACT_TYPES, type ClientCategory, type ClientPatch, type ClientStatus, type ContractType } from "@/lib/dash/types";
+import { toAsciiSlug } from "@/lib/slug";
 import type { ActionResult } from "./actions";
 
 const PATH = "/app/admin/clients";
@@ -20,6 +21,10 @@ function clean(patch: ClientPatch): ClientPatch | string {
     if (patch.contract_type !== null && !CONTRACT_TYPES.includes(patch.contract_type as ContractType)) return "잘못된 계약 형태";
     out.contract_type = patch.contract_type;
   }
+  if (patch.category !== undefined) {
+    if (patch.category !== null && !CLIENT_CATEGORIES.includes(patch.category as ClientCategory)) return "잘못된 구분";
+    out.category = patch.category;
+  }
   if (patch.status !== undefined) {
     if (!CLIENT_STATUSES.includes(patch.status as ClientStatus)) return "잘못된 계약 상태";
     out.status = patch.status;
@@ -35,22 +40,22 @@ function clean(patch: ClientPatch): ClientPatch | string {
   return out;
 }
 
-export async function createClientRow(_prev: ActionResult | null, formData: FormData): Promise<ActionResult> {
+/** 클라이언트를 추가하면 고객사(대시보드 프로젝트)도 함께 만들어 잇는다. 사이드바 고객사 목록에 바로 나온다. */
+export async function addClient(name: string): Promise<ActionResult> {
   const s = await requireStaff();
-  const str = (k: string) => String(formData.get(k) ?? "");
-  const c = clean({
-    name: str("name"),
-    contract_type: (str("contract_type") || null) as ContractType | null,
-    status: (str("status") || "active") as ClientStatus,
-    contract_date: str("contract_date") || null,
-    revenue_model: str("revenue_model"),
-    project_id: str("project_id") || null,
-  });
+  const c = clean({ name });
   if (typeof c === "string") return { ok: false, error: c };
-  const { error } = await s.supabase.from("clients").insert(c);
-  if (error) return { ok: false, error: error.code === "23505" ? "이미 다른 클라이언트에 연결된 대시보드 프로젝트입니다." : error.message };
-  revalidatePath(PATH);
-  return { ok: true, message: `${c.name} 클라이언트를 추가했습니다.` };
+  const base = toAsciiSlug(c.name!.replace(/\(주\)|주식회사/g, "")) || "client";
+  let projectId: string | null = null;
+  for (const slug of [base, `${base}-${Date.now().toString(36).slice(-4)}`]) {
+    const { data, error } = await s.supabase.from("projects").insert({ name: c.name, slug, is_own: false }).select("id").single();
+    if (data) { projectId = data.id; break; }
+    if (error?.code !== "23505") return { ok: false, error: error?.message ?? "고객사 생성 실패" };
+  }
+  const { error } = await s.supabase.from("clients").insert({ ...c, project_id: projectId, category: "db" });
+  if (error) return { ok: false, error: error.message };
+  revalidatePath("/app", "layout");
+  return { ok: true };
 }
 
 export async function updateClientRow(id: string, patch: ClientPatch): Promise<ActionResult> {
@@ -60,9 +65,11 @@ export async function updateClientRow(id: string, patch: ClientPatch): Promise<A
   // 종료로 바꾸면 종료일을 오늘로, 다시 진행중으로 돌리면 종료일을 비운다
   if (c.status === "ended" && c.end_date === undefined) c.end_date = new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
   if (c.status === "active") c.end_date = null;
-  const { error } = await s.supabase.from("clients").update({ ...c, updated_at: new Date().toISOString() }).eq("id", id);
+  if (c.contract_type === "own") c.category = null;
+  const { data: row, error } = await s.supabase.from("clients").update({ ...c, updated_at: new Date().toISOString() }).eq("id", id).select("project_id").maybeSingle();
   if (error) return { ok: false, error: error.code === "23505" ? "이미 다른 클라이언트에 연결된 대시보드 프로젝트입니다." : error.message };
-  revalidatePath(PATH);
+  if (c.contract_type !== undefined && row?.project_id) await s.supabase.from("projects").update({ is_own: c.contract_type === "own" }).eq("id", row.project_id);
+  revalidatePath("/app", "layout"); // 사이드바의 구분 표시도 함께 갱신
   return { ok: true };
 }
 

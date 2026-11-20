@@ -179,6 +179,9 @@ export const CONTRACT_TYPE_LABEL: Record<ContractType, string> = { markup: "마�
 export const CLIENT_STATUSES = ["active", "ended"] as const;
 export type ClientStatus = (typeof CLIENT_STATUSES)[number];
 export const CLIENT_STATUS_LABEL: Record<ClientStatus, string> = { active: "진행중", ended: "종료" };
+export const CLIENT_CATEGORIES = ["db", "sales"] as const;
+export type ClientCategory = (typeof CLIENT_CATEGORIES)[number];
+export const CLIENT_CATEGORY_LABEL: Record<ClientCategory, string> = { db: "DB", sales: "판매" };
 export interface Client {
   id: string;
   name: string;
@@ -189,11 +192,12 @@ export interface Client {
   end_date: string | null;
   revenue_model: string | null;
   logo_url: string | null;
+  category: ClientCategory | null;
   memo: string | null;
   created_at: string;
   updated_at: string;
 }
-export type ClientPatch = Partial<Pick<Client, "name" | "project_id" | "contract_type" | "status" | "contract_date" | "end_date" | "revenue_model" | "memo">>;
+export type ClientPatch = Partial<Pick<Client, "name" | "project_id" | "contract_type" | "status" | "contract_date" | "end_date" | "revenue_model" | "memo" | "category">>;
 
 // ---------- 업무 관리 (프로젝트 → 마일스톤 → 할 일) ----------
 export const PRIORITIES = ["high", "mid", "low"] as const;

@@ -759,3 +759,49 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .c-logo.none { display: inline-grid; place-items: center; font-size: 11.5px; font-weight: 700; color: var(--muted); background: #f1f2f7; }
 .pp-side a.item .c-logo { width: 18px; height: 18px; border-radius: 5px; }
 .pp-side.collapsed a.item .c-logo { width: 30px; height: 30px; border-radius: 8px; }
+
+/* 노션식 데이터베이스 표 */
+.pp-dash .ndb-views { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; border-bottom: 1px solid var(--line); margin-bottom: 0; padding-bottom: 6px; }
+.pp-dash .ndb-views button { all: unset; cursor: pointer; font-size: 13.5px; font-weight: 500; color: var(--muted); padding: 5px 10px; border-radius: 6px; position: relative; }
+.pp-dash .ndb-views button:hover { background: color-mix(in srgb, var(--text) 5%, transparent); }
+.pp-dash .ndb-views button.on { color: var(--text); font-weight: 600; }
+.pp-dash .ndb-views button.on::after { content: ""; position: absolute; left: 8px; right: 8px; bottom: -7px; height: 2px; background: var(--text); border-radius: 2px; }
+.pp-dash .ndb-views button small { color: var(--muted); font-weight: 400; margin-left: 2px; }
+.pp-dash .ndb-views .pill { font-size: 12px; }
+.pp-dash .ndb { width: 100%; border-collapse: collapse; font-size: 14px; background: transparent; }
+.pp-dash .ndb th { text-align: left; font-weight: 400; font-size: 13px; color: var(--muted); padding: 8px 10px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); white-space: nowrap; }
+.pp-dash .ndb th svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; opacity: .8; }
+.pp-dash .ndb td { padding: 0 4px; height: 38px; border-bottom: 1px solid var(--line); border-right: 1px solid var(--line); vertical-align: middle; }
+.pp-dash .ndb th:last-child, .pp-dash .ndb td:last-child { border-right: 0; }
+.pp-dash .ndb tbody tr:hover td { background: color-mix(in srgb, var(--text) 2.5%, transparent); }
+.pp-dash .ndb tr.dim td > * { opacity: .55; }
+.pp-dash .ndb td.title { min-width: 220px; padding-left: 8px; white-space: nowrap; }
+.pp-dash .ndb td.title > * { vertical-align: middle; }
+.pp-dash .ndb td.title .c-logo { display: inline-block; margin-right: 4px; }
+.pp-dash .ndb td.title .c-logo.none { display: inline-grid; }
+.pp-dash .ndb td.title .cell-in { width: calc(100% - 60px); min-width: 130px; }
+.pp-dash .ndb td.title .cell-in { font-weight: 600; }
+.pp-dash .ndb td.wide { min-width: 220px; width: 24%; }
+.pp-dash .ndb td.nowrap { white-space: nowrap; }
+.pp-dash .ndb td.pad { padding: 0 10px; color: var(--text-2); }
+.pp-dash .ndb td small { color: var(--muted); font-size: 12px; margin-right: 6px; }
+.pp-dash .ndb td.act { width: 34px; text-align: center; border-right: 0; }
+.pp-dash .ndb td.act .t-del { opacity: 0; }
+.pp-dash .ndb tr:hover td.act .t-del { opacity: .6; }
+.pp-dash .ndb .cell-in { width: 100%; border: 0; border-radius: 4px; background: transparent; font: inherit; font-size: 14px; color: var(--text); padding: 6px; outline: none; }
+.pp-dash .ndb .cell-in.date { width: auto; color: var(--text-2); font-size: 13px; }
+.pp-dash .ndb .cell-in::placeholder { color: transparent; }
+.pp-dash .ndb tr:hover .cell-in::placeholder, .pp-dash .ndb .cell-in:focus::placeholder { color: color-mix(in srgb, var(--muted) 70%, transparent); }
+.pp-dash .ndb .cell-in:focus { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--s1) 55%, transparent); background: var(--card); }
+.pp-dash .ndb select.pill { appearance: none; -webkit-appearance: none; border-color: transparent; margin-left: 6px; padding: 1px 9px; border-radius: 4px; font-size: 13px; }
+.pp-dash .ndb select.pill:not([class*="tag-"]) { background: transparent; color: var(--muted); }
+.pp-dash .ndb span.pill { margin-left: 6px; border-radius: 4px; font-size: 13px; padding: 1px 9px; }
+.pp-dash .ndb .ndb-link { color: var(--text-2); font-size: 13px; padding: 0 6px; text-decoration: none; }
+.pp-dash .ndb .ndb-link:hover { color: var(--s1); }
+.pp-dash .ndb .ndb-open { flex: none; font-size: 11.5px; font-weight: 600; letter-spacing: .02em; color: var(--text-2); background: var(--card); border: 1px solid var(--line); border-radius: 4px; padding: 2px 7px; text-decoration: none; opacity: 0; box-shadow: 0 1px 2px rgba(0,0,0,.05); }
+.pp-dash .ndb tr:hover .ndb-open { opacity: 1; }
+.pp-dash .ndb .wt-prog { padding-left: 6px; }
+.pp-dash .ndb tr.new td { border-right: 0; padding: 0; }
+.pp-dash .ndb tr.new form { display: flex; align-items: center; gap: 8px; padding: 0 10px; color: var(--muted); }
+.pp-dash .ndb tr.new input { flex: 1; border: 0; background: transparent; font: inherit; font-size: 14px; color: var(--text); outline: none; height: 36px; }
+.pp-dash .ndb tr.new input::placeholder { color: var(--muted); }

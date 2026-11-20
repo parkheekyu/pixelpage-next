@@ -31,6 +31,14 @@ export async function createWorkProject(_prev: ActionResult | null, formData: Fo
   return { ok: true, message: `${c.name} 프로젝트를 만들었습니다.` };
 }
 
+export async function addWorkProject(name: string): Promise<ActionResult> {
+  const s = await requireStaff();
+  const c = cleanProject({ name });
+  if (typeof c === "string") return fail(c);
+  const { error } = await s.supabase.from("work_projects").insert(c);
+  return error ? fail(error.message) : done();
+}
+
 export async function updateWorkProject(id: string, patch: WorkProjectPatch): Promise<ActionResult> {
   const s = await requireStaff();
   const c = cleanProject(patch);
