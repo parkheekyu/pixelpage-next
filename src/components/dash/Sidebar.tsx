@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Building2, Clapperboard, LayoutDashboard, Users } from "lucide-react";
+import { Building2, Clapperboard, Handshake, LayoutDashboard, Users } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import { useEffect, useRef, useState } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -40,6 +40,7 @@ export default function Sidebar({ profile, projects, unread }: { profile: Profil
           <h4>관리</h4>
           <nav>
             <Link className={`item ${pathname === "/app/admin" ? "on" : ""}`} href="/app/admin" title="전체 개요"><LayoutDashboard className="ico" aria-hidden /> <span className="lbl">전체 개요</span></Link>
+            <Link className={`item ${pathname.startsWith("/app/admin/clients") ? "on" : ""}`} href="/app/admin/clients" title="클라이언트"><Handshake className="ico" aria-hidden /> <span className="lbl">클라이언트</span></Link>
             <Link className={`item ${pathname.startsWith("/app/admin/users") ? "on" : ""}`} href="/app/admin/users" title="회원 · 권한"><Users className="ico" aria-hidden /> <span className="lbl">회원 · 권한</span></Link>
           </nav>
         </>

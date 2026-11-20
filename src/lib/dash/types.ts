@@ -168,3 +168,25 @@ export interface Proposal {
 }
 
 export type MetaGoalLike = "lead" | "purchase";
+
+// ---------- 클라이언트(계약) 관리 ----------
+export const CONTRACT_TYPES = ["markup", "revshare", "cpa", "own"] as const;
+export type ContractType = (typeof CONTRACT_TYPES)[number];
+export const CONTRACT_TYPE_LABEL: Record<ContractType, string> = { markup: "마크업", revshare: "수익쉐어", cpa: "CPA", own: "자사" };
+export const CLIENT_STATUSES = ["active", "ended"] as const;
+export type ClientStatus = (typeof CLIENT_STATUSES)[number];
+export const CLIENT_STATUS_LABEL: Record<ClientStatus, string> = { active: "진행중", ended: "종료" };
+export interface Client {
+  id: string;
+  name: string;
+  project_id: string | null;
+  contract_type: ContractType | null;
+  status: ClientStatus;
+  contract_date: string | null;
+  end_date: string | null;
+  revenue_model: string | null;
+  memo: string | null;
+  created_at: string;
+  updated_at: string;
+}
+export type ClientPatch = Partial<Pick<Client, "name" | "project_id" | "contract_type" | "status" | "contract_date" | "end_date" | "revenue_model" | "memo">>;
