@@ -7,3 +7,4 @@ update dash.clients set logo_url = '/client-logos/gymcompany.png'   where name l
 update dash.clients set logo_url = '/client-logos/plusspeech.png'   where project_id = (select id from dash.projects where slug = 'plusspeech') and logo_url is null;
 update dash.clients set logo_url = '/client-logos/pixelpage.png'    where name = '픽셀페이지' and logo_url is null;
 notify pgrst, 'reload schema';
+update dash.clients set logo_url = '/client-logos/butler.png' where name like '%버틀러%' and logo_url is null;
