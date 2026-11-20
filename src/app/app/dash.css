@@ -868,9 +868,20 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .fold-sum { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; flex: 1; }
 .pp-dash .fold-body { padding: 4px 18px 18px; border-top: 1px solid var(--line); }
 .pp-dash .fold-body > .sub { margin: 12px 0; }
-.pp-dash .rs-fields { display: grid; gap: 12px 14px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-.pp-dash .rs-fields label.f > span { font-weight: 600; color: var(--text); font-size: 13px; }
-.pp-dash .rs-fields em { font-style: normal; font-weight: 500; font-size: 11.5px; color: var(--bad); margin-left: 4px; }
+.pp-dash .pf-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 12px 0 4px; }
+.pp-dash .pf-top .sub { margin: 0; }
+.pp-dash .pf-acts { display: flex; align-items: center; gap: 6px; flex: none; }
+.pp-dash .pf { margin: 0; max-width: 860px; }
+.pp-dash .pf-row { display: grid; grid-template-columns: 130px 1fr; gap: 16px; padding: 11px 0; border-top: 1px solid var(--line); }
+.pp-dash .pf-row:first-child { border-top: 0; }
+.pp-dash .pf dt { color: var(--muted); font-size: 13px; line-height: 1.6; }
+.pp-dash .pf dt em { font-style: normal; font-size: 11px; color: var(--bad); margin-left: 5px; }
+.pp-dash .pf dd { margin: 0; font-size: 14px; line-height: 1.6; white-space: pre-wrap; word-break: keep-all; overflow-wrap: anywhere; min-width: 0; }
+.pp-dash .pf-empty { color: var(--muted); opacity: .6; }
+.pp-dash .pf.edit .pf-row { padding: 7px 0; border-top: 0; }
+.pp-dash .pf.edit dt { padding-top: 8px; color: var(--text-2); }
+.pp-dash .pf.edit textarea { min-height: 0; field-sizing: content; resize: none; display: block; line-height: 1.6; }
+@media (max-width: 640px) { .pp-dash .pf-row { grid-template-columns: 1fr; gap: 3px; } .pp-dash .pf.edit dt { padding-top: 0; } }
 .pp-dash .rs-prompts { display: grid; gap: 0; border: 1px solid var(--line); border-radius: 8px; margin-bottom: 10px; }
 .pp-dash .rs-prompt { padding: 6px 8px 6px 12px; border-top: 1px solid var(--line); }
 .pp-dash .rs-prompt:first-child { border-top: 0; }
