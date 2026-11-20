@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, LogOut, Search } from "lucide-react";
+import { Bell, LogOut, Moon, Search, Sun } from "lucide-react";
 import { signOut } from "@/app/app/actions";
 import { projectHome, type Profile, type Project } from "@/lib/dash/types";
 
@@ -14,6 +14,15 @@ export default function TopBar({ profile, projects }: { profile: Profile; projec
   const ref = useRef<HTMLInputElement>(null);
   const hits = useMemo(() => (q.trim() ? projects.filter((p) => p.name.includes(q.trim()) || p.slug.includes(q.trim().toLowerCase())) : projects).slice(0, 8), [q, projects]);
   useEffect(() => { const h = (e: KeyboardEvent) => { if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "f") { e.preventDefault(); ref.current?.focus(); setOpen(true); } if (e.key === "Escape") setOpen(false); }; window.addEventListener("keydown", h); return () => window.removeEventListener("keydown", h); }, []);
+  // 다크 모드: .pp-dash 의 data-theme 로 켜고 끈다. 첫 적용은 layout 의 스크립트가 한다.
+  const [dark, setDark] = useState(false);
+  useEffect(() => { setDark(document.querySelector<HTMLElement>(".pp-dash")?.dataset.theme === "dark"); }, []);
+  const toggleTheme = () => {
+    const next = !dark; setDark(next);
+    const root = document.querySelector<HTMLElement>(".pp-dash");
+    if (root) { if (next) root.dataset.theme = "dark"; else delete root.dataset.theme; }
+    try { localStorage.setItem("pp-theme", next ? "dark" : "light"); } catch {}
+  };
   const initials = (profile.name || profile.email).slice(0, 1).toUpperCase();
   return (
     <div className="pp-topbar">
@@ -29,6 +38,7 @@ export default function TopBar({ profile, projects }: { profile: Profile; projec
         )}
       </div>
       <div className="sp" />
+      <button type="button" className="iconbtn" onClick={toggleTheme} title={dark ? "밝은 화면으로" : "어두운 화면으로"} aria-label={dark ? "밝은 화면으로" : "어두운 화면으로"}>{dark ? <Sun className="ico" aria-hidden /> : <Moon className="ico" aria-hidden />}</button>
       <button type="button" className="iconbtn" title="알림 (준비 중)" aria-label="알림"><Bell className="ico" aria-hidden /></button>
       <div className="me">
         <div className="avatar" aria-hidden>{initials}</div>
