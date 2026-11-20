@@ -1,40 +1,65 @@
 "use client";
 
-import { useTransition } from "react";
+import { Fragment, useState, useTransition } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
-import { RefreshCw } from "lucide-react";
+import { ChevronRight, RefreshCw } from "lucide-react";
 import { runAdsAnalysis } from "@/app/app/analysis-actions";
 import type { MetaAccountSnapshot, MetaGoal, MetaInsight } from "@/lib/integrations/meta";
 import type { Analysis, Project } from "@/lib/dash/types";
-import { fmtN, fmtW, pct } from "@/lib/dash/agg";
+import { fmtN, fmtW } from "@/lib/dash/agg";
 import AnalysisPanel from "./AnalysisPanel";
 
 interface Props { project: Project; isStaff: boolean; adAccountId: string | null; preset: string; snapshot: MetaAccountSnapshot | null; snapError: string | null; cachedAt: string | null; goal: MetaGoal; analyses: Analysis[]; tokenConfigured: boolean }
 const PRESETS: [string, string][] = [["last_7d", "최근 7일"], ["last_14d", "최근 14일"], ["last_30d", "최근 30일"], ["last_90d", "최근 90일"]];
+const ST_LABEL: Record<string, string> = { ACTIVE: "진행", PAUSED: "중지", CAMPAIGN_PAUSED: "중지", ADSET_PAUSED: "중지", ARCHIVED: "보관", DELETED: "삭제" };
 
-const roasPct = (v: number | null) => (v == null ? "-" : (v * 100).toFixed(0) + "%");
-function M({ i, goal }: { i: MetaInsight | null; goal: MetaGoal }) {
-  if (!i) return <span className="metrics">성과 없음</span>;
-  const conv = goal === "purchase" ? `구매 ${i.purchases} · 매출 ${fmtW(i.purchase_value)} · CPA ${i.cpa == null ? "-" : fmtW(i.cpa)} · ROAS ${roasPct(i.roas)}` : `리드 ${i.leads} · CPL ${i.cpl == null ? "-" : fmtW(i.cpl)}`;
-  return <span className="metrics">지출 {fmtW(i.spend)} · 노출 {fmtN(i.impressions)} · 도달 {fmtN(i.reach)} · 빈도 {i.frequency.toFixed(2)} · CPM {fmtW(i.cpm)} · CTR {i.ctr.toFixed(2)}% · CPC {fmtW(i.cpc)} · 링크클릭 {fmtN(i.link_clicks)} · 랜딩뷰 {fmtN(i.landing_page_views)} · {conv}{i.thruplays ? ` · 훅률 ${pct(i.thruplays, i.impressions)}` : ""}</span>;
+const won = (v: number | null | undefined) => (v == null ? "–" : fmtW(v));
+const roasPct = (v: number | null) => (v == null ? "–" : (v * 100).toFixed(0) + "%");
+/** 폼 전환율: 링크 클릭 대비 리드 수 */
+const formRate = (i: MetaInsight) => (i.link_clicks > 0 ? ((i.leads / i.link_clicks) * 100).toFixed(1) + "%" : "–");
+
+/** 표의 숫자 칸. 목표(리드/구매)에 따라 열이 달라진다. */
+function cols(goal: MetaGoal): { label: string; get: (i: MetaInsight) => string }[] {
+  const tail = goal === "purchase"
+    ? [{ label: "구매", get: (i: MetaInsight) => fmtN(i.purchases) }, { label: "CPA", get: (i: MetaInsight) => won(i.cpa) }, { label: "ROAS", get: (i: MetaInsight) => roasPct(i.roas) }]
+    : [{ label: "리드", get: (i: MetaInsight) => fmtN(i.leads) }, { label: "리드 단가", get: (i: MetaInsight) => won(i.cpl) }, { label: "폼 전환율", get: formRate }];
+  return [{ label: "소진액", get: (i) => fmtW(i.spend) }, ...tail, { label: "CTR", get: (i) => i.ctr.toFixed(2) + "%" }, { label: "CPM", get: (i) => fmtW(i.cpm) }, { label: "빈도", get: (i) => i.frequency.toFixed(2) }];
+}
+
+function Thumb({ ad, size }: { ad: MetaAccountSnapshot["winners"][number]; size: number }) {
+  const src = ad.creative?.thumbnail_url ?? ad.creative?.image_url;
+  return src ? <img src={src} alt="" style={{ width: size, height: size }} /> : <span className="noimg" style={{ width: size, height: size }}>{ad.creative?.format ?? "–"}</span>;
 }
 
 export default function AdsClient({ project, isStaff, adAccountId, preset, snapshot, snapError, cachedAt, goal, analyses, tokenConfigured }: Props) {
   const router = useRouter(), pathname = usePathname();
   const [pending, start] = useTransition();
   const canRun = !!adAccountId && tokenConfigured && !snapError;
+  const C = cols(goal);
+
+  // 캠페인은 소진액 큰 순. 처음에는 가장 큰 캠페인만 세트까지 펼쳐 둔다.
+  const camps = (snapshot?.campaigns ?? []).filter((c) => c.insight || c.adsets.some((s) => s.insight)).sort((a, b) => (b.insight?.spend ?? 0) - (a.insight?.spend ?? 0));
+  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set(camps[0] ? [camps[0].id] : []));
+  const toggle = (id: string) => setOpenIds((cur) => { const n = new Set(cur); if (n.has(id)) n.delete(id); else n.add(id); return n; });
+  const t = snapshot?.totals;
+  const hero: [string, string][] = !t ? [] : goal === "purchase"
+    ? [["소진액", fmtW(t.spend)], ["구매", fmtN(t.purchases)], ["CPA", won(t.cpa)], ["매출", fmtW(t.purchase_value)], ["ROAS", roasPct(t.roas)], ["CTR", t.ctr.toFixed(2) + "%"]]
+    : [["소진액", fmtW(t.spend)], ["리드", fmtN(t.leads)], ["리드 단가", won(t.cpl)], ["CTR", t.ctr.toFixed(2) + "%"], ["폼 전환율", formRate(t)], ["CPM", fmtW(t.cpm)]];
+  const minor: [string, string][] = !t ? [] : [["노출", fmtN(t.impressions)], ["도달", fmtN(t.reach)], ["빈도", t.frequency.toFixed(2)], ["CPC", fmtW(t.cpc)], ["링크 클릭", fmtN(t.link_clicks)], ["랜딩뷰", fmtN(t.landing_page_views)], ...(goal === "purchase" ? [["CPM", fmtW(t.cpm)] as [string, string]] : [])];
 
   return (
     <>
-      <div className="ph" style={{ marginTop: -4 }}>
-        <h2 style={{ fontSize: 15 }}>Meta 광고 현황</h2>
-        {isStaff && <div className="controls">
-          <select value={preset} onChange={(e) => start(() => router.replace(`${pathname}?preset=${e.target.value}`))}>{PRESETS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
-          {cachedAt && <span className="hint" style={{ marginTop: 0 }}>{new Date(cachedAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })} 조회 · 30분 캐시</span>}
-          {adAccountId && <button type="button" className="btn" disabled={pending} onClick={() => start(() => router.replace(`${pathname}?preset=${preset}&refresh=1`))}><RefreshCw className="ico" aria-hidden /> 새로고침</button>}
-        </div>}
-      </div>
+      {isStaff && (
+        <div className="sec-bar">
+          <b>Meta 광고 현황</b>
+          {snapshot && <span className="hint">{snapshot.account.name ?? snapshot.account.id}</span>}
+          <span className="sp" />
+          {cachedAt && <span className="hint">{new Date(cachedAt).toLocaleString("ko-KR", { timeZone: "Asia/Seoul", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hour12: false })} 기준</span>}
+          <select value={preset} aria-label="기간" onChange={(e) => start(() => router.replace(`${pathname}?preset=${e.target.value}`))}>{PRESETS.map(([k, l]) => <option key={k} value={k}>{l}</option>)}</select>
+          {adAccountId && <button type="button" className="btn" disabled={pending} onClick={() => start(() => router.replace(`${pathname}?preset=${preset}&refresh=1`))}><RefreshCw className="ico" aria-hidden /> {pending ? "불러오는 중…" : "새로고침"}</button>}
+        </div>
+      )}
 
       {isStaff && (!adAccountId || snapError || !tokenConfigured) && (
         <div className="card" style={{ marginBottom: 12 }}>
@@ -43,58 +68,71 @@ export default function AdsClient({ project, isStaff, adAccountId, preset, snaps
           {snapError && <div className="msg err">광고 계정 조회 실패: {snapError}</div>}
         </div>
       )}
-      {isStaff && snapshot && (
-        <>
-          <section className="tiles">
-            {(() => { const t = snapshot.totals; const base: [string, string][] = [["지출", fmtW(t.spend)], ["노출", fmtN(t.impressions)], ["도달", fmtN(t.reach)], ["빈도", t.frequency.toFixed(2)], ["CPM", fmtW(t.cpm)], ["CTR", t.ctr.toFixed(2) + "%"], ["CPC", fmtW(t.cpc)], ["링크 클릭", fmtN(t.link_clicks)], ["랜딩뷰", fmtN(t.landing_page_views)]]; const g: [string, string][] = goal === "purchase" ? [["구매", fmtN(t.purchases)], ["CPA", t.cpa == null ? "-" : fmtW(t.cpa)], ["매출", fmtW(t.purchase_value)], ["ROAS", roasPct(t.roas)]] : [["리드", fmtN(t.leads)], ["CPL", t.cpl == null ? "-" : fmtW(t.cpl)]]; return [...base, ...g].map(([k, v]) => <div className="tile" key={k}><div className="k">{k}</div><div className="v">{v}</div></div>); })()}
+
+      {isStaff && snapshot && t && (
+        <div style={{ opacity: pending ? 0.6 : 1, transition: "opacity .15s" }}>
+          <section className="kpis">
+            {hero.map(([k, v]) => <div className="kpi" key={k}><span>{k}</span><b>{v}</b></div>)}
           </section>
-          <section className="grid" style={{ marginBottom: 12 }}>
-            <div className="card c5">
-              <h2>위너 광고</h2><div className="sub">{goal === "purchase" ? "구매 수 → ROAS → CPA 순" : "리드 수 → CPL → CTR 순"} · {snapshot.account.name ?? snapshot.account.id}</div>
-              {snapshot.winners.length === 0 && <div className="hint" style={{ margin: 0 }}>기간 내 성과 데이터가 없습니다.</div>}
-              {snapshot.winners.map((ad, i) => (
-                <div className="winner" key={ad.id}>
-                  {ad.creative?.thumbnail_url || ad.creative?.image_url ? <img src={ad.creative.thumbnail_url ?? ad.creative.image_url} alt="" /> : <div className="noimg" style={{ width: 72, height: 72 }}>{ad.creative?.format ?? "-"}</div>}
-                  <div>
-                    <div><span className="rank">{i + 1}</span><b>{ad.name}</b> <span className={`st ${ad.status}`}>{ad.status}</span></div>
-                    <M i={ad.insight} goal={goal} />
-                    {ad.creative?.title && <div className="copy" style={{ marginTop: 3, color: "var(--text)" }}>{ad.creative.title}</div>}
-                    {ad.creative?.body && <div className="copy">{ad.creative.body}</div>}
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="card c7">
-              <h2>캠페인 구조</h2><div className="sub">캠페인 → 세트 → 광고 (성과 있는 항목만)</div>
-              <div className="tree">
-                {snapshot.campaigns.filter((c) => c.insight || c.adsets.some((s) => s.insight)).map((c) => (
-                  <div className="camp" key={c.id}>
-                    <div className="camp-head"><span className={`st ${c.status}`}>{c.status}</span><span>{c.name}</span><span className="metrics">{c.objective}{c.daily_budget ? ` · 일예산 ${fmtW(c.daily_budget)}` : ""}</span></div>
-                    <div style={{ padding: "4px 12px" }}><M i={c.insight} goal={goal} /></div>
-                    {c.adsets.filter((s) => s.insight).map((s) => (
-                      <div className="set" key={s.id}>
-                        <div className="set-head"><span className={`st ${s.status}`}>{s.status}</span><span>{s.name}</span><span className="metrics">{s.optimization_goal}{s.daily_budget ? ` · 일예산 ${fmtW(s.daily_budget)}` : ""}</span></div>
-                        {s.targeting_summary && <div className="metrics">타깃: {s.targeting_summary}</div>}
-                        <M i={s.insight} goal={goal} />
-                        {s.ads.filter((a) => a.insight && a.insight.spend > 0).map((a) => (
-                          <div className="ad" key={a.id}>
-                            {a.creative?.thumbnail_url || a.creative?.image_url ? <img src={a.creative.thumbnail_url ?? a.creative.image_url} alt="" /> : <div className="noimg">{a.creative?.format ?? "-"}</div>}
-                            <div>
-                              <div><span className={`st ${a.status}`}>{a.status}</span> <b>{a.name}</b> <span className="metrics">{a.creative?.format}{a.creative?.call_to_action ? ` · ${a.creative.call_to_action}` : ""}</span></div>
-                              <M i={a.insight} goal={goal} />
-                              {a.creative?.body && <div className="copy">{a.creative.body}</div>}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    ))}
+          <div className="kpi-minor">{minor.map(([k, v]) => <span key={k}>{k} <b>{v}</b></span>)}</div>
+
+          {snapshot.winners.length > 0 && (
+            <section className="card" style={{ marginBottom: 12 }}>
+              <h2>위너 광고</h2><div className="sub">{goal === "purchase" ? "구매 수 → ROAS → CPA 순" : "리드 수 → 리드 단가 → CTR 순"}</div>
+              <div className="winners">
+                {snapshot.winners.map((ad, i) => (
+                  <div className="win" key={ad.id}>
+                    <div className="win-top"><Thumb ad={ad} size={56} /><div><span className="rank">{i + 1}</span><b title={ad.name}>{ad.name}</b>{ad.creative?.title && <p>{ad.creative.title}</p>}</div></div>
+                    {ad.insight && <dl>{C.slice(0, 4).map((c) => <div key={c.label}><dt>{c.label}</dt><dd>{c.get(ad.insight!)}</dd></div>)}</dl>}
                   </div>
                 ))}
-                {snapshot.campaigns.length === 0 && <div className="hint" style={{ margin: 0 }}>캠페인이 없습니다.</div>}
               </div>
+            </section>
+          )}
+
+          <section className="card" style={{ marginBottom: 12 }}>
+            <h2>캠페인별 성과</h2><div className="sub">캠페인을 누르면 세트와 광고가 펼쳐집니다 · 성과 있는 항목만 · 소진액 큰 순</div>
+            <div className="tbl-wrap">
+              <table className="atbl">
+                <thead><tr><th>이름</th><th>상태</th>{C.map((c) => <th key={c.label} className="num">{c.label}</th>)}</tr></thead>
+                <tbody>
+                  {camps.length === 0 && <tr><td colSpan={C.length + 2} className="empty">기간 내 성과가 있는 캠페인이 없습니다.</td></tr>}
+                  {camps.map((c) => {
+                    const open = openIds.has(c.id);
+                    return (
+                      <Fragment key={c.id}>
+                        <tr className="lv0" onClick={() => toggle(c.id)}>
+                          <td><ChevronRight className={`chev ${open ? "open" : ""}`} aria-hidden /><b>{c.name}</b>{c.daily_budget ? <small>일예산 {fmtW(c.daily_budget)}</small> : null}</td>
+                          <td><span className={`st ${c.status}`}>{ST_LABEL[c.status] ?? c.status}</span></td>
+                          {C.map((col) => <td key={col.label} className="num">{c.insight ? col.get(c.insight) : "–"}</td>)}
+                        </tr>
+                        {open && c.adsets.filter((s) => s.insight).map((s) => {
+                          const sOpen = openIds.has(s.id), ads = s.ads.filter((a) => a.insight && a.insight.spend > 0);
+                          return (
+                            <Fragment key={s.id}>
+                              <tr className="lv1" onClick={() => toggle(s.id)}>
+                                <td><ChevronRight className={`chev ${sOpen ? "open" : ""}`} aria-hidden /><span>{s.name}</span><small>광고 {ads.length}개{s.targeting_summary ? ` · ${s.targeting_summary}` : ""}</small></td>
+                                <td><span className={`st ${s.status}`}>{ST_LABEL[s.status] ?? s.status}</span></td>
+                                {C.map((col) => <td key={col.label} className="num">{s.insight ? col.get(s.insight) : "–"}</td>)}
+                              </tr>
+                              {sOpen && ads.map((a) => (
+                                <tr className="lv2" key={a.id}>
+                                  <td><Thumb ad={a} size={32} /><span title={a.creative?.body ?? a.name}>{a.name}</span></td>
+                                  <td><span className={`st ${a.status}`}>{ST_LABEL[a.status] ?? a.status}</span></td>
+                                  {C.map((col) => <td key={col.label} className="num">{a.insight ? col.get(a.insight) : "–"}</td>)}
+                                </tr>
+                              ))}
+                            </Fragment>
+                          );
+                        })}
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
             </div>
           </section>
-        </>
+        </div>
       )}
 
       <AnalysisPanel projectId={project.id} analyses={analyses} isStaff={isStaff} runLabel={`AI 광고 분석 실행 (${PRESETS.find(([k]) => k === preset)?.[1]})`} canRun={canRun} disabledReason={!adAccountId ? "광고 계정 ID를 저장하세요." : !tokenConfigured ? "META_ACCESS_TOKEN 이 필요합니다." : snapError ? "광고 계정 조회가 실패해 실행할 수 없습니다." : undefined} onRun={() => runAdsAnalysis(project.id, preset)} />
