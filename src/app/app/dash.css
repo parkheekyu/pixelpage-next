@@ -749,3 +749,7 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .ph h1 .h-edit { font-size: inherit; font-weight: inherit; width: auto; min-width: 200px; }
 .pp-dash .milestone-add { display: flex; gap: 8px; margin-bottom: 12px; border-style: dashed; }
 .pp-dash .milestone-add input { flex: 1; border: 0; background: transparent; font: inherit; font-size: 14px; outline: none; }
+.pp-dash .work-tbl td { vertical-align: middle; }
+.pp-dash .wt-prog { display: inline-flex; align-items: center; gap: 8px; }
+.pp-dash .wt-prog .gauge { width: 110px; }
+.pp-dash .wt-prog b { font-variant-numeric: tabular-nums; min-width: 38px; }
