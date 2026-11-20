@@ -7,6 +7,7 @@ import { createMilestone, deleteMilestone, deleteWorkProject, renameMilestone, u
 import type { ActionResult } from "@/app/app/actions";
 import type { Client, WorkMilestone, WorkProject, WorkProjectPatch, WorkTask } from "@/lib/dash/types";
 import { ddayLabel, progress, risk } from "@/lib/dash/work";
+import { Check, Flag, Rocket } from "lucide-react";
 import { Gauge } from "./WorkProjects";
 import { TaskAdd, TaskRow, sortTasks, useFreshOnMount, useTaskEdits } from "./WorkTasks";
 
@@ -44,6 +45,7 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
             <select value={p.client_id ?? ""} onChange={(e) => save({ client_id: e.target.value || null })}><option value="">없음</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
           </label>
         </div>
+        <Roadmap steps={milestones.map((m) => ({ id: m.id, title: m.title, ...progress(edits.view.filter((t) => t.milestone_id === m.id)) }))} />
         <Gauge pct={pr.pct} risk={r} />
         <div className="wc-foot">
           <b>{pr.pct}%</b>
@@ -55,7 +57,7 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
         const list = edits.view.filter((t) => t.milestone_id === m.id).sort(sortTasks);
         const mp = progress(list);
         return (
-          <section key={m.id} className="card milestone">
+          <section key={m.id} id={`ms-${m.id}`} className="card milestone">
             <div className="ms-head">
               <span className={`ms-num ${mp.base > 0 && mp.pct === 100 ? "done" : ""}`}>{i + 1}</span>
               <input className="h-edit" defaultValue={m.title} aria-label="마일스톤 이름" onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== m.title) run(() => renameMilestone(m.id, v)); else e.target.value = m.title; }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} />
@@ -79,6 +81,34 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
         {loose.sort(sortTasks).map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} />)}
         <TaskAdd edits={edits} fixed={{ project_id: p.id, milestone_id: null, client_id: p.client_id }} placeholder="마일스톤에 넣지 않을 할 일" />
       </section>
+    </div>
+  );
+}
+
+/** 마일스톤 여정 그림: 출발점에서 마일스톤을 차례로 지나 마지막 깃발(목표)까지. 로켓은 지금 진행 중인 마일스톤 구간 안에서 완료 비율만큼 나아가 있다. */
+function Roadmap({ steps }: { steps: { id: string; title: string; done: number; base: number; pct: number }[] }) {
+  const n = steps.length;
+  if (n === 0) return <div className="hint" style={{ margin: "0 0 12px" }}>마일스톤을 추가하면 여기에 목표까지의 여정이 그려집니다.</div>;
+  const finished = (st: { base: number; pct: number }) => st.base > 0 && st.pct >= 100;
+  const cur = steps.findIndex((st) => !finished(st)); // 아직 안 끝난 첫 마일스톤
+  const pos = cur === -1 ? 100 : ((cur + steps[cur].pct / 100) / n) * 100;
+  return (
+    <div className="roadmap-wrap">
+      <div className="roadmap" style={{ minWidth: n * 96 }}>
+        <div className="rm-line"><i style={{ width: `${pos}%` }} /></div>
+        <span className="rm-start" title="출발" />
+        {steps.map((st, i) => {
+          const state = finished(st) ? "done" : i === cur ? "cur" : "todo";
+          return (
+            <a key={st.id} href={`#ms-${st.id}`} className={`rm-node ${state}`} style={{ left: `${((i + 1) / n) * 100}%` }} title={`${st.title} · ${st.done}/${st.base}`}>
+              <span className="rm-dot">{state === "done" ? <Check size={14} aria-hidden /> : i === n - 1 ? <Flag size={13} aria-hidden /> : i + 1}</span>
+              <span className="rm-label">{st.title}</span>
+              <small>{st.base > 0 ? `${st.done}/${st.base}` : "할 일 없음"}</small>
+            </a>
+          );
+        })}
+        <span className={`rm-rocket ${cur === -1 ? "arrived" : ""}`} style={{ left: `${pos}%` }} aria-hidden><Rocket size={19} /></span>
+      </div>
     </div>
   );
 }
