@@ -157,6 +157,7 @@ async function runSchedules() {
   const now = new Date(Date.now() + 9 * 3600 * 1000); const today = now.toISOString().slice(0, 10); const hm = now.toISOString().slice(11, 16); const dow = now.getUTCDay();
   for (const j of cfg.jobs ?? []) {
     if (j.days === "weekdays" && (dow === 0 || dow === 6)) continue;
+    if (Array.isArray(j.days) && !j.days.includes(["sun", "mon", "tue", "wed", "thu", "fri", "sat"][dow])) continue; // 요일 지정: ["mon"] 등
     const due = (j.times ?? []).filter((t) => hm >= t).pop(); if (!due) continue;
     const key = `${today} ${due}`; if (schedRuns.get(j.id) === key) continue;
     // 워커가 슬롯 뒤에 켜졌어도 하루 안이면 실행 (단 3시간 넘게 지났으면 건너뜀)
