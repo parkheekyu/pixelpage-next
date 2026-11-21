@@ -1014,3 +1014,20 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .atbl tr.flat td:first-child { padding-left: 10px; }
 .pp-dash[data-theme="dark"] .vd-bar i { background: #2a2f3b; }
 @media (max-width: 720px) { .pp-dash .vd { grid-template-columns: 1fr; } }
+
+/* ---------- 랜딩: 세 가지 질문 ---------- */
+.pp-dash .lqs { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; margin-bottom: 12px; }
+.pp-dash .lq { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.pp-dash .lq-q { font-size: 13px; font-weight: 600; color: var(--text-2); }
+.pp-dash .lq-main { display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.pp-dash .lq-main > span:first-child { font-size: 12.5px; color: var(--muted); }
+.pp-dash .lq-main b { font-size: 30px; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.pp-dash .lq-main .pill { font-size: 12px; align-self: center; }
+.pp-dash .lq-extra { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12.5px; color: var(--muted); }
+.pp-dash .lq-extra b { color: var(--text-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+.pp-dash .lq p { margin: 2px 0 0; font-size: 13.5px; line-height: 1.6; color: var(--text-2); }
+.pp-dash .lq.off { justify-content: center; border-style: dashed; background: transparent; }
+.pp-dash .lts { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 12px; }
+.pp-dash .atbl.compact td:first-child { min-width: 0; }
+.pp-dash .lts > .card { min-width: 0; grid-column: auto; }
+.pp-dash .atbl.compact { min-width: 0; width: 100%; }
