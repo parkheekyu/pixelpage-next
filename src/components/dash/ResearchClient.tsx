@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ChevronRight, Copy, Pencil, Save } from "lucide-react";
-import { perplexityPrompts, perplexityTopicPrompt } from "@/lib/dash/research-prompts";
+import { ChevronRight, Pencil, Save } from "lucide-react";
 import { runResearch, saveResearchInput } from "@/app/app/analysis-actions";
 import type { Analysis, Project, ResearchInput } from "@/lib/dash/types";
 import AnalysisPanel from "./AnalysisPanel";
@@ -21,24 +20,13 @@ const FIELDS: { key: keyof ResearchInput; label: string; short: string; ph: stri
 export default function ResearchClient({ project, analyses, market, isStaff }: { project: Project; analyses: Analysis[]; market: Analysis[]; isStaff: boolean }) {
   const [input, setInput] = useState<ResearchInput>(project.research_input ?? {});
   const [saved, setSaved] = useState<string | null>(null);
-  const [copied, setCopied] = useState<string | null>(null);
-  const [topic, setTopic] = useState("");
-  const [open, setOpen] = useState<string | null>(null);
-  const copy = (title: string, text: string) => {
-    const done = () => { setCopied(title); setTimeout(() => setCopied((c) => (c === title ? null : c)), 2000); };
-    if (navigator.clipboard?.writeText) navigator.clipboard.writeText(text).then(done, () => setOpen(title));
-    else setOpen(title);
-  };
   const [pending, start] = useTransition();
   const canRun = !!(input.product?.trim() && input.target?.trim());
   const [base, setBase] = useState<ResearchInput>(project.research_input ?? {});
-  const save = () => start(async () => { const r = await saveResearchInput(project.id, input); setSaved(r.ok ? "저장됨" : r.error); if (r.ok) setBase(input); });
 
   const filled = FIELDS.filter((f) => (input[f.key] ?? "").trim()).length;
-  const preLen = (input.pre_research ?? "").length;
   // 필수 정보가 비어 있을 때만 입력 칸을 처음부터 펼친다. 채워져 있으면 접어 두고 리포트를 먼저 보여 준다.
   const [showInfo, setShowInfo] = useState(!canRun);
-  const [showPre, setShowPre] = useState(false);
   // 저장된 정보는 읽기 전용 표로 보여 주고, 수정을 눌렀을 때만 입력 칸으로 바꾼다.
   const [editing, setEditing] = useState(!canRun);
   const saveInfo = () => start(async () => {
@@ -48,7 +36,6 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
   });
   // 취소는 고객사 정보 칸만 되돌린다. 붙여 넣은 사전 조사는 그대로 둔다.
   const cancel = () => { setInput({ ...base, pre_research: input.pre_research }); setEditing(false); setSaved(null); };
-  const prompts = [...(topic.trim() ? [{ title: "주제", prompt: perplexityTopicPrompt(project.name, input, topic.trim()) }] : []), ...perplexityPrompts(project.name, input)];
 
   return (
     <>
@@ -90,41 +77,6 @@ export default function ResearchClient({ project, analyses, market, isStaff }: {
                     );
                   })}
                 </dl>
-              </div>
-            )}
-          </section>
-
-          <section className={`card fold ${showPre ? "open" : ""}`}>
-            <button type="button" className="fold-head" onClick={() => setShowPre((v) => !v)} aria-expanded={showPre}>
-              <ChevronRight className="chev" aria-hidden />
-              <b>퍼플렉시티 사전 조사</b>
-              <span className={`pill ${preLen ? "tag-green" : "tag-gray"}`}>{preLen ? `${preLen.toLocaleString()}자 붙여 넣음` : "선택"}</span>
-              {!showPre && <span className="fold-sum">프롬프트를 복사해 퍼플렉시티에서 조사한 결과를 붙여 넣으면 1차 근거로 씁니다</span>}
-            </button>
-            {showPre && (
-              <div className="fold-body">
-                <div className="sub">① 프롬프트를 복사해 퍼플렉시티 Research 모드에 붙여 넣고 ② 나온 답(출처 포함)을 맨 아래 칸에 붙여 넣으세요. 비워 두면 AI가 직접 웹 검색합니다.{!canRun && " 상품/서비스와 타깃 고객을 먼저 채우면 프롬프트가 더 정확해집니다."}</div>
-                <div className="form-row" style={{ marginBottom: 8 }}>
-                  <input value={topic} placeholder="특정 주제로 물어보기 (예: 경쟁 강의 가격과 수강생 불만)" onChange={(e) => setTopic(e.target.value)} style={{ flex: "1 1 320px" }} />
-                  <a className="btn" href="https://www.perplexity.ai/" target="_blank" rel="noopener noreferrer">퍼플렉시티 열기</a>
-                </div>
-                <div className="rs-prompts">
-                  {prompts.map((q) => (
-                    <div key={q.title} className="rs-prompt">
-                      <div className="rs-prompt-row">
-                        <span>{q.title === "주제" ? `주제: ${topic.trim()}` : q.title}</span>
-                        <button type="button" className="btn ghost" onClick={() => setOpen(open === q.title ? null : q.title)}>{open === q.title ? "접기" : "내용 보기"}</button>
-                        <button type="button" className="btn" onClick={() => copy(q.title, q.prompt)}><Copy className="ico" aria-hidden /> {copied === q.title ? "복사됨" : "복사"}</button>
-                      </div>
-                      {open === q.title && <textarea readOnly value={q.prompt} rows={8} onFocus={(e) => e.currentTarget.select()} style={{ marginTop: 6, fontSize: 12 }} />}
-                    </div>
-                  ))}
-                </div>
-                <textarea value={input.pre_research ?? ""} placeholder="퍼플렉시티 답변을 그대로 붙여 넣으세요 (여러 개를 이어서 붙여도 됩니다). 출처 링크가 함께 있으면 보고서에 출처로 표시됩니다." onChange={(e) => setInput({ ...input, pre_research: e.target.value })} rows={6} />
-                <div className="form-row" style={{ marginTop: 8 }}>
-                  <button type="button" className="btn" onClick={save} disabled={pending}><Save className="ico" aria-hidden /> 저장</button>
-                  <span className="hint" style={{ marginTop: 0 }}>{preLen.toLocaleString()}자 · 리서치 실행 시에도 자동 저장됩니다{saved ? ` · ${saved}` : ""}</span>
-                </div>
               </div>
             )}
           </section>
