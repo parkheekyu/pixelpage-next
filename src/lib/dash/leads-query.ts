@@ -5,6 +5,7 @@ import type { LeadPage, LeadQuery, LeadSummary } from "./leads-types";
 export type { LeadPage, LeadQuery, LeadSummary, SheetSort, SheetView } from "./leads-types";
 export { defaultQuery } from "./leads-types";
 import { isDate, MIN_DATE, todayKST } from "./dates";
+import { sheetLeads } from "./sheet-leads";
 
 type DashClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -20,6 +21,24 @@ export async function queryLeads(supabase: DashClient, projectId: string, p: Lea
   const until = new Date(to + "T23:59:59.999+09:00").toISOString();
   const limit = Math.min(Math.max(p.limit, 1), 5000);
   const offset = Math.max(p.offset, 0);
+
+  // 시트를 연결한 프로젝트는 시트에서 읽어 같은 모양으로 돌려준다 (중복 판정은 없다)
+  const sl = await sheetLeads(projectId);
+  if (sl) {
+    const inRange = sl.filter((l) => l.submitted_at >= since && l.submitted_at <= until);
+    const term = p.q.trim().toLowerCase();
+    let rows = inRange.filter((l) => p.view !== "dup"
+      && (p.view !== "todo" || l.status === "신규" || l.status === "연락중") && (p.view !== "conv" || l.status === "전환") && (p.view !== "need" || (l.status === "전환" && !l.revenue)) && (p.view !== "drop" || l.status === "드랍")
+      && (!p.status || l.status === p.status) && (!p.src || l.utm_source === p.src)
+      && (!term || [l.name, l.phone, l.email].some((v) => (v ?? "").toLowerCase().includes(term))));
+    rows = rows.sort((a, b) => p.sort === "ts_asc" ? a.submitted_at.localeCompare(b.submitted_at) : p.sort === "rev_desc" ? b.revenue - a.revenue || b.submitted_at.localeCompare(a.submitted_at) : p.sort === "status" ? a.status.localeCompare(b.status) || b.submitted_at.localeCompare(a.submitted_at) : b.submitted_at.localeCompare(a.submitted_at));
+    const n = (f: (l: Lead) => boolean) => inRange.filter(f).length;
+    return {
+      rows: rows.slice(offset, offset + limit), total: rows.length,
+      summary: { all: inRange.length, todo: n((l) => l.status === "신규" || l.status === "연락중"), conv: n((l) => l.status === "전환"), need: n((l) => l.status === "전환" && !l.revenue), drop: n((l) => l.status === "드랍"), dup: 0, revenue: inRange.reduce((a, l) => a + (l.status === "전환" ? l.revenue : 0), 0) },
+      sources: [...new Set(inRange.map((l) => l.utm_source))].sort(),
+    };
+  }
 
   let q = supabase.from("leads").select(LEAD_COLS, { count: "exact" }).eq("project_id", projectId).gte("submitted_at", since).lte("submitted_at", until);
   q = p.view === "dup" ? q.eq("is_duplicate", true) : q.eq("is_duplicate", false);

@@ -1,15 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
-import { runAllLeadSync } from "@/lib/dash/leadsync-run";
+import { NextResponse } from "next/server";
 
-export const dynamic = "force-dynamic";
-export const maxDuration = 300;
-
-/** 시트·에어테이블 양방향 동기화 (워커가 2분마다 호출). Authorization: Bearer LEAD_WEBHOOK_SECRET */
-export async function POST(req: NextRequest) {
-  const secret = process.env.LEAD_WEBHOOK_SECRET;
-  if (!secret || (req.headers.get("authorization") ?? "") !== `Bearer ${secret}`) return NextResponse.json({ ok: false, error: "unauthorized" }, { status: 401 });
-  const t0 = Date.now();
-  const results = await runAllLeadSync(createAdminClient());
-  return NextResponse.json({ ok: true, ms: Date.now() - t0, results });
-}
+/** 예전의 시트·에어테이블 양방향 동기화 주소. 리드는 이제 구글 시트가 원본이고 대시보드는 읽기만 하므로 아무 일도 하지 않는다. (예전 워커가 호출해도 오류가 나지 않게 남겨 둔다) */
+export function POST() { return NextResponse.json({ ok: true, results: [], note: "lead sync retired" }); }

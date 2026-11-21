@@ -964,3 +964,20 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .atbl tr.lv2 td:first-child .noimg { display: inline-grid; }
 .pp-dash .atbl tr:last-child td { border-bottom: 0; }
 .pp-dash .atbl .empty { color: var(--muted); text-align: center; padding: 28px; }
+
+/* ---------- 리드 = 구글 시트 보기 (읽기 전용) ---------- */
+.pp-dash .sl-search { display: inline-flex; align-items: center; gap: 6px; padding: 0 10px; height: 34px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--muted); min-width: 220px; }
+.pp-dash .sl-search input { all: unset; flex: 1; font-size: 13.5px; color: var(--text); min-width: 0; }
+.pp-dash .sl-count { font-size: 14px !important; font-variant-numeric: tabular-nums; }
+.pp-dash .sl-card { padding: 0; overflow: hidden; }
+.pp-dash .sl-scroll { overflow: auto; max-height: calc(100vh - 230px); }
+.pp-dash .sl-table { font-size: 13.5px; }
+.pp-dash .sl-table th { position: sticky; top: 0; z-index: 1; background: var(--card); box-shadow: 0 1px 0 var(--line); }
+.pp-dash .sl-table td { height: 36px; color: var(--text); }
+.pp-dash .sl-table .sl-no { width: 44px; text-align: right; padding: 0 8px; color: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.pp-dash .sl-cell { display: block; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-dash .sl-empty { padding: 48px 16px; text-align: center; color: var(--muted); font-size: 14px; }
+.pp-dash .sl-more { all: unset; box-sizing: border-box; display: block; width: 100%; text-align: center; padding: 11px; font-size: 13.5px; color: var(--text-2); cursor: pointer; border-top: 1px solid var(--line); }
+.pp-dash .sl-more:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
+.pp-dash .tabs button { all: unset; cursor: pointer; padding: 6px 14px; color: var(--text-2); font-size: 13.5px; }
+.pp-dash .tabs button.on { background: var(--s1); color: #fff; }

@@ -28,6 +28,8 @@ export interface Project {
   slug: string;
   name: string;
   is_own: boolean;
+  /** 리드 구글 시트가 연결돼 있다 (리드 탭은 시트를 읽어서 보여 준다) */
+  has_lead_sheet?: boolean;
   active: boolean;
   created_at: string;
   custom_fields: CustomField[];

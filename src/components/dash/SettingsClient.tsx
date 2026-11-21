@@ -2,8 +2,8 @@
 
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, ChevronUp, Copy, Download, RefreshCw, Save, Upload, Webhook, MessageSquare } from "lucide-react";
-import { regenerateWebhookToken, saveIntegrations, saveProjectBasic, syncLeads } from "@/app/app/analysis-actions";
+import { Check, ChevronDown, ChevronUp, Copy, RefreshCw, Save, Webhook, MessageSquare } from "lucide-react";
+import { regenerateWebhookToken, saveIntegrations, saveProjectBasic } from "@/app/app/analysis-actions";
 import type { ActionResult } from "@/app/app/actions";
 import type { Project, ProjectIntegrations } from "@/lib/dash/types";
 import { BRAND } from "./brand-icons";
@@ -92,7 +92,7 @@ export default function SettingsClient({ project, integ, env }: Props) {
           {renderMsg("clarity")}
         </Card>
 
-        <Card logo={<span className="integ-mark"><Webhook className="ico" aria-hidden /></span>} title="웹훅" desc="Make · n8n · 폼 빌더 → 리드 시트" state="on" stateText="항상 사용 가능" open={open === "webhook"} onToggle={() => toggle("webhook")}>
+        <Card logo={<span className="integ-mark"><Webhook className="ico" aria-hidden /></span>} title="웹훅" desc="Make · n8n · 폼 빌더 → 연결한 구글 시트에 한 줄 추가" state={integ?.google_sheet_id ? "on" : "off"} open={open === "webhook"} onToggle={() => toggle("webhook")}>
           <div className="form-row">
             <label className="f" style={{ flex: 1 }}>URL<input type="text" readOnly value={webhookUrl} /></label>
             <label className="f" style={{ flex: 1 }}>이 프로젝트 토큰<input type="text" readOnly value={token} /></label>
@@ -113,42 +113,16 @@ export default function SettingsClient({ project, integ, env }: Props) {
           {renderMsg("slack")}
         </Card>
 
-        <Card logo={<Brand id="sheets" />} title="Google Sheets" desc="리드 내보내기 · 가져오기" state={!env.google ? "need" : integ?.google_sheet_id ? "on" : "off"} open={open === "sheets"} onToggle={() => toggle("sheets")}>
+        <Card logo={<Brand id="sheets" />} title="Google Sheets" desc="리드 원본 시트 (읽기 전용으로 보여 줌)" state={!env.google ? "need" : integ?.google_sheet_id ? "on" : "off"} open={open === "sheets"} onToggle={() => toggle("sheets")}>
           <div className="form-row">
             <label className="f" style={{ flex: 1, minWidth: 260 }}>시트 주소 또는 ID<input type="text" value={f.google_sheet_id} onChange={(e) => setF({ ...f, google_sheet_id: e.target.value })} placeholder="https://docs.google.com/spreadsheets/d/…" /></label>
             <label className="f">탭 이름<input type="text" value={f.google_sheet_tab} onChange={(e) => setF({ ...f, google_sheet_tab: e.target.value })} placeholder="리드" /></label>
             {saveBtn("sheets")}
           </div>
-          <div className="form-row" style={{ marginTop: 6, gap: 16 }}>
-            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><input type="checkbox" checked={f.sync_pull} onChange={(e) => setF({ ...f, sync_pull: e.target.checked })} /> 시트 → 대시보드 자동 가져오기 (5분마다)</label>
-            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><input type="checkbox" checked={f.lead_sync_enabled} onChange={(e) => setF({ ...f, lead_sync_enabled: e.target.checked })} /> 새 리드 들어오면 시트에 추가</label>
-            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6 }}><input type="checkbox" checked={f.sync_push} onChange={(e) => setF({ ...f, sync_push: e.target.checked })} /> 대시보드 수정(상태·매출 등)을 시트에 반영</label>
-          </div>
-          <div className="hint">{env.google ? <>시트를 <code>{env.googleEmail}</code> 에게 편집자로 공유하세요. 첫 행 열 이름은 자동 생성됩니다.</> : "서버에 구글 서비스 계정 키가 필요합니다."}</div>
-          <div className="form-row" style={{ marginTop: 8 }}>
-            <button type="button" className="btn" disabled={pending || !integ?.google_sheet_id} onClick={() => start(async () => note("sheets", await syncLeads(project.id, "sheets", "push")))}><Upload className="ico" aria-hidden /> 전체 내보내기</button>
-            <button type="button" className="btn" disabled={pending || !integ?.google_sheet_id} onClick={() => start(async () => note("sheets", await syncLeads(project.id, "sheets", "pull")))}><Download className="ico" aria-hidden /> 가져오기</button>
-          </div>
+          <div className="hint">{env.google ? <>리드는 이 시트가 원본입니다. 대시보드는 시트를 읽어서 리드 탭에 보여 주기만 하고, 수정은 시트에서 합니다. 시트를 <code>{env.googleEmail}</code> 에게 공유해 주세요(보기 권한이면 됩니다). 첫 행은 열 이름이어야 하고, 날짜·상태·매출 열이 있으면 전체 개요 집계에 반영됩니다.</> : "서버에 구글 서비스 계정 키가 필요합니다."}</div>
           {renderMsg("sheets")}
         </Card>
-
-        <Card logo={<Brand id="airtable" />} title="Airtable" desc="리드 내보내기 · 가져오기" state={integ?.airtable_base_id && integ?.airtable_token ? "on" : "off"} open={open === "airtable"} onToggle={() => toggle("airtable")}>
-          <div className="form-row">
-            <label className="f">개인 토큰 {integ?.airtable_token ? "(저장됨)" : ""}<input type="password" value={f.airtable_token} onChange={(e) => setF({ ...f, airtable_token: e.target.value })} autoComplete="off" placeholder="pat…" /></label>
-            <label className="f">베이스 ID 또는 주소<input type="text" value={f.airtable_base_id} onChange={(e) => setF({ ...f, airtable_base_id: e.target.value })} placeholder="appXXXXXXXXXXXXXX" /></label>
-            <label className="f">테이블 이름<input type="text" value={f.airtable_table} onChange={(e) => setF({ ...f, airtable_table: e.target.value })} placeholder="리드" /></label>
-            <label className="f" style={{ flexDirection: "row", alignItems: "center", gap: 6, alignSelf: "flex-end", paddingBottom: 8 }}><input type="checkbox" checked={f.lead_sync_enabled} onChange={(e) => setF({ ...f, lead_sync_enabled: e.target.checked })} /> 새 리드 자동 내보내기</label>
-            {saveBtn("airtable")}
-          </div>
-          <div className="hint">토큰 권한 data.records:read/write. 테이블에 같은 이름의 열(리드ID, 등록일시, 이름, 연락처, 이메일, 문의내용, 유입매체, 상태, 매출액, 메모 등)이 있어야 값이 들어갑니다.</div>
-          <div className="form-row" style={{ marginTop: 8 }}>
-            <button type="button" className="btn" disabled={pending || !integ?.airtable_base_id} onClick={() => start(async () => note("airtable", await syncLeads(project.id, "airtable", "push")))}><Upload className="ico" aria-hidden /> 전체 내보내기</button>
-            <button type="button" className="btn" disabled={pending || !integ?.airtable_base_id} onClick={() => start(async () => note("airtable", await syncLeads(project.id, "airtable", "pull")))}><Download className="ico" aria-hidden /> 가져오기</button>
-          </div>
-          {renderMsg("airtable")}
-        </Card>
       </div>
-      <div className="hint" style={{ marginTop: 10 }}>가져오기는 우리 DB에 없는 연락처만 새 리드로 추가합니다. 시트와 에어테이블 사이 이동은 가져오기 뒤 내보내기 순서로 하면 됩니다.</div>
     </>
   );
 }

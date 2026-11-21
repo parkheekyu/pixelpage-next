@@ -14,7 +14,6 @@ import { ga4Summary } from "@/lib/integrations/ga4";
 import { claritySummary } from "@/lib/integrations/clarity";
 import { hasPerplexity, preResearch } from "@/lib/integrations/perplexity";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { runLeadSync } from "@/lib/dash/leadsync-run";
 import { randomBytes } from "node:crypto";
 
 const PATHS: Record<AnalysisKind, string> = { research: "/app/research", market: "/app/research", ads: "/app/ads", landing: "/app/landing" };
@@ -40,8 +39,9 @@ export async function saveIntegrations(projectId: string, input: { meta_ad_accou
   if (input.slack_channel_id !== undefined) row.slack_channel_id = clean(input.slack_channel_id);
   const { error } = await s.supabase.from("project_integrations").upsert(row, { onConflict: "project_id" });
   if (error) return { ok: false, error: error.message };
+  if (input.google_sheet_id !== undefined) await s.supabase.from("projects").update({ has_lead_sheet: !!row.google_sheet_id }).eq("id", projectId); // 리드 탭 표시 기준
   for (const p of Object.values(PATHS)) revalidatePath(`${p}/${projectId}`);
-  revalidatePath(`/app/settings/${projectId}`);
+  revalidatePath("/app", "layout");
   return { ok: true, message: "저장했습니다." };
 }
 
@@ -199,14 +199,6 @@ export async function regenerateWebhookToken(projectId: string): Promise<ActionR
   if (error) return { ok: false, error: error.message };
   revalidatePath(`/app/settings/${projectId}`);
   return { ok: true, token, message: "새 토큰을 발급했습니다. 이전 토큰은 더 이상 쓸 수 없습니다." };
-}
-
-// ---------- 리드 동기화 (직원): 내보내기(push) / 가져오기(pull) ----------
-export async function syncLeads(projectId: string, target: "sheets" | "airtable", direction: "push" | "pull"): Promise<ActionResult> {
-  await requireStaff();
-  const r = await runLeadSync(createAdminClient(), projectId, target, direction);
-  revalidatePath(`/app/projects/${projectId}`);
-  return r.ok ? { ok: true, message: r.message } : { ok: false, error: r.error ?? "동기화 실패" };
 }
 
 /** 이력에서 리포트 클릭 시 본문 조회 (RLS: 직원 또는 배정 고객사) */

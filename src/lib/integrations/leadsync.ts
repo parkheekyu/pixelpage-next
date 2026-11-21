@@ -40,7 +40,7 @@ export function matchHeader(h: string): string | null {
   for (const [std, list] of Object.entries(ALIASES)) if (list.some((a) => normKey(a) === n)) return std;
   return null;
 }
-function parseDate(v: string): string | undefined {
+export function parseDate(v: string): string | undefined {
   const t = v.trim(); if (!t) return undefined;
   let m = t.match(/(\d{4})[.\-/년]\s*(\d{1,2})[.\-/월]\s*(\d{1,2})[일]?(?:[\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
   // 두 자리 연도 (26.08.13 18:34, 26-8-5)
@@ -146,6 +146,12 @@ export async function sheetsReadAll(sheetId: string, tab: string): Promise<Exter
   const [header, ...rows] = j.values ?? [];
   if (!header) return [];
   return rows.map((r, i) => ({ external_id: String(i + 2), values: Object.fromEntries(header.map((h, k) => [h, r[k] ?? ""])) }));
+}
+/** 시트를 있는 그대로 (머리글 + 행). 읽기 전용 리드 화면용 */
+export async function sheetsReadGrid(sheetId: string, tab: string): Promise<{ header: string[]; rows: string[][] }> {
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A:AZ"))}`)) as { values?: string[][] };
+  const [header, ...rows] = j.values ?? [];
+  return { header: (header ?? []).map((h) => String(h ?? "")), rows: rows.map((r) => r.map((c) => String(c ?? ""))) };
 }
 
 // ---------- Airtable ----------

@@ -21,7 +21,7 @@ export default function ProjectNav({ project, isStaff, unread, right }: { projec
     <header className="ph pnav">
       <div className="pnav-title"><h1>{project.name}{project.is_own && <small>자사</small>}</h1></div>
       <nav className="ptabs">
-        {TABS.filter((t) => (!t.staffOnly || isStaff) && (t.key !== "leads" || project.is_own)).map((t) => {
+        {TABS.filter((t) => (!t.staffOnly || isStaff) && (t.key !== "leads" || project.is_own || project.has_lead_sheet)).map((t) => {
           const href = `${t.base}/${project.id}`;
           const on = pathname === href || pathname.startsWith(href + "/");
           const n = t.key === "settings" || t.key === "presets" || on ? 0 : (unread[t.key] ?? 0);

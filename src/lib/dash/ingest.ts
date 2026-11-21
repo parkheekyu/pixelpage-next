@@ -1,7 +1,9 @@
 import "server-only";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { Lead } from "./types";
-import { airtableCreate, sheetsAppend } from "@/lib/integrations/leadsync";
+import { randomUUID } from "node:crypto";
+import { sheetsAppend } from "@/lib/integrations/leadsync";
+import { sheetConfig } from "./sheet-leads";
 
 /** 웹훅·홈페이지 문의 공용 리드 적재. 연락처(숫자만) 기준 중복은 버리지 않고 표시. */
 export interface IngestInput {
@@ -31,8 +33,24 @@ export async function ingestLead(input: IngestInput): Promise<IngestResult> {
     ? await admin.from("projects").select("id,slug").eq("id", input.project_id).maybeSingle()
     : await admin.from("projects").select("id,slug").eq("slug", client).maybeSingle();
   if (!project) return { ok: false, status: 404, error: `unknown client: ${client || input.project_id}` };
-  // 픽셀페이지 자체 리드만 DB에 쌓는다 (고객사 리드 수집 중단)
-  if (project.slug !== "pixelpage") return { ok: false, status: 403, error: "이 프로젝트는 리드 수집이 중단되었습니다." };
+  // 리드는 구글 시트에만 쌓는다. 시트를 연결한 프로젝트는 시트 끝에 한 줄을 추가하고 DB 에는 넣지 않는다.
+  const sheet = await sheetConfig(project.id);
+  if (sheet) {
+    const now = new Date().toISOString();
+    const sub = str(input.submitted_at);
+    const lead = {
+      id: randomUUID(), project_id: project.id, submitted_at: sub && !Number.isNaN(Date.parse(sub)) ? new Date(sub).toISOString() : now,
+      name: str(input.name).slice(0, 100) || null, phone: phone.slice(0, 40), phone_norm: phoneNorm, email: str(input.email).slice(0, 200) || null, message: str(input.message).slice(0, 4000) || null,
+      company: str(input.company).slice(0, 120) || null, industry: str(input.industry).slice(0, 80) || null, budget: str(input.budget).slice(0, 80) || null, services: null, marketing_status: null,
+      utm_source: (str(input.utm_source) || "unknown").toLowerCase().slice(0, 60), utm_medium: null, utm_campaign: str(input.utm_campaign).slice(0, 120) || null, utm_content: str(input.utm_content).slice(0, 120) || null, utm_term: null,
+      landing_id: str(input.landing_id).slice(0, 80) || null, landing_url: null, status: "신규", drop_reason: null, assignee: null, first_contact_at: null, consulted_at: null, converted_on: null,
+      revenue: 0, pay_type: null, memo: null, custom: {}, manual_order: null, is_duplicate: false, original_lead_id: null, created_at: now, updated_at: now,
+    } as Lead;
+    try { await sheetsAppend(sheet.sheetId, sheet.tab, [lead]); } catch (e) { return { ok: false, status: 502, error: (e as Error).message }; }
+    return { ok: true, id: lead.id, duplicate: false, original_lead_id: null };
+  }
+  // 시트를 아직 연결하지 않은 자사 프로젝트만 예전처럼 DB 에 받는다 (홈페이지 문의가 사라지지 않도록). 고객사는 시트 연결이 먼저다.
+  if (project.slug !== "pixelpage") return { ok: false, status: 409, error: "리드 시트가 연결되지 않았습니다. 설정에서 Google Sheets 를 먼저 연결해 주세요." };
 
   const { data: original } = await admin
     .from("leads").select("id").eq("project_id", project.id).eq("phone_norm", phoneNorm)
@@ -70,19 +88,5 @@ export async function ingestLead(input: IngestInput): Promise<IngestResult> {
   };
   const { data, error } = await admin.from("leads").insert(row).select("*").single();
   if (error) return { ok: false, status: 500, error: error.message };
-  // 리드 연동이 켜져 있으면 구글 시트/에어테이블로 즉시 푸시 (실패해도 적재는 성공)
-  void pushLeadToIntegrations(project.id, data as Lead).catch(() => {});
   return { ok: true, id: data.id, duplicate: !!original, original_lead_id: original?.id ?? null };
-}
-
-/** 새 리드 1건을 연동 대상에 푸시하고 lead_sync 에 기록 */
-export async function pushLeadToIntegrations(projectId: string, lead: Lead) {
-  const admin = createAdminClient();
-  const { data: integ } = await admin.from("project_integrations").select("lead_sync_enabled,google_sheet_id,google_sheet_tab,airtable_base_id,airtable_table,airtable_token").eq("project_id", projectId).maybeSingle();
-  if (!integ?.lead_sync_enabled) return;
-  if (lead.utm_medium === "import") return; // 시트/에어테이블에서 가져온 리드를 다시 그쪽으로 보내면 무한 복제된다
-  const jobs: Promise<unknown>[] = [];
-  if (integ.google_sheet_id) jobs.push(sheetsAppend(integ.google_sheet_id, integ.google_sheet_tab || "리드", [lead]).then((r) => admin.from("lead_sync").upsert({ lead_id: lead.id, target: "sheets", external_id: r.startRow ? String(r.startRow) : null })));
-  if (integ.airtable_token && integ.airtable_base_id && integ.airtable_table) jobs.push(airtableCreate(integ.airtable_token, integ.airtable_base_id, integ.airtable_table, [lead]).then((r) => admin.from("lead_sync").upsert({ lead_id: lead.id, target: "airtable", external_id: r.ids[lead.id] ?? null })));
-  await Promise.allSettled(jobs);
 }
