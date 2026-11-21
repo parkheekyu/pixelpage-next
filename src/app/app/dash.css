@@ -981,3 +981,36 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .sl-more:hover { background: color-mix(in srgb, var(--text) 3%, transparent); }
 .pp-dash .tabs button { all: unset; cursor: pointer; padding: 6px 14px; color: var(--text-2); font-size: 13.5px; }
 .pp-dash .tabs button.on { background: var(--s1); color: #fff; }
+
+/* ---------- 광고: 퍼널, 영상 소재 ---------- */
+.pp-dash .card-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+.pp-dash .fn { display: flex; align-items: stretch; gap: 0; margin-top: 4px; }
+.pp-dash .fn-step { flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 3px; padding: 16px 18px; border-radius: 10px; background: color-mix(in srgb, var(--s1) 7%, var(--card)); }
+.pp-dash .fn-step.s1 { margin-block: 7px; background: color-mix(in srgb, var(--s1) 12%, var(--card)); }
+.pp-dash .fn-step.s2 { margin-block: 14px; background: color-mix(in srgb, var(--s1) 18%, var(--card)); }
+.pp-dash .fn-step.s3 { margin-block: 21px; }
+.pp-dash .fn-step.last { background: var(--s1); color: #fff; }
+.pp-dash .fn-step span { font-size: 12.5px; color: var(--text-2); }
+.pp-dash .fn-step b { font-size: clamp(18px, 1.8vw, 24px); font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.pp-dash .fn-step small { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.pp-dash .fn-step.last span, .pp-dash .fn-step.last small { color: rgba(255,255,255,.82); }
+.pp-dash .fn-arrow { flex: none; width: 74px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: var(--muted); }
+.pp-dash .fn-arrow b { font-size: 13.5px; color: var(--text); font-variant-numeric: tabular-nums; }
+.pp-dash .fn-arrow svg { width: 16px; height: 16px; }
+.pp-dash .fn-foot { margin-top: 12px; font-size: 13px; color: var(--text-2); }
+.pp-dash .fn-foot b { color: var(--text); }
+@media (max-width: 720px) { .pp-dash .fn { flex-direction: column; } .pp-dash .fn-step { margin: 0 !important; } .pp-dash .fn-arrow { width: auto; flex-direction: row; gap: 6px; padding: 5px 0; } .pp-dash .fn-arrow svg { transform: rotate(90deg); } }
+.pp-dash .vd { display: grid; grid-template-columns: minmax(220px, 300px) 1fr; gap: 22px; align-items: center; margin: 4px 0 16px; }
+.pp-dash .vd-kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.pp-dash .vd-kpis div { display: flex; flex-direction: column; gap: 3px; }
+.pp-dash .vd-kpis span { font-size: 12.5px; color: var(--muted); }
+.pp-dash .vd-kpis b { font-size: 21px; font-weight: 700; letter-spacing: -.02em; font-variant-numeric: tabular-nums; }
+.pp-dash .vd-curve { display: grid; gap: 5px; }
+.pp-dash .vd-bar { display: grid; grid-template-columns: 38px 1fr 46px; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-2); }
+.pp-dash .vd-bar i { height: 10px; border-radius: 99px; background: var(--grid); overflow: hidden; }
+.pp-dash .vd-bar em { display: block; height: 100%; border-radius: 99px; background: var(--s1); }
+.pp-dash .vd-bar b { text-align: right; font-weight: 600; color: var(--text); font-variant-numeric: tabular-nums; }
+.pp-dash .vd-curve small { color: var(--muted); font-size: 11.5px; margin-left: 46px; }
+.pp-dash .atbl tr.flat td:first-child { padding-left: 10px; }
+.pp-dash[data-theme="dark"] .vd-bar i { background: #2a2f3b; }
+@media (max-width: 720px) { .pp-dash .vd { grid-template-columns: 1fr; } }

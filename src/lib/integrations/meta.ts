@@ -8,7 +8,9 @@ export interface MetaAction { action_type: string; value: string }
 export interface MetaInsight {
   spend: number; impressions: number; reach: number; frequency: number; clicks: number; ctr: number; cpc: number; cpm: number;
   link_clicks: number; landing_page_views: number; leads: number; purchases: number; purchase_value: number; cpl: number | null; cpa: number | null; roas: number | null;
-  video_p25: number; video_p50: number; video_p75: number; video_p100: number; thruplays: number; hook_rate: number | null; hold_rate: number | null;
+  video_p25: number; video_p50: number; video_p75: number; video_p100: number; thruplays: number;
+  /** 3초 이상 재생 수. 훅 비율 = 3초 재생 ÷ 노출, 지속률 = 끝까지(또는 15초) 본 수 ÷ 3초 재생 */
+  video_3s?: number; hook_rate: number | null; hold_rate: number | null;
 }
 export interface MetaCreative {
   id: string; name?: string; title?: string; body?: string; call_to_action?: string; link?: string;
@@ -74,21 +76,24 @@ function toInsight(r: RawInsight | undefined): MetaInsight | null {
   const spend = n(r.spend), imps = n(r.impressions);
   const plays = act(r.video_play_actions, "video_view"), p25 = act(r.video_p25_watched_actions, "video_view"), p100 = act(r.video_p100_watched_actions, "video_view");
   const thru = act(r.video_thruplay_watched_actions, "video_view");
+  const v3 = act(r.actions, "video_view"); // 3초 이상 재생
   const purchases = act(r.actions, "purchase", "offsite_conversion.fb_pixel_purchase", "omni_purchase");
   const purchase_value = act(r.action_values, "purchase", "offsite_conversion.fb_pixel_purchase", "omni_purchase");
   return {
     spend, impressions: imps, reach: n(r.reach), frequency: n(r.frequency), clicks: n(r.clicks), ctr: n(r.ctr), cpc: n(r.cpc), cpm: n(r.cpm),
     link_clicks: n(r.inline_link_clicks), landing_page_views: act(r.actions, "landing_page_view"), leads, purchases, purchase_value,
     cpl: leads > 0 ? spend / leads : null, cpa: purchases > 0 ? spend / purchases : null, roas: spend > 0 && purchase_value > 0 ? purchase_value / spend : null,
-    video_p25: p25, video_p50: act(r.video_p50_watched_actions, "video_view"), video_p75: act(r.video_p75_watched_actions, "video_view"), video_p100: p100, thruplays: thru,
-    hook_rate: imps > 0 && plays > 0 ? thru / imps : null, hold_rate: p25 > 0 ? p100 / p25 : null,
+    video_p25: p25, video_p50: act(r.video_p50_watched_actions, "video_view"), video_p75: act(r.video_p75_watched_actions, "video_view"), video_p100: p100, thruplays: thru, video_3s: v3,
+    hook_rate: imps > 0 && (v3 > 0 || plays > 0) ? v3 / imps : null, hold_rate: v3 > 0 ? thru / v3 : null,
   };
 }
 function sum(list: (MetaInsight | null)[]): MetaInsight {
   const t: MetaInsight = { spend: 0, impressions: 0, reach: 0, frequency: 0, clicks: 0, ctr: 0, cpc: 0, cpm: 0, link_clicks: 0, landing_page_views: 0, leads: 0, purchases: 0, purchase_value: 0, cpl: null, cpa: null, roas: null, video_p25: 0, video_p50: 0, video_p75: 0, video_p100: 0, thruplays: 0, hook_rate: null, hold_rate: null };
   for (const i of list) if (i) for (const k of ["spend", "impressions", "reach", "clicks", "link_clicks", "landing_page_views", "leads", "purchases", "purchase_value", "video_p25", "video_p50", "video_p75", "video_p100", "thruplays"] as const) t[k] += i[k];
+  t.video_3s = list.reduce((a, i) => a + (i?.video_3s ?? 0), 0);
+  t.hook_rate = t.impressions && t.video_3s ? t.video_3s / t.impressions : null; t.hold_rate = t.video_3s ? t.thruplays / t.video_3s : null;
   t.ctr = t.impressions ? (t.clicks / t.impressions) * 100 : 0; t.cpc = t.clicks ? t.spend / t.clicks : 0; t.cpm = t.impressions ? (t.spend / t.impressions) * 1000 : 0;
-  t.frequency = t.reach ? t.impressions / t.reach : 0; t.cpl = t.leads ? t.spend / t.leads : null; t.cpa = t.purchases ? t.spend / t.purchases : null; t.roas = t.spend && t.purchase_value ? t.purchase_value / t.spend : null; t.hook_rate = t.impressions && t.thruplays ? t.thruplays / t.impressions : null; t.hold_rate = t.video_p25 ? t.video_p100 / t.video_p25 : null;
+  t.frequency = t.reach ? t.impressions / t.reach : 0; t.cpl = t.leads ? t.spend / t.leads : null; t.cpa = t.purchases ? t.spend / t.purchases : null; t.roas = t.spend && t.purchase_value ? t.purchase_value / t.spend : null; 
   return t;
 }
 
