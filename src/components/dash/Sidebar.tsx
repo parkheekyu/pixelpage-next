@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Building2, Clapperboard, Handshake, LayoutDashboard, ListChecks, Users } from "lucide-react";
+import { Building2, Clapperboard, Handshake, LayoutDashboard, ListChecks, Users, Wallet, type LucideIcon } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import { useEffect, useRef, useState } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -12,6 +12,23 @@ import type { UnreadMap } from "@/lib/dash/auth";
 
 type SeenKindKey = "leads" | "research" | "ads" | "landing";
 const SECTIONS = ["projects", "research", "ads", "landing", "settings"] as const;
+/** 관리 메뉴. 순서는 끌어서 바꿀 수 있고, 여기 순서가 기본값이다. */
+const ADMIN: { key: string; href: string; label: string; Icon: LucideIcon; exact?: boolean }[] = [
+  { key: "overview", href: "/app/admin", label: "전체 개요", Icon: LayoutDashboard, exact: true },
+  { key: "clients", href: "/app/admin/clients", label: "클라이언트", Icon: Handshake },
+  { key: "work", href: "/app/admin/work", label: "업무 관리", Icon: ListChecks },
+  { key: "finance", href: "/app/admin/finance", label: "수입·지출", Icon: Wallet },
+  { key: "users", href: "/app/admin/users", label: "회원 · 권한", Icon: Users },
+];
+const ORDER_KEY = "pp-side-order";
+type Order = Record<string, string[]>;
+/** 저장된 순서대로 늘어놓는다. 저장된 뒤에 새로 생긴 항목은 원래 자리(앞 항목 바로 뒤)에 끼운다. */
+function sorted<T>(items: T[], keyOf: (t: T) => string, saved?: string[]): T[] {
+  if (!saved?.length) return items;
+  const out = saved.map((k) => items.find((i) => keyOf(i) === k)).filter((i): i is T => !!i);
+  items.forEach((it, idx) => { if (out.includes(it)) return; const prev = idx > 0 ? out.indexOf(items[idx - 1]) : -1; out.splice(prev + 1, 0, it); });
+  return out;
+}
 
 /** 왼쪽: 고객사 목록. 고객사를 고르면 위쪽 탭(리드·리서치·광고·랜딩·설정)으로 이동. 안 본 항목은 빨간 배지. */
 export default function Sidebar({ profile, projects, unread, logos = {}, categories = {} }: { profile: Profile; projects: Project[]; unread: UnreadMap; logos?: Record<string, string>; categories?: Record<string, "db" | "sales"> }) {
@@ -29,6 +46,38 @@ export default function Sidebar({ profile, projects, unread, logos = {}, categor
   useEffect(() => { try { if (localStorage.getItem("pp-side-collapsed") === "1") { ref.current?.classList.add("collapsed"); ref.current?.parentElement?.classList.add("side-collapsed"); } } catch {} }, []);
   const toggle = () => { const next = !ref.current?.classList.contains("collapsed"); ref.current?.classList.toggle("collapsed", next); ref.current?.parentElement?.classList.toggle("side-collapsed", next); setCollapsed(next); try { localStorage.setItem("pp-side-collapsed", next ? "1" : "0"); } catch {} };
 
+  // 메뉴 순서: 끌어다 놓으면 바뀌고, 이 브라우저에 기억된다
+  const [order, setOrder] = useState<Order>({});
+  const [drag, setDrag] = useState<{ group: string; key: string } | null>(null);
+  const [over, setOver] = useState<{ key: string; after: boolean } | null>(null);
+  useEffect(() => { try { const v = JSON.parse(localStorage.getItem(ORDER_KEY) ?? "{}"); if (v && typeof v === "object") setOrder(v as Order); } catch {} }, []);
+  const adminItems = sorted(ADMIN, (a) => a.key, order.admin);
+  const projectItems = sorted(projects, (p) => p.id, order.projects);
+  /** 항목 하나에 붙이는 끌기 속성 */
+  const dnd = (group: string, key: string, keys: string[]) => ({
+    draggable: true,
+    onDragStart: (e: React.DragEvent) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", key); setDrag({ group, key }); },
+    onDragOver: (e: React.DragEvent) => {
+      if (!drag || drag.group !== group) return;
+      e.preventDefault(); e.dataTransfer.dropEffect = "move";
+      const r = e.currentTarget.getBoundingClientRect(), after = e.clientY > r.top + r.height / 2;
+      if (over?.key !== key || over.after !== after) setOver({ key, after });
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (!drag || drag.group !== group) return;
+      e.preventDefault();
+      if (drag.key !== key) {
+        const rest = keys.filter((k) => k !== drag.key);
+        rest.splice(rest.indexOf(key) + (over?.after ? 1 : 0), 0, drag.key);
+        const next = { ...order, [group]: rest };
+        setOrder(next); try { localStorage.setItem(ORDER_KEY, JSON.stringify(next)); } catch {}
+      }
+      setDrag(null); setOver(null);
+    },
+    onDragEnd: () => { setDrag(null); setOver(null); },
+  });
+  const dndClass = (group: string, key: string) => (drag?.group === group ? (drag.key === key ? " dragging" : over?.key === key ? (over.after ? " drop-after" : " drop-before") : "") : "");
+
   return (
     <aside className="pp-side" ref={ref}>
       <div className="brand">
@@ -40,20 +89,19 @@ export default function Sidebar({ profile, projects, unread, logos = {}, categor
         <>
           <h4>관리</h4>
           <nav>
-            <Link className={`item ${pathname === "/app/admin" ? "on" : ""}`} href="/app/admin" title="전체 개요"><LayoutDashboard className="ico" aria-hidden /> <span className="lbl">전체 개요</span></Link>
-            <Link className={`item ${pathname.startsWith("/app/admin/clients") ? "on" : ""}`} href="/app/admin/clients" title="클라이언트"><Handshake className="ico" aria-hidden /> <span className="lbl">클라이언트</span></Link>
-            <Link className={`item ${pathname.startsWith("/app/admin/work") ? "on" : ""}`} href="/app/admin/work" title="업무 관리"><ListChecks className="ico" aria-hidden /> <span className="lbl">업무 관리</span></Link>
-            <Link className={`item ${pathname.startsWith("/app/admin/users") ? "on" : ""}`} href="/app/admin/users" title="회원 · 권한"><Users className="ico" aria-hidden /> <span className="lbl">회원 · 권한</span></Link>
+            {adminItems.map(({ key, href, label, Icon, exact }) => (
+              <Link key={key} className={`item ${(exact ? pathname === href : pathname.startsWith(href)) ? "on" : ""}${dndClass("admin", key)}`} href={href} title={label} {...dnd("admin", key, adminItems.map((a) => a.key))}><Icon className="ico" aria-hidden /> <span className="lbl">{label}</span></Link>
+            ))}
           </nav>
         </>
       )}
       <h4>고객사</h4>
       <nav>
         {projects.length === 0 && <div className="hint" style={{ padding: "0 10px" }}>표시할 프로젝트가 없습니다</div>}
-        {projects.map((p) => {
+        {projectItems.map((p) => {
           const n = total(p.id, p.is_own);
           return (
-            <Link key={p.id} className={`item ${curProject === p.id ? "on" : ""}`} href={hrefFor(p)} title={p.name}>
+            <Link key={p.id} className={`item ${curProject === p.id ? "on" : ""}${dndClass("projects", p.id)}`} href={hrefFor(p)} title={p.name} {...dnd("projects", p.id, projectItems.map((x) => x.id))}>
               {logos[p.id]
                 ? <img className="c-logo" src={logos[p.id]} alt="" />
                 : <><Building2 className="ico" aria-hidden /><span className="initial" aria-hidden>{p.name.slice(0, 1)}</span></>}

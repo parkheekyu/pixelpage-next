@@ -20,12 +20,6 @@ function notes(c: Ga4Commerce): string[] {
   if (land && avg && land.purchases / land.sessions >= avg * 1.5) out.push(`${land.path} 로 들어온 방문은 100번 중 ${((land.purchases / land.sessions) * 100).toFixed(1)}번 구매합니다. 전체 평균(${(avg * 100).toFixed(1)}번)보다 훨씬 높으니, 광고와 링크를 이 페이지로 더 보내 볼 만합니다.`);
   const src = c.bySource.filter((s) => !s.folded && s.sessions >= MIN && s.purchases > 0).sort((a, b) => b.revenue / b.sessions - a.revenue / a.sessions)[0];
   if (src) out.push(`방문 한 번당 매출이 가장 큰 유입처는 ${src.source} 입니다 (방문당 ${fmtW(src.revenue / src.sessions)}).`);
-  const mo = c.byDevice.find((d) => d.device === "mobile"), pcd = c.byDevice.find((d) => d.device === "desktop");
-  if (mo && pcd && mo.sessions >= MIN && pcd.sessions >= MIN) {
-    const a = mo.purchases / mo.sessions, b = pcd.purchases / pcd.sessions;
-    const [lo, hi, loName, hiName] = a < b ? [a, b, "모바일", "PC"] : [b, a, "PC", "모바일"];
-    if (lo > 0 && hi / lo >= 1.5) out.push(`${loName}의 구매 전환율이 ${(lo * 100).toFixed(1)}%로 ${hiName}(${(hi * 100).toFixed(1)}%)보다 크게 낮습니다. ${loName} 결제 과정을 직접 한 번 따라가 보세요.`);
-  }
   return out;
 }
 
@@ -83,7 +77,7 @@ export default function LandingCommerce({ c }: { c: Ga4Commerce }) {
           {hop && <div className="hint" style={{ marginTop: 8 }}>「결제·로그인 뒤 복귀」는 결제창이나 카카오 로그인을 거쳐 돌아온 방문입니다. 원래 어디서 왔는지가 가려진 매출이 {pc(hop.revenue, t.revenue, 0)} 있다는 뜻입니다.</div>}
         </div>
         <div className="card">
-          <h2>기기별</h2><div className="sub">전환율 차이가 크면 낮은 쪽 결제 화면을 먼저 손봅니다</div>
+          <h2>기기별</h2><div className="sub">이미 산 책을 읽으러 온 방문도 섞여 있어, 전환율 차이만으로 결제 화면 문제라고 볼 수는 없습니다</div>
           <table className="atbl compact"><thead><tr><th>기기</th><th className="num">방문</th><th className="num">구매</th><th className="num">전환율</th><th className="num">객단가</th><th className="num">매출</th></tr></thead>
             <tbody>{[...c.byDevice].sort((a, b) => b.revenue - a.revenue).map((d) => <tr key={d.device}><td>{DEVICE[d.device] ?? d.device}</td><td className="num">{fmtN(d.sessions)}</td><td className="num">{fmtN(d.purchases)}</td><td className="num">{pc(d.purchases, d.sessions)}</td><td className="num">{d.purchases ? fmtW(d.revenue / d.purchases) : "–"}</td><td className="num">{fmtW(d.revenue)}</td></tr>)}</tbody></table>
         </div>
