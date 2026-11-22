@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { Fragment, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Plus, Repeat, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Pencil, Plus, Repeat, Search, X } from "lucide-react";
 import { KIND_LABEL, LEDGER_CATEGORIES, LEDGER_METHODS, type LedgerInput, type LedgerKind, type LedgerRow } from "@/lib/dash/ledger";
 import { fmtN, fmtW } from "@/lib/dash/agg";
 import { deleteLedger, saveLedger } from "@/app/app/ledger-actions";
@@ -81,7 +81,8 @@ function Form({ init, id, categories, onClose }: { init: LedgerInput; id: string
 }
 
 export default function LedgerClient({ rows, today }: { rows: LedgerRow[]; today: string }) {
-  const [period, setPeriod] = useState("all");
+  // 처음에는 가장 최근 달을 보여 준다
+  const [period, setPeriod] = useState(() => rows.reduce((m, r) => (r.date.slice(0, 7) > m ? r.date.slice(0, 7) : m), "") || "all");
   const [kind, setKind] = useState<"all" | LedgerKind>("all");
   const [cat, setCat] = useState("");
   const [q, setQ] = useState("");
@@ -91,6 +92,7 @@ export default function LedgerClient({ rows, today }: { rows: LedgerRow[]; today
   const months = useMemo(() => [...new Set(rows.map((r) => r.date.slice(0, 7)))].sort(), [rows]);
   const years = useMemo(() => [...new Set(months.map((m) => m.slice(0, 4)))], [months]);
   const categories = useMemo(() => [...new Set([...LEDGER_CATEGORIES, ...rows.map((r) => r.category)])], [rows]);
+  const monthlyAll = useMemo(() => months.map((m) => { const rs = rows.filter((r) => r.date.startsWith(m)); const income = sum(rs, "income"), expense = sum(rs, "expense"); return { m, income, expense, net: income - expense, fixed: rs.reduce((a, r) => a + (r.kind === "expense" && r.fixed ? r.amount : 0), 0), count: rs.length }; }), [rows, months]);
   const monthly = useMemo(() => months.slice(-13).map((m) => { const rs = rows.filter((r) => r.date.startsWith(m)); const income = sum(rs, "income"), expense = sum(rs, "expense"); return { m, income, expense, net: income - expense }; }), [rows, months]);
   const inPeriod = useMemo(() => (period === "all" ? rows : rows.filter((r) => r.date.startsWith(period))), [rows, period]);
 
@@ -109,7 +111,19 @@ export default function LedgerClient({ rows, today }: { rows: LedgerRow[]; today
     const k = q.trim().toLowerCase();
     return inPeriod.filter((r) => (kind === "all" || r.kind === kind) && (!cat || r.category === cat) && (!k || `${r.title} ${r.memo ?? ""} ${r.category} ${r.method ?? ""}`.toLowerCase().includes(k)));
   }, [inPeriod, kind, cat, q]);
-  const pick = (v: string) => { setPeriod((p) => (p === v ? "all" : v)); setShown(STEP); };
+  const go = (v: string) => { setPeriod(v); setShown(STEP); };
+  // 달 넘기기: 한 달을 보고 있을 때만 앞뒤 달로 간다
+  const mi = months.indexOf(period), isMonth = mi >= 0;
+  const prev = isMonth ? monthlyAll[mi - 1] : undefined, cur = isMonth ? monthlyAll[mi] : undefined;
+  /** 지난달과 비교한 한 줄 */
+  const vs = (now: number, before: number | undefined, goodWhenUp: boolean) => {
+    if (before === undefined) return null;
+    const d = now - before;
+    if (d === 0) return <small className="kpi-sub">지난달과 같음</small>;
+    return <small className="kpi-sub" style={{ color: (d > 0) === goodWhenUp ? "var(--good)" : "var(--bad)" }}>지난달보다 {short(Math.abs(d))}원 {d > 0 ? "많음" : "적음"}</small>;
+  };
+  // 여러 달을 볼 때는 내역을 달마다 끊어서 보여 준다
+  const visible = list.slice(0, shown);
   const blank = (): LedgerInput => ({ date: today, kind: "expense", category: "기타", method: "카카오뱅크", amount: 0, fixed: false, title: "", memo: null });
 
   return (
@@ -117,7 +131,11 @@ export default function LedgerClient({ rows, today }: { rows: LedgerRow[]; today
       <div className="sec-bar">
         <b>수입·지출</b><span className="hint">{periodLabel(period)} · {fmtN(inPeriod.length)}건</span>
         <span className="sp" />
-        <select value={period} aria-label="기간" onChange={(e) => { setPeriod(e.target.value); setShown(STEP); }}>
+        <div className="lg-step">
+          <button type="button" className="btn" aria-label="이전 달" disabled={!isMonth || mi === 0} onClick={() => go(months[mi - 1])}><ChevronLeft size={15} aria-hidden /></button>
+          <button type="button" className="btn" aria-label="다음 달" disabled={!isMonth || mi === months.length - 1} onClick={() => go(months[mi + 1])}><ChevronRight size={15} aria-hidden /></button>
+        </div>
+        <select value={period} aria-label="기간" onChange={(e) => go(e.target.value)}>
           <option value="all">전체 기간</option>
           {[...years].reverse().map((y) => <option key={y} value={y}>{y}년</option>)}
           {[...months].reverse().map((m) => <option key={m} value={m}>{m.slice(0, 4)}년 {Number(m.slice(5, 7))}월</option>)}
@@ -128,23 +146,44 @@ export default function LedgerClient({ rows, today }: { rows: LedgerRow[]; today
       {edit && <Form key={edit.id ?? "new"} id={edit.id} init={edit.init} categories={categories} onClose={() => setEdit(null)} />}
 
       <section className="kpis" style={{ marginBottom: 12 }}>
-        <div className="kpi"><span>수입</span><b>{fmtW(income)}</b></div>
-        <div className="kpi"><span>지출</span><b>{fmtW(expense)}</b></div>
+        <div className="kpi"><span>수입</span><b>{fmtW(income)}</b>{cur && vs(income, prev?.income, true)}</div>
+        <div className="kpi"><span>지출</span><b>{fmtW(expense)}</b>{cur && vs(expense, prev?.expense, false)}</div>
         <div className="kpi"><span>남은 돈 (수입 − 지출)</span><b style={{ color: net < 0 ? "var(--bad)" : undefined }}>{fmtW(net)}</b><small className="kpi-sub">수입의 {pc(net, income)}</small></div>
         <div className="kpi"><span>고정비</span><b>{fmtW(fixedSum)}</b><small className="kpi-sub">{nMonths > 1 ? `월평균 ${fmtW(fixedSum / nMonths)}` : `지출의 ${pc(fixedSum, expense)}`}</small></div>
       </section>
 
       <div className="card" style={{ marginBottom: 12 }}>
-        <div className="lg-chart-head"><div><h2>월별 흐름</h2><div className="sub">막대를 누르면 그 달만 봅니다. 한 번 더 누르면 전체로 돌아갑니다</div></div>
+        <div className="lg-chart-head"><div><h2>월별 흐름</h2><div className="sub">막대를 누르면 그 달을 봅니다</div></div>
           <div className="lg-legend"><span><i style={{ background: "var(--s1)" }} />수입</span><span><i style={{ background: "var(--s2)" }} />지출</span></div></div>
         <div className="lg-chart">
           {monthly.map((x) => (
-            <button type="button" key={x.m} className={`lg-col ${period === x.m ? "on" : ""} ${period !== "all" && period.length === 7 && period !== x.m ? "dim" : ""}`} onClick={() => pick(x.m)} title={`${periodLabel(x.m)} · 수입 ${fmtW(x.income)} · 지출 ${fmtW(x.expense)} · 남은 돈 ${fmtW(x.net)}`}>
+            <button type="button" key={x.m} className={`lg-col ${period === x.m ? "on" : ""} ${period !== "all" && period.length === 7 && period !== x.m ? "dim" : ""}`} onClick={() => go(x.m)} title={`${periodLabel(x.m)} · 수입 ${fmtW(x.income)} · 지출 ${fmtW(x.expense)} · 남은 돈 ${fmtW(x.net)}`}>
               <span className="net" style={{ color: x.net < 0 ? "var(--bad)" : undefined }}>{x.net >= 0 ? "+" : ""}{short(x.net)}</span>
               <span className="bars"><i style={{ height: `${(x.income / chartMax) * 100}%`, background: "var(--s1)" }} /><i style={{ height: `${(x.expense / chartMax) * 100}%`, background: "var(--s2)" }} /></span>
               <span className="lbl">{x.m.endsWith("-01") || x.m === monthly[0].m ? `${x.m.slice(2, 4)}년 ` : ""}{monthLabel(x.m)}</span>
             </button>
           ))}
+        </div>
+      </div>
+
+      <div className="card" style={{ marginBottom: 12 }}>
+        <div className="lg-chart-head"><div><h2>월별 요약</h2><div className="sub">줄을 누르면 그 달을 봅니다</div></div>
+          <button type="button" className={`btn ${period === "all" ? "primary" : ""}`} onClick={() => go("all")}>전체 기간 보기</button></div>
+        <div className="lg-tbl-wrap">
+          <table className="atbl lg-month">
+            <thead><tr><th>월</th><th className="num">수입</th><th className="num">지출</th><th className="num">남은 돈</th><th className="num">고정비</th><th className="num">건수</th></tr></thead>
+            <tbody>
+              {[...monthlyAll].reverse().map((x) => (
+                <tr key={x.m} className={period === x.m ? "on" : ""} onClick={() => go(x.m)} tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(x.m); } }}>
+                  <td>{x.m.slice(0, 4)}년 {Number(x.m.slice(5, 7))}월</td>
+                  <td className="num">{fmtN(x.income)}</td><td className="num">{fmtN(x.expense)}</td>
+                  <td className="num" style={{ fontWeight: 600, color: x.net < 0 ? "var(--bad)" : undefined }}>{fmtN(x.net)}</td>
+                  <td className="num">{fmtN(x.fixed)}</td><td className="num">{fmtN(x.count)}</td>
+                </tr>
+              ))}
+            </tbody>
+            <tfoot><tr><td>합계</td><td className="num">{fmtN(sum(rows, "income"))}</td><td className="num">{fmtN(sum(rows, "expense"))}</td><td className="num">{fmtN(sum(rows, "income") - sum(rows, "expense"))}</td><td className="num">{fmtN(monthlyAll.reduce((a, x) => a + x.fixed, 0))}</td><td className="num">{fmtN(rows.length)}</td></tr></tfoot>
+          </table>
         </div>
       </div>
 
@@ -170,8 +209,12 @@ export default function LedgerClient({ rows, today }: { rows: LedgerRow[]; today
           <table className="atbl lg-tbl">
             <thead><tr><th>날짜</th><th>내역</th><th>분류</th><th>결제수단</th><th className="num">금액</th><th aria-label="고치기" /></tr></thead>
             <tbody>
-              {list.slice(0, shown).map((r) => (
-                <tr key={r.id} className={r.kind}>
+              {visible.map((r, i) => (
+                <Fragment key={r.id}>
+                {!isMonth && (i === 0 || visible[i - 1].date.slice(0, 7) !== r.date.slice(0, 7)) && (() => { const m = r.date.slice(0, 7), rs = list.filter((x) => x.date.startsWith(m)); return (
+                  <tr className="lg-mh"><td colSpan={6}><b>{m.slice(0, 4)}년 {Number(m.slice(5, 7))}월</b><span>{fmtN(rs.length)}건</span><span>수입 {fmtN(sum(rs, "income"))}</span><span>지출 {fmtN(sum(rs, "expense"))}</span></td></tr>
+                ); })()}
+                <tr className={r.kind}>
                   <td className="d">{r.date.slice(2).replace(/-/g, ".")}</td>
                   <td><span className="t">{r.title}</span>{r.fixed && <Repeat className="fx" size={13} aria-label="고정비" />}{r.memo && <small>{r.memo}</small>}</td>
                   <td><span className="pill tag-gray">{r.category}</span></td>
@@ -179,6 +222,7 @@ export default function LedgerClient({ rows, today }: { rows: LedgerRow[]; today
                   <td className="num amt">{r.kind === "income" ? "+" : r.kind === "expense" ? "−" : ""}{fmtN(r.amount)}{r.kind === "excluded" && <small>제외</small>}</td>
                   <td><button type="button" className="btn ghost" aria-label={`${r.title} 고치기`} onClick={() => { const { id, ...init } = r; setEdit({ id, init }); window.scrollTo({ top: 0, behavior: "smooth" }); }}><Pencil size={14} aria-hidden /></button></td>
                 </tr>
+                </Fragment>
               ))}
               {list.length === 0 && <tr><td colSpan={6}><div className="sl-empty" style={{ padding: "28px 0" }}>조건에 맞는 내역이 없습니다.</div></td></tr>}
             </tbody>
