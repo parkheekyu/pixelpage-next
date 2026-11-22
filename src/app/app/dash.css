@@ -1031,3 +1031,12 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .atbl.compact td:first-child { min-width: 0; }
 .pp-dash .lts > .card { min-width: 0; grid-column: auto; }
 .pp-dash .atbl.compact { min-width: 0; width: 100%; }
+
+/* ---------- 랜딩: 매출(판매 고객사) ---------- */
+.pp-dash .lnotes { margin-bottom: 12px; }
+.pp-dash .lnotes ul { margin: 8px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; font-size: 13.5px; line-height: 1.6; color: var(--text-2); }
+.pp-dash .rvb { display: flex; align-items: flex-end; gap: 3px; height: 130px; margin-top: 14px; border-bottom: 1px solid var(--line); }
+.pp-dash .rvb-c { flex: 1 1 0; min-width: 0; height: 100%; display: flex; align-items: flex-end; }
+.pp-dash .rvb-c i { display: block; width: 100%; border-radius: 3px 3px 0 0; background: color-mix(in srgb, var(--s1) 45%, var(--card)); }
+.pp-dash .rvb-c:hover i, .pp-dash .rvb-c i.pk { background: var(--s1); }
+.pp-dash .rvb-x { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }

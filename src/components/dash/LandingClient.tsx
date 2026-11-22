@@ -8,6 +8,7 @@ import type { Analysis, Project } from "@/lib/dash/types";
 import type { LandingStats } from "@/lib/dash/landing-stats";
 import { fmtN } from "@/lib/dash/agg";
 import AnalysisPanel from "./AnalysisPanel";
+import LandingCommerce from "./LandingCommerce";
 
 interface Props { project: Project; isStaff: boolean; analyses: Analysis[]; stats: LandingStats | null; days: number; integ: { ga4_property_id: string | null; clarity_project_id: string | null; hasClarityToken: boolean } | null; ga4Configured: boolean }
 
@@ -35,7 +36,10 @@ export default function LandingClient({ project, isStaff, analyses, stats, days,
   const [pending, start] = useTransition();
   const ga4 = !!(integ?.ga4_property_id && ga4Configured), clarity = !!integ?.hasClarityToken;
   const t = stats?.ga?.totals, c = stats?.clarity;
+  // 판매 고객사(GA4에 구매 기록이 있는 곳)는 신청 대신 구매 기준으로 본다
+  const shop = stats?.commerce ?? null;
   const cvr = t && t.sessions ? t.conversions / t.sessions : 0;
+  const buy = shop && shop.totals.sessions ? shop.totals.purchases / shop.totals.sessions : 0;
   const rate = (conv: number, sessions: number) => (sessions ? pc(conv / sessions) : "–");
   // Clarity 는 최근 3일만 준다. 세션 100회당 건수로 바꿔서 본다.
   const per100 = (n: number) => (c && c.sessions ? (n / c.sessions) * 100 : 0);
@@ -67,7 +71,10 @@ export default function LandingClient({ project, isStaff, analyses, stats, days,
       {isStaff && (t || c) && (
         <div style={{ opacity: pending ? 0.6 : 1, transition: "opacity .15s" }}>
           <section className="lqs">
-            {t && <Q q="들어온 사람이 신청하나" label="전환율" value={t.sessions ? pc(cvr, 2) : "–"} g={!t.sessions ? "none" : t.conversions === 0 ? "none" : grade(cvr, 0.01, 0.03)}
+            {shop ? <Q q="들어온 사람이 사나" label="구매 전환율" value={pc(buy, 2)} g={grade(buy, 0.01, 0.03)}
+              extra={[["방문", fmtN(shop.totals.sessions)], ["구매", fmtN(shop.totals.purchases)]]}
+              read={`방문 100번 중 ${(buy * 100).toFixed(1)}번이 구매로 이어집니다. 구매한 사람은 ${fmtN(shop.totals.purchasers)}명입니다.`} />
+            : t && <Q q="들어온 사람이 신청하나" label="전환율" value={t.sessions ? pc(cvr, 2) : "–"} g={!t.sessions ? "none" : t.conversions === 0 ? "none" : grade(cvr, 0.01, 0.03)}
               extra={[["방문", fmtN(t.sessions)], ["전환", fmtN(t.conversions)]]}
               read={!t.sessions ? "이 기간에 방문이 없습니다." : t.conversions === 0 ? "전환이 0건입니다. 실제로 신청이 없었거나, GA4에 전환 이벤트(신청 완료)가 설정되지 않은 상태입니다." : `방문 100번 중 ${(cvr * 100).toFixed(1)}번이 신청으로 이어집니다.`} />}
             {t && <Q q="들어와서 바로 나가나" label="참여율" value={t.sessions ? pc(t.engagementRate, 0) : "–"} g={t.sessions ? grade(t.engagementRate, 0.4, 0.6) : "none"}
@@ -79,7 +86,8 @@ export default function LandingClient({ project, isStaff, analyses, stats, days,
               : <div className="lq off"><div className="lq-q">어디서 막히나</div><p>Clarity를 연결하면 스크롤 깊이와 클릭 문제가 여기에 나옵니다.</p></div>}
           </section>
 
-          {stats?.ga && (stats.ga.byDevice.length > 0 || stats.ga.bySource.length > 0) && (
+          {shop && <LandingCommerce c={shop} />}
+          {!shop && stats?.ga && (stats.ga.byDevice.length > 0 || stats.ga.bySource.length > 0) && (
             <section className="lts">
               <div className="card">
                 <h2>기기별</h2><div className="sub">모바일과 PC의 전환율 차이가 크면 낮은 쪽 화면을 먼저 손봅니다</div>

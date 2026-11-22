@@ -70,3 +70,74 @@ export async function ga4Summary(propertyId: string, days = 28, pathFilter?: str
     daily: day.rows.map((r) => ({ date: r.dims[0], sessions: r.metrics[0], conversions: r.metrics[1] })),
   };
 }
+
+/* ---------- 판매(전자상거래) 요약 ---------- */
+export interface Ga4Commerce {
+  /** 실제 집계 시작일 (YYYYMMDD). 구매 기록이 기간 중간에 시작됐으면 그 날짜 */
+  from: string;
+  /** 구매 기록이 기간 중간에 시작돼 집계 구간을 줄였는가 */
+  trimmed: boolean;
+  totals: { sessions: number; purchases: number; revenue: number; purchasers: number };
+  daily: { date: string; sessions: number; purchases: number; revenue: number }[];
+  items: { id: string; name: string; qty: number; revenue: number }[];
+  bySource: { source: string; sessions: number; purchases: number; revenue: number; folded?: boolean }[];
+  byDevice: { device: string; sessions: number; purchases: number; revenue: number }[];
+  byLanding: { path: string; sessions: number; purchases: number; revenue: number }[];
+}
+
+/** 결제창·로그인 화면을 거쳐 돌아온 방문. GA4가 새 유입으로 잘못 세는 것들이라 한 줄로 묶는다 */
+const RETURN_HOP = /tosspayments|kakaopay|kauth\.kakao|accounts\.kakao|nid\.naver|pay\.naver|inicis|nicepay|kcp\.co|payco|payple|portone|iamport|accounts\.google|appleid\.apple|paypal|stripe\.com/i;
+
+/** 구매 이벤트(purchase)가 들어오는 속성만 값이 나온다. 구매가 한 건도 없으면 null */
+export async function ga4Commerce(propertyId: string, days = 28): Promise<Ga4Commerce | null> {
+  const end = "yesterday";
+  const m = (...n: string[]) => n.map((name) => ({ name }));
+  const day = await runReport(propertyId, { dateRanges: [{ startDate: `${days}daysAgo`, endDate: end }], dimensions: [{ name: "date" }], metrics: m("sessions", "ecommercePurchases", "purchaseRevenue"), orderBys: [{ dimension: { dimensionName: "date" } }] });
+  const dailyAll = day.rows.map((r) => ({ date: r.dims[0], sessions: r.metrics[0], purchases: r.metrics[1], revenue: r.metrics[2] }));
+  const first = dailyAll.find((d) => d.purchases > 0);
+  if (!first) return null;
+
+  // 기간 앞쪽에 구매가 비어 있으면, 그 전에도 구매 기록이 없었는지 본다. 없었다면 구매 추적을 그날 시작한 것이므로 그날부터만 센다.
+  let from = dailyAll[0].date, trimmed = false;
+  if (first.date !== dailyAll[0].date) {
+    const prior = await runReport(propertyId, { dateRanges: [{ startDate: `${days + 365}daysAgo`, endDate: `${days + 1}daysAgo` }], metrics: m("ecommercePurchases") });
+    if (!(prior.rows[0]?.metrics[0] > 0)) { from = first.date; trimmed = true; }
+  }
+  const start = `${from.slice(0, 4)}-${from.slice(4, 6)}-${from.slice(6, 8)}`;
+  const range = [{ startDate: start, endDate: end }];
+  const rev = [{ metric: { metricName: "purchaseRevenue" }, desc: true }];
+  const [tot, item, src, dev, land] = await Promise.all([
+    runReport(propertyId, { dateRanges: range, metrics: m("sessions", "ecommercePurchases", "purchaseRevenue", "totalPurchasers") }),
+    runReport(propertyId, { dateRanges: range, dimensions: [{ name: "itemId" }, { name: "itemName" }], metrics: m("itemsPurchased", "itemRevenue"), orderBys: [{ metric: { metricName: "itemRevenue" }, desc: true }], limit: 200 }),
+    runReport(propertyId, { dateRanges: range, dimensions: [{ name: "sessionSourceMedium" }], metrics: m("sessions", "ecommercePurchases", "purchaseRevenue"), orderBys: [{ metric: { metricName: "sessions" }, desc: true }], limit: 50 }),
+    runReport(propertyId, { dateRanges: range, dimensions: [{ name: "deviceCategory" }], metrics: m("sessions", "ecommercePurchases", "purchaseRevenue") }),
+    runReport(propertyId, { dateRanges: range, dimensions: [{ name: "landingPage" }], metrics: m("sessions", "ecommercePurchases", "purchaseRevenue"), orderBys: rev, limit: 20 }),
+  ]);
+
+  // 같은 상품이 할인 문구만 바뀌어 여러 이름으로 들어오므로 상품 ID로 합친다. 이름은 매출이 가장 큰 것을 쓴다.
+  const items = new Map<string, { id: string; name: string; qty: number; revenue: number }>();
+  for (const r of item.rows) {
+    const id = r.dims[0] && r.dims[0] !== "(not set)" ? r.dims[0] : r.dims[1];
+    const cur = items.get(id);
+    if (cur) { cur.qty += r.metrics[0]; cur.revenue += r.metrics[1]; } else items.set(id, { id, name: r.dims[1], qty: r.metrics[0], revenue: r.metrics[1] });
+  }
+  const hop = { source: "결제·로그인 뒤 복귀", sessions: 0, purchases: 0, revenue: 0, folded: true };
+  const bySource: Ga4Commerce["bySource"] = [];
+  for (const r of src.rows) {
+    if (RETURN_HOP.test(r.dims[0])) { hop.sessions += r.metrics[0]; hop.purchases += r.metrics[1]; hop.revenue += r.metrics[2]; }
+    else bySource.push({ source: r.dims[0], sessions: r.metrics[0], purchases: r.metrics[1], revenue: r.metrics[2] });
+  }
+  if (hop.sessions) bySource.push(hop);
+  bySource.sort((a, b) => b.revenue - a.revenue || b.sessions - a.sessions);
+  const t = tot.rows[0]?.metrics ?? [];
+  return {
+    from, trimmed,
+    totals: { sessions: t[0] ?? 0, purchases: t[1] ?? 0, revenue: t[2] ?? 0, purchasers: t[3] ?? 0 },
+    daily: dailyAll.filter((d) => d.date >= from),
+    items: [...items.values()].sort((a, b) => b.revenue - a.revenue),
+    bySource,
+    byDevice: dev.rows.map((r) => ({ device: r.dims[0], sessions: r.metrics[0], purchases: r.metrics[1], revenue: r.metrics[2] })),
+    // 결제 완료·로그인 복귀 화면은 처음 들어온 페이지가 아니라 돌아온 페이지이므로 뺀다
+    byLanding: land.rows.filter((r) => r.dims[0] && r.dims[0] !== "(not set)" && !/\/(payment|checkout|pay|order|login|auth|oauth|callback)(\/|$)/i.test(r.dims[0])).map((r) => ({ path: r.dims[0], sessions: r.metrics[0], purchases: r.metrics[1], revenue: r.metrics[2] })),
+  };
+}
