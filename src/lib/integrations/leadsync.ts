@@ -149,6 +149,21 @@ export async function sheetsReadAll(sheetId: string, tab: string): Promise<Exter
   if (!header) return [];
   return rows.map((r, i) => ({ external_id: String(i + 2), values: Object.fromEntries(header.map((h, k) => [h, r[k] ?? ""])) }));
 }
+/** 파일 제목과 탭 목록 (MCP 의 시트 점검·연결용) */
+export async function sheetsTabs(sheetId: string): Promise<{ title: string; tabs: { name: string; rows: number; cols: number }[] }> {
+  const j = (await sheetsFetch(`${sheetId}?fields=properties.title,sheets.properties(title,gridProperties)`)) as { properties?: { title?: string }; sheets?: { properties: { title: string; gridProperties?: { rowCount?: number; columnCount?: number } } }[] };
+  return { title: j.properties?.title ?? "", tabs: (j.sheets ?? []).map((x) => ({ name: x.properties.title, rows: x.properties.gridProperties?.rowCount ?? 0, cols: x.properties.gridProperties?.columnCount ?? 0 })) };
+}
+/** A1 범위에 값을 그대로 쓴다 (예: "J1", "A2:C3"). 서비스 계정이 편집자로 공유되어 있어야 한다. */
+export async function sheetsWriteRange(sheetId: string, tab: string, a1: string, values: string[][]): Promise<number> {
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, a1))}?valueInputOption=USER_ENTERED`, { method: "PUT", body: JSON.stringify({ values }) })) as { updatedCells?: number };
+  return j.updatedCells ?? 0;
+}
+/** 맨 아래에 행을 덧붙인다 */
+export async function sheetsAppendRows(sheetId: string, tab: string, values: string[][]): Promise<string> {
+  const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A:A"))}:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS`, { method: "POST", body: JSON.stringify({ values }) })) as { updates?: { updatedRange?: string } };
+  return j.updates?.updatedRange ?? "";
+}
 /** 시트를 있는 그대로 (머리글 + 행). 읽기 전용 리드 화면용 */
 export async function sheetsReadGrid(sheetId: string, tab: string): Promise<{ header: string[]; rows: string[][] }> {
   const j = (await sheetsFetch(`${sheetId}/values/${enc(rangeOf(tab, "A:AZ"))}`)) as { values?: string[][] };

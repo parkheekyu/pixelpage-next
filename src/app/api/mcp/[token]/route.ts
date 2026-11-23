@@ -2,6 +2,8 @@ import { timingSafeEqual } from "node:crypto";
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { createMcp } from "@/lib/dash/mcp-core.mjs";
+import { mapStatus, matchHeader, parseDate, sheetsAppendRows, sheetsReadGrid, sheetsTabs, sheetsWriteRange } from "@/lib/integrations/leadsync";
+import { googleServiceAccountEmail, hasGoogleServiceAccount } from "@/lib/integrations/ga4";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 120;
@@ -23,7 +25,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ tok
   let body: unknown;
   try { body = await req.json(); } catch { return NextResponse.json({ jsonrpc: "2.0", id: null, error: { code: -32700, message: "parse error" } }, { status: 400 }); }
   const db = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { db: { schema: "dash" }, auth: { persistSession: false } });
-  const handle = createMcp({ db, site: req.nextUrl.origin, secret: process.env.LEAD_WEBHOOK_SECRET });
+  // 구글 시트 도구(점검·읽기·쓰기·연결)는 서비스 계정이 있을 때만 붙는다
+  const sheets = hasGoogleServiceAccount() ? { tabs: sheetsTabs, grid: sheetsReadGrid, write: sheetsWriteRange, append: sheetsAppendRows, matchHeader, parseDate, mapStatus, email: googleServiceAccountEmail() } : null;
+  const handle = createMcp({ db, site: req.nextUrl.origin, secret: process.env.LEAD_WEBHOOK_SECRET, sheets });
   if (Array.isArray(body)) {
     const out = (await Promise.all(body.map((m) => handle(m)))).filter(Boolean);
     return out.length ? NextResponse.json(out) : new NextResponse(null, { status: 202 });

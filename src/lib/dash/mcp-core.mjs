@@ -4,9 +4,9 @@
  *   - src/app/api/mcp/[token]/route.ts: ChatGPT 등 외부 AI 용 (HTTPS)
  * service role 로 dash 스키마에 직접 접근하므로 권한 제한이 없다(삭제 포함). 광고 계정 조작은 일부러 넣지 않았다.
  */
-const READ_ONLY = ["overview", "dash_report", "db_select"];
+const READ_ONLY = ["overview", "dash_report", "db_select", "lead_sheet_inspect", "lead_sheet_read"];
 
-export function createMcp({ db, site, secret }) {
+export function createMcp({ db, site, secret, sheets = null }) {
   const today = () => new Date(Date.now() + 9 * 3600_000).toISOString().slice(0, 10);
   const isUuid = (v) => /^[0-9a-f]{8}-[0-9a-f-]{27}$/i.test(v ?? "");
   const isDate = (v) => /^\d{4}-\d{2}-\d{2}$/.test(v ?? "");
@@ -167,7 +167,7 @@ export function createMcp({ db, site, secret }) {
       },
     },
     db_select: {
-      description: "dash 스키마 표를 직접 읽는다. 주요 표: clients, projects, work_projects, work_milestones, work_tasks, leads, analyses, integrations, profiles. match 는 {컬럼: 값} (같음), {컬럼: null}, {컬럼: [값들]}, {컬럼: {gte: 값}} (eq|neq|gt|gte|lt|lte|like|ilike|in). 컬럼을 모르면 limit 1 로 먼저 읽어 확인한다.",
+      description: "dash 스키마 표를 직접 읽는다. 주요 표: clients, projects, work_projects, work_milestones, work_tasks, leads, analyses, project_integrations, profiles. match 는 {컬럼: 값} (같음), {컬럼: null}, {컬럼: [값들]}, {컬럼: {gte: 값}} (eq|neq|gt|gte|lt|lte|like|ilike|in). 컬럼을 모르면 limit 1 로 먼저 읽어 확인한다.",
       schema: { type: "object", properties: { table: str, columns: { ...str, description: "쉼표로 구분, 기본 *" }, match: obj, order: { ...str, description: "컬럼 이름, 내림차순은 뒤에 .desc" }, limit: { type: "integer" } }, required: ["table"] },
       async run({ table, columns, match, order, limit }) {
         let q = applyFilters(db.from(table).select(columns || "*"), match);
@@ -198,13 +198,123 @@ export function createMcp({ db, site, secret }) {
     },
   };
 
+  // ---------- 리드 구글 시트: 점검 · 읽기 · 고치기 · 연결 ----------
+  if (sheets) {
+    const sheetIdOf = (v) => { const m = String(v ?? "").match(/\/d\/([A-Za-z0-9_-]{20,})/); const id = m ? m[1] : String(v ?? "").trim(); if (!/^[A-Za-z0-9_-]{20,}$/.test(id)) throw new Error("sheet 는 구글 시트 주소나 시트 ID 여야 합니다."); return id; };
+    const share = `시트를 서비스 계정(${sheets.email ?? "설정 확인 필요"})에 공유했는지 확인하세요. 읽기는 '링크가 있는 모든 사용자: 뷰어'로도 되고, 쓰기는 이 계정을 편집자로 추가해야 합니다.`;
+    const g = async (fn) => { try { return await fn(); } catch (e) { throw new Error(`${e?.message ?? e} — ${share}`); } };
+    const tabList = (v) => (Array.isArray(v) ? v : String(v ?? "").split(",")).map((t) => String(t).trim()).filter(Boolean);
+    /** 프로젝트 이름을 주면 연결된 시트를, 아니면 sheet 값을 쓴다 */
+    async function target({ project, sheet, tab }) {
+      if (sheet) return { id: sheetIdOf(sheet), tab };
+      if (!project) throw new Error("project(고객사 이름) 나 sheet(주소) 중 하나는 줘야 합니다.");
+      const p = await find("projects", project);
+      const i = must(await db.from("project_integrations").select("google_sheet_id,google_sheet_tab").eq("project_id", p.id).maybeSingle());
+      if (!i?.google_sheet_id) throw new Error(`${p.name} 에 연결된 시트가 없습니다.`);
+      return { id: i.google_sheet_id, tab: tab || tabList(i.google_sheet_tab)[0] };
+    }
+    /** 탭 하나를 대시보드가 어떻게 읽는지 요약한다. 행 내용(개인정보)은 내보내지 않는다. */
+    async function inspectTab(id, tab) {
+      const { header, rows: all } = await g(() => sheets.grid(id, tab));
+      const rows = all.filter((r) => r.some((c) => (c ?? "").trim()));
+      const cols = header.map((h, k) => ({ column: h, reads_as: sheets.matchHeader(h), filled: rows.filter((r) => (r[k] ?? "").trim()).length }));
+      const at = (std) => cols.findIndex((c) => c.reads_as === std);
+      const out = { tab, data_rows: rows.length, columns: cols.filter((c) => c.column.trim()) };
+      const need = ["등록일시", "이름", "연락처", "상태", "매출액", "유입매체"];
+      out.missing = need.filter((n) => at(n) < 0);
+      const dc = at("등록일시");
+      if (dc >= 0) {
+        const ds = rows.map((r) => sheets.parseDate(r[dc] ?? "")); const good = ds.filter(Boolean).sort();
+        out.dates = { readable: good.length, unreadable: rows.length - good.length, first: good[0]?.slice(0, 10) ?? null, last: good.at(-1)?.slice(0, 10) ?? null };
+      }
+      const sc = at("상태");
+      if (sc >= 0) { const m = {}; for (const r of rows) { const raw = (r[sc] ?? "").trim(); const k = `${raw || "(빈칸)"} → ${sheets.mapStatus(raw) || "신규"}`; m[k] = (m[k] ?? 0) + 1; } out.status = Object.fromEntries(Object.entries(m).sort((a, b) => b[1] - a[1]).slice(0, 15)); }
+      const rc = at("매출액");
+      if (rc >= 0) out.revenue_sum = rows.reduce((a, r) => a + (Number(String(r[rc] ?? "").replace(/[^0-9.]/g, "")) || 0), 0);
+      out.notes = [
+        dc < 0 ? "날짜 열을 못 찾았습니다. 머리글을 '등록일시'(또는 신청일시·결제일시 등)로 바꾸지 않으면 집계에 하나도 잡히지 않습니다." : null,
+        sc < 0 ? "'상태' 열이 없어 모든 리드가 '신규'로 잡힙니다." : null,
+        rc < 0 ? "'매출액' 열이 없어 매출이 0으로 나옵니다." : null,
+        at("유입매체") < 0 ? "'유입매체' 열이 없어 매체가 모두 unknown 으로 나옵니다." : null,
+      ].filter(Boolean);
+      return out;
+    }
+    Object.assign(TOOLS, {
+      lead_sheet_inspect: {
+        description: "리드 구글 시트를 점검한다(읽기 전용, 행 내용은 내보내지 않음). 탭 목록, 각 열을 대시보드가 무엇으로 읽는지(reads_as: 등록일시·이름·연락처·상태·매출액 등, null 이면 그냥 보여 주기만 함), 날짜를 읽을 수 있는 행 수, 상태 값이 어떻게 바뀌는지, 빠진 열을 알려 준다. 연결 전에 먼저 부른다. sheet(주소/ID) 나 project(이미 연결된 고객사) 중 하나를 준다. tab 을 안 주면 모든 탭을 본다.",
+        schema: { type: "object", properties: { sheet: { ...str, description: "구글 시트 주소 또는 ID" }, project: { ...str, description: "이미 시트가 연결된 고객사 이름 또는 id" }, tab: { ...str, description: "탭 이름. 쉼표로 여러 개" } } },
+        async run(a) {
+          const t = await target({ ...a, tab: undefined });
+          const meta = await g(() => sheets.tabs(t.id));
+          const want = tabList(a.tab); const names = want.length ? want : meta.tabs.map((x) => x.name).slice(0, 8);
+          const bad = names.filter((n) => !meta.tabs.some((x) => x.name === n)); if (bad.length) throw new Error(`없는 탭: ${bad.join(", ")}. 있는 탭: ${meta.tabs.map((x) => x.name).join(", ")}`);
+          return { sheet_id: t.id, title: meta.title, service_account: sheets.email, all_tabs: meta.tabs.map((x) => x.name), tabs: await Promise.all(names.map((n) => inspectTab(t.id, n))) };
+        },
+      },
+      lead_sheet_read: {
+        description: "리드 구글 시트의 행을 그대로 읽는다(개인정보 포함). row 는 시트의 행 번호(머리글이 1행, 데이터는 2행부터). 한 번에 최대 200행.",
+        schema: { type: "object", properties: { sheet: str, project: str, tab: str, from_row: { type: "integer", description: "기본 2" }, limit: { type: "integer", description: "기본 30, 최대 200" }, newest: { type: "boolean", description: "true 면 맨 아래 행부터 limit 개" } } },
+        async run(a) {
+          const t = await target(a); if (!t.tab) { const meta = await g(() => sheets.tabs(t.id)); t.tab = meta.tabs[0]?.name; }
+          const { header, rows } = await g(() => sheets.grid(t.id, t.tab));
+          const n = Math.min(Math.max(a.limit ?? 30, 1), 200); const start = a.newest ? Math.max(0, rows.length - n) : Math.max(0, (a.from_row ?? 2) - 2);
+          return { sheet_id: t.id, tab: t.tab, header, total_rows: rows.length, rows: rows.slice(start, start + n).map((r, i) => ({ row: start + i + 2, values: r })) };
+        },
+      },
+      lead_sheet_write: {
+        description: "리드 구글 시트의 칸을 고친다(머리글 이름 바꾸기, 상태·매출액 열 추가, 값 수정 등). range 는 A1 표기(예: 'J1', 'A2:C3'), values 는 행들의 배열(예: [['상태','매출액']]). 덮어쓰면 되돌릴 수 없으니 lead_sheet_read 로 먼저 확인한다. 서비스 계정이 시트의 편집자여야 한다. 대시보드에는 2분 안에 반영된다.",
+        schema: { type: "object", properties: { sheet: str, project: str, tab: str, range: { ...str, description: "A1 표기, 탭 이름은 빼고" }, values: { type: "array", items: { type: "array", items: {} } } }, required: ["range", "values"] },
+        async run(a) {
+          const t = await target(a); if (!t.tab) throw new Error("tab(탭 이름)을 줘야 합니다.");
+          if (!/^[A-Za-z]{1,3}\d{0,7}(:[A-Za-z]{1,3}\d{0,7})?$/.test(a.range ?? "")) throw new Error("range 는 A1 표기여야 합니다 (예: J1, A2:C3).");
+          const values = (a.values ?? []).map((r) => (Array.isArray(r) ? r : [r]).map((c) => (c == null ? "" : String(c))));
+          const cells = values.reduce((n, r) => n + r.length, 0); if (!cells) throw new Error("values 가 비었습니다."); if (cells > 5000) throw new Error("한 번에 5,000칸까지만 씁니다.");
+          return { sheet_id: t.id, tab: t.tab, range: a.range, updated_cells: await g(() => sheets.write(t.id, t.tab, a.range, values)) };
+        },
+      },
+      lead_sheet_append: {
+        description: "리드 구글 시트 맨 아래에 행을 덧붙인다. rows 는 행들의 배열이고 칸 순서는 시트 머리글 순서와 같아야 한다(lead_sheet_read 의 header 참고). 서비스 계정이 편집자여야 한다.",
+        schema: { type: "object", properties: { sheet: str, project: str, tab: str, rows: { type: "array", items: { type: "array", items: {} } } }, required: ["rows"] },
+        async run(a) {
+          const t = await target(a); if (!t.tab) throw new Error("tab(탭 이름)을 줘야 합니다.");
+          const rows = (a.rows ?? []).map((r) => (Array.isArray(r) ? r : [r]).map((c) => (c == null ? "" : String(c)))); if (!rows.length) throw new Error("rows 가 비었습니다."); if (rows.length > 500) throw new Error("한 번에 500행까지만 넣습니다.");
+          return { sheet_id: t.id, tab: t.tab, appended: rows.length, range: await g(() => sheets.append(t.id, t.tab, rows)) };
+        },
+      },
+      lead_sheet_link: {
+        description: "고객사에 리드 구글 시트를 연결한다(이미 있으면 바꾼다). 연결하면 그 고객사의 리드 탭과 집계가 이 시트를 읽는다. tabs 는 읽을 탭 이름(쉼표나 배열로 여러 개면 한 표로 합친다, 생략하면 첫 탭). 탭이 없거나 날짜 열을 못 읽으면 연결하지 않고 이유를 알려 준다(그래도 연결하려면 force:true). unlink:true 면 연결을 끊는다(시트는 그대로 둔다).",
+        schema: { type: "object", properties: { project: { ...str, description: "고객사(사이드바 프로젝트) 이름 또는 id" }, sheet: { ...str, description: "구글 시트 주소 또는 ID" }, tabs: { description: "탭 이름. 쉼표 문자열이나 배열" }, force: { type: "boolean" }, unlink: { type: "boolean" } }, required: ["project"] },
+        async run({ project, sheet, tabs, force, unlink }) {
+          const p = await find("projects", project);
+          const cur = must(await db.from("project_integrations").select("project_id,google_sheet_id,google_sheet_tab").eq("project_id", p.id).maybeSingle());
+          const save = async (patch) => must(cur ? await db.from("project_integrations").update(patch).eq("project_id", p.id).select("project_id") : await db.from("project_integrations").insert({ project_id: p.id, ...patch }).select("project_id"));
+          if (unlink) {
+            if (!cur?.google_sheet_id) return { project: p.name, linked: false, note: "연결된 시트가 없었습니다." };
+            await save({ google_sheet_id: null }); must(await db.from("projects").update({ has_lead_sheet: false }).eq("id", p.id).select("id"));
+            return { project: p.name, linked: false, was: { sheet_id: cur.google_sheet_id, tabs: cur.google_sheet_tab } };
+          }
+          if (!sheet) throw new Error("sheet(구글 시트 주소)를 줘야 합니다.");
+          const id = sheetIdOf(sheet); const meta = await g(() => sheets.tabs(id));
+          const names = tabList(tabs).length ? tabList(tabs) : [meta.tabs[0]?.name].filter(Boolean);
+          const bad = names.filter((n) => !meta.tabs.some((x) => x.name === n)); if (bad.length || !names.length) throw new Error(`없는 탭: ${bad.join(", ") || "(탭 없음)"}. 있는 탭: ${meta.tabs.map((x) => x.name).join(", ")}`);
+          if (names.some((n) => n.includes(","))) throw new Error("탭 이름에 쉼표가 있으면 연결할 수 없습니다. 탭 이름을 바꿔 주세요.");
+          const checked = await Promise.all(names.map((n) => inspectTab(id, n)));
+          const blockers = checked.flatMap((c) => (!c.dates ? [`${c.tab}: 날짜 열을 못 찾음`] : c.dates.readable === 0 && c.data_rows > 0 ? [`${c.tab}: 날짜를 읽을 수 있는 행이 없음`] : []));
+          if (blockers.length && !force) return { linked: false, reason: blockers, hint: "lead_sheet_write 로 머리글을 '등록일시' 등으로 고친 뒤 다시 연결하거나, 그대로 연결하려면 force:true.", tabs: checked };
+          await save({ google_sheet_id: id, google_sheet_tab: names.join(", ") }); must(await db.from("projects").update({ has_lead_sheet: true }).eq("id", p.id).select("id"));
+          return { project: p.name, linked: true, sheet_id: id, title: meta.title, tabs: checked, was: cur?.google_sheet_id ? { sheet_id: cur.google_sheet_id, tabs: cur.google_sheet_tab } : null, view: `${site}/app/projects/${p.id}` };
+        },
+      },
+    });
+  }
+
   /** JSON-RPC 메시지 하나를 처리한다. 알림(id 없음)은 null 을 돌려준다. */
   return async function handle(msg) {
     const { id, method, params } = msg ?? {};
     if (id === undefined || id === null) return null;
     const ok = (result) => ({ jsonrpc: "2.0", id, result });
     try {
-      if (method === "initialize") return ok({ protocolVersion: params?.protocolVersion ?? "2025-06-18", capabilities: { tools: {} }, serverInfo: { name: "pixelpage-dash", version: "1.1.0" }, instructions: "픽셀페이지 대시보드(pixelpage.co.kr/app)의 클라이언트, 업무 관리, 고객사 정보를 읽고 고친다. 먼저 overview 로 현황과 id 를 확인한다. 날짜는 한국 시간 YYYY-MM-DD." });
+      if (method === "initialize") return ok({ protocolVersion: params?.protocolVersion ?? "2025-06-18", capabilities: { tools: {} }, serverInfo: { name: "pixelpage-dash", version: "1.2.0" }, instructions: "픽셀페이지 대시보드(pixelpage.co.kr/app)의 클라이언트, 업무 관리, 고객사 정보를 읽고 고친다. 먼저 overview 로 현황과 id 를 확인한다. 날짜는 한국 시간 YYYY-MM-DD. 리드 구글 시트는 lead_sheet_inspect 로 점검하고 lead_sheet_link 로 연결한다." });
       if (method === "ping") return ok({});
       if (method === "tools/list") return ok({ tools: Object.entries(TOOLS).map(([name, t]) => ({ name, description: t.description, inputSchema: t.schema, annotations: { readOnlyHint: READ_ONLY.includes(name), destructiveHint: name === "db_delete", openWorldHint: false } })) });
       if (method === "tools/call") {
