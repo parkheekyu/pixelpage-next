@@ -18,7 +18,7 @@ const ADMIN: { key: string; href: string; label: string; Icon: LucideIcon; exact
   { key: "clients", href: "/app/admin/clients", label: "클라이언트", Icon: Handshake },
   { key: "tasks", href: "/app/admin/tasks", label: "업무 관리", Icon: ListChecks },
   { key: "work", href: "/app/admin/work", label: "프로젝트 관리", Icon: FolderKanban },
-  { key: "finance", href: "/app/admin/finance", label: "수입·지출", Icon: Wallet },
+  { key: "finance", href: "/app/admin/finance", label: "매출·지출", Icon: Wallet },
   { key: "users", href: "/app/admin/users", label: "회원 · 권한", Icon: Users },
 ];
 const ORDER_KEY = "pp-side-order";

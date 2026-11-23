@@ -1,7 +1,7 @@
-/** 수입·지출 장부 */
+/** 매출·지출 장부 */
 export const LEDGER_KINDS = ["income", "expense", "excluded"] as const;
 export type LedgerKind = (typeof LEDGER_KINDS)[number];
-export const KIND_LABEL: Record<LedgerKind, string> = { income: "수입", expense: "지출", excluded: "제외" };
+export const KIND_LABEL: Record<LedgerKind, string> = { income: "매출", expense: "지출", excluded: "제외" };
 export interface LedgerRow { id: string; date: string; kind: LedgerKind; category: string; method: string | null; amount: number; fixed: boolean; title: string; memo: string | null }
 export type LedgerInput = Omit<LedgerRow, "id">;
 /** 새 항목을 넣을 때 고를 수 있는 기본 분류. 이미 쓰인 분류는 여기에 더해진다. */

@@ -32,11 +32,11 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
     <>
       <OverviewBoard tasks={(tasks ?? []) as WorkTask[]} projects={(workProjects ?? []) as WorkProject[]} clients={(clients ?? []) as Client[]} today={today} />
 
-      <div className="ov-h"><h2>{+month.slice(5)}월 수입·지출</h2><small>{last ? `${+last.slice(5, 7)}월 ${+last.slice(8, 10)}일까지 기록됨` : "이번 달 기록이 아직 없습니다"}</small><Link href="/app/admin/finance">수입·지출 열기 ›</Link></div>
+      <div className="ov-h"><h2>{+month.slice(5)}월 매출·지출</h2><small>{last ? `${+last.slice(5, 7)}월 ${+last.slice(8, 10)}일까지 기록됨` : "이번 달 기록이 아직 없습니다"}</small><Link href="/app/admin/finance">매출·지출 열기 ›</Link></div>
       <section className="kpis">
-        <div className="kpi"><span>수입</span><b>{fmtW(income)}</b></div>
+        <div className="kpi"><span>매출</span><b>{fmtW(income)}</b></div>
         <div className="kpi"><span>지출</span><b>{fmtW(expense)}</b></div>
-        <div className="kpi"><span>남은 돈 (수입 − 지출)</span><b style={{ color: net < 0 ? "var(--bad)" : undefined }}>{fmtW(net)}</b></div>
+        <div className="kpi"><span>남은 돈 (매출 − 지출)</span><b style={{ color: net < 0 ? "var(--bad)" : undefined }}>{fmtW(net)}</b></div>
         <Link className="kpi" href="/app/admin/clients"><span>진행 중 클라이언트</span><b>{activeClients}곳</b></Link>
       </section>
 
