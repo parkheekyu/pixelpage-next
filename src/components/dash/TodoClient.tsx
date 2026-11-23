@@ -241,7 +241,7 @@ export function OverviewBoard({ tasks, projects, clients, today }: { tasks: Work
   }).sort((a, b) => (a.p.deadline ?? "9").localeCompare(b.p.deadline ?? "9"));
 
   return (
-    <div className="pg">
+    <div>
       <header className="ph"><h1>전체 개요 <small>{dayLabel(today)} · 남은 일 {left}건 · 진행 중 프로젝트 {rows.length}개</small></h1></header>
       {edits.err && <div className="msg err">{edits.err}</div>}
       <div className="ov-grid">
