@@ -5,7 +5,7 @@ import { loadAllProjectData } from "@/lib/dash/data";
 import { agg, fmtW, slice, sparkPoints } from "@/lib/dash/agg";
 import AdminOverview, { type OverviewRow } from "@/components/dash/AdminOverview";
 import { OverviewBoard } from "@/components/dash/TodoClient";
-import type { Client, WorkProject, WorkTask } from "@/lib/dash/types";
+import type { Client, WorkMilestone, WorkProject, WorkTask } from "@/lib/dash/types";
 import { todayKST } from "@/lib/dash/work";
 
 export const dynamic = "force-dynamic";
@@ -18,9 +18,10 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const today = todayKST(), month = today.slice(0, 7);
   const nextMonth = new Date(Date.UTC(+month.slice(0, 4), +month.slice(5, 7), 1)).toISOString().slice(0, 10); // 다음 달 1일
   const { supabase } = await requireStaff();
-  const [{ data: tasks }, { data: workProjects }, { data: clients }, { data: ledger }] = await Promise.all([
+  const [{ data: tasks }, { data: workProjects }, { data: milestones }, { data: clients }, { data: ledger }] = await Promise.all([
     supabase.from("work_tasks").select("*").order("created_at"),
     supabase.from("work_projects").select("*").order("name"),
+    supabase.from("work_milestones").select("*").order("position"),
     supabase.from("clients").select("id,name,status"),
     supabase.from("ledger").select("date,kind,amount").gte("date", `${month}-01`).lt("date", nextMonth).limit(1000),
   ]);
@@ -30,7 +31,7 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const activeClients = (clients ?? []).filter((c) => c.status === "active").length;
   return (
     <>
-      <OverviewBoard tasks={(tasks ?? []) as WorkTask[]} projects={(workProjects ?? []) as WorkProject[]} clients={(clients ?? []) as Client[]} today={today} />
+      <OverviewBoard tasks={(tasks ?? []) as WorkTask[]} projects={(workProjects ?? []) as WorkProject[]} milestones={(milestones ?? []) as WorkMilestone[]} clients={(clients ?? []) as Client[]} today={today} />
 
       <div className="ov-h"><h2>{+month.slice(5)}월 매출·지출</h2><small>{last ? `${+last.slice(5, 7)}월 ${+last.slice(8, 10)}일까지 기록됨` : "이번 달 기록이 아직 없습니다"}</small><Link href="/app/admin/finance">매출·지출 열기 ›</Link></div>
       <section className="kpis">
