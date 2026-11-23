@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Building2, Clapperboard, Handshake, LayoutDashboard, ListChecks, Users, Wallet, type LucideIcon } from "lucide-react";
+import { Building2, Clapperboard, FolderKanban, Handshake, LayoutDashboard, ListChecks, Users, Wallet, type LucideIcon } from "lucide-react";
 import logoDark from "@/assets/logo-dark.png";
 import { useEffect, useRef, useState } from "react";
 import { PanelLeftClose, PanelLeftOpen } from "lucide-react";
@@ -16,7 +16,8 @@ const SECTIONS = ["projects", "research", "ads", "landing", "settings"] as const
 const ADMIN: { key: string; href: string; label: string; Icon: LucideIcon; exact?: boolean }[] = [
   { key: "overview", href: "/app/admin", label: "전체 개요", Icon: LayoutDashboard, exact: true },
   { key: "clients", href: "/app/admin/clients", label: "클라이언트", Icon: Handshake },
-  { key: "work", href: "/app/admin/work", label: "업무 관리", Icon: ListChecks },
+  { key: "tasks", href: "/app/admin/tasks", label: "업무 관리", Icon: ListChecks },
+  { key: "work", href: "/app/admin/work", label: "프로젝트 관리", Icon: FolderKanban },
   { key: "finance", href: "/app/admin/finance", label: "수입·지출", Icon: Wallet },
   { key: "users", href: "/app/admin/users", label: "회원 · 권한", Icon: Users },
 ];

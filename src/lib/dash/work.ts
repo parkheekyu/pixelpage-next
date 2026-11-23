@@ -32,16 +32,11 @@ export function ddayLabel(deadline: string | null, today: string) {
   return d === 0 ? "오늘" : d > 0 ? `D-${d}` : `${-d}일 지남`;
 }
 
-export type TaskGroup = "late" | "today" | "week" | "later" | "none" | "hold" | "done";
-export const GROUP_LABEL: Record<TaskGroup, string> = { late: "지연", today: "오늘", week: "이번 주", later: "이후", none: "기한 없음", hold: "보류", done: "완료" };
-export const GROUP_ORDER: TaskGroup[] = ["late", "today", "week", "later", "none", "hold", "done"];
-export function groupOf(t: WorkTask, today: string): TaskGroup {
-  if (t.status === "done") return "done";
-  if (t.status === "hold") return "hold";
-  if (!t.deadline) return "none";
-  const d = daysLeft(t.deadline, today);
-  if (d < 0) return "late";
-  if (d === 0) return "today";
-  const dow = (new Date(today + "T00:00:00Z").getUTCDay() + 6) % 7; // 월=0
-  return d <= 6 - dow ? "week" : "later";
-}
+/** 날짜에 n일을 더한다 (YYYY-MM-DD) */
+export const addDays = (s: string, n: number) => new Date((day(s) + n) * 86400_000).toISOString().slice(0, 10);
+const DOW = ["일", "월", "화", "수", "목", "금", "토"];
+export const dowOf = (s: string) => DOW[new Date(s + "T00:00:00Z").getUTCDay()];
+/** "11월 23일 (월)" */
+export const dayLabel = (s: string) => `${+s.slice(5, 7)}월 ${+s.slice(8, 10)}일 (${dowOf(s)})`;
+/** 그 날이 든 주의 월요일 */
+export const weekStart = (s: string) => addDays(s, -((new Date(s + "T00:00:00Z").getUTCDay() + 6) % 7));

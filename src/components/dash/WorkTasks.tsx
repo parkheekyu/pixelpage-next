@@ -7,7 +7,7 @@ import { X } from "lucide-react";
 import { createTask, deleteTask, updateTask } from "@/app/app/work-actions";
 import type { ActionResult } from "@/app/app/actions";
 import { PRIORITIES, PRIORITY_LABEL, TASK_STATUSES, TASK_STATUS_LABEL, type Client, type Priority, type TaskStatus, type WorkProject, type WorkTask, type WorkTaskPatch } from "@/lib/dash/types";
-import { GROUP_LABEL, GROUP_ORDER, ddayLabel, daysLeft, groupOf, type TaskGroup } from "@/lib/dash/work";
+import { ddayLabel, daysLeft } from "@/lib/dash/work";
 
 const PRI_TAG: Record<Priority, string> = { high: "red", mid: "blue", low: "gray" };
 const ST_TAG: Record<TaskStatus, string> = { todo: "blue", done: "green", hold: "orange" };
@@ -58,13 +58,13 @@ export function useTaskEdits(tasks: WorkTask[]) {
     remove: (id: string) => { setView((cur) => cur.filter((t) => t.id !== id)); send(() => deleteTask(id)); },
     add: (input: WorkTaskPatch) => {
       const id = crypto.randomUUID();
-      const row: WorkTask = { id, title: (input.title ?? "").trim(), client_id: input.client_id ?? null, project_id: input.project_id ?? null, milestone_id: input.milestone_id ?? null, deadline: input.deadline ?? null, priority: input.priority ?? "mid", status: "todo", hold_reason: null, done_at: null, created_at: new Date().toISOString() };
+      const row: WorkTask = { id, title: (input.title ?? "").trim(), client_id: input.client_id ?? null, project_id: input.project_id ?? null, milestone_id: input.milestone_id ?? null, deadline: input.deadline ?? null, do_date: input.do_date ?? null, priority: input.priority ?? "mid", status: "todo", hold_reason: null, done_at: null, created_at: new Date().toISOString() };
       setView((cur) => [...cur, row]);
       send(() => createTask({ ...input, id }));
     },
   };
 }
-type Edits = ReturnType<typeof useTaskEdits>;
+export type Edits = ReturnType<typeof useTaskEdits>;
 
 /** 할 일 한 줄. context 를 주면 클라이언트·프로젝트 칸도 보여 준다 (전체 업무 리스트용). */
 export function TaskRow({ t, today, edits, context }: { t: WorkTask; today: string; edits: Edits; context?: { clients: Client[]; projects: WorkProject[] } }) {
@@ -143,43 +143,5 @@ export function TaskAdd({ edits, fixed, context, placeholder }: { edits: Edits; 
       </select>
       <button className="btn primary" type="submit" disabled={!title.trim()}>추가</button>
     </form>
-  );
-}
-
-/** 전체 업무 리스트: 지연 / 오늘 / 이번 주 / 이후 / 기한 없음 / 보류 / 완료 로 묶어 보여 준다 */
-export default function WorkTaskBoard({ tasks, clients, projects, today }: { tasks: WorkTask[]; clients: Client[]; projects: WorkProject[]; today: string }) {
-  useFreshOnMount();
-  const edits = useTaskEdits(tasks);
-  const [showDone, setShowDone] = useState(false);
-  const context = { clients, projects };
-  const groups = new Map<TaskGroup, WorkTask[]>();
-  for (const t of edits.view) { const g = groupOf(t, today); groups.set(g, [...(groups.get(g) ?? []), t]); }
-  const open = edits.view.filter((t) => t.status === "todo").length;
-  const doneList = (groups.get("done") ?? []).sort((a, b) => (b.done_at ?? "").localeCompare(a.done_at ?? ""));
-
-  return (
-    <div className="card work-board" style={{ marginBottom: 12 }}>
-      <h2>업무 리스트 <small style={{ color: "var(--muted)", fontWeight: 400, marginLeft: 6 }}>진행 {open}건{groups.get("late")?.length ? ` · 지연 ${groups.get("late")!.length}건` : ""}</small></h2>
-      <div className="sub">체크하면 프로젝트 진행률에 바로 반영됩니다. <Link href="/app/admin/work" style={{ color: "var(--s1)" }}>프로젝트 보기 ›</Link></div>
-      <TaskAdd edits={edits} context={context} />
-      {edits.err && <div className="msg err">{edits.err}</div>}
-      {edits.view.length === 0 && <div className="hint">아직 업무가 없습니다. 위 칸에 적고 엔터를 누르면 추가됩니다.</div>}
-      {GROUP_ORDER.filter((g) => g !== "done").map((g) => {
-        const list = (groups.get(g) ?? []).sort(sortTasks);
-        if (list.length === 0) return null;
-        return (
-          <section key={g} className={`task-group g-${g}`}>
-            <h3>{GROUP_LABEL[g]} <small>{list.length}</small></h3>
-            {list.map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} context={context} />)}
-          </section>
-        );
-      })}
-      {doneList.length > 0 && (
-        <section className="task-group g-done">
-          <h3><button type="button" className="link" onClick={() => setShowDone((v) => !v)}>{showDone ? "▾" : "▸"} 완료 <small>{doneList.length}</small></button></h3>
-          {showDone && doneList.slice(0, 50).map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} context={context} />)}
-        </section>
-      )}
-    </div>
   );
 }

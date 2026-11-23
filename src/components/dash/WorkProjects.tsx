@@ -31,7 +31,7 @@ export default function WorkProjects({ projects, tasks, clients, today }: { proj
 
   return (
     <>
-      <header className="ph"><h1>업무 관리 <small>진행 중 프로젝트 {active.length}개</small></h1></header>
+      <header className="ph"><h1>프로젝트 관리 <small>진행 중 프로젝트 {active.length}개</small></h1></header>
 
       <div className="ndb-views">
         <button type="button" className={!showDone ? "on" : ""} onClick={() => setShowDone(false)}>진행 중 <small>{active.length}</small></button>

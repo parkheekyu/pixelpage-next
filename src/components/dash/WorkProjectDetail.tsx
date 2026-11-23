@@ -28,7 +28,7 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
   return (
     <div style={{ opacity: pending ? 0.7 : 1 }}>
       <header className="ph">
-        <h1><Link href="/app/admin/work" style={{ color: "var(--muted)", fontWeight: 400 }}>업무 관리 ›</Link> <input className="h-edit" defaultValue={p.name} aria-label="프로젝트 명" onBlur={blurSave("name", p.name)} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} /></h1>
+        <h1><Link href="/app/admin/work" style={{ color: "var(--muted)", fontWeight: 400 }}>프로젝트 관리 ›</Link> <input className="h-edit" defaultValue={p.name} aria-label="프로젝트 명" onBlur={blurSave("name", p.name)} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} /></h1>
         <div className="controls">
           <button type="button" className="btn" onClick={() => save({ status: p.status === "active" ? "done" : "active" })}>{p.status === "active" ? "프로젝트 완료 처리" : "다시 진행 중으로"}</button>
           <button type="button" className="btn danger" onClick={() => { if (confirm(`${p.name} 프로젝트를 삭제할까요? 마일스톤과 할 일 ${tasks.length}건이 함께 지워집니다.`)) run(() => deleteWorkProject(p.id), () => router.push("/app/admin/work")); }}>삭제</button>

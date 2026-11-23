@@ -31,9 +31,9 @@ export default function AdminOverview({ rows: input, days }: { rows: OverviewRow
   return (
     <div style={{ opacity: pending ? 0.6 : 1, transition: "opacity .15s" }}>
       <header className="ph">
-        <h1>전체 고객사 <small>{rows.length}개사 · 총 광고비 {fmtW(tot.cost)}</small></h1>
+        <h1>고객사 광고 성과 <small>{rows.length}개사 · 총 광고비 {fmtW(tot.cost)}</small></h1>
         <div className="controls">
-          <select value={days} onChange={(e) => start(() => router.replace(`${pathname}?days=${e.target.value}`))}>
+          <select value={days} onChange={(e) => start(() => router.replace(`${pathname}?days=${e.target.value}`, { scroll: false }))}>
             <option value={7}>최근 7일</option><option value={14}>최근 14일</option><option value={28}>최근 4주</option>
           </select>
           <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}>

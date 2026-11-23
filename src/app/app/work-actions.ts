@@ -84,6 +84,7 @@ function cleanTask(p: WorkTaskPatch): WorkTaskPatch | string {
   const out: WorkTaskPatch = {};
   if (p.title !== undefined) { const v = String(p.title).trim().slice(0, 200); if (!v) return "할 일을 입력해 주세요."; out.title = v; }
   if (p.deadline !== undefined) { if (p.deadline && !isDate(p.deadline)) return "날짜 형식 오류"; out.deadline = p.deadline || null; }
+  if (p.do_date !== undefined) { if (p.do_date && !isDate(p.do_date)) return "날짜 형식 오류"; out.do_date = p.do_date || null; }
   if (p.priority !== undefined) { if (!PRIORITIES.includes(p.priority as Priority)) return "잘못된 우선순위"; out.priority = p.priority; }
   if (p.status !== undefined) { if (!TASK_STATUSES.includes(p.status as TaskStatus)) return "잘못된 상태"; out.status = p.status; }
   if (p.hold_reason !== undefined) out.hold_reason = (p.hold_reason ?? "").trim().slice(0, 200) || null;

@@ -225,11 +225,13 @@ export interface WorkTask {
   project_id: string | null;
   milestone_id: string | null;
   deadline: string | null;
+  /** 하는 날. 업무 관리(할 일 목록)에서 이 날짜의 할 일로 보인다. 마감일과는 별개. */
+  do_date: string | null;
   priority: Priority;
   status: TaskStatus;
   hold_reason: string | null;
   done_at: string | null;
   created_at: string;
 }
-export type WorkTaskPatch = Partial<Pick<WorkTask, "title" | "client_id" | "project_id" | "milestone_id" | "deadline" | "priority" | "status" | "hold_reason">>;
+export type WorkTaskPatch = Partial<Pick<WorkTask, "title" | "client_id" | "project_id" | "milestone_id" | "deadline" | "do_date" | "priority" | "status" | "hold_reason">>;
 export type WorkProjectPatch = Partial<Pick<WorkProject, "name" | "goal" | "deadline" | "client_id" | "status">>;
