@@ -1,5 +1,6 @@
 "use client";
 
+import DateInput from "./DateInput";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
@@ -96,7 +97,7 @@ export function TaskRow({ t, today, edits, context }: { t: WorkTask; today: stri
         </>
       )}
       <span className="t-date">
-        <input type="date" value={t.deadline ?? ""} aria-label="데드라인" onChange={(e) => edits.save(t.id, { deadline: e.target.value || null })} />
+        <DateInput value={t.deadline} label="데드라인" onCommit={(v) => edits.save(t.id, { deadline: v })} />
         {t.deadline && t.status !== "done" && <small className={late ? "late" : ""}>{ddayLabel(t.deadline, today)}</small>}
       </span>
       <select className={`pill tag-${PRI_TAG[t.priority]}`} value={t.priority} aria-label="우선순위" onChange={(e) => edits.save(t.id, { priority: e.target.value as Priority })}>

@@ -1,5 +1,6 @@
 "use client";
 
+import DateInput from "./DateInput";
 import Link from "next/link";
 import { useState } from "react";
 import { ArrowUpDown, CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, CircleDot, Flag, FolderInput, FolderKanban, Plus, Type, X } from "lucide-react";
@@ -239,7 +240,7 @@ function DbRow({ t, today, edits, projects, milestones }: Shared & { t: WorkTask
           {TASK_STATUSES.map((x) => <option key={x} value={x}>{TASK_STATUS_LABEL[x]}</option>)}
         </select>
       </td>
-      <td className="nowrap"><input type="date" className="cell-in date" value={t.do_date ?? ""} aria-label="하는 날" onChange={(e) => edits.save(t.id, { do_date: e.target.value || null })} />{t.do_date && <small>{dowOf(t.do_date)}</small>}</td>
+      <td className="nowrap"><DateInput className="cell-in date" value={t.do_date} label="하는 날" onCommit={(v) => edits.save(t.id, { do_date: v })} />{t.do_date && <small>{dowOf(t.do_date)}</small>}</td>
       <td>
         <select className="pill" value={t.project_id ?? ""} aria-label="프로젝트" onChange={(e) => edits.save(t.id, { project_id: e.target.value || null })}>
           <option value="">없음</option>
@@ -247,7 +248,7 @@ function DbRow({ t, today, edits, projects, milestones }: Shared & { t: WorkTask
         </select>
       </td>
       <td className="pad nowrap">{ms?.title ?? ""}</td>
-      <td className="nowrap"><input type="date" className="cell-in date" value={t.deadline ?? ""} aria-label="마감" onChange={(e) => edits.save(t.id, { deadline: e.target.value || null })} />{t.deadline && t.status !== "done" && <small className={late ? "late" : ""}>{ddayLabel(t.deadline, today)}</small>}</td>
+      <td className="nowrap"><DateInput className="cell-in date" value={t.deadline} label="마감" onCommit={(v) => edits.save(t.id, { deadline: v })} />{t.deadline && t.status !== "done" && <small className={late ? "late" : ""}>{ddayLabel(t.deadline, today)}</small>}</td>
       <td>
         <select className={`pill tag-${PRI_TAG[t.priority]}`} value={t.priority} aria-label="우선순위" onChange={(e) => edits.save(t.id, { priority: e.target.value as Priority })}>
           {PRIORITIES.map((x) => <option key={x} value={x}>{PRIORITY_LABEL[x]}</option>)}

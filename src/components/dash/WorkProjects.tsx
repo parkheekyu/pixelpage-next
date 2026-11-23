@@ -1,5 +1,6 @@
 "use client";
 
+import DateInput from "./DateInput";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { Building2, CalendarDays, CircleDot, Gauge as Gauge2, ListChecks, Plus, Target, Type, X } from "lucide-react";
@@ -63,7 +64,7 @@ export default function WorkProjects({ projects, tasks, clients, today }: { proj
                 </td>
                 <td className="wide"><input className="cell-in" defaultValue={p.goal ?? ""} key={p.goal ?? ""} aria-label="목표" placeholder="비어 있음" onBlur={(e) => { const v = e.target.value.trim(); if (v !== (p.goal ?? "")) save(p.id, { goal: v }); }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} /></td>
                 <td className="nowrap">
-                  <input type="date" className="cell-in date" defaultValue={p.deadline ?? ""} key={p.deadline ?? ""} aria-label="데드라인" onChange={(e) => save(p.id, { deadline: e.target.value || null })} />
+                  <DateInput className="cell-in date" value={p.deadline} label="데드라인" onCommit={(v) => save(p.id, { deadline: v })} />
                   {p.deadline && p.status === "active" && <small className={r === "late" ? "late" : ""}>{ddayLabel(p.deadline, today)}</small>}
                 </td>
                 <td className="nowrap">

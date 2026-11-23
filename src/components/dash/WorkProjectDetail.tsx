@@ -1,5 +1,6 @@
 "use client";
 
+import DateInput from "./DateInput";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
@@ -40,7 +41,7 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
       <div className="card" style={{ marginBottom: 12 }}>
         <div className="form-row" style={{ alignItems: "flex-end", marginBottom: 14 }}>
           <label className="f" style={{ flex: 1, minWidth: 260 }}>목표<input type="text" defaultValue={p.goal ?? ""} placeholder="이 프로젝트로 이루려는 것" onBlur={blurSave("goal", p.goal ?? "")} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} /></label>
-          <label className="f">데드라인<input type="date" defaultValue={p.deadline ?? ""} onChange={(e) => save({ deadline: e.target.value || null })} /></label>
+          <label className="f">데드라인<DateInput value={p.deadline} label="데드라인" onCommit={(v) => save({ deadline: v })} /></label>
           <label className="f">클라이언트
             <select value={p.client_id ?? ""} onChange={(e) => save({ client_id: e.target.value || null })}><option value="">없음</option>{clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select>
           </label>

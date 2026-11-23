@@ -1,5 +1,6 @@
 "use client";
 
+import DateInput from "./DateInput";
 import Link from "next/link";
 import { useState, useTransition } from "react";
 import { CalendarDays, CircleDot, FileText, LayoutGrid, Link2, Plus, Tag, Type, Wallet, X } from "lucide-react";
@@ -84,7 +85,7 @@ export default function ClientsAdmin({ clients, loadError }: { clients: Client[]
                     </select>
                   </td>
                   <td className="nowrap">
-                    <input type="date" className="cell-in date" defaultValue={c.contract_date ?? ""} key={c.contract_date ?? ""} aria-label="계약일" onChange={(e) => save(c.id, { contract_date: e.target.value || null })} />
+                    <DateInput className="cell-in date" value={c.contract_date} label="계약일" onCommit={(v) => save(c.id, { contract_date: v })} />
                     {m !== null && <small>{c.status === "ended" ? `${m}개월 진행` : `${m}개월차`}</small>}
                   </td>
                   <td className="wide"><input className="cell-in" defaultValue={c.revenue_model ?? ""} key={c.revenue_model ?? ""} aria-label="수익구조" placeholder="비어 있음" onKeyDown={enter} onBlur={(e) => { const v = e.target.value.trim(); if (v !== (c.revenue_model ?? "")) save(c.id, { revenue_model: v }); }} /></td>
