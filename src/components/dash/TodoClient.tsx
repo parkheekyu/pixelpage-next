@@ -272,7 +272,7 @@ function DbAdd({ edits, day, label }: { edits: Edits; day: string | null; label:
   );
 }
 
-/** 업무 관리: 모든 할 일을 데이터베이스 표로 본다. 이번 주 보기는 요일별로 묶인다. */
+/** 업무 관리: 모든 할 일을 데이터베이스 표로 본다. 이번 주 보기는 하는 날 순으로 늘어놓는다. */
 export default function TodoClient({ tasks, projects, milestones, today }: { tasks: WorkTask[]; projects: WorkProject[]; milestones: WorkMilestone[]; today: string }) {
   useFreshOnMount();
   const edits = useTaskEdits(tasks);
@@ -285,7 +285,7 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
   const thisWeek = start === weekStart(today);
   const byDate = (a: WorkTask, b: WorkTask) => (a.do_date ?? "9").localeCompare(b.do_date ?? "9") || sortDay(a, b);
   const lists: Record<View, WorkTask[]> = {
-    week: all.filter((t) => t.do_date && t.do_date >= days[0] && t.do_date <= days[6]),
+    week: all.filter((t) => t.do_date && t.do_date >= days[0] && t.do_date <= days[6]).sort(byDate),
     overdue: all.filter((t) => t.status === "todo" && t.do_date && t.do_date < today).sort(byDate),
     none: all.filter((t) => t.status !== "done" && !t.do_date).sort(sortTasks),
     all: all.filter((t) => t.status !== "done").sort(byDate),
@@ -329,27 +329,15 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
               <th><Flag aria-hidden /> 마일스톤</th><th><CalendarDays aria-hidden /> 마감</th><th><ArrowUpDown aria-hidden /> 우선순위</th><th />
             </tr>
           </thead>
-          {view === "week"
-            ? days.map((d) => {
-                const list = rows.filter((t) => t.do_date === d).sort(sortDay), done = list.filter((t) => t.status === "done").length;
-                return (
-                  <tbody key={d}>
-                    <tr className={`grp${d === today ? " today" : ""}`}><td colSpan={8}><b>{dowOf(d)}요일</b> {md(d)}{d === today && <em>오늘</em>}<small>{list.length > 0 ? `${done} / ${list.length}` : "비어 있음"}</small></td></tr>
-                    {list.map((t) => <DbRow key={t.id} t={t} {...shared} />)}
-                    <DbAdd edits={edits} day={d} label={`${dowOf(d)}요일 할 일 추가 (적고 엔터)`} />
-                  </tbody>
-                );
-              })
-            : (
-              <tbody>
-                {rows.slice(0, 200).map((t) => <DbRow key={t.id} t={t} {...shared} />)}
-                {rows.length === 0 && <tr><td colSpan={8} className="pad" style={{ color: "var(--muted)" }}>{view === "overdue" ? "밀린 일이 없습니다." : view === "done" ? "완료한 일이 없습니다." : "해당하는 일이 없습니다."}</td></tr>}
-                {(view === "none" || view === "all") && <DbAdd edits={edits} day={null} label="새 할 일 (적고 엔터, 날짜는 나중에)" />}
-              </tbody>
-            )}
+          <tbody>
+            {rows.slice(0, 200).map((t) => <DbRow key={t.id} t={t} {...shared} />)}
+            {rows.length === 0 && <tr><td colSpan={8} className="pad" style={{ color: "var(--muted)" }}>{view === "week" ? "이 주에 잡힌 일이 없습니다." : view === "overdue" ? "밀린 일이 없습니다." : view === "done" ? "완료한 일이 없습니다." : "해당하는 일이 없습니다."}</td></tr>}
+            {view === "week" && <DbAdd edits={edits} day={target} label={`새 할 일 (적고 엔터, ${dayName(target, today)} 날짜로 들어갑니다)`} />}
+            {(view === "none" || view === "all") && <DbAdd edits={edits} day={null} label="새 할 일 (적고 엔터, 날짜는 나중에)" />}
+          </tbody>
         </table>
       </div>
-      <div className="hint">칸을 눌러 바로 고칩니다. "하는 날"을 바꾸면 그 요일로 옮겨지고, 체크하면 프로젝트 진행률에 반영됩니다.</div>
+      <div className="hint">칸을 눌러 바로 고칩니다. "하는 날"이 이번 주 안에 있는 일이 이번 주 보기에 나오고, 체크하면 프로젝트 진행률에 반영됩니다.</div>
     </>
   );
 }
