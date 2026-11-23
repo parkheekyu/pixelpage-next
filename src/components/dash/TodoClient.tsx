@@ -133,6 +133,7 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
 
   return (
     <div className="ov-left">
+      <div className="card td-card ov-box ov-today">
       <div className="td-week" role="tablist" aria-label="이번 주">
         <button type="button" className="nav" aria-label="지난주" title="지난주" onClick={() => go(addDays(day, -7))}><ChevronLeft size={16} aria-hidden /></button>
         {week.map((d) => {
@@ -146,8 +147,6 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
         })}
         <button type="button" className="nav" aria-label="다음 주" title="다음 주" onClick={() => go(addDays(day, 7))}><ChevronRight size={16} aria-hidden /></button>
       </div>
-
-      <div className="card td-card ov-box ov-today">
         <div className="td-head">
           <h2>{isToday ? "오늘 할 일" : `${dayLabel(day)} 할 일`}{!isToday && <button type="button" className="td-move" style={{ marginLeft: 8 }} onClick={() => go(today)}>오늘로</button>}</h2>
           <DayProgress list={list} />

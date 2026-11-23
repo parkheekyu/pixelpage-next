@@ -1183,14 +1183,13 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .td-pick-foot { display: flex; gap: 8px; margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); position: sticky; bottom: 0; background: var(--surface); }
 .pp-dash .ov-grid { display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 12px; align-items: start; }
 .pp-dash .ov-grid > .card { grid-column: auto; margin-bottom: 0; }
-/* 주간 띠는 두 칸 위에 걸치고, 오늘 할 일과 프로젝트 진행률은 같은 줄에 같은 높이로 둔다. 넘치면 상자 안에서 스크롤한다. */
+/* 오늘 할 일(주간 띠 포함)과 프로젝트 진행률은 같은 줄에 같은 높이로 둔다. 넘치면 상자 안에서 스크롤한다. */
 .pp-dash .ov-left { display: contents; }
-.pp-dash .ov-grid .td-week { grid-column: 1 / -1; margin-bottom: 0; }
 .pp-dash .ov-grid .td-card { grid-column: 1; margin-bottom: 0; }
-.pp-dash .ov-grid .ov-today { grid-row: 2; }
-.pp-dash .ov-grid .ov-prog { grid-column: 2; grid-row: 2; }
-.pp-dash .ov-box { height: 460px; display: flex; flex-direction: column; }
-.pp-dash .ov-box > .td-head, .pp-dash .ov-box > .td-foot { flex: none; }
+.pp-dash .ov-grid .ov-today { grid-row: 1; }
+.pp-dash .ov-grid .ov-prog { grid-column: 2; grid-row: 1; }
+.pp-dash .ov-box { height: 520px; display: flex; flex-direction: column; }
+.pp-dash .ov-box > .td-head, .pp-dash .ov-box > .td-foot, .pp-dash .ov-box > .td-week { flex: none; }
 .pp-dash .ov-box > .td-foot { margin-top: 0; }
 .pp-dash .ov-scroll { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; margin-right: -6px; padding-right: 6px; }
 .pp-dash .pj-row { display: block; padding: 12px 2px; border-top: 1px solid var(--line); color: inherit; text-decoration: none; }
@@ -1204,7 +1203,7 @@ textarea.vx-in { resize: vertical; }
 @media (max-width: 860px) {
   .pp-dash .ov-grid { grid-template-columns: 1fr; }
   .pp-dash .ov-grid .ov-today, .pp-dash .ov-grid .ov-prog { grid-column: 1; grid-row: auto; }
-  .pp-dash .ov-box { height: auto; max-height: 460px; }
+  .pp-dash .ov-box { height: auto; max-height: 520px; }
   .pp-dash .td-row { flex-wrap: wrap; }
   .pp-dash .td-row .td-title { flex-basis: calc(100% - 40px); }
 }
