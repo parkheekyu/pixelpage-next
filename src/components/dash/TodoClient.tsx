@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight, FolderInput, X } from "lucide-react";
-import type { Client, WorkMilestone, WorkProject, WorkTask } from "@/lib/dash/types";
+import { ArrowUpDown, CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, CircleDot, Flag, FolderInput, FolderKanban, Plus, Type, X } from "lucide-react";
+import { PRIORITIES, PRIORITY_LABEL, TASK_STATUSES, TASK_STATUS_LABEL, type Client, type Priority, type TaskStatus, type WorkMilestone, type WorkProject, type WorkTask } from "@/lib/dash/types";
 import { addDays, dayLabel, daysLeft, ddayLabel, dowOf, progress, risk, weekStart, type Risk } from "@/lib/dash/work";
 import { Gauge } from "./WorkProjects";
 import { sortTasks, useFreshOnMount, useTaskEdits, type Edits } from "./WorkTasks";
@@ -220,110 +220,137 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
   );
 }
 
-/** 주간 보드의 할 일 카드. 끌어서 다른 요일로 옮긴다. 제목을 누르면 고칠 수 있다. */
-function WeekCard({ t, today, edits, projects, onDrag, from }: { t: WorkTask; today: string; edits: Edits; projects: WorkProject[]; onDrag: (id: string | null) => void; from?: boolean }) {
-  const [editing, setEditing] = useState(false);
-  const project = projects.find((p) => p.id === t.project_id);
+const PRI_TAG: Record<Priority, string> = { high: "red", mid: "blue", low: "gray" };
+const ST_TAG: Record<TaskStatus, string> = { todo: "blue", done: "green", hold: "orange" };
+type View = "week" | "overdue" | "none" | "all" | "done";
+
+/** 데이터베이스 표의 한 줄: 칸마다 바로 고친다 */
+function DbRow({ t, today, edits, projects, milestones }: Shared & { t: WorkTask }) {
   const late = t.status === "todo" && t.deadline && daysLeft(t.deadline, today) < 0;
+  const ms = milestones.find((m) => m.id === t.milestone_id);
   return (
-    <div className={`wk-card ${t.status}`} draggable={!editing} onDragStart={(e) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", t.id); onDrag(t.id); }} onDragEnd={() => onDrag(null)}>
-      <input type="checkbox" className="chk" checked={t.status === "done"} aria-label="완료" onChange={(e) => edits.save(t.id, { status: e.target.checked ? "done" : "todo" })} />
-      <div className="wk-body">
-        {editing
-          ? <input className="wk-edit" autoFocus defaultValue={t.title} aria-label="할 일" onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== t.title) edits.save(t.id, { title: v }); setEditing(false); }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); if (e.key === "Escape") setEditing(false); }} />
-          : <button type="button" className="wk-title" title="눌러서 고치기" onClick={() => setEditing(true)}>{t.title}</button>}
-        {(project || t.deadline || t.status === "hold" || from) && (
-          <div className="wk-meta">
-            {t.status === "hold" && <span className="pill tag-orange">보류</span>}
-            {project && <Link className="td-proj" href={`/app/admin/work/${project.id}`} title="프로젝트 열기">{project.name}</Link>}
-            {t.deadline && t.status !== "done" && <small className={late ? "late" : ""}>마감 {ddayLabel(t.deadline, today)}</small>}
-            {from && t.do_date && <small>{md(t.do_date)}</small>}
-          </div>
-        )}
-      </div>
-      <RemoveBtn t={t} edits={edits} />
-    </div>
+    <tr className={t.status === "done" ? "dim" : ""}>
+      <td className="title db-title">
+        <input type="checkbox" className="chk" checked={t.status === "done"} aria-label="완료" onChange={(e) => edits.save(t.id, { status: e.target.checked ? "done" : "todo" })} />
+        <input className="cell-in" defaultValue={t.title} key={t.title} aria-label="할 일" onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== t.title) edits.save(t.id, { title: v }); else e.target.value = t.title; }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} />
+      </td>
+      <td>
+        <select className={`pill tag-${ST_TAG[t.status]}`} value={t.status} aria-label="상태" onChange={(e) => edits.save(t.id, { status: e.target.value as TaskStatus })}>
+          {TASK_STATUSES.map((x) => <option key={x} value={x}>{TASK_STATUS_LABEL[x]}</option>)}
+        </select>
+      </td>
+      <td className="nowrap"><input type="date" className="cell-in date" value={t.do_date ?? ""} aria-label="하는 날" onChange={(e) => edits.save(t.id, { do_date: e.target.value || null })} />{t.do_date && <small>{dowOf(t.do_date)}</small>}</td>
+      <td>
+        <select className="pill" value={t.project_id ?? ""} aria-label="프로젝트" onChange={(e) => edits.save(t.id, { project_id: e.target.value || null })}>
+          <option value="">없음</option>
+          {projects.filter((p) => p.status === "active" || p.id === t.project_id).map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+        </select>
+      </td>
+      <td className="pad nowrap">{ms?.title ?? ""}</td>
+      <td className="nowrap"><input type="date" className="cell-in date" value={t.deadline ?? ""} aria-label="마감" onChange={(e) => edits.save(t.id, { deadline: e.target.value || null })} />{t.deadline && t.status !== "done" && <small className={late ? "late" : ""}>{ddayLabel(t.deadline, today)}</small>}</td>
+      <td>
+        <select className={`pill tag-${PRI_TAG[t.priority]}`} value={t.priority} aria-label="우선순위" onChange={(e) => edits.save(t.id, { priority: e.target.value as Priority })}>
+          {PRIORITIES.map((x) => <option key={x} value={x}>{PRIORITY_LABEL[x]}</option>)}
+        </select>
+      </td>
+      <td className="act"><button type="button" className="t-del" title="삭제" aria-label="삭제" onClick={() => { if (confirm(`"${t.title}" 을(를) 삭제할까요?${t.project_id ? " 프로젝트에서도 지워집니다." : ""}`)) edits.remove(t.id); }}><X size={14} aria-hidden /></button></td>
+    </tr>
   );
 }
 
-/** 업무 관리: 한 주를 요일별 칸으로 보고, 끌어서 요일을 옮긴다. */
+function DbAdd({ edits, day, label }: { edits: Edits; day: string | null; label: string }) {
+  const [v, setV] = useState("");
+  return (
+    <tr className="new">
+      <td colSpan={8}>
+        <form onSubmit={(e) => { e.preventDefault(); if (!v.trim()) return; edits.add({ title: v, do_date: day }); setV(""); }}>
+          <Plus size={14} aria-hidden />
+          <input value={v} onChange={(e) => setV(e.target.value)} placeholder={label} aria-label={label} />
+        </form>
+      </td>
+    </tr>
+  );
+}
+
+/** 업무 관리: 모든 할 일을 데이터베이스 표로 본다. 이번 주 보기는 요일별로 묶인다. */
 export default function TodoClient({ tasks, projects, milestones, today }: { tasks: WorkTask[]; projects: WorkProject[]; milestones: WorkMilestone[]; today: string }) {
   useFreshOnMount();
   const edits = useTaskEdits(tasks);
+  const [view, setView] = useState<View>("week");
   const [start, setStart] = useState(weekStart(today));
   const [picking, setPicking] = useState(false);
-  const [drag, setDrag] = useState<string | null>(null);
-  const [over, setOver] = useState<string | null>(null);
-  const [draft, setDraft] = useState<Record<string, string>>({});
   const all = edits.view;
+  const shared = { edits, projects, milestones, today };
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const thisWeek = start === weekStart(today);
-  const inWeek = all.filter((t) => t.do_date && t.do_date >= days[0] && t.do_date <= days[6]);
-  const pr = progress(inWeek);
-  // 이 주보다 앞선 날짜에 잡아 두고 못 끝낸 일
-  const carried = all.filter((t) => t.status === "todo" && t.do_date && t.do_date < days[0] && t.do_date < today).sort((a, b) => a.do_date!.localeCompare(b.do_date!));
-  const undated = all.filter((t) => !t.project_id && !t.do_date && t.status !== "done").sort(sortTasks);
-  const dropTo = (d: string) => ({
-    onDragOver: (e: React.DragEvent) => { if (!drag) return; e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (over !== d) setOver(d); },
-    onDragLeave: (e: React.DragEvent) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) setOver(null); },
-    onDrop: (e: React.DragEvent) => { e.preventDefault(); if (drag && all.find((t) => t.id === drag)?.do_date !== d) edits.save(drag, { do_date: d }); setDrag(null); setOver(null); },
-  });
-  const add = (d: string) => { const v = (draft[d] ?? "").trim(); if (!v) return; edits.add({ title: v, do_date: d }); setDraft((c) => ({ ...c, [d]: "" })); };
+  const byDate = (a: WorkTask, b: WorkTask) => (a.do_date ?? "9").localeCompare(b.do_date ?? "9") || sortDay(a, b);
+  const lists: Record<View, WorkTask[]> = {
+    week: all.filter((t) => t.do_date && t.do_date >= days[0] && t.do_date <= days[6]),
+    overdue: all.filter((t) => t.status === "todo" && t.do_date && t.do_date < today).sort(byDate),
+    none: all.filter((t) => t.status !== "done" && !t.do_date).sort(sortTasks),
+    all: all.filter((t) => t.status !== "done").sort(byDate),
+    done: all.filter((t) => t.status === "done").sort((a, b) => (b.done_at ?? "").localeCompare(a.done_at ?? "")),
+  };
+  const VIEWS: [View, string][] = [["week", thisWeek ? "이번 주" : `${md(days[0])} 주`], ["overdue", "밀린 일"], ["none", "날짜 미정"], ["all", "남은 일 전체"], ["done", "완료"]];
+  const rows = lists[view];
+  const pr = progress(lists.week);
   const target = thisWeek ? today : days[0];
 
   return (
-    <div>
+    <>
       <header className="ph">
-        <h1>업무 관리 <small>{md(days[0])} ~ {md(days[6])}{thisWeek ? " · 이번 주" : ""} · 할 일 {inWeek.length}건{inWeek.length > 0 ? ` 중 ${pr.done}건 완료` : ""}</small></h1>
+        <h1>업무 관리 <small>{md(days[0])} ~ {md(days[6])} 할 일 {lists.week.length}건{lists.week.length > 0 ? ` 중 ${pr.done}건 완료` : ""}</small></h1>
         <div className="controls">
-          <span className="lg-step">
-            <button type="button" className="btn" aria-label="지난주" title="지난주" onClick={() => setStart(addDays(start, -7))}><ChevronLeft size={16} aria-hidden /></button>
-            <button type="button" className="btn" aria-label="다음 주" title="다음 주" onClick={() => setStart(addDays(start, 7))}><ChevronRight size={16} aria-hidden /></button>
-          </span>
-          {!thisWeek && <button type="button" className="btn" onClick={() => setStart(weekStart(today))}>이번 주</button>}
+          {view === "week" && (
+            <>
+              <span className="lg-step">
+                <button type="button" className="btn" aria-label="지난주" title="지난주" onClick={() => setStart(addDays(start, -7))}><ChevronLeft size={16} aria-hidden /></button>
+                <button type="button" className="btn" aria-label="다음 주" title="다음 주" onClick={() => setStart(addDays(start, 7))}><ChevronRight size={16} aria-hidden /></button>
+              </span>
+              {!thisWeek && <button type="button" className="btn" onClick={() => setStart(weekStart(today))}>이번 주</button>}
+            </>
+          )}
           <button type="button" className={`btn td-pickbtn ${picking ? "on" : ""}`} onClick={() => setPicking((v) => !v)}><FolderInput size={15} aria-hidden /> 프로젝트에서 가져오기</button>
         </div>
       </header>
 
-      {inWeek.length > 0 && <div className="wk-prog"><Gauge pct={pr.pct} /><b>{pr.pct}%</b></div>}
-      {edits.err && <div className="msg err">{edits.err}</div>}
-      {picking && <Picker key={start} edits={edits} projects={projects} milestones={milestones} today={today} days={days} start={target} onClose={() => setPicking(false)} />}
-
-      <div className="wk-board">
-        {days.map((d) => {
-          const list = all.filter((t) => t.do_date === d).sort(sortDay), done = list.filter((t) => t.status === "done").length;
-          return (
-            <section key={d} className={`wk-col${d === today ? " today" : ""}${d < today ? " past" : ""}${over === d ? " over" : ""}`} {...dropTo(d)}>
-              <h3><span>{dowOf(d)}</span><b>{+d.slice(8, 10)}</b>{d === today && <em>오늘</em>}<small className={list.length > 0 && done === list.length ? "all" : ""}>{list.length > 0 ? `${done}/${list.length}` : ""}</small></h3>
-              {list.map((t) => <WeekCard key={t.id} t={t} today={today} edits={edits} projects={projects} onDrag={setDrag} />)}
-              <form onSubmit={(e) => { e.preventDefault(); add(d); }}>
-                <input value={draft[d] ?? ""} onChange={(e) => setDraft((c) => ({ ...c, [d]: e.target.value }))} placeholder="+ 할 일" aria-label={`${dayLabel(d)} 새 할 일`} />
-              </form>
-            </section>
-          );
-        })}
+      <div className="ndb-views">
+        {VIEWS.map(([k, label]) => <button key={k} type="button" className={view === k ? "on" : ""} onClick={() => setView(k)}>{label} <small>{lists[k].length}</small></button>)}
       </div>
-      <div className="hint">카드를 끌어서 다른 요일로 옮길 수 있습니다. 제목을 누르면 고칠 수 있고, 체크하면 프로젝트 진행률에 반영됩니다.</div>
 
-      {(carried.length > 0 || undated.length > 0) && (
-        <div className="wk-side">
-          {carried.length > 0 && (
-            <div className="card td-card td-over">
-              <div className="td-head"><h2>앞에서 밀린 일 <small>{carried.length}건</small></h2><button type="button" className="btn" onClick={() => carried.forEach((t) => edits.save(t.id, { do_date: target }))}>모두 {dayName(target, today)}로</button></div>
-              <div className="sub">이전 주에 잡아 두고 끝내지 못한 일입니다. 요일 칸으로 끌어다 놓으세요.</div>
-              <div className="wk-list">{carried.map((t) => <WeekCard key={t.id} t={t} today={today} edits={edits} projects={projects} onDrag={setDrag} from />)}</div>
-            </div>
-          )}
-          {undated.length > 0 && (
-            <div className="card td-card">
-              <div className="td-head"><h2>날짜를 안 정한 일 <small>{undated.length}건</small></h2></div>
-              <div className="sub">요일 칸으로 끌어다 놓으세요.</div>
-              <div className="wk-list">{undated.map((t) => <WeekCard key={t.id} t={t} today={today} edits={edits} projects={projects} onDrag={setDrag} />)}</div>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
+      {edits.err && <div className="msg err">{edits.err}</div>}
+      {picking && <div style={{ marginTop: 12 }}><Picker key={start} {...shared} days={days} start={target} onClose={() => setPicking(false)} /></div>}
+
+      <div className="tbl-wrap">
+        <table className="ndb db-tasks">
+          <thead>
+            <tr>
+              <th><Type aria-hidden /> 할 일</th><th><CircleDot aria-hidden /> 상태</th><th><CalendarCheck aria-hidden /> 하는 날</th><th><FolderKanban aria-hidden /> 프로젝트</th>
+              <th><Flag aria-hidden /> 마일스톤</th><th><CalendarDays aria-hidden /> 마감</th><th><ArrowUpDown aria-hidden /> 우선순위</th><th />
+            </tr>
+          </thead>
+          {view === "week"
+            ? days.map((d) => {
+                const list = rows.filter((t) => t.do_date === d).sort(sortDay), done = list.filter((t) => t.status === "done").length;
+                return (
+                  <tbody key={d}>
+                    <tr className={`grp${d === today ? " today" : ""}`}><td colSpan={8}><b>{dowOf(d)}요일</b> {md(d)}{d === today && <em>오늘</em>}<small>{list.length > 0 ? `${done} / ${list.length}` : "비어 있음"}</small></td></tr>
+                    {list.map((t) => <DbRow key={t.id} t={t} {...shared} />)}
+                    <DbAdd edits={edits} day={d} label={`${dowOf(d)}요일 할 일 추가 (적고 엔터)`} />
+                  </tbody>
+                );
+              })
+            : (
+              <tbody>
+                {rows.slice(0, 200).map((t) => <DbRow key={t.id} t={t} {...shared} />)}
+                {rows.length === 0 && <tr><td colSpan={8} className="pad" style={{ color: "var(--muted)" }}>{view === "overdue" ? "밀린 일이 없습니다." : view === "done" ? "완료한 일이 없습니다." : "해당하는 일이 없습니다."}</td></tr>}
+                {(view === "none" || view === "all") && <DbAdd edits={edits} day={null} label="새 할 일 (적고 엔터, 날짜는 나중에)" />}
+              </tbody>
+            )}
+        </table>
+      </div>
+      <div className="hint">칸을 눌러 바로 고칩니다. "하는 날"을 바꾸면 그 요일로 옮겨지고, 체크하면 프로젝트 진행률에 반영됩니다.</div>
+    </>
   );
 }
 
