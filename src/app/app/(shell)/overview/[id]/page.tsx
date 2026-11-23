@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { requireProject, getUnreadCounts } from "@/lib/dash/auth";
 import { loadProjectData } from "@/lib/dash/data";
-import { agg, dropStats, fmtN, fmtW, type Agg } from "@/lib/dash/agg";
+import { agg, fmtN, fmtW, type Agg } from "@/lib/dash/agg";
 import type { Project } from "@/lib/dash/types";
 import { periodDataDays, periodSlices, REPORT_PERIODS, type ReportPeriod } from "@/lib/dash/report";
 import ProjectNav from "@/components/dash/ProjectNav";
@@ -74,13 +74,6 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
     const r = before ? div(s.n, before.n) : null, pr = before ? div(s.prev, before.prev) : null;
     return { ...s, r, pr, lost: before ? Math.max(0, before.n - s.n) : 0, total: i > 0 ? div(s.n, st[0].n) : null, change: r != null && pr != null && pr > 0 ? r / pr - 1 : null };
   });
-  // 가장 많이 새는 단계(리드 이후)와, 앞 기간보다 가장 나빠진·좋아진 단계
-  const sales = steps.filter((s) => ["contacted", "consulted", "conv"].includes(s.key) && s.r != null);
-  const leak = sales.length ? sales.reduce((a, b) => ((b.r ?? 1) < (a.r ?? 1) ? b : a)) : null;
-  const moved = cmp ? steps.filter((s) => s.change != null && Math.abs(s.change) >= 0.1) : [];
-  const worst = moved.length ? moved.reduce((a, b) => (b.change! < a.change! ? b : a)) : null;
-  const best = moved.length ? moved.reduce((a, b) => (b.change! > a.change! ? b : a)) : null;
-  const drops = dropStats(cur.L).rows;
   const empty = st.every((s) => s.n === 0);
   const before = (i: number) => steps[i - 1].label;
 
@@ -126,31 +119,6 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
           )}
         </div>
 
-        {!empty && (
-          <div className="fn-grid">
-            <div className="card">
-              <div className="td-head"><h2>읽는 법</h2></div>
-              <ul className="fn-notes">
-                {leak && <li><b>가장 많이 새는 곳</b> {before(steps.indexOf(leak))} → {leak.label} 단계에서 {rate(leak.r)}만 넘어갑니다 ({fmtN(leak.lost)}건 이탈).</li>}
-                {worst && worst.change! < 0 && <li><b>앞 기간보다 나빠진 곳</b> {before(steps.indexOf(worst))} → {worst.label} 비율이 {rate(worst.pr)}에서 {rate(worst.r)}로 내려갔습니다.</li>}
-                {best && best.change! > 0 && <li><b>앞 기간보다 좋아진 곳</b> {before(steps.indexOf(best))} → {best.label} 비율이 {rate(best.pr)}에서 {rate(best.r)}로 올라갔습니다.</li>}
-                {A.metaLeads != null && A.leads > 0 && Math.abs(A.metaLeads - A.leads) / Math.max(A.metaLeads, A.leads) > 0.2 && <li><b>리드 수 차이</b> Meta 집계({fmtN(A.metaLeads)}건)와 접수된 리드({fmtN(A.leads)}건)가 20% 넘게 다릅니다. 시트 누락이나 중복 집계를 확인해 보세요.</li>}
-                {A.metaLeads != null && A.metaLeads > 0 && A.leads === 0 && <li><b>리드 기록 없음</b> Meta 에는 결과가 {fmtN(A.metaLeads)}건 잡혔는데 접수된 리드 기록이 없습니다. 리드 시트가 최신인지 확인해 보세요.</li>}
-                {!leak && !worst && !best && A.metaLeads == null && <li>눈에 띄는 변화가 없습니다.</li>}
-              </ul>
-            </div>
-            <div className="card">
-              <div className="td-head"><h2>드랍 사유</h2></div>
-              {drops.length === 0 ? <div className="td-empty">이 기간에 드랍으로 기록된 리드가 없습니다.</div> : (
-                <div className="fn-drops">
-                  {drops.slice(0, 8).map((d) => (
-                    <div key={d.d}><span>{d.d}</span><i><u style={{ width: `${(d.n / drops[0].n) * 100}%` }} /></i><b>{d.n}건</b></div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
     </>
   );
 }

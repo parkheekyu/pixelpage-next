@@ -1273,20 +1273,9 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .fn-total { font-size: 13px; color: var(--text-2); }
 .pp-dash .fn-cost b { display: block; font-size: 13.5px; font-weight: 600; }
 .pp-dash .fn-cost small { font-size: 11.5px; color: var(--muted); }
-.pp-dash .fn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; align-items: start; }
-.pp-dash .fn-grid > .card { margin: 0; grid-column: auto; }
-.pp-dash .fn-notes { margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--text-2); }
-.pp-dash .fn-notes li { padding: 8px 2px; border-top: 1px solid var(--line); line-height: 1.5; }
-.pp-dash .fn-notes li b { display: block; color: var(--text); font-size: 12.5px; }
-.pp-dash .fn-drops > div { display: grid; grid-template-columns: 110px minmax(0, 1fr) 48px; gap: 10px; align-items: center; padding: 6px 2px; font-size: 13px; }
-.pp-dash .fn-drops span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.pp-dash .fn-drops i { height: 8px; background: var(--surface); border-radius: 99px; overflow: hidden; }
-.pp-dash .fn-drops u { display: block; height: 100%; background: var(--warn); border-radius: 99px; }
-.pp-dash .fn-drops b { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
 @media (max-width: 860px) {
   .pp-dash .fn-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; }
   .pp-dash .fn-th { display: none; }
   .pp-dash .fn-bar { grid-column: 1 / -1; order: 3; }
   .pp-dash .fn-total, .pp-dash .fn-cost { display: none; }
-  .pp-dash .fn-grid { grid-template-columns: 1fr; }
-}
+  }
