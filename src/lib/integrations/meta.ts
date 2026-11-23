@@ -115,6 +115,13 @@ function toCreative(c: RawCreative | undefined): MetaCreative | undefined {
   };
 }
 
+/** 계정 전체의 일별 광고비·노출·클릭 (since~until, YYYY-MM-DD, 계정 시간대 기준). 지출이 없는 날은 빠진다. */
+export async function fetchMetaDailySpend(adAccountId: string, since: string, until: string): Promise<{ date: string; spend: number; impressions: number; clicks: number }[]> {
+  const acct = adAccountId.startsWith("act_") ? adAccountId : `act_${adAccountId}`;
+  const rows = await gall<RawInsight & { date_start: string }>(`${acct}/insights`, { level: "account", time_increment: "1", time_range: JSON.stringify({ since, until }), fields: "spend,impressions,clicks", limit: "500" }, 2000);
+  return rows.map((r) => ({ date: r.date_start, spend: n(r.spend), impressions: n(r.impressions), clicks: n(r.clicks) }));
+}
+
 /** 계정 전체 스냅샷 (기간 프리셋: last_7d | last_14d | last_30d | last_90d | maximum) */
 export async function fetchMetaSnapshot(adAccountId: string, datePreset = "last_30d"): Promise<MetaAccountSnapshot> {
   const acct = adAccountId.startsWith("act_") ? adAccountId : `act_${adAccountId}`;

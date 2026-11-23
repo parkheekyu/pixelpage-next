@@ -4,6 +4,7 @@ import type { createClient } from "@/lib/supabase/server";
 type DashClient = Awaited<ReturnType<typeof createClient>>;
 import type { AdSpend, Creative, Lead, Project } from "./types";
 import { sheetLeads } from "./sheet-leads";
+import { metaSpend } from "./meta-spend";
 
 export interface ProjectData {
   project: Project;
@@ -38,7 +39,8 @@ export async function loadProjectData(supabase: DashClient, project: Project, da
   const [leads, spend, creatives] = await Promise.all([
     // 시트를 연결한 프로젝트는 시트가 원본이다. DB 는 읽지 않는다.
     (project.has_lead_sheet ? sheetLeads(project.id).catch(() => [] as Lead[]) : Promise.resolve(null)).then((sl) => sl ? sl.filter((l) => l.submitted_at >= since).sort((x, y) => y.submitted_at.localeCompare(x.submitted_at)) : fetchAll<Lead>((a, b) => supabase.from("leads").select(LEAD_COLS).eq("project_id", project.id).eq("is_duplicate", false).gte("submitted_at", since).order("submitted_at", { ascending: false }).range(a, b))),
-    fetchAll<AdSpend>((a, b) => supabase.from("ad_spend").select(SPEND_COLS).eq("project_id", project.id).gte("date", since.slice(0, 10)).order("date").range(a, b)),
+    // Meta 광고 계정을 연결한 프로젝트는 Meta 가 원본이다. 연결이 없거나 읽기에 실패하면 DB 를 읽는다.
+    metaSpend(project.id, since.slice(0, 10)).catch(() => null).then((ms) => ms ?? fetchAll<AdSpend>((a, b) => supabase.from("ad_spend").select(SPEND_COLS).eq("project_id", project.id).gte("date", since.slice(0, 10)).order("date").range(a, b))),
     supabase.from("creatives").select("*").eq("project_id", project.id).order("creative_id"),
   ]);
   return {
