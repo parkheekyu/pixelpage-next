@@ -284,22 +284,26 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const thisWeek = start === weekStart(today);
   const byDate = (a: WorkTask, b: WorkTask) => (a.do_date ?? "9").localeCompare(b.do_date ?? "9") || sortDay(a, b);
+  // 체크한 일은 그날까지만 원래 자리에 남고, 다음 날부터는 완료 탭에만 보인다 (한국 시간 기준)
+  const doneDay = (t: WorkTask) => (t.done_at ? new Date(Date.parse(t.done_at) + 9 * 3600_000).toISOString().slice(0, 10) : "");
+  const live = (t: WorkTask) => t.status !== "done" || doneDay(t) >= today;
+  const weekAll = all.filter((t) => t.do_date && t.do_date >= days[0] && t.do_date <= days[6]);
   const lists: Record<View, WorkTask[]> = {
-    week: all.filter((t) => t.do_date && t.do_date >= days[0] && t.do_date <= days[6]).sort(byDate),
-    overdue: all.filter((t) => t.status === "todo" && t.do_date && t.do_date < today).sort(byDate),
-    none: all.filter((t) => t.status !== "done" && !t.do_date).sort(sortTasks),
-    all: all.filter((t) => t.status !== "done").sort(byDate),
+    week: weekAll.filter(live).sort(byDate),
+    overdue: all.filter((t) => live(t) && t.status !== "hold" && t.do_date && t.do_date < today).sort(byDate),
+    none: all.filter((t) => live(t) && !t.do_date).sort(sortTasks),
+    all: all.filter(live).sort(byDate),
     done: all.filter((t) => t.status === "done").sort((a, b) => (b.done_at ?? "").localeCompare(a.done_at ?? "")),
   };
   const VIEWS: [View, string][] = [["week", thisWeek ? "이번 주" : `${md(days[0])} 주`], ["overdue", "밀린 일"], ["none", "날짜 미정"], ["all", "남은 일 전체"], ["done", "완료"]];
   const rows = lists[view];
-  const pr = progress(lists.week);
+  const pr = progress(weekAll);
   const target = thisWeek ? today : days[0];
 
   return (
     <>
       <header className="ph">
-        <h1>업무 관리 <small>{md(days[0])} ~ {md(days[6])} 할 일 {lists.week.length}건{lists.week.length > 0 ? ` 중 ${pr.done}건 완료` : ""}</small></h1>
+        <h1>업무 관리 <small>{md(days[0])} ~ {md(days[6])} 할 일 {weekAll.length}건{weekAll.length > 0 ? ` 중 ${pr.done}건 완료` : ""}</small></h1>
         <div className="controls">
           {view === "week" && (
             <>
@@ -315,7 +319,7 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
       </header>
 
       <div className="ndb-views">
-        {VIEWS.map(([k, label]) => <button key={k} type="button" className={view === k ? "on" : ""} onClick={() => setView(k)}>{label} <small>{lists[k].length}</small></button>)}
+        {VIEWS.map(([k, label]) => <button key={k} type="button" className={view === k ? "on" : ""} onClick={() => setView(k)}>{label} <small>{k === "done" ? lists[k].length : lists[k].filter((t) => t.status !== "done").length}</small></button>)}
       </div>
 
       {edits.err && <div className="msg err">{edits.err}</div>}
@@ -337,7 +341,7 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
           </tbody>
         </table>
       </div>
-      <div className="hint">칸을 눌러 바로 고칩니다. "하는 날"이 이번 주 안에 있는 일이 이번 주 보기에 나오고, 체크하면 프로젝트 진행률에 반영됩니다.</div>
+      <div className="hint">칸을 눌러 바로 고칩니다. "하는 날"이 이번 주 안에 있는 일이 이번 주 보기에 나오고, 체크한 일은 오늘까지만 여기 남고 내일부터는 완료 탭에만 보입니다.</div>
     </>
   );
 }
