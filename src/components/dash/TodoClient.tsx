@@ -132,7 +132,7 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
   const go = (d: string) => setDay(d);
 
   return (
-    <div>
+    <div className="ov-left">
       <div className="td-week" role="tablist" aria-label="이번 주">
         <button type="button" className="nav" aria-label="지난주" title="지난주" onClick={() => go(addDays(day, -7))}><ChevronLeft size={16} aria-hidden /></button>
         {week.map((d) => {
@@ -147,11 +147,12 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
         <button type="button" className="nav" aria-label="다음 주" title="다음 주" onClick={() => go(addDays(day, 7))}><ChevronRight size={16} aria-hidden /></button>
       </div>
 
-      <div className="card td-card">
+      <div className="card td-card ov-box ov-today">
         <div className="td-head">
           <h2>{isToday ? "오늘 할 일" : `${dayLabel(day)} 할 일`}{!isToday && <button type="button" className="td-move" style={{ marginLeft: 8 }} onClick={() => go(today)}>오늘로</button>}</h2>
           <DayProgress list={list} />
         </div>
+        <div className="ov-scroll">
         {isToday && dueNow.length > 0 && (
           <div className="td-nudge">마감이 오늘까지인 프로젝트 업무 {dueNow.length}건이 아직 목록에 없습니다. <button type="button" className="link" onClick={() => moveAll(dueNow, today)}>오늘 할 일에 넣기</button></div>
         )}
@@ -162,6 +163,7 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
             <RemoveBtn t={t} edits={edits} />
           </TodoRow>
         ))}
+        </div>
         <div className="td-foot"><Link href="/app/admin/tasks">주간 업무 관리 열기 ›</Link></div>
       </div>
 
@@ -347,8 +349,9 @@ export function OverviewBoard({ tasks, projects, milestones, clients, today }: {
       <div className="ov-grid">
         <DayTodo edits={edits} projects={projects} milestones={milestones} today={today} />
 
-        <div className="card td-card">
+        <div className="card td-card ov-box ov-prog">
           <div className="td-head"><h2>프로젝트 진행률</h2></div>
+          <div className="ov-scroll">
           {rows.length === 0 && <div className="td-empty">진행 중인 프로젝트가 없습니다. <Link href="/app/admin/work">프로젝트 관리</Link>에서 만들 수 있습니다.</div>}
           {rows.map(({ p, pr, r, todayN }) => (
             <Link key={p.id} href={`/app/admin/work/${p.id}`} className="pj-row">
@@ -366,6 +369,7 @@ export function OverviewBoard({ tasks, projects, milestones, clients, today }: {
               </div>
             </Link>
           ))}
+          </div>
           <div className="td-foot"><Link href="/app/admin/work">프로젝트 관리 열기 ›</Link></div>
         </div>
       </div>
