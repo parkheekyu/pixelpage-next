@@ -14,15 +14,16 @@ const kstDate = (ms: number) => new Date(ms + 9 * 3600_000).toISOString().slice(
 /** since(YYYY-MM-DD)부터 오늘까지의 일별 광고비. 연결된 계정이나 토큰이 없으면 null. */
 export async function metaSpend(projectId: string, since: string): Promise<AdSpend[] | null> {
   if (!process.env.META_ACCESS_TOKEN) return null;
-  const { data } = await createAdminClient().from("project_integrations").select("meta_ad_account_id").eq("project_id", projectId).maybeSingle();
+  const { data } = await createAdminClient().from("project_integrations").select("meta_ad_account_id,meta_goal").eq("project_id", projectId).maybeSingle();
   const acct = data?.meta_ad_account_id as string | null | undefined;
   if (!acct) return null;
+  const purchase = data?.meta_goal === "purchase"; // 판매 캠페인은 구매 수를 결과로 센다
   // Meta 는 37개월보다 오래된 날짜를 받지 않는다
   const floor = kstDate(Date.now() - 36 * 30 * 86400_000), from = since < floor ? floor : since, until = kstDate(Date.now());
-  const key = `${acct}\n${from}\n${until}`;
+  const key = `${acct}\n${from}\n${until}\n${purchase}`;
   const hit = memo.get(key);
   if (hit && Date.now() - hit.at < TTL) return hit.rows;
-  const rows = fetchMetaDailySpend(acct, from, until).then((days) => days.map((d) => ({ id: `meta-${acct}-${d.date}`, project_id: projectId, date: d.date, creative_id: "", source: "meta", impressions: d.impressions, clicks: d.clicks, cost: d.spend })));
+  const rows = fetchMetaDailySpend(acct, from, until).then((days) => days.map((d) => ({ id: `meta-${acct}-${d.date}`, project_id: projectId, date: d.date, creative_id: "", source: "meta", impressions: d.impressions, clicks: d.clicks, cost: d.spend, platform_leads: purchase ? d.purchases : d.leads })));
   memo.set(key, { at: Date.now(), rows });
   rows.catch(() => memo.delete(key)); // 실패는 기억하지 않는다
   return rows;

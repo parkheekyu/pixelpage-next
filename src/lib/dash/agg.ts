@@ -35,7 +35,8 @@ export interface Agg {
   cost: number; imps: number; clicks: number;
   leads: number; contacted: number; consulted: number; conv: number;
   revenue: number; stale: number;
-  cpl: number; cpa: number; roas: number;
+  /** CPL 은 Meta 가 집계한 결과 수가 있으면 그걸로 나눈다 (metaLeads). 없으면 리드 수로 나눈다. */
+  cpl: number; cpa: number; roas: number; metaLeads: number | null;
 }
 
 export function agg(L: Lead[], S: AdSpend[], now = Date.now()): Agg {
@@ -47,9 +48,11 @@ export function agg(L: Lead[], S: AdSpend[], now = Date.now()): Agg {
   const conv = L.filter((l) => l.status === "전환");
   const revenue = conv.filter((l) => l.pay_type === "결제확정").reduce((a, l) => a + Number(l.revenue || 0), 0);
   const stale = L.filter((l) => l.status === "신규" && (now - leadTs(l)) / DAY > 1).length;
+  const metaLeads = S.some((s) => s.platform_leads != null) ? S.reduce((a, s) => a + (s.platform_leads ?? 0), 0) : null;
   return {
+    metaLeads,
     cost, imps, clicks, leads: L.length, contacted, consulted, conv: conv.length, revenue, stale,
-    cpl: ratio(cost, L.length), cpa: ratio(cost, conv.length), roas: ratio(revenue, cost),
+    cpl: ratio(cost, metaLeads ?? L.length), cpa: ratio(cost, conv.length), roas: ratio(revenue, cost),
   };
 }
 

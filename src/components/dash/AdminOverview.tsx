@@ -47,7 +47,7 @@ export default function AdminOverview({ rows: input, days }: { rows: OverviewRow
 
       <div className="card">
         <h2>고객사별 성과</h2>
-        <div className="sub">행을 클릭하면 해당 프로젝트 리포트로 이동합니다 · 24h 미처리는 상태 업데이트 SLA 위반 건수</div>
+        <div className="sub">행을 클릭하면 해당 프로젝트 리포트로 이동합니다 · 24h 미처리는 상태 업데이트 SLA 위반 건수 · CPL은 Meta가 집계한 결과 수 기준 (괄호 안 숫자)</div>
         <div className="tbl-wrap">
           <table className="tbl clients-tbl">
             <thead><tr><th>고객사</th><th>광고비</th><th>리드</th><th>CPL</th><th>전환</th><th>전환율</th><th>확정매출</th><th>ROAS</th><th>24h 미처리</th><th>리드 추이</th><th></th></tr></thead>
@@ -57,7 +57,7 @@ export default function AdminOverview({ rows: input, days }: { rows: OverviewRow
                   <td>{p.name}{p.is_own && <span className="pill" style={{ fontSize: 11.5, marginLeft: 6 }}>자사</span>}</td>
                   <td>{fmtW(A.cost)}</td>
                   <td>{A.leads} <Trend a={A.leads} b={P.leads} /></td>
-                  <td>{fmtW(A.cpl)} <Trend a={A.cpl} b={P.cpl} inverse /></td>
+                  <td>{fmtW(A.cpl)}{A.metaLeads != null && <small style={{ color: "var(--muted)", marginLeft: 4 }}>({A.metaLeads})</small>} <Trend a={A.cpl} b={P.cpl} inverse /></td>
                   <td>{A.conv}</td>
                   <td>{pct(A.conv, A.leads)}</td>
                   <td>{fmtW(A.revenue)}</td>

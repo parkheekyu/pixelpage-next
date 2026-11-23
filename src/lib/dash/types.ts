@@ -109,6 +109,8 @@ export interface AdSpend {
   impressions: number;
   clicks: number;
   cost: number;
+  /** 광고 플랫폼(Meta)이 집계한 결과 수 (리드, 판매 캠페인은 구매). Meta 에서 읽은 행에만 있다. */
+  platform_leads?: number | null;
 }
 
 export interface Lead {
