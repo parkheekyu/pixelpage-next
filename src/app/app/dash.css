@@ -1247,3 +1247,47 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .milestone.drop-after { box-shadow: 0 3px 0 var(--s1); }
 .pp-dash .milestone.drop-in { border-color: var(--s1); }
 @media (hover: none) { .pp-dash .grip { opacity: .5; } }
+
+/* 클라이언트별 개요: 퍼널 */
+.pp-dash .fn-periods { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+.pp-dash .fn-periods a { font-size: 13px; padding: 5px 12px; border: 1px solid var(--line); border-radius: 99px; color: var(--text-2); text-decoration: none; background: var(--card); }
+.pp-dash .fn-periods a:hover { border-color: var(--muted); }
+.pp-dash .fn-periods a.on { border-color: var(--s1); color: var(--s1); box-shadow: inset 0 0 0 1px var(--s1); font-weight: 600; }
+.pp-dash .kpi b small { font-size: 13px; font-weight: 500; color: var(--muted); margin-left: 4px; }
+.pp-dash .fn-card { margin-top: 12px; }
+.pp-dash .fn-row { display: grid; grid-template-columns: 150px minmax(0, 1fr) 150px 80px 110px; gap: 14px; align-items: center; padding: 10px 2px; border-top: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.pp-dash .fn-th { border-top: 0; padding: 0 2px 6px; font-size: 12px; color: var(--muted); }
+.pp-dash .fn-th span:nth-child(n+3) { text-align: right; }
+.pp-dash .fn-name b { display: block; font-size: 14.5px; font-weight: 600; }
+.pp-dash .fn-name small { display: block; font-size: 11.5px; color: var(--muted); line-height: 1.35; margin-top: 2px; }
+.pp-dash .fn-bar { position: relative; display: flex; align-items: center; height: 38px; background: var(--surface); border-radius: 8px; overflow: hidden; }
+.pp-dash .fn-bar i { position: absolute; inset: 0 auto 0 0; border-radius: 8px; background: color-mix(in srgb, var(--s1) 28%, transparent); min-width: 0; }
+.pp-dash .fn-bar i.k-imps, .pp-dash .fn-bar i.k-clicks { background: color-mix(in srgb, var(--s4) 32%, transparent); }
+.pp-dash .fn-bar i.k-conv { background: color-mix(in srgb, var(--good) 34%, transparent); }
+.pp-dash .fn-bar em { position: relative; font-style: normal; font-size: 14.5px; font-weight: 600; padding-left: 12px; white-space: nowrap; }
+.pp-dash .fn-bar em small { font-size: 11.5px; font-weight: 400; color: var(--muted); margin-left: 8px; }
+.pp-dash .fn-rate, .pp-dash .fn-total, .pp-dash .fn-cost { text-align: right; }
+.pp-dash .fn-rate b { font-size: 16px; font-weight: 700; }
+.pp-dash .fn-rate small { display: block; font-size: 11.5px; color: var(--muted); line-height: 1.4; }
+.pp-dash .fn-rate small.up { color: var(--good); } .pp-dash .fn-rate small.down { color: var(--bad); }
+.pp-dash .fn-total { font-size: 13px; color: var(--text-2); }
+.pp-dash .fn-cost b { display: block; font-size: 13.5px; font-weight: 600; }
+.pp-dash .fn-cost small { font-size: 11.5px; color: var(--muted); }
+.pp-dash .fn-row.leak { background: color-mix(in srgb, var(--bad) 5%, transparent); box-shadow: inset 3px 0 0 var(--bad); padding-left: 10px; }
+.pp-dash .fn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; align-items: start; }
+.pp-dash .fn-grid > .card { margin: 0; grid-column: auto; }
+.pp-dash .fn-notes { margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--text-2); }
+.pp-dash .fn-notes li { padding: 8px 2px; border-top: 1px solid var(--line); line-height: 1.5; }
+.pp-dash .fn-notes li b { display: block; color: var(--text); font-size: 12.5px; }
+.pp-dash .fn-drops > div { display: grid; grid-template-columns: 110px minmax(0, 1fr) 48px; gap: 10px; align-items: center; padding: 6px 2px; font-size: 13px; }
+.pp-dash .fn-drops span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pp-dash .fn-drops i { height: 8px; background: var(--surface); border-radius: 99px; overflow: hidden; }
+.pp-dash .fn-drops u { display: block; height: 100%; background: var(--warn); border-radius: 99px; }
+.pp-dash .fn-drops b { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+@media (max-width: 860px) {
+  .pp-dash .fn-row { grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; }
+  .pp-dash .fn-th { display: none; }
+  .pp-dash .fn-bar { grid-column: 1 / -1; order: 3; }
+  .pp-dash .fn-total, .pp-dash .fn-cost { display: none; }
+  .pp-dash .fn-grid { grid-template-columns: 1fr; }
+}

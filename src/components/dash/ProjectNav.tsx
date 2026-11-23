@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FlaskConical, Globe, Megaphone, Settings, Table2, type LucideIcon } from "lucide-react";
+import { FlaskConical, Globe, LayoutDashboard, Megaphone, Settings, Table2, type LucideIcon } from "lucide-react";
 import type { Project } from "@/lib/dash/types";
 import type { SeenKind } from "@/lib/dash/auth";
 
-const TABS: { key: SeenKind | "settings" | "presets"; label: string; base: string; icon: LucideIcon; staffOnly?: boolean }[] = [
+const TABS: { key: SeenKind | "overview" | "settings" | "presets"; label: string; base: string; icon: LucideIcon; staffOnly?: boolean }[] = [
+  { key: "overview", label: "개요", base: "/app/overview", icon: LayoutDashboard },
   { key: "leads", label: "리드", base: "/app/projects", icon: Table2 },
   { key: "research", label: "리서치", base: "/app/research", icon: FlaskConical },
   { key: "ads", label: "광고", base: "/app/ads", icon: Megaphone },
@@ -14,7 +15,7 @@ const TABS: { key: SeenKind | "settings" | "presets"; label: string; base: strin
   { key: "settings", label: "설정", base: "/app/settings", icon: Settings, staffOnly: true },
 ];
 
-/** 프로젝트 헤더: 이름 + 탭(리드·리서치·광고·랜딩·설정). 프리셋 탭은 숨겼다 (/app/presets/<id> 주소와 사이드바 '소재 프리셋'으로는 열린다). 현재 탭 외 안 본 항목은 배지 */
+/** 프로젝트 헤더: 이름 + 탭(개요·리드·리서치·광고·랜딩·설정). 프리셋 탭은 숨겼다 (/app/presets/<id> 주소와 사이드바 '소재 프리셋'으로는 열린다). 현재 탭 외 안 본 항목은 배지 */
 export default function ProjectNav({ project, isStaff, unread, right }: { project: Project; isStaff: boolean; unread: Partial<Record<SeenKind, number>>; right?: React.ReactNode }) {
   const pathname = usePathname() ?? "";
   return (
@@ -24,7 +25,7 @@ export default function ProjectNav({ project, isStaff, unread, right }: { projec
         {TABS.filter((t) => (!t.staffOnly || isStaff) && (t.key !== "leads" || project.is_own || project.has_lead_sheet)).map((t) => {
           const href = `${t.base}/${project.id}`;
           const on = pathname === href || pathname.startsWith(href + "/");
-          const n = t.key === "settings" || t.key === "presets" || on ? 0 : (unread[t.key] ?? 0);
+          const n = t.key === "overview" || t.key === "settings" || t.key === "presets" || on ? 0 : (unread[t.key] ?? 0);
           return (
             <Link key={t.key} href={href} className={`ptab ${on ? "on" : ""}`} title={t.label}>
               <t.icon className="ico" aria-hidden />
