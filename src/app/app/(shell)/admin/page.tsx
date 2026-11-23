@@ -16,12 +16,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const days = [7, 14, 28].includes(+(sp.days ?? 0)) ? +sp.days! : 28;
   const today = todayKST(), month = today.slice(0, 7);
+  const nextMonth = new Date(Date.UTC(+month.slice(0, 4), +month.slice(5, 7), 1)).toISOString().slice(0, 10); // 다음 달 1일
   const { supabase } = await requireStaff();
   const [{ data: tasks }, { data: workProjects }, { data: clients }, { data: ledger }] = await Promise.all([
     supabase.from("work_tasks").select("*").order("created_at"),
     supabase.from("work_projects").select("*").order("name"),
     supabase.from("clients").select("id,name,status"),
-    supabase.from("ledger").select("date,kind,amount").gte("date", `${month}-01`).lte("date", `${month}-31`).limit(1000),
+    supabase.from("ledger").select("date,kind,amount").gte("date", `${month}-01`).lt("date", nextMonth).limit(1000),
   ]);
   const sum = (kind: string) => (ledger ?? []).filter((r) => r.kind === kind).reduce((a, r) => a + Number(r.amount), 0);
   const income = sum("income"), expense = sum("expense"), net = income - expense;
