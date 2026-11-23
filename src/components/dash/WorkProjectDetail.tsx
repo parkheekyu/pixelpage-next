@@ -125,7 +125,7 @@ export default function WorkProjectDetail({ project: p, milestones: msProp, task
               <div style={{ width: 120 }}><Gauge pct={mp.pct} /></div>
               <button type="button" className="t-del" title="마일스톤 삭제" aria-label="마일스톤 삭제" onClick={() => { if (confirm(`"${m.title}" 마일스톤을 삭제할까요? 안에 있는 할 일 ${list.length}건은 '마일스톤 없음'으로 남습니다.`)) run(() => deleteMilestone(m.id)); }}>✕</button>
             </div>
-            {list.map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} dnd={rowDnd(t, m.id)} />)}
+            {list.map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} todayBtn dnd={rowDnd(t, m.id)} />)}
             <TaskAdd edits={edits} fixed={{ project_id: p.id, milestone_id: m.id, client_id: p.client_id }} placeholder="이 마일스톤까지 가기 위한 할 일을 적고 엔터" />
           </section>
         );
@@ -138,7 +138,7 @@ export default function WorkProjectDetail({ project: p, milestones: msProp, task
 
       <section className={`card milestone${secCls(null)}`} {...secDnd(null)}>
         <div className="ms-head"><strong>마일스톤 없음</strong><small>{loose.length}건</small></div>
-        {loose.sort(sortTasks).map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} dnd={rowDnd(t, null)} />)}
+        {loose.sort(sortTasks).map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} todayBtn dnd={rowDnd(t, null)} />)}
         <TaskAdd edits={edits} fixed={{ project_id: p.id, milestone_id: null, client_id: p.client_id }} placeholder="마일스톤에 넣지 않을 할 일" />
       </section>
     </div>

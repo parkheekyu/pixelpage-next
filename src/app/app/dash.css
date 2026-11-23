@@ -734,6 +734,9 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .task.hold .t-title { color: var(--text-2); }
 .pp-dash .task-add .t-title { flex: 1 1 220px; border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; font: inherit; font-size: 14px; background: var(--card); outline: none; }
 .pp-dash .task-add .t-title:focus { border-color: var(--s1); }
+.pp-dash .task .t-today { flex: none; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--text-2); font: inherit; font-size: 12px; padding: 3px 10px; cursor: pointer; white-space: nowrap; }
+.pp-dash .task .t-today:hover { border-color: var(--s1); color: var(--s1); }
+.pp-dash .task .t-today.on { border-color: var(--s1); background: var(--s1); color: #fff; }
 .pp-dash .task .t-sel, .pp-dash .task-add .t-sel { max-width: 140px; font-size: 12.5px; }
 .pp-dash .task .t-sel { border-color: transparent; background: transparent; color: var(--text-2); }
 .pp-dash .task .t-proj { font-size: 12.5px; color: var(--s1); max-width: 140px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

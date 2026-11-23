@@ -78,7 +78,7 @@ export type Edits = ReturnType<typeof useTaskEdits>;
 
 /** 할 일 한 줄. context 를 주면 클라이언트·프로젝트 칸도 보여 준다 (전체 업무 리스트용). */
 export type RowDnd = { cls: string; row: React.HTMLAttributes<HTMLDivElement>; handle: React.HTMLAttributes<HTMLSpanElement> };
-export function TaskRow({ t, today, edits, context, dnd }: { t: WorkTask; today: string; edits: Edits; context?: { clients: Client[]; projects: WorkProject[] }; dnd?: RowDnd }) {
+export function TaskRow({ t, today, edits, context, dnd, todayBtn }: { t: WorkTask; today: string; edits: Edits; context?: { clients: Client[]; projects: WorkProject[] }; dnd?: RowDnd; todayBtn?: boolean }) {
   const late = t.status === "todo" && t.deadline && daysLeft(t.deadline, today) < 0;
   const project = context?.projects.find((p) => p.id === t.project_id);
   return (
@@ -104,6 +104,11 @@ export function TaskRow({ t, today, edits, context, dnd }: { t: WorkTask; today:
                 {context.projects.filter((p) => p.status === "active").map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
               </select>}
         </>
+      )}
+      {todayBtn && t.status !== "done" && (
+        <button type="button" className={`t-today${t.do_date === today ? " on" : ""}`} aria-pressed={t.do_date === today} title={t.do_date === today ? "오늘 할 일에서 빼기" : "업무 관리의 오늘 할 일에 넣기"} onClick={() => edits.save(t.id, { do_date: t.do_date === today ? null : today })}>
+          {t.do_date === today ? "오늘 할 일 ✓" : "오늘 하기"}
+        </button>
       )}
       <span className="t-date">
         <DateInput value={t.deadline} label="데드라인" onCommit={(v) => edits.save(t.id, { deadline: v })} />
