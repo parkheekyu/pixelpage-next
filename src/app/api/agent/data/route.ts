@@ -71,7 +71,7 @@ export async function GET(req: NextRequest) {
     if (op === "meta") {
       if (!integ?.meta_ad_account_id) return text(`${p.name}: 메타 광고 계정 미연동`);
       if (!process.env.META_ACCESS_TOKEN) return text("META_ACCESS_TOKEN 미설정");
-      const preset = ["last_7d", "last_14d", "last_30d", "last_90d"].includes(sp.get("preset") ?? "") ? sp.get("preset")! : "last_30d";
+      const preset = ["last_7d", "last_14d", "last_30d", "last_90d", "maximum"].includes(sp.get("preset") ?? "") ? sp.get("preset")! : "last_30d";
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const r = await getMetaSnapshot(db as any, p.id, integ.meta_ad_account_id, preset, sp.get("refresh") === "1");
       const winners = rankWinners(r.snapshot, goal, 6);

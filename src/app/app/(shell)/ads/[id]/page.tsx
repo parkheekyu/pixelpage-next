@@ -14,7 +14,7 @@ export default async function AdsPage({ params, searchParams }: { params: Promis
   const unread = (await getUnreadCounts())[project.id] ?? {};
   after(() => markSeen(project.id, "ads"));
   const isStaff = profile.role === "staff";
-  const preset = ["last_7d", "last_14d", "last_30d", "last_90d"].includes(sp.preset ?? "") ? sp.preset! : "last_30d";
+  const preset = ["last_7d", "last_14d", "last_30d", "last_90d", "maximum"].includes(sp.preset ?? "") ? sp.preset! : "last_30d";
   const [integ, analyses] = await Promise.all([getIntegrations(supabase, project.id), listAnalyses(supabase, project.id, "ads")]);
   const goal: MetaGoal = integ?.meta_goal === "purchase" ? "purchase" : "lead";
   // 광고 계정 스냅샷: 직원에게만 실시간 표시 (고객사는 AI 리포트만)

@@ -10,7 +10,7 @@ import { fmtN, fmtW } from "@/lib/dash/agg";
 import AnalysisPanel from "./AnalysisPanel";
 
 interface Props { project: Project; isStaff: boolean; adAccountId: string | null; preset: string; snapshot: MetaAccountSnapshot | null; snapError: string | null; cachedAt: string | null; goal: MetaGoal; analyses: Analysis[]; tokenConfigured: boolean }
-const PRESETS: [string, string][] = [["last_7d", "최근 7일"], ["last_14d", "최근 14일"], ["last_30d", "최근 30일"], ["last_90d", "최근 90일"]];
+const PRESETS: [string, string][] = [["last_7d", "최근 7일"], ["last_14d", "최근 14일"], ["last_30d", "최근 30일"], ["last_90d", "최근 90일"], ["maximum", "최대"]];
 const ST_LABEL: Record<string, string> = { ACTIVE: "진행", PAUSED: "중지", CAMPAIGN_PAUSED: "중지", ADSET_PAUSED: "중지", ARCHIVED: "보관", DELETED: "삭제" };
 
 const won = (v: number | null | undefined) => (v == null ? "–" : fmtW(v));
