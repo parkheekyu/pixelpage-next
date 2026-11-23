@@ -9,7 +9,7 @@ import { Funnel, HBar, SourcePill, Tiles, WeeklyChart } from "./charts";
 export default function ProjectReport({ model: m, isStaff }: { model: ReportModel; isStaff: boolean }) {
   const router = useRouter(), pathname = usePathname();
   const [pending, start] = useTransition();
-  const go = (days: number, src: string) => start(() => router.replace(`${pathname}?days=${days}&src=${encodeURIComponent(src)}`));
+  const go = (days: string, src: string) => start(() => router.replace(`${pathname}?days=${days}&src=${encodeURIComponent(src)}`));
 
   const cplRows = [...m.creatives].sort((a, b) => a.cpl - b.cpl).map((r, i) => ({ label: r.creative_id, value: r.cpl, text: `${fmtW(r.cpl)} · ${r.leads}건`, tip: `${r.creative_id} · CPL ${fmtW(r.cpl)} · 광고비 ${fmtW(r.cost)}`, hi: i === 0 }));
   const lands = m.landings.map((r, i) => ({ label: r.lp, value: r.r, text: (r.r * 100).toFixed(1) + "%", tip: `${r.lp} · 클릭 ${fmtN(r.clicks)} → 리드 ${r.n}`, hi: i === 0 }));
@@ -17,15 +17,15 @@ export default function ProjectReport({ model: m, isStaff }: { model: ReportMode
   return (
     <div style={{ opacity: pending ? 0.6 : 1, transition: "opacity .15s" }}>
       <div className="controls" style={{ marginBottom: 12 }}>
-        <select value={m.days} onChange={(e) => go(+e.target.value, m.src)}><option value={7}>최근 7일</option><option value={14}>최근 14일</option><option value={28}>최근 4주</option><option value={56}>최근 8주</option></select>
-        <select value={m.src} onChange={(e) => go(m.days, e.target.value)}><option value="all">전체 매체</option>{m.sources.map((s) => <option key={s} value={s}>{s}</option>)}</select>
+        <select value={m.period} aria-label="기간" onChange={(e) => go(e.target.value, m.src)}><option value="7">최근 7일</option><option value="14">최근 14일</option><option value="28">최근 4주</option><option value="56">최근 8주</option><option value="month">이번 달</option><option value="prev">지난달</option><option value="max">최대</option></select>
+        <select value={m.src} onChange={(e) => go(m.period, e.target.value)}><option value="all">전체 매체</option>{m.sources.map((s) => <option key={s} value={s}>{s}</option>)}</select>
       </div>
 
       <Tiles A={m.A} P={m.P} keys={isStaff ? ["leads", "cost", "cpl", "conv", "cvr", "revenue", "roas", "stale"] : ["leads", "cost", "cpl", "conv", "cvr", "revenue", "roas"]} />
 
       <section className="grid">
         <div className="card c8">
-          <h2>주간 리드 · 전환</h2><div className="sub">중복 제외</div>
+          <h2>리드 · 전환 추이</h2><div className="sub">중복 제외</div>
           <div className="legend"><span><i style={{ background: "var(--s1)" }} />리드</span><span><i style={{ background: "var(--s3)" }} />전환</span></div>
           <WeeklyChart buckets={m.buckets} />
         </div>

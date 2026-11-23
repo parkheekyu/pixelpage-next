@@ -56,9 +56,10 @@ export function agg(L: Lead[], S: AdSpend[], now = Date.now()): Agg {
 export interface Bucket { label: string; leads: number; conv: number }
 
 export function buckets(L: Lead[], days: number, now = Date.now()): Bucket[] {
-  const step = days <= 14 ? 1 : 7;
+  // 기간이 길면 막대가 너무 많아지지 않게 주 단위, 더 길면 30일 단위로 묶는다
+  const step = days <= 14 ? 1 : days <= 120 ? 7 : 30;
   const out: Bucket[] = [];
-  for (let d = days - step; d >= 0; d -= step) {
+  for (let d = Math.ceil(days / step) * step - step; d >= 0; d -= step) {
     const to = now - d * DAY, from = to - step * DAY;
     const inB = L.filter((l) => { const t = leadTs(l); return t > from && t <= to; });
     const parts = new Intl.DateTimeFormat("en-US", { timeZone: "Asia/Seoul", month: "numeric", day: "numeric" }).formatToParts(new Date(to));
