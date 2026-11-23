@@ -231,6 +231,8 @@ export interface WorkTask {
   status: TaskStatus;
   hold_reason: string | null;
   done_at: string | null;
+  /** 프로젝트(마일스톤) 안에서의 순서. 끌어서 바꾼다. */
+  position: number;
   created_at: string;
 }
 export type WorkTaskPatch = Partial<Pick<WorkTask, "title" | "client_id" | "project_id" | "milestone_id" | "deadline" | "do_date" | "priority" | "status" | "hold_reason">>;

@@ -5,6 +5,7 @@ import { requireStaff } from "@/lib/dash/auth";
 import { PRIORITIES, TASK_STATUSES, type Priority, type TaskStatus, type WorkProjectPatch, type WorkTaskPatch } from "@/lib/dash/types";
 import type { ActionResult } from "./actions";
 
+const UUID = /^[0-9a-f-]{36}$/;
 const isDate = (v: string) => /^\d{4}-\d{2}-\d{2}$/.test(v);
 const done = () => { revalidatePath("/app/admin", "layout"); return { ok: true } as const; };
 const fail = (error: string): ActionResult => ({ ok: false, error });
@@ -101,8 +102,16 @@ export async function createTask(input: WorkTaskPatch & { id?: string }): Promis
     const { data: p } = await s.supabase.from("work_projects").select("client_id").eq("id", c.project_id).maybeSingle();
     c.client_id = p?.client_id ?? null;
   }
-  const id = input.id && /^[0-9a-f-]{36}$/.test(input.id) ? input.id : undefined;
-  const { error } = await s.supabase.from("work_tasks").insert({ ...c, ...(id ? { id } : {}) } as Record<string, unknown>);
+  // 프로젝트에 넣는 할 일은 그 마일스톤의 맨 아래에 붙인다
+  let position = 0;
+  if (c.project_id) {
+    let q = s.supabase.from("work_tasks").select("position").eq("project_id", c.project_id);
+    q = c.milestone_id ? q.eq("milestone_id", c.milestone_id) : q.is("milestone_id", null);
+    const { data: last } = await q.order("position", { ascending: false }).limit(1).maybeSingle();
+    position = (last?.position ?? 0) + 1;
+  }
+  const id = input.id && UUID.test(input.id) ? input.id : undefined;
+  const { error } = await s.supabase.from("work_tasks").insert({ ...c, position, ...(id ? { id } : {}) } as Record<string, unknown>);
   return error ? fail(error.message) : { ok: true };
 }
 
@@ -121,4 +130,22 @@ export async function deleteTask(id: string): Promise<ActionResult> {
   const s = await requireStaff();
   const { error } = await s.supabase.from("work_tasks").delete().eq("id", id);
   return error ? fail(error.message) : { ok: true };
+}
+
+// ---------- 순서 바꾸기 (끌어다 놓기) ----------
+/** 한 마일스톤(또는 '마일스톤 없음') 안의 할 일을 넘겨받은 순서대로 다시 번호 매긴다. 다른 마일스톤에서 끌어온 할 일은 여기로 옮겨진다. */
+export async function reorderTasks(projectId: string, milestoneId: string | null, ids: string[]): Promise<ActionResult> {
+  const s = await requireStaff();
+  if (!UUID.test(projectId) || (milestoneId && !UUID.test(milestoneId)) || ids.length > 500 || ids.some((id) => !UUID.test(id))) return fail("잘못된 요청");
+  const rs = await Promise.all(ids.map((id, i) => s.supabase.from("work_tasks").update({ position: i + 1, milestone_id: milestoneId }).eq("id", id).eq("project_id", projectId)));
+  const bad = rs.find((r) => r.error);
+  return bad?.error ? fail(bad.error.message) : { ok: true };
+}
+
+export async function reorderMilestones(projectId: string, ids: string[]): Promise<ActionResult> {
+  const s = await requireStaff();
+  if (!UUID.test(projectId) || ids.length > 200 || ids.some((id) => !UUID.test(id))) return fail("잘못된 요청");
+  const rs = await Promise.all(ids.map((id, i) => s.supabase.from("work_milestones").update({ position: i + 1 }).eq("id", id).eq("project_id", projectId)));
+  const bad = rs.find((r) => r.error);
+  return bad?.error ? fail(bad.error.message) : done();
 }

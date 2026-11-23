@@ -4,8 +4,8 @@ import DateInput from "./DateInput";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { X } from "lucide-react";
-import { createTask, deleteTask, updateTask } from "@/app/app/work-actions";
+import { GripVertical, X } from "lucide-react";
+import { createTask, deleteTask, reorderTasks, updateTask } from "@/app/app/work-actions";
 import type { ActionResult } from "@/app/app/actions";
 import { PRIORITIES, PRIORITY_LABEL, TASK_STATUSES, TASK_STATUS_LABEL, type Client, type Priority, type TaskStatus, type WorkProject, type WorkTask, type WorkTaskPatch } from "@/lib/dash/types";
 import { ddayLabel, daysLeft } from "@/lib/dash/work";
@@ -13,8 +13,9 @@ import { ddayLabel, daysLeft } from "@/lib/dash/work";
 const PRI_TAG: Record<Priority, string> = { high: "red", mid: "blue", low: "gray" };
 const ST_TAG: Record<TaskStatus, string> = { todo: "blue", done: "green", hold: "orange" };
 const PRI_RANK: Record<Priority, number> = { high: 0, mid: 1, low: 2 };
+/** 끌어서 정한 순서(position)가 먼저. 순서가 없는 일(프로젝트 밖)은 우선순위 → 마감 → 이름 순. */
 export const sortTasks = (a: WorkTask, b: WorkTask) =>
-  PRI_RANK[a.priority] - PRI_RANK[b.priority] || (a.deadline ?? "9").localeCompare(b.deadline ?? "9") || a.created_at.localeCompare(b.created_at)
+  (a.position ?? 0) - (b.position ?? 0) || PRI_RANK[a.priority] - PRI_RANK[b.priority] || (a.deadline ?? "9").localeCompare(b.deadline ?? "9") || a.created_at.localeCompare(b.created_at)
   // 한꺼번에 넣은 업무는 만든 시각이 같다. 이름(1-1, 1-2 …)과 id 로 순서를 고정해야 체크할 때 줄이 뒤바뀌지 않는다.
   || a.title.localeCompare(b.title, "ko", { numeric: true }) || a.id.localeCompare(b.id);
 
@@ -59,10 +60,16 @@ export function useTaskEdits(tasks: WorkTask[]) {
       send(() => updateTask(id, patch));
     },
     remove: (id: string) => { setView((cur) => cur.filter((t) => t.id !== id)); send(() => deleteTask(id)); },
+    /** 한 마일스톤 안의 순서를 ids 대로 바꾼다. 다른 마일스톤에서 온 일은 이 마일스톤으로 옮겨진다. */
+    reorder: (projectId: string, milestoneId: string | null, ids: string[]) => {
+      setView((cur) => cur.map((t) => { const i = ids.indexOf(t.id); return i < 0 ? t : { ...t, position: i + 1, milestone_id: milestoneId }; }));
+      send(() => reorderTasks(projectId, milestoneId, ids));
+    },
     add: (input: WorkTaskPatch) => {
       const id = crypto.randomUUID();
-      const row: WorkTask = { id, title: (input.title ?? "").trim(), client_id: input.client_id ?? null, project_id: input.project_id ?? null, milestone_id: input.milestone_id ?? null, deadline: input.deadline ?? null, do_date: input.do_date ?? null, priority: input.priority ?? "mid", status: "todo", hold_reason: null, done_at: null, created_at: new Date().toISOString() };
-      setView((cur) => [...cur, row]);
+      const row: WorkTask = { id, title: (input.title ?? "").trim(), client_id: input.client_id ?? null, project_id: input.project_id ?? null, milestone_id: input.milestone_id ?? null, deadline: input.deadline ?? null, do_date: input.do_date ?? null, priority: input.priority ?? "mid", status: "todo", hold_reason: null, done_at: null, position: 0, created_at: new Date().toISOString() };
+      // 프로젝트에 넣는 일은 그 마일스톤 맨 아래에 붙는다
+      setView((cur) => [...cur, row.project_id ? { ...row, position: Math.max(0, ...cur.filter((t) => t.project_id === row.project_id && t.milestone_id === row.milestone_id).map((t) => t.position ?? 0)) + 1 } : row]);
       send(() => createTask({ ...input, id }));
     },
   };
@@ -70,11 +77,13 @@ export function useTaskEdits(tasks: WorkTask[]) {
 export type Edits = ReturnType<typeof useTaskEdits>;
 
 /** 할 일 한 줄. context 를 주면 클라이언트·프로젝트 칸도 보여 준다 (전체 업무 리스트용). */
-export function TaskRow({ t, today, edits, context }: { t: WorkTask; today: string; edits: Edits; context?: { clients: Client[]; projects: WorkProject[] } }) {
+export type RowDnd = { cls: string; row: React.HTMLAttributes<HTMLDivElement>; handle: React.HTMLAttributes<HTMLSpanElement> };
+export function TaskRow({ t, today, edits, context, dnd }: { t: WorkTask; today: string; edits: Edits; context?: { clients: Client[]; projects: WorkProject[] }; dnd?: RowDnd }) {
   const late = t.status === "todo" && t.deadline && daysLeft(t.deadline, today) < 0;
   const project = context?.projects.find((p) => p.id === t.project_id);
   return (
-    <div className={`task ${t.status}`}>
+    <div className={`task ${t.status}${dnd?.cls ?? ""}`} {...dnd?.row}>
+      {dnd && <span className="grip" draggable title="끌어서 순서 바꾸기" aria-hidden {...dnd.handle}><GripVertical size={14} /></span>}
       <input type="checkbox" className="chk" checked={t.status === "done"} aria-label="완료" onChange={(e) => edits.save(t.id, { status: e.target.checked ? "done" : "todo" })} />
       <div className="t-main">
         <input className="t-title" defaultValue={t.title} key={t.title} aria-label="할 일" onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== t.title) edits.save(t.id, { title: v }); else e.target.value = t.title; }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} />

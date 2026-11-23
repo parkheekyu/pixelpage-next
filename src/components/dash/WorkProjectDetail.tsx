@@ -4,15 +4,15 @@ import DateInput from "./DateInput";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
-import { createMilestone, deleteMilestone, deleteWorkProject, renameMilestone, updateWorkProject } from "@/app/app/work-actions";
+import { createMilestone, deleteMilestone, deleteWorkProject, renameMilestone, reorderMilestones, updateWorkProject } from "@/app/app/work-actions";
 import type { ActionResult } from "@/app/app/actions";
 import type { Client, WorkMilestone, WorkProject, WorkProjectPatch, WorkTask } from "@/lib/dash/types";
 import { ddayLabel, progress, risk } from "@/lib/dash/work";
-import { Check, Flag, Plane, Rocket, Send, Sparkles } from "lucide-react";
+import { Check, Flag, GripVertical, Plane, Rocket, Send, Sparkles } from "lucide-react";
 import { Gauge } from "./WorkProjects";
-import { TaskAdd, TaskRow, sortTasks, useFreshOnMount, useTaskEdits } from "./WorkTasks";
+import { TaskAdd, TaskRow, sortTasks, useFreshOnMount, useTaskEdits, type RowDnd } from "./WorkTasks";
 
-export default function WorkProjectDetail({ project: p, milestones, tasks, clients, today }: { project: WorkProject; milestones: WorkMilestone[]; tasks: WorkTask[]; clients: Client[]; today: string }) {
+export default function WorkProjectDetail({ project: p, milestones: msProp, tasks, clients, today }: { project: WorkProject; milestones: WorkMilestone[]; tasks: WorkTask[]; clients: Client[]; today: string }) {
   const router = useRouter();
   useFreshOnMount();
   const edits = useTaskEdits(tasks);
@@ -21,6 +21,64 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
   const [newMs, setNewMs] = useState("");
   const run = (fn: () => Promise<ActionResult>, after?: () => void) => start(async () => { setErr(null); const r = await fn(); if (!r.ok) setErr(r.error); else after?.(); });
   const save = (patch: WorkProjectPatch) => run(() => updateWorkProject(p.id, patch));
+
+  // 마일스톤 순서: 끌어다 놓으면 화면을 먼저 바꾸고 뒤에서 저장한다
+  const [msIds, setMsIds] = useState<string[] | null>(null);
+  const [seenMs, setSeenMs] = useState(msProp);
+  if (seenMs !== msProp) { setSeenMs(msProp); setMsIds(null); }
+  const milestones = msIds ? msIds.map((id) => msProp.find((m) => m.id === id)).filter((m): m is WorkMilestone => !!m) : msProp;
+
+  // 끌어다 놓기: 할 일은 같은 마일스톤 안에서 순서를 바꾸거나 다른 마일스톤으로 옮기고, 마일스톤은 서로 자리를 바꾼다
+  const [drag, setDrag] = useState<{ kind: "task" | "ms"; id: string } | null>(null);
+  const [over, setOver] = useState<{ id: string; after: boolean } | null>(null);
+  const clear = () => { setDrag(null); setOver(null); };
+  const groupOf = (t: WorkTask) => (t.milestone_id && milestones.some((m) => m.id === t.milestone_id) ? t.milestone_id : null);
+  const listOf = (g: string | null) => edits.view.filter((t) => groupOf(t) === g).sort(sortTasks);
+  const half = (e: React.DragEvent) => { const r = e.currentTarget.getBoundingClientRect(); return e.clientY > r.top + r.height / 2; };
+  const mark = (id: string, after: boolean) => { if (over?.id !== id || over.after !== after) setOver({ id, after }); };
+  const dragStart = (kind: "task" | "ms", id: string, sel: string) => (e: React.DragEvent) => {
+    e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", id);
+    const el = e.currentTarget.closest(sel); if (el) e.dataTransfer.setDragImage(el, 14, 14);
+    setDrag({ kind, id });
+  };
+  /** 끌던 할 일을 g 마일스톤의 anchor 앞(또는 뒤)에 놓는다. anchor 가 없으면 맨 아래. */
+  const dropTask = (g: string | null, anchor: string | null, after: boolean) => {
+    if (!drag || drag.kind !== "task" || drag.id === anchor) return clear();
+    const ids = listOf(g).map((t) => t.id).filter((id) => id !== drag.id);
+    const i = anchor ? ids.indexOf(anchor) : -1;
+    ids.splice(i < 0 ? ids.length : i + (after ? 1 : 0), 0, drag.id);
+    edits.reorder(p.id, g, ids);
+    clear();
+  };
+  const rowDnd = (t: WorkTask, g: string | null): RowDnd => ({
+    cls: drag?.kind === "task" ? (drag.id === t.id ? " dragging" : over?.id === t.id ? (over.after ? " drop-after" : " drop-before") : "") : "",
+    row: {
+      onDragOver: (e) => { if (drag?.kind !== "task") return; e.preventDefault(); e.stopPropagation(); mark(t.id, half(e)); },
+      onDrop: (e) => { if (drag?.kind !== "task") return; e.preventDefault(); e.stopPropagation(); dropTask(g, t.id, half(e)); },
+    },
+    handle: { onDragStart: dragStart("task", t.id, ".task"), onDragEnd: clear },
+  });
+  /** 마일스톤 카드: 할 일을 빈 곳에 놓으면 맨 아래로, 마일스톤을 놓으면 그 앞뒤로 */
+  const secDnd = (g: string | null) => ({
+    onDragOver: (e: React.DragEvent) => {
+      if (!drag || (drag.kind === "ms" && !g)) return;
+      e.preventDefault();
+      if (drag.kind === "task") mark(`end:${g}`, true); else mark(g!, half(e));
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (!drag || (drag.kind === "ms" && !g)) return;
+      e.preventDefault();
+      if (drag.kind === "task") return dropTask(g, null, true);
+      if (drag.id !== g) {
+        const ids = milestones.map((m) => m.id).filter((id) => id !== drag.id);
+        ids.splice(ids.indexOf(g!) + (half(e) ? 1 : 0), 0, drag.id);
+        setMsIds(ids);
+        run(() => reorderMilestones(p.id, ids));
+      }
+      clear();
+    },
+  });
+  const secCls = (g: string | null) => (!drag ? "" : drag.kind === "task" ? (over?.id === `end:${g}` ? " drop-in" : "") : drag.id === g ? " dragging" : over?.id === g ? (over.after ? " drop-after" : " drop-before") : "");
 
   const pr = progress(edits.view), r = risk(p, pr.pct, today);
   const loose = edits.view.filter((t) => !t.milestone_id || !milestones.some((m) => m.id === t.milestone_id));
@@ -58,15 +116,16 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
         const list = edits.view.filter((t) => t.milestone_id === m.id).sort(sortTasks);
         const mp = progress(list);
         return (
-          <section key={m.id} id={`ms-${m.id}`} className="card milestone">
+          <section key={m.id} id={`ms-${m.id}`} className={`card milestone${secCls(m.id)}`} {...secDnd(m.id)}>
             <div className="ms-head">
+              <span className="grip" draggable title="끌어서 마일스톤 순서 바꾸기" aria-hidden onDragStart={dragStart("ms", m.id, ".milestone")} onDragEnd={clear}><GripVertical size={15} /></span>
               <span className={`ms-num ${mp.base > 0 && mp.pct === 100 ? "done" : ""}`}>{i + 1}</span>
               <input className="h-edit" defaultValue={m.title} aria-label="마일스톤 이름" onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== m.title) run(() => renameMilestone(m.id, v)); else e.target.value = m.title; }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} />
               <small>{mp.done} / {mp.base}{mp.hold ? ` · 보류 ${mp.hold}` : ""}</small>
               <div style={{ width: 120 }}><Gauge pct={mp.pct} /></div>
               <button type="button" className="t-del" title="마일스톤 삭제" aria-label="마일스톤 삭제" onClick={() => { if (confirm(`"${m.title}" 마일스톤을 삭제할까요? 안에 있는 할 일 ${list.length}건은 '마일스톤 없음'으로 남습니다.`)) run(() => deleteMilestone(m.id)); }}>✕</button>
             </div>
-            {list.map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} />)}
+            {list.map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} dnd={rowDnd(t, m.id)} />)}
             <TaskAdd edits={edits} fixed={{ project_id: p.id, milestone_id: m.id, client_id: p.client_id }} placeholder="이 마일스톤까지 가기 위한 할 일을 적고 엔터" />
           </section>
         );
@@ -77,9 +136,9 @@ export default function WorkProjectDetail({ project: p, milestones, tasks, clien
         <button className="btn primary" type="submit" disabled={!newMs.trim()}>추가</button>
       </form>
 
-      <section className="card milestone">
+      <section className={`card milestone${secCls(null)}`} {...secDnd(null)}>
         <div className="ms-head"><strong>마일스톤 없음</strong><small>{loose.length}건</small></div>
-        {loose.sort(sortTasks).map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} />)}
+        {loose.sort(sortTasks).map((t) => <TaskRow key={t.id} t={t} today={today} edits={edits} dnd={rowDnd(t, null)} />)}
         <TaskAdd edits={edits} fixed={{ project_id: p.id, milestone_id: null, client_id: p.client_id }} placeholder="마일스톤에 넣지 않을 할 일" />
       </section>
     </div>
