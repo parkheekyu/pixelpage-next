@@ -84,7 +84,7 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
               <div className="fnl">
                 <div className="fn-row fn-th"><span>단계</span><span>규모</span><span>앞 단계 대비</span><span>처음 대비</span><span>건당 비용</span></div>
                 {steps.map((s, i) => (
-                  <div key={s.key} className={`fn-row${leak?.key === s.key ? " leak" : ""}`}>
+                  <div key={s.key} className="fn-row">
                     <span className="fn-name"><b>{s.label}</b>{s.note && <small>{s.note}</small>}</span>
                     <span className="fn-bar">
                       <i className={`k-${s.key}`} style={{ width: `${width(s.n)}%` }} />
