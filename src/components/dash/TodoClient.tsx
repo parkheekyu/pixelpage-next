@@ -3,7 +3,7 @@
 import DateInput from "./DateInput";
 import Link from "next/link";
 import { useState } from "react";
-import { ArrowUpDown, CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, CircleDot, Flag, FolderInput, FolderKanban, Plus, Type, X } from "lucide-react";
+import { ArrowUpDown, Building2, CalendarCheck, CalendarDays, ChevronLeft, ChevronRight, CircleDot, Flag, FolderInput, FolderKanban, Plus, Type, X } from "lucide-react";
 import { PRIORITIES, PRIORITY_LABEL, TASK_STATUSES, TASK_STATUS_LABEL, type Client, type Priority, type TaskStatus, type WorkMilestone, type WorkProject, type WorkTask } from "@/lib/dash/types";
 import { addDays, dayLabel, daysLeft, ddayLabel, dowOf, progress, risk, weekStart, type Risk } from "@/lib/dash/work";
 import { Gauge } from "./WorkProjects";
@@ -226,7 +226,7 @@ const ST_TAG: Record<TaskStatus, string> = { todo: "blue", done: "green", hold: 
 type View = "week" | "overdue" | "none" | "all" | "done";
 
 /** 데이터베이스 표의 한 줄: 칸마다 바로 고친다 */
-function DbRow({ t, today, edits, projects, milestones }: Shared & { t: WorkTask }) {
+function DbRow({ t, today, edits, projects, milestones, clients }: Shared & { t: WorkTask; clients: Client[] }) {
   const late = t.status === "todo" && t.deadline && daysLeft(t.deadline, today) < 0;
   const ms = milestones.find((m) => m.id === t.milestone_id);
   return (
@@ -234,6 +234,12 @@ function DbRow({ t, today, edits, projects, milestones }: Shared & { t: WorkTask
       <td className="title db-title">
         <input type="checkbox" className="chk" checked={t.status === "done"} aria-label="완료" onChange={(e) => edits.save(t.id, { status: e.target.checked ? "done" : "todo" })} />
         <input className="cell-in" defaultValue={t.title} key={t.title} aria-label="할 일" onBlur={(e) => { const v = e.target.value.trim(); if (v && v !== t.title) edits.save(t.id, { title: v }); else e.target.value = t.title; }} onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }} />
+      </td>
+      <td>
+        <select className="pill" value={t.client_id ?? ""} aria-label="클라이언트" onChange={(e) => edits.save(t.id, { client_id: e.target.value || null })}>
+          <option value="">없음</option>
+          {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        </select>
       </td>
       <td>
         <select className={`pill tag-${ST_TAG[t.status]}`} value={t.status} aria-label="상태" onChange={(e) => edits.save(t.id, { status: e.target.value as TaskStatus })}>
@@ -263,7 +269,7 @@ function DbAdd({ edits, day, label }: { edits: Edits; day: string | null; label:
   const [v, setV] = useState("");
   return (
     <tr className="new">
-      <td colSpan={8}>
+      <td colSpan={9}>
         <form onSubmit={(e) => { e.preventDefault(); if (!v.trim()) return; edits.add({ title: v, do_date: day }); setV(""); }}>
           <Plus size={14} aria-hidden />
           <input value={v} onChange={(e) => setV(e.target.value)} placeholder={label} aria-label={label} />
@@ -274,7 +280,7 @@ function DbAdd({ edits, day, label }: { edits: Edits; day: string | null; label:
 }
 
 /** 업무 관리: 모든 할 일을 데이터베이스 표로 본다. 이번 주 보기는 하는 날 순으로 늘어놓는다. */
-export default function TodoClient({ tasks, projects, milestones, today }: { tasks: WorkTask[]; projects: WorkProject[]; milestones: WorkMilestone[]; today: string }) {
+export default function TodoClient({ tasks, projects, milestones, clients, today }: { tasks: WorkTask[]; projects: WorkProject[]; milestones: WorkMilestone[]; clients: Client[]; today: string }) {
   useFreshOnMount();
   const edits = useTaskEdits(tasks);
   const [view, setView] = useState<View>("week");
@@ -330,13 +336,13 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
         <table className="ndb db-tasks">
           <thead>
             <tr>
-              <th><Type aria-hidden /> 할 일</th><th><CircleDot aria-hidden /> 상태</th><th><CalendarCheck aria-hidden /> 하는 날</th><th><FolderKanban aria-hidden /> 프로젝트</th>
+              <th><Type aria-hidden /> 할 일</th><th><Building2 aria-hidden /> 클라이언트</th><th><CircleDot aria-hidden /> 상태</th><th><CalendarCheck aria-hidden /> 하는 날</th><th><FolderKanban aria-hidden /> 프로젝트</th>
               <th><Flag aria-hidden /> 마일스톤</th><th><CalendarDays aria-hidden /> 마감</th><th><ArrowUpDown aria-hidden /> 우선순위</th><th />
             </tr>
           </thead>
           <tbody>
-            {rows.slice(0, 200).map((t) => <DbRow key={t.id} t={t} {...shared} />)}
-            {rows.length === 0 && <tr><td colSpan={8} className="pad" style={{ color: "var(--muted)" }}>{view === "week" ? "이 주에 잡힌 일이 없습니다." : view === "overdue" ? "밀린 일이 없습니다." : view === "done" ? "완료한 일이 없습니다." : "해당하는 일이 없습니다."}</td></tr>}
+            {rows.slice(0, 200).map((t) => <DbRow key={t.id} t={t} {...shared} clients={clients} />)}
+            {rows.length === 0 && <tr><td colSpan={9} className="pad" style={{ color: "var(--muted)" }}>{view === "week" ? "이 주에 잡힌 일이 없습니다." : view === "overdue" ? "밀린 일이 없습니다." : view === "done" ? "완료한 일이 없습니다." : "해당하는 일이 없습니다."}</td></tr>}
             {view === "week" && <DbAdd edits={edits} day={target} label={`새 할 일 (적고 엔터, ${dayName(target, today)} 날짜로 들어갑니다)`} />}
             {(view === "none" || view === "all") && <DbAdd edits={edits} day={null} label="새 할 일 (적고 엔터, 날짜는 나중에)" />}
           </tbody>
