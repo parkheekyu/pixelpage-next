@@ -27,6 +27,7 @@ const ALIASES: Record<string, string[]> = {
   "소재": ["소재", "광고소재", "utm_content", "content"],
   "랜딩": ["랜딩", "랜딩페이지", "landing"],
   "상태": ["상태", "진행상태", "처리상태", "주문상태", "status"],
+  "등록여부": ["등록여부", "노션등록여부"],
   "드랍사유": ["드랍사유", "취소사유", "이탈사유", "실패사유", "사유"],
   "매출액": ["매출액", "매출", "결제금액", "금액", "계약금액", "실결제액", "실결제액(원)", "revenue", "amount"],
   "결제구분": ["결제구분", "결제상태", "결제단계"],
@@ -59,6 +60,17 @@ export function mapStatus(v: string): string {
   if (/상담|연락|통화|진행|대기/.test(t)) return "연락중";
   return "";
 }
+/** 학원형 상담 DB 의 "등록 여부" 값(여러 개면 쉼표로 구분) → 퍼널 단계. 가장 앞선 단계를 고른다.
+ *  등록·예약금 = 전환 / 미등록·등록유력·결제대기 = 상담완료(내방함) / 상담예정·재연락·미전환·상담취소·노쇼 = 연락중 / 부재·기타 = 신규 */
+export function stageFromRegistration(v: string): string {
+  const vals = v.split(",").map((x) => x.replace(/\s/g, "")).filter(Boolean);
+  if (!vals.length) return "";
+  const has = (...xs: string[]) => vals.some((x) => xs.includes(x));
+  if (has("등록", "수강전예약금완료")) return "전환";
+  if (has("미등록", "등록유력", "바로결제대기")) return "상담완료";
+  if (has("상담예정", "재연락예정", "미전환", "상담취소", "노쇼")) return "연락중";
+  return "신규";
+}
 const EMPTY = new Set(["-", "—", "–", "없음", "n/a", "na", "null", "x", "X", "."]);
 const clean = (v: unknown) => { const t = (v ?? "").toString().trim(); return EMPTY.has(t) ? "" : t; };
 const DROPS = ["부재", "노쇼", "가격", "타상품", "자격미달", "관심없음", "허위정보", "중복"];
@@ -77,10 +89,12 @@ export function rowToLeadInput(r: Record<string, string>) {
   const g = (k: string) => std[k] ?? "";
   if (/^1[0-9]{9,10}$/.test((std["연락처"] ?? "").replace(/[^0-9]/g, ""))) std["연락처"] = "0" + (std["연락처"] ?? "").replace(/[^0-9]/g, "");
   const revenueNum = Number(g("매출액").replace(/[^0-9.]/g, ""));
-  const pay = g("결제구분"); const stRaw = g("상태"); const status = mapStatus(stRaw);
+  const pay = g("결제구분"); const stRaw = g("상태"); const reg = g("등록여부");
+  // "등록 여부" 열이 있으면 그 값으로 단계를 정한다. 상태 열에 전환이라고 적혀 있으면 전환이 우선이다.
+  const status = mapStatus(stRaw) === "전환" ? "전환" : stageFromRegistration(reg) || mapStatus(stRaw);
   let payType = ["결제확정", "예약금", "가계약", "환불"].find((p) => pay.includes(p)) ?? "";
   if (!payType) { if (/환불/.test(stRaw + pay)) payType = "환불"; else if (/가계약/.test(stRaw + pay)) payType = "가계약"; else if (/예약금|계약금|보증금/.test(stRaw + pay)) payType = "예약금"; else if (status === "전환" && (revenueNum > 0 || /결제|입금|구매|완료|확정/.test(stRaw))) payType = "결제확정"; }
-  return { name: g("이름"), phone: g("연락처"), email: g("이메일"), message: g("문의내용"), company: g("회사"), industry: g("업종"), budget: g("예산"), utm_source: g("유입매체"), utm_campaign: g("캠페인"), utm_content: g("소재"), landing_id: g("랜딩"), submitted_at: parseDate(g("등록일시")), memo: g("메모"), assignee: g("담당자"), status, raw_status: stRaw, lead_id: g("리드ID"),
+  return { name: g("이름"), phone: g("연락처"), email: g("이메일"), message: g("문의내용"), company: g("회사"), industry: g("업종"), budget: g("예산"), utm_source: g("유입매체"), utm_campaign: g("캠페인"), utm_content: g("소재"), landing_id: g("랜딩"), submitted_at: parseDate(g("등록일시")), memo: g("메모"), assignee: g("담당자"), status, raw_status: stRaw, by_registration: !!reg, lead_id: g("리드ID"),
     revenue: g("매출액") && !isNaN(revenueNum) ? Math.round(revenueNum) : null, pay_type: payType, converted_on: parseDate(g("전환일"))?.slice(0, 10) ?? null, drop_reason: mapDropReason(g("드랍사유")), extra: { ...extra, ...(g("드랍사유") && !mapDropReason(g("드랍사유")) ? { "드랍사유(원본)": g("드랍사유") } : {}) } };
 }
 

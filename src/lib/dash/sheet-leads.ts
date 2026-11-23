@@ -66,7 +66,7 @@ export async function sheetLeads(projectId: string): Promise<Lead[] | null> {
       landing_id: v.landing_id || null, landing_url: null,
       status: (v.status || "신규") as Lead["status"], drop_reason: (v.drop_reason || null) as Lead["drop_reason"], assignee: v.assignee || null,
       first_contact_at: null, consulted_at: null, converted_on: v.converted_on ?? null, revenue: v.revenue ?? 0, pay_type: (v.pay_type || null) as Lead["pay_type"],
-      memo: v.memo || null, custom: {}, manual_order: null, is_duplicate: false, original_lead_id: null, created_at: v.submitted_at, updated_at: v.submitted_at,
+      memo: v.memo || null, custom: v.by_registration ? { stage_by: "등록 여부" } : {}, manual_order: null, is_duplicate: false, original_lead_id: null, created_at: v.submitted_at, updated_at: v.submitted_at,
     });
   });
   return out;

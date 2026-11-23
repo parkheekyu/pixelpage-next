@@ -16,7 +16,7 @@ const rate = (v: number | null) => (v == null ? "–" : (v * 100).toFixed(v >= 0
 const div = (a: number, b: number) => (b > 0 ? a / b : null);
 
 /** 광고 노출부터 전환까지의 단계. 광고 계정이 없으면 리드부터, 리드 원본이 없으면 Meta 가 집계한 결과까지만 보여 준다. */
-function stages(A: Agg, P: Agg): Stage[] {
+function stages(A: Agg, P: Agg, visit: boolean): Stage[] {
   const out: Stage[] = [];
   const hasAds = A.imps > 0 || A.cost > 0 || P.imps > 0;
   if (hasAds) {
@@ -28,7 +28,7 @@ function stages(A: Agg, P: Agg): Stage[] {
   out.push({ key: "leads", label: "리드", n, prev: p, unit: "건", costLabel: "리드당", cost: n ? A.cost / n : 0, note: own ? (A.metaLeads != null ? `접수된 리드 기준 · Meta 집계는 ${fmtN(A.metaLeads)}건` : "접수된 리드 기준") : "Meta 집계 기준 (이 기간에 접수된 리드 기록이 없습니다)" });
   if (own) {
     out.push({ key: "contacted", label: "연락", n: A.contacted, prev: P.contacted, unit: "건", costLabel: "연락당", cost: A.contacted ? A.cost / A.contacted : 0 });
-    out.push({ key: "consulted", label: "상담완료", n: A.consulted, prev: P.consulted, unit: "건", costLabel: "상담당", cost: A.consulted ? A.cost / A.consulted : 0 });
+    out.push({ key: "consulted", label: visit ? "내방" : "상담완료", n: A.consulted, prev: P.consulted, unit: "건", costLabel: visit ? "내방당" : "상담당", cost: A.consulted ? A.cost / A.consulted : 0 });
     out.push({ key: "conv", label: "전환", n: A.conv, prev: P.conv, unit: "건", costLabel: "전환당", cost: A.conv ? A.cost / A.conv : 0 });
   }
   return out;
@@ -43,7 +43,9 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
   const { cur, prev } = periodSlices(data, period);
   const A = agg(cur.L, cur.S, data.now), P = agg(prev.L, prev.S, data.now);
   const cmp = period !== "max"; // 최대는 앞 기간이 없어 비교하지 않는다
-  const st = stages(A, P);
+  // "등록 여부" 열로 단계를 정하는 클라이언트(학원형)는 상담완료 대신 내방이라고 부른다
+  const visit = data.leads.some((l) => (l.custom as Record<string, unknown> | null)?.stage_by === "등록 여부");
+  const st = stages(A, P, visit);
   const top = Math.max(1, st[0]?.n ?? 1);
   const width = (n: number) => (n > 0 ? Math.max(6, (Math.log10(n + 1) / Math.log10(top + 1)) * 100) : 0);
   const steps = st.map((s, i) => {
@@ -104,7 +106,7 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
                   </div>
                 ))}
               </div>
-              <div className="hint">막대 길이는 로그 눈금입니다(단계마다 규모 차이가 커서). "앞 단계 대비"는 바로 앞 단계에서 넘어온 비율이고, ▲▼는 바로 앞 같은 길이 기간과의 차이입니다. 연락·상담·전환은 리드의 상태 값으로 셉니다.</div>
+              <div className="hint">막대 길이는 로그 눈금입니다(단계마다 규모 차이가 커서). "앞 단계 대비"는 바로 앞 단계에서 넘어온 비율이고, ▲▼는 바로 앞 같은 길이 기간과의 차이입니다. {visit ? "연락·내방·전환은 시트의 \"등록 여부\" 값으로 셉니다 (등록·예약금 = 전환, 미등록·등록유력·결제대기 = 내방, 상담예정·재연락·미전환·상담취소·노쇼 = 연락)." : "연락·상담·전환은 리드의 상태 값으로 셉니다."}</div>
             </>
           )}
         </div>
