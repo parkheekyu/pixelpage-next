@@ -43,6 +43,9 @@ export async function loadProjectData(supabase: DashClient, project: Project, da
     metaSpend(project.id, since.slice(0, 10)).catch(() => null).then((ms) => ms ?? fetchAll<AdSpend>((a, b) => supabase.from("ad_spend").select(SPEND_COLS).eq("project_id", project.id).gte("date", since.slice(0, 10)).order("date").range(a, b))),
     supabase.from("creatives").select("*").eq("project_id", project.id).order("creative_id"),
   ]);
+  // 객단가를 정해 둔 프로젝트: 전환했는데 매출액이 없는 리드는 객단가만큼 매출이 난 것으로 본다 (추정)
+  const aov = Number(project.avg_order_value) || 0;
+  if (aov > 0) for (const l of leads) if (l.status === "전환" && !(Number(l.revenue) > 0) && l.pay_type !== "환불") { l.revenue = aov; l.pay_type = "결제확정"; }
   return {
     project,
     leads,

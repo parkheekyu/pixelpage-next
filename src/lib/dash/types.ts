@@ -37,6 +37,8 @@ export interface Project {
   landing_url: string | null;
   research_input: ResearchInput;
   webhook_token: string | null;
+  /** 객단가(원). 전환했는데 매출액이 비어 있는 리드의 매출을 이 값으로 추정한다. */
+  avg_order_value?: number | null;
 }
 
 /** 리드 탭은 자사 프로젝트에만 있다 (고객사 리드 수집을 중단하면서 고객사 쪽 탭은 뺐다). 프로젝트를 열 때의 첫 화면. */

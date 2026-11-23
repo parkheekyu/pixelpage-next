@@ -76,7 +76,7 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
           <div className="kpi"><span>리드</span><b>{fmtN(steps.find((s) => s.key === "leads")?.n ?? 0)}건</b></div>
           <div className="kpi"><span>CPL (Meta 기준)</span><b>{fmtW(A.cpl)}</b></div>
           <div className="kpi"><span>전환</span><b>{fmtN(A.conv)}건</b></div>
-          <div className="kpi"><span>확정매출 · ROAS</span><b>{fmtW(A.revenue)} <small>{A.cost > 0 ? `${(A.roas * 100).toFixed(0)}%` : "–"}</small></b></div>
+          <div className="kpi"><span>{Number(project.avg_order_value) > 0 ? `매출 (객단가 ${fmtN(Number(project.avg_order_value) / 10000)}만 원 추정) · ROAS` : "확정매출 · ROAS"}</span><b>{fmtW(A.revenue)} <small>{A.cost > 0 ? `${(A.roas * 100).toFixed(0)}%` : "–"}</small></b></div>
         </section>
 
         <div className="card fn-card">
