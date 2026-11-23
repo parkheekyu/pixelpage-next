@@ -38,23 +38,6 @@ function RemoveBtn({ t, edits }: { t: WorkTask; edits: Edits }) {
     : <button type="button" className="t-del" title="삭제" aria-label="삭제" onClick={() => { if (confirm(`"${t.title}" 을(를) 삭제할까요?`)) edits.remove(t.id); }}><X size={14} aria-hidden /></button>;
 }
 
-function QuickAdd({ edits, day, projects, placeholder }: { edits: Edits; day: string; projects?: WorkProject[]; placeholder: string }) {
-  const [title, setTitle] = useState("");
-  const [projectId, setProjectId] = useState("");
-  return (
-    <form className="td-add" onSubmit={(e) => { e.preventDefault(); if (!title.trim()) return; edits.add({ title, do_date: day, project_id: projectId || null }); setTitle(""); }}>
-      <input value={title} onChange={(e) => setTitle(e.target.value)} placeholder={placeholder} aria-label="새 할 일" />
-      {projects && projects.length > 0 && (
-        <select value={projectId} aria-label="프로젝트" title="프로젝트를 고르면 그 프로젝트의 업무로도 들어갑니다" onChange={(e) => setProjectId(e.target.value)}>
-          <option value="">프로젝트 없음</option>
-          {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-        </select>
-      )}
-      <button className="btn primary" type="submit" disabled={!title.trim()}>추가</button>
-    </form>
-  );
-}
-
 function DayProgress({ list }: { list: WorkTask[] }) {
   const pr = progress(list);
   if (list.length === 0) return null;
@@ -137,9 +120,7 @@ function Picker({ edits, projects, milestones, today, days, start, onClose }: Sh
 /** 하루 단위 할 일: 날짜 이동, 추가, 프로젝트에서 가져오기, 밀린 일. 전체 개요에 들어간다. */
 function DayTodo({ edits, projects, milestones, today }: Shared) {
   const [day, setDay] = useState(today);
-  const [picking, setPicking] = useState(false);
   const all = edits.view;
-  const active = projects.filter((p) => p.status === "active");
   const list = all.filter((t) => t.do_date === day).sort(sortDay);
   const isToday = day === today;
   const overdue = all.filter((t) => t.status === "todo" && t.do_date && t.do_date < today).sort((a, b) => a.do_date!.localeCompare(b.do_date!));
@@ -148,7 +129,7 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
   const dueNow = all.filter((t) => t.project_id && t.status === "todo" && !t.do_date && t.deadline && t.deadline <= today);
   const week = Array.from({ length: 7 }, (_, i) => addDays(weekStart(day), i));
   const moveAll = (items: WorkTask[], to: string) => items.forEach((t) => edits.save(t.id, { do_date: to }));
-  const go = (d: string) => { setDay(d); setPicking(false); };
+  const go = (d: string) => setDay(d);
 
   return (
     <div>
@@ -171,15 +152,10 @@ function DayTodo({ edits, projects, milestones, today }: Shared) {
           <h2>{isToday ? "오늘 할 일" : `${dayLabel(day)} 할 일`}{!isToday && <button type="button" className="td-move" style={{ marginLeft: 8 }} onClick={() => go(today)}>오늘로</button>}</h2>
           <DayProgress list={list} />
         </div>
-        <div className="td-addrow">
-          <QuickAdd edits={edits} day={day} projects={active} placeholder="할 일을 적고 엔터" />
-          <button type="button" className={`btn ${picking ? "on" : ""}`} onClick={() => setPicking((v) => !v)}><FolderInput size={15} aria-hidden /> 프로젝트에서 가져오기</button>
-        </div>
-        {picking && <Picker key={day} edits={edits} projects={projects} milestones={milestones} today={today} days={[day]} start={day} onClose={() => setPicking(false)} />}
-        {isToday && dueNow.length > 0 && !picking && (
+        {isToday && dueNow.length > 0 && (
           <div className="td-nudge">마감이 오늘까지인 프로젝트 업무 {dueNow.length}건이 아직 목록에 없습니다. <button type="button" className="link" onClick={() => moveAll(dueNow, today)}>오늘 할 일에 넣기</button></div>
         )}
-        {list.length === 0 && !picking && <div className="td-empty">{isToday ? "오늘 할 일이 아직 없습니다." : "이 날 할 일이 없습니다."} 위 칸에 적거나 프로젝트에서 가져오세요.</div>}
+        {list.length === 0 && <div className="td-empty">{isToday ? "오늘 할 일이 아직 없습니다." : "이 날 할 일이 없습니다."} 할 일은 <Link href="/app/admin/tasks">업무 관리</Link>에서 추가합니다.</div>}
         {list.map((t) => (
           <TodoRow key={t.id} t={t} today={today} edits={edits} projects={projects}>
             {t.status !== "done" && <button type="button" className="td-move" title="다음 날로 미루기" onClick={() => edits.save(t.id, { do_date: addDays(day, 1) })}>내일로</button>}
