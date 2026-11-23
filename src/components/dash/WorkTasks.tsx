@@ -13,7 +13,9 @@ const PRI_TAG: Record<Priority, string> = { high: "red", mid: "blue", low: "gray
 const ST_TAG: Record<TaskStatus, string> = { todo: "blue", done: "green", hold: "orange" };
 const PRI_RANK: Record<Priority, number> = { high: 0, mid: 1, low: 2 };
 export const sortTasks = (a: WorkTask, b: WorkTask) =>
-  PRI_RANK[a.priority] - PRI_RANK[b.priority] || (a.deadline ?? "9").localeCompare(b.deadline ?? "9") || a.created_at.localeCompare(b.created_at);
+  PRI_RANK[a.priority] - PRI_RANK[b.priority] || (a.deadline ?? "9").localeCompare(b.deadline ?? "9") || a.created_at.localeCompare(b.created_at)
+  // 한꺼번에 넣은 업무는 만든 시각이 같다. 이름(1-1, 1-2 …)과 id 로 순서를 고정해야 체크할 때 줄이 뒤바뀌지 않는다.
+  || a.title.localeCompare(b.title, "ko", { numeric: true }) || a.id.localeCompare(b.id);
 
 /** 화면에 들어올 때 뒤에서 한 번 서버 값을 다시 받는다. 다른 화면에서 고친 업무가 캐시된 예전 값으로 보이지 않게 한다. */
 export function useFreshOnMount() {

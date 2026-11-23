@@ -1193,3 +1193,15 @@ textarea.vx-in { resize: vertical; }
   .pp-dash .td-row { flex-wrap: wrap; }
   .pp-dash .td-row .td-title { flex-basis: calc(100% - 40px); }
 }
+.pp-dash .td-crumb { display: flex; align-items: center; flex-wrap: wrap; gap: 4px; font-size: 13.5px; color: var(--muted); margin-bottom: 8px; }
+.pp-dash .td-crumb button { all: unset; cursor: pointer; color: var(--s1); padding: 2px 4px; border-radius: 6px; }
+.pp-dash .td-crumb button:hover { background: var(--card); }
+.pp-dash .td-crumb button:disabled { color: var(--text); font-weight: 600; cursor: default; background: none; }
+.pp-dash .td-crumb b { color: var(--text); font-weight: 600; padding: 2px 4px; }
+.pp-dash .td-step { font: inherit; display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; padding: 11px 12px; margin-top: 6px; border: 1px solid var(--line); border-radius: 8px; background: var(--card); color: var(--text); font-size: 14px; cursor: pointer; }
+.pp-dash .td-step:hover { border-color: var(--s1); }
+.pp-dash .td-step span { flex: 1 1 auto; min-width: 0; font-weight: 500; }
+.pp-dash .td-step small { flex: none; font-size: 12px; color: var(--muted); }
+.pp-dash .td-step em { flex: none; font-style: normal; font-size: 12px; color: var(--s1); font-weight: 500; }
+.pp-dash .td-step svg { flex: none; color: var(--muted); }
+.pp-dash .td-pick-all { text-align: right; }

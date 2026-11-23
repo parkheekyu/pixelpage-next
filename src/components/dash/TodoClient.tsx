@@ -67,7 +67,8 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
   const [day, setDay] = useState(today);
   const [picking, setPicking] = useState(false);
   const [sel, setSel] = useState<Set<string>>(new Set());
-  const [pickProject, setPickProject] = useState("");
+  const [pickProject, setPickProject] = useState(""); // 가져오기: 고른 프로젝트
+  const [pickGroup, setPickGroup] = useState(""); // 가져오기: 고른 마일스톤
   const all = edits.view;
   const active = projects.filter((p) => p.status === "active");
 
@@ -82,7 +83,7 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
 
   // 가져올 수 있는 업무: 아직 안 끝났고 이 날 목록에 없는 프로젝트 업무
   const cands = all.filter((t) => t.project_id && t.status === "todo" && t.do_date !== day);
-  const pickList = active.filter((p) => !pickProject || p.id === pickProject).map((p) => {
+  const pickList = active.map((p) => {
     const mine = cands.filter((t) => t.project_id === p.id);
     const ms = milestones.filter((m) => m.project_id === p.id);
     const groups = [...ms.map((m) => ({ key: m.id, title: m.title, items: mine.filter((t) => t.milestone_id === m.id).sort(sortTasks) })),
@@ -128,49 +129,58 @@ export default function TodoClient({ tasks, projects, milestones, today }: { tas
         </div>
         <div className="td-addrow">
           <QuickAdd edits={edits} day={day} projects={active} placeholder="할 일을 적고 엔터" />
-          <button type="button" className={`btn ${picking ? "on" : ""}`} onClick={() => { setPicking((v) => !v); setSel(new Set()); }}><FolderInput size={15} aria-hidden /> 프로젝트에서 가져오기</button>
+          <button type="button" className={`btn ${picking ? "on" : ""}`} onClick={() => { setPicking((v) => !v); setSel(new Set()); setPickProject(""); setPickGroup(""); }}><FolderInput size={15} aria-hidden /> 프로젝트에서 가져오기</button>
         </div>
 
-        {picking && (
-          <div className="td-pick">
-            <div className="td-pick-head">
-              <b>가져올 업무를 고르세요</b>
-              {active.length > 1 && (
-                <select value={pickProject} aria-label="프로젝트" onChange={(e) => setPickProject(e.target.value)}>
-                  <option value="">모든 프로젝트</option>
-                  {active.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
-                </select>
-              )}
-            </div>
-            {pickList.every((x) => x.count === 0) && <div className="hint">가져올 업무가 없습니다. 진행 중인 프로젝트의 남은 업무가 여기에 나옵니다.</div>}
-            {pickList.filter((x) => x.count > 0).map(({ p, groups }) => {
-              const ids = groups.flatMap((g) => g.items.map((t) => t.id)), allOn = ids.every((id) => sel.has(id));
-              return (
-                <section key={p.id}>
-                  <h3>{p.name} <small>남은 업무 {ids.length}건</small> <button type="button" className="link" onClick={() => toggle(ids, !allOn)}>{allOn ? "전체 해제" : "전체 선택"}</button></h3>
-                  {groups.map((g) => (
-                    <div key={g.key} className="td-pick-g">
-                      <h4>{g.title}</h4>
-                      {g.items.map((t) => (
-                        <label key={t.id} className={sel.has(t.id) ? "on" : ""}>
-                          <input type="checkbox" className="chk" checked={sel.has(t.id)} onChange={(e) => toggle([t.id], e.target.checked)} />
-                          <span>{t.title}</span>
-                          {t.priority === "high" && <small className="pill tag-red">높음</small>}
-                          {t.deadline && <small className={daysLeft(t.deadline, today) < 0 ? "late" : ""}>마감 {ddayLabel(t.deadline, today)}</small>}
-                          {t.do_date && <small>{md(t.do_date)} 예정</small>}
-                        </label>
-                      ))}
-                    </div>
+        {picking && (() => {
+          const withTasks = pickList.filter((x) => x.count > 0);
+          const proj = withTasks.find((x) => x.p.id === pickProject);
+          const group = proj?.groups.find((g) => g.key === pickGroup);
+          const nSel = (items: WorkTask[]) => items.filter((t) => sel.has(t.id)).length;
+          const ids = group?.items.map((t) => t.id) ?? [], allOn = ids.length > 0 && ids.every((id) => sel.has(id));
+          return (
+            <div className="td-pick">
+              <div className="td-crumb">
+                <button type="button" disabled={!proj} onClick={() => { setPickProject(""); setPickGroup(""); }}>프로젝트</button>
+                {proj && <><ChevronRight size={14} aria-hidden /><button type="button" disabled={!group} onClick={() => setPickGroup("")}>{proj.p.name}</button></>}
+                {group && <><ChevronRight size={14} aria-hidden /><b>{group.title}</b></>}
+              </div>
+              {withTasks.length === 0 && <div className="hint">가져올 업무가 없습니다. 진행 중인 프로젝트의 남은 업무가 여기에 나옵니다.</div>}
+              {!proj && withTasks.map(({ p, groups, count }) => (
+                <button key={p.id} type="button" className="td-step" onClick={() => { setPickProject(p.id); setPickGroup(""); }}>
+                  <span>{p.name}</span>
+                  {nSel(groups.flatMap((g) => g.items)) > 0 && <em>{nSel(groups.flatMap((g) => g.items))}건 선택</em>}
+                  <small>남은 업무 {count}건</small><ChevronRight size={16} aria-hidden />
+                </button>
+              ))}
+              {proj && !group && proj.groups.map((g) => (
+                <button key={g.key} type="button" className="td-step" onClick={() => { setPickProject(proj.p.id); setPickGroup(g.key); }}>
+                  <span>{g.title}</span>
+                  {nSel(g.items) > 0 && <em>{nSel(g.items)}건 선택</em>}
+                  <small>남은 업무 {g.items.length}건</small><ChevronRight size={16} aria-hidden />
+                </button>
+              ))}
+              {group && (
+                <div className="td-pick-g">
+                  <div className="td-pick-all"><button type="button" className="link" onClick={() => toggle(ids, !allOn)}>{allOn ? "전체 해제" : "전체 선택"}</button></div>
+                  {group.items.map((t) => (
+                    <label key={t.id} className={sel.has(t.id) ? "on" : ""}>
+                      <input type="checkbox" className="chk" checked={sel.has(t.id)} onChange={(e) => toggle([t.id], e.target.checked)} />
+                      <span>{t.title}</span>
+                      {t.priority === "high" && <small className="pill tag-red">높음</small>}
+                      {t.deadline && <small className={daysLeft(t.deadline, today) < 0 ? "late" : ""}>마감 {ddayLabel(t.deadline, today)}</small>}
+                      {t.do_date && <small>{md(t.do_date)} 예정</small>}
+                    </label>
                   ))}
-                </section>
-              );
-            })}
-            <div className="td-pick-foot">
-              <button type="button" className="btn primary" disabled={sel.size === 0} onClick={bring}>{sel.size > 0 ? `${sel.size}건을 ` : ""}{isToday ? "오늘" : md(day)} 할 일로 가져오기</button>
-              <button type="button" className="btn" onClick={() => { setPicking(false); setSel(new Set()); }}>닫기</button>
+                </div>
+              )}
+              <div className="td-pick-foot">
+                <button type="button" className="btn primary" disabled={sel.size === 0} onClick={bring}>{sel.size > 0 ? `${sel.size}건을 ` : ""}{isToday ? "오늘" : md(day)} 할 일로 가져오기</button>
+                <button type="button" className="btn" onClick={() => { setPicking(false); setSel(new Set()); }}>닫기</button>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {isToday && dueNow.length > 0 && !picking && (
           <div className="td-nudge">마감이 오늘까지인 프로젝트 업무 {dueNow.length}건이 아직 목록에 없습니다. <button type="button" className="link" onClick={() => moveAll(dueNow, today)}>오늘 할 일에 넣기</button></div>
