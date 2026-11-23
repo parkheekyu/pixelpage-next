@@ -1,7 +1,9 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { requireProject, getUnreadCounts } from "@/lib/dash/auth";
 import { loadProjectData } from "@/lib/dash/data";
 import { agg, dropStats, fmtN, fmtW, type Agg } from "@/lib/dash/agg";
+import type { Project } from "@/lib/dash/types";
 import { periodDataDays, periodSlices, REPORT_PERIODS, type ReportPeriod } from "@/lib/dash/report";
 import ProjectNav from "@/components/dash/ProjectNav";
 
@@ -37,9 +39,28 @@ function stages(A: Agg, P: Agg, visit: boolean): Stage[] {
 /** 클라이언트별 개요: 노출 → 클릭 → 리드 → 연락 → 상담 → 전환 퍼널을 단계별 비율과 함께 보여 준다. */
 export default async function ProjectOverviewPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ days?: string }> }) {
   const [{ id }, sp] = await Promise.all([params, searchParams]);
-  const { supabase, project, profile } = await requireProject(id);
+  const { project, profile } = await requireProject(id);
   const period = ((REPORT_PERIODS as readonly string[]).includes(sp.days ?? "") ? sp.days : "28") as ReportPeriod;
-  const [data, unread] = await Promise.all([loadProjectData(supabase, project, periodDataDays(period)), getUnreadCounts()]);
+  const unread = await getUnreadCounts();
+  // 탭 메뉴와 기간 버튼은 바로 보여 주고, 시트·광고 계정을 읽어야 하는 퍼널은 준비되는 대로 뒤따라 뜬다
+  return (
+    <>
+      <ProjectNav project={project} isStaff={profile.role === "staff"} unread={unread[project.id] ?? {}} />
+      <div className="pg">
+        <div className="fn-periods" role="tablist" aria-label="기간">
+          {REPORT_PERIODS.map((p) => <Link key={p} href={`/app/overview/${project.id}?days=${p}`} className={p === period ? "on" : ""} role="tab" aria-selected={p === period}>{PERIOD_LABEL[p]}</Link>)}
+        </div>
+        <Suspense key={period} fallback={<div className="skel" aria-busy="true" aria-label="불러오는 중"><div className="skel-tiles"><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /></div><div className="skel-block" /></div>}>
+          <Funnel project={project} period={period} />
+        </Suspense>
+      </div>
+    </>
+  );
+}
+
+async function Funnel({ project, period }: { project: Project; period: ReportPeriod }) {
+  const { supabase } = await requireProject(project.id);
+  const data = await loadProjectData(supabase, project, periodDataDays(period));
   const { cur, prev } = periodSlices(data, period);
   const A = agg(cur.L, cur.S, data.now), P = agg(prev.L, prev.S, data.now);
   const cmp = period !== "max"; // 최대는 앞 기간이 없어 비교하지 않는다
@@ -65,12 +86,6 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
 
   return (
     <>
-      <ProjectNav project={project} isStaff={profile.role === "staff"} unread={unread[project.id] ?? {}} />
-      <div className="pg">
-        <div className="fn-periods" role="tablist" aria-label="기간">
-          {REPORT_PERIODS.map((p) => <Link key={p} href={`/app/overview/${project.id}?days=${p}`} className={p === period ? "on" : ""} role="tab" aria-selected={p === period}>{PERIOD_LABEL[p]}</Link>)}
-        </div>
-
         <section className="kpis">
           <div className="kpi"><span>광고비</span><b>{fmtW(A.cost)}</b></div>
           <div className="kpi"><span>리드</span><b>{fmtN(steps.find((s) => s.key === "leads")?.n ?? 0)}건</b></div>
@@ -136,7 +151,6 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
             </div>
           </div>
         )}
-      </div>
     </>
   );
 }
