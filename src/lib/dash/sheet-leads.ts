@@ -12,22 +12,37 @@ export interface SheetGrid { sheetId: string; tab: string; header: string[]; row
 const TTL = 120_000;
 const memo = new Map<string, { at: number; grid: Promise<SheetGrid> }>();
 
-export async function sheetConfig(projectId: string): Promise<{ sheetId: string; tab: string } | null> {
+/** tab 은 첫 번째 탭(웹훅으로 들어온 리드를 적는 곳), tabs 는 읽어 올 탭 전부. 설정의 탭 이름에 쉼표로 여러 개를 적을 수 있다. */
+export async function sheetConfig(projectId: string): Promise<{ sheetId: string; tab: string; tabs: string[] } | null> {
   const { data } = await createAdminClient().from("project_integrations").select("google_sheet_id,google_sheet_tab").eq("project_id", projectId).maybeSingle();
-  return data?.google_sheet_id ? { sheetId: data.google_sheet_id, tab: data.google_sheet_tab || "리드" } : null;
+  if (!data?.google_sheet_id) return null;
+  const tabs = (data.google_sheet_tab || "리드").split(",").map((t: string) => t.trim()).filter(Boolean);
+  return { sheetId: data.google_sheet_id, tab: tabs[0] ?? "리드", tabs: tabs.length ? tabs : ["리드"] };
 }
 
 /** 연결된 시트 전체 (머리글 + 행). 연결이 없으면 null. fresh 면 기억해 둔 것을 버리고 다시 읽는다. */
 export async function loadSheetGrid(projectId: string, fresh = false): Promise<SheetGrid | null> {
   const cfg = await sheetConfig(projectId);
   if (!cfg) return null;
-  const key = `${cfg.sheetId}\n${cfg.tab}`;
+  const key = `${cfg.sheetId}\n${cfg.tabs.join(",")}`;
   const hit = memo.get(key);
   if (hit && !fresh && Date.now() - hit.at < TTL) return hit.grid;
-  const grid = sheetsReadGrid(cfg.sheetId, cfg.tab).then((g) => ({ ...cfg, ...g, fetchedAt: Date.now() }));
+  const grid = Promise.all(cfg.tabs.map((t) => sheetsReadGrid(cfg.sheetId, t))).then((gs) => ({ sheetId: cfg.sheetId, tab: cfg.tabs.join(", "), ...mergeTabs(cfg.tabs, gs), fetchedAt: Date.now() }));
   memo.set(key, { at: Date.now(), grid });
   grid.catch(() => memo.delete(key)); // 실패는 기억하지 않는다
   return grid;
+}
+
+/** 탭이 여럿이면 한 표로 합친다: 맨 앞에 어느 탭에서 왔는지("구분") 열을 붙이고, 열은 머리글 이름으로 맞춘다. */
+function mergeTabs(tabs: string[], grids: { header: string[]; rows: string[][] }[]): { header: string[]; rows: string[][] } {
+  if (grids.length === 1) return grids[0];
+  const header: string[] = [];
+  for (const g of grids) for (const h of g.header) if (h.trim() && !header.includes(h)) header.push(h);
+  const rows = grids.flatMap((g, gi) => {
+    const at = header.map((h) => g.header.indexOf(h));
+    return g.rows.filter((r) => r.some((c) => (c ?? "").trim())).map((r) => [tabs[gi], ...at.map((k) => (k >= 0 ? r[k] ?? "" : ""))]);
+  });
+  return { header: ["구분", ...header], rows };
 }
 
 /** 등록일시로 알아볼 수 있는 열의 위치 (없으면 -1) */

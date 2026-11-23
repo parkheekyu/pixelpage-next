@@ -42,6 +42,8 @@ export function matchHeader(h: string): string | null {
 }
 export function parseDate(v: string): string | undefined {
   const t = v.trim(); if (!t) return undefined;
+  // 시간대가 붙은 ISO 시각(…Z, …+09:00)은 적힌 시간대 그대로 읽는다. 아래 규칙은 시간대가 없는 값을 한국 시간으로 본다.
+  if (/^\d{4}-\d{2}-\d{2}T[\d:.]+(Z|[+-]\d{2}:?\d{2})$/.test(t)) { const d = new Date(t); if (!isNaN(d.getTime())) return d.toISOString(); }
   let m = t.match(/(\d{4})[.\-/년]\s*(\d{1,2})[.\-/월]\s*(\d{1,2})[일]?(?:[\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/);
   // 두 자리 연도 (26.08.13 18:34, 26-8-5)
   if (!m) { const m2 = t.match(/^(\d{2})[.\-/]\s*(\d{1,2})[.\-/]\s*(\d{1,2})\.?(?:[\sT]+(\d{1,2}):(\d{2})(?::(\d{2}))?)?/); if (m2) m = [m2[0], "20" + m2[1], m2[2], m2[3], m2[4], m2[5], m2[6]] as unknown as RegExpMatchArray; }
