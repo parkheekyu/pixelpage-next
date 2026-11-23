@@ -1,48 +1,49 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { fmtW, pct, ratio, type Agg } from "@/lib/dash/agg";
+import { fmtW, pct, type Agg } from "@/lib/dash/agg";
 import { projectHome, type Project } from "@/lib/dash/types";
-import { Spark, Tiles, Trend } from "./charts";
+import { Spark, Trend } from "./charts";
+import { ORDER_EVENT, ORDER_KEY, sorted } from "./Sidebar";
 import ProjectCreateForm from "./ProjectCreateForm";
 
 export interface OverviewRow { project: Project; A: Agg; P: Agg; spark: number[] }
-type SortKey = "cost" | "leads" | "cpl" | "roas" | "stale";
+type SortKey = "menu" | "cost" | "leads" | "cpl" | "roas" | "stale";
 
 export default function AdminOverview({ rows: input, days }: { rows: OverviewRow[]; days: number }) {
   const router = useRouter(), pathname = usePathname();
   const [pending, start] = useTransition();
-  const [sortKey, setSortKey] = useState<SortKey>("cost");
+  const [sortKey, setSortKey] = useState<SortKey>("menu");
+  // 왼쪽 메뉴에서 끌어서 정한 고객사 순서 (이 브라우저에 저장된 값)
+  const [menuOrder, setMenuOrder] = useState<string[] | undefined>();
+  useEffect(() => {
+    const read = () => { try { const v = JSON.parse(localStorage.getItem(ORDER_KEY) ?? "{}"); setMenuOrder(Array.isArray(v?.projects) ? v.projects : undefined); } catch {} };
+    read();
+    window.addEventListener(ORDER_EVENT, read);
+    return () => window.removeEventListener(ORDER_EVENT, read);
+  }, []);
 
   const rows = useMemo(() => {
-    const dir: Record<SortKey, number> = { cpl: 1, cost: -1, leads: -1, roas: -1, stale: -1 };
-    return [...input].sort((a, b) => (a.A[sortKey] - b.A[sortKey]) * dir[sortKey]);
-  }, [input, sortKey]);
-
-  const sum = (pick: (r: OverviewRow) => Agg): Agg => {
-    const t = rows.reduce((acc, r) => { const a = pick(r); for (const k of ["cost", "imps", "clicks", "leads", "contacted", "consulted", "conv", "revenue", "stale"] as const) acc[k] += a[k]; return acc; },
-      { cost: 0, imps: 0, clicks: 0, leads: 0, contacted: 0, consulted: 0, conv: 0, revenue: 0, stale: 0, cpl: 0, cpa: 0, roas: 0 });
-    return { ...t, cpl: ratio(t.cost, t.leads), cpa: ratio(t.cost, t.conv), roas: ratio(t.revenue, t.cost) };
-  };
-  const tot = sum((r) => r.A), totP = sum((r) => r.P);
+    if (sortKey === "menu") return sorted(input, (r) => r.project.id, menuOrder);
+    const dir = { cpl: 1, cost: -1, leads: -1, roas: -1, stale: -1 }[sortKey];
+    return [...input].sort((a, b) => (a.A[sortKey] - b.A[sortKey]) * dir);
+  }, [input, sortKey, menuOrder]);
 
   return (
     <div style={{ opacity: pending ? 0.6 : 1, transition: "opacity .15s" }}>
       <header className="ph">
-        <h1>고객사 광고 성과 <small>{rows.length}개사 · 총 광고비 {fmtW(tot.cost)}</small></h1>
+        <h1>고객사 광고 성과 <small>{rows.length}개사</small></h1>
         <div className="controls">
           <select value={days} onChange={(e) => start(() => router.replace(`${pathname}?days=${e.target.value}`, { scroll: false }))}>
             <option value={7}>최근 7일</option><option value={14}>최근 14일</option><option value={28}>최근 4주</option>
           </select>
           <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}>
-            <option value="cost">광고비 순</option><option value="leads">리드 순</option><option value="cpl">CPL 낮은 순</option><option value="roas">ROAS 높은 순</option><option value="stale">미처리 많은 순</option>
+            <option value="menu">메뉴 순서</option><option value="cost">광고비 순</option><option value="leads">리드 순</option><option value="cpl">CPL 낮은 순</option><option value="roas">ROAS 높은 순</option><option value="stale">미처리 많은 순</option>
           </select>
         </div>
       </header>
-
-      <Tiles A={tot} P={totP} keys={["cost", "leads", "cpl", "conv", "revenue", "roas", "stale"]} />
 
       <div className="card">
         <h2>고객사별 성과</h2>

@@ -21,10 +21,12 @@ const ADMIN: { key: string; href: string; label: string; Icon: LucideIcon; exact
   { key: "finance", href: "/app/admin/finance", label: "매출·지출", Icon: Wallet },
   { key: "users", href: "/app/admin/users", label: "회원 · 권한", Icon: Users },
 ];
-const ORDER_KEY = "pp-side-order";
+export const ORDER_KEY = "pp-side-order";
+/** 메뉴 순서가 바뀌면 이 이름의 이벤트를 window 에 쏜다 (같은 순서로 보여 주는 화면이 따라 바뀌게) */
+export const ORDER_EVENT = "pp-side-order";
 type Order = Record<string, string[]>;
 /** 저장된 순서대로 늘어놓는다. 저장된 뒤에 새로 생긴 항목은 원래 자리(앞 항목 바로 뒤)에 끼운다. */
-function sorted<T>(items: T[], keyOf: (t: T) => string, saved?: string[]): T[] {
+export function sorted<T>(items: T[], keyOf: (t: T) => string, saved?: string[]): T[] {
   if (!saved?.length) return items;
   const out = saved.map((k) => items.find((i) => keyOf(i) === k)).filter((i): i is T => !!i);
   items.forEach((it, idx) => { if (out.includes(it)) return; const prev = idx > 0 ? out.indexOf(items[idx - 1]) : -1; out.splice(prev + 1, 0, it); });
@@ -71,7 +73,7 @@ export default function Sidebar({ profile, projects, unread, logos = {}, categor
         const rest = keys.filter((k) => k !== drag.key);
         rest.splice(rest.indexOf(key) + (over?.after ? 1 : 0), 0, drag.key);
         const next = { ...order, [group]: rest };
-        setOrder(next); try { localStorage.setItem(ORDER_KEY, JSON.stringify(next)); } catch {}
+        setOrder(next); try { localStorage.setItem(ORDER_KEY, JSON.stringify(next)); window.dispatchEvent(new Event(ORDER_EVENT)); } catch {}
       }
       setDrag(null); setOver(null);
     },
