@@ -1273,7 +1273,7 @@ textarea.vx-in { resize: vertical; }
 .pp-dash .fn-total { font-size: 13px; color: var(--text-2); }
 .pp-dash .fn-cost b { display: block; font-size: 13.5px; font-weight: 600; }
 .pp-dash .fn-cost small { font-size: 11.5px; color: var(--muted); }
-.pp-dash .fn-row.leak { background: color-mix(in srgb, var(--bad) 5%, transparent); box-shadow: inset 3px 0 0 var(--bad); padding-left: 10px; }
+.pp-dash .fn-row.leak { background: color-mix(in srgb, var(--bad) 5%, transparent); box-shadow: inset 3px 0 0 var(--bad); }
 .pp-dash .fn-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 12px; align-items: start; }
 .pp-dash .fn-grid > .card { margin: 0; grid-column: auto; }
 .pp-dash .fn-notes { margin: 0; padding: 0; list-style: none; font-size: 13.5px; color: var(--text-2); }

@@ -53,7 +53,7 @@ export default function AdminOverview({ rows: input, days }: { rows: OverviewRow
             <thead><tr><th>고객사</th><th>광고비</th><th>리드</th><th>CPL</th><th>전환</th><th>전환율</th><th>확정매출</th><th>ROAS</th><th>24h 미처리</th><th>리드 추이</th><th></th></tr></thead>
             <tbody>
               {rows.map(({ project: p, A, P, spark }) => (
-                <tr key={p.id} className="row" onClick={() => router.push(p.is_own ? `/app/projects/${p.id}/report` : `/app/research/${p.id}`)}>
+                <tr key={p.id} className="row" onClick={() => router.push(`/app/overview/${p.id}`)}>
                   <td>{p.name}{p.is_own && <span className="pill" style={{ fontSize: 11.5, marginLeft: 6 }}>자사</span>}</td>
                   <td>{fmtW(A.cost)}</td>
                   <td>{A.leads} <Trend a={A.leads} b={P.leads} /></td>

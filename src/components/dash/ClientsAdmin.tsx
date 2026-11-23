@@ -90,7 +90,7 @@ export default function ClientsAdmin({ clients, loadError }: { clients: Client[]
                   </td>
                   <td className="wide"><input className="cell-in" defaultValue={c.revenue_model ?? ""} key={c.revenue_model ?? ""} aria-label="수익구조" placeholder="비어 있음" onKeyDown={enter} onBlur={(e) => { const v = e.target.value.trim(); if (v !== (c.revenue_model ?? "")) save(c.id, { revenue_model: v }); }} /></td>
                   <td className="wide"><input className="cell-in" defaultValue={c.memo ?? ""} key={c.memo ?? ""} aria-label="메모" placeholder="비어 있음" onKeyDown={enter} onBlur={(e) => { const v = e.target.value.trim(); if (v !== (c.memo ?? "")) save(c.id, { memo: v }); }} /></td>
-                  <td>{c.project_id ? <Link href={`/app/research/${c.project_id}`} className="ndb-link">열기 ›</Link> : <small>없음</small>}</td>
+                  <td>{c.project_id ? <Link href={`/app/overview/${c.project_id}`} className="ndb-link">열기 ›</Link> : <small>없음</small>}</td>
                   <td className="act"><button type="button" className="t-del" title="삭제" aria-label="삭제" onClick={() => { if (confirm(`${c.name} 클라이언트를 삭제할까요? 계약 정보만 지워지고 고객사(대시보드)는 남습니다.`)) run(() => deleteClientRow(c.id)); }}><X size={14} aria-hidden /></button></td>
                 </tr>
               );

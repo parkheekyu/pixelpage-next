@@ -81,7 +81,7 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
           <div className="td-head"><h2>전체 퍼널 <small>{PERIOD_LABEL[period]}</small></h2></div>
           {empty ? <div className="td-empty">이 기간에는 광고 지출과 리드가 없습니다. 기간을 넓혀 보세요.</div> : (
             <>
-              <div className="fn">
+              <div className="fnl">
                 <div className="fn-row fn-th"><span>단계</span><span>규모</span><span>앞 단계 대비</span><span>처음 대비</span><span>건당 비용</span></div>
                 {steps.map((s, i) => (
                   <div key={s.key} className={`fn-row${leak?.key === s.key ? " leak" : ""}`}>

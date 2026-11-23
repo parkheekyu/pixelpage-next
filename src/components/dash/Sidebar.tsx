@@ -11,7 +11,7 @@ import type { Profile, Project } from "@/lib/dash/types";
 import type { UnreadMap } from "@/lib/dash/auth";
 
 type SeenKindKey = "leads" | "research" | "ads" | "landing";
-const SECTIONS = ["projects", "research", "ads", "landing", "settings"] as const;
+const SECTIONS = ["overview", "projects", "research", "ads", "landing", "settings"] as const;
 /** 관리 메뉴. 순서는 끌어서 바꿀 수 있고, 여기 순서가 기본값이다. */
 const ADMIN: { key: string; href: string; label: string; Icon: LucideIcon; exact?: boolean }[] = [
   { key: "overview", href: "/app/admin", label: "전체 개요", Icon: LayoutDashboard, exact: true },
@@ -38,10 +38,11 @@ export default function Sidebar({ profile, projects, unread, logos = {}, categor
   const pathname = usePathname() ?? "";
   const isStaff = profile.role === "staff";
   // 현재 보고 있는 프로젝트·종류는 배지에서 제외 (열면 확인 처리됨)
-  const m = pathname.match(/^\/app\/(projects|research|ads|landing|settings)\/([^/]+)/);
+  const m = pathname.match(/^\/app\/(overview|projects|research|ads|landing|settings)\/([^/]+)/);
   const curProject = m?.[2], curKind = m?.[1] === "projects" ? "leads" : m?.[1];
   const total = (id: string, own: boolean) => { const u = unread[id] ?? {}; return ((own ? ["leads", "research", "ads", "landing"] : ["research", "ads", "landing"]) as SeenKindKey[]).reduce((a, k) => a + (curProject === id && curKind === k ? 0 : (u[k] ?? 0)), 0); };
-  const hrefFor = (p: Project) => { const cur = m?.[1] && (SECTIONS as readonly string[]).includes(m[1]) ? m[1] : null; const sec = !cur || (cur === "projects" && !p.is_own) ? (p.is_own ? "projects" : "research") : cur; return `/app/${sec}/${p.id}`; };
+  // 처음 열 때는 개요, 그 뒤로는 보던 탭을 유지
+  const hrefFor = (p: Project) => { const cur = m?.[1] && (SECTIONS as readonly string[]).includes(m[1]) ? m[1] : null; const sec = !cur || (cur === "projects" && !p.is_own && !p.has_lead_sheet) ? "overview" : cur; return `/app/${sec}/${p.id}`; };
 
   // 접기/펴기: 저장된 값은 마운트 후 DOM 에 바로 적용 (서버 렌더와 어긋나지 않게)
   const ref = useRef<HTMLElement | null>(null);
