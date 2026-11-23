@@ -2,7 +2,8 @@ import { Suspense } from "react";
 import Link from "next/link";
 import { requireStaff, getMyProjects } from "@/lib/dash/auth";
 import { loadAllProjectData } from "@/lib/dash/data";
-import { agg, fmtW, slice, sparkPoints } from "@/lib/dash/agg";
+import { agg, buckets, fmtW } from "@/lib/dash/agg";
+import { periodDataDays, periodSlices, REPORT_PERIODS, type ReportPeriod } from "@/lib/dash/report";
 import AdminOverview, { type OverviewRow } from "@/components/dash/AdminOverview";
 import { OverviewBoard } from "@/components/dash/TodoClient";
 import type { Client, WorkMilestone, WorkProject, WorkTask } from "@/lib/dash/types";
@@ -14,7 +15,7 @@ export const dynamic = "force-dynamic";
  *  가벼운 것들이 먼저 뜨고, 리드 집계가 필요한 광고 성과는 준비되는 대로 뒤따라 뜬다. */
 export default async function AdminPage({ searchParams }: { searchParams: Promise<{ days?: string }> }) {
   const sp = await searchParams;
-  const days = [7, 14, 28].includes(+(sp.days ?? 0)) ? +sp.days! : 28;
+  const days = ((REPORT_PERIODS as readonly string[]).includes(sp.days ?? "") ? sp.days : "28") as ReportPeriod;
   const today = todayKST(), month = today.slice(0, 7);
   const nextMonth = new Date(Date.UTC(+month.slice(0, 4), +month.slice(5, 7), 1)).toISOString().slice(0, 10); // 다음 달 1일
   const { supabase } = await requireStaff();
@@ -50,13 +51,13 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   );
 }
 
-async function Overview({ days }: { days: number }) {
+async function Overview({ days }: { days: ReportPeriod }) {
   const { supabase } = await requireStaff();
   const projects = await getMyProjects();
-  const data = await loadAllProjectData(supabase, projects, days);
+  const data = await loadAllProjectData(supabase, projects, periodDataDays(days));
   const rows: OverviewRow[] = data.map((d) => {
-    const cur = slice(d.leads, d.spend, days, "all", 0, d.now), prev = slice(d.leads, d.spend, days, "all", 1, d.now);
-    return { project: d.project, A: agg(cur.L, cur.S, d.now), P: agg(prev.L, prev.S, d.now), spark: sparkPoints(d.leads, days, d.now) };
+    const { cur, prev, days: n, end } = periodSlices(d, days);
+    return { project: d.project, A: agg(cur.L, cur.S, d.now), P: agg(prev.L, prev.S, d.now), spark: buckets(cur.L, n, end).map((b) => b.leads) };
   });
   return <AdminOverview rows={rows} days={days} />;
 }

@@ -39,17 +39,22 @@ export function periodLoadDays(period: ReportPeriod, now = Date.now()): number {
   return period === "max" ? w.days : Math.ceil((now - w.end) / DAY + w.days * 2) + 1;
 }
 
-export function buildReport(data: ProjectData, period: ReportPeriod, src: string): ReportModel {
-  const now = data.now;
-  const w = periodWindow(period, now);
+/** 그 기간(cur)과 바로 앞 같은 길이 기간(prev)의 리드·광고비. 최대는 가장 오래된 리드·광고비가 있는 날부터 지금까지. */
+export function periodSlices(data: ProjectData, period: ReportPeriod, src = "all") {
+  const now = data.now, w = periodWindow(period, now);
   let days = w.days;
-  // 최대: 가장 오래된 리드·광고비가 있는 날부터 지금까지
   if (period === "max") {
     const first = Math.min(now, ...data.leads.map((l) => new Date(l.submitted_at).getTime()), ...data.spend.map((s) => kstMidnight(s.date)));
     days = Math.max(1, Math.ceil((now - first) / DAY) + 1);
   }
-  const end = w.end;
-  const cur = slice(data.leads, data.spend, days, src, 0, end), prev = slice(data.leads, data.spend, days, src, 1, end);
+  return { cur: slice(data.leads, data.spend, days, src, 0, w.end), prev: slice(data.leads, data.spend, days, src, 1, w.end), days, end: w.end };
+}
+/** loadProjectData 에 넘길 날 수 (그쪽에서 비교 기간까지 두 배로 읽는다) */
+export const periodDataDays = (period: ReportPeriod) => (period === "max" ? 3650 : Math.ceil(periodLoadDays(period) / 2));
+
+export function buildReport(data: ProjectData, period: ReportPeriod, src: string): ReportModel {
+  const now = data.now;
+  const { cur, prev, days, end } = periodSlices(data, period, src);
   const A = agg(cur.L, cur.S, now), P = agg(prev.L, prev.S, now);
   const recent = [...cur.L].sort((a, b) => new Date(b.submitted_at).getTime() - new Date(a.submitted_at).getTime()).slice(0, 10)
     .map((l) => ({ id: l.id, submitted_at: l.submitted_at, name: l.name, phone: l.phone, utm_source: l.utm_source, utm_content: l.utm_content, assignee: l.assignee, status: l.status }));

@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { ExternalLink, RefreshCw, Search } from "lucide-react";
 
 interface Row { n: number; t: number; c: string[] }
-const RANGES = [{ key: "all", label: "전체", days: 0 }, { key: "1", label: "오늘", days: 1 }, { key: "7", label: "7일", days: 7 }, { key: "30", label: "30일", days: 30 }] as const;
+const RANGES = [{ key: "all", label: "최대", days: 0 }, { key: "1", label: "오늘", days: 1 }, { key: "7", label: "7일", days: 7 }, { key: "30", label: "30일", days: 30 }, { key: "month", label: "이번 달", days: 0 }, { key: "prev", label: "지난달", days: 0 }] as const;
 const STEP = 200;
 
 /** 리드 = 구글 시트 보기. 시트가 원본이고 여기서는 읽기만 한다. 수정은 시트에서 한다. */
@@ -21,9 +21,16 @@ export default function SheetLeads({ header, rows, total, hasDate, dateIndex, sh
     const days = RANGES.find((r) => r.key === range)!.days;
     // 오늘 = 한국 시간 자정부터, N일 = 오늘 포함 최근 N일
     const kstMidnight = Math.floor((fetchedAt + 9 * 3600_000) / 86400_000) * 86400_000 - 9 * 3600_000;
-    const since = days ? kstMidnight - (days - 1) * 86400_000 : 0;
+    let since = days ? kstMidnight - (days - 1) * 86400_000 : 0, until = Infinity;
+    if (range === "month" || range === "prev") {
+      // 이번 달 1일 0시(한국 시간). 지난달은 그 앞 달 1일부터 이번 달 1일 직전까지
+      const k = new Date(fetchedAt + 9 * 3600_000), y = k.getUTCFullYear(), mo = k.getUTCMonth();
+      const first = (n: number) => Date.UTC(y, mo + n, 1) - 9 * 3600_000;
+      since = range === "month" ? first(0) : first(-1);
+      if (range === "prev") until = first(0);
+    }
     const term = q.trim().toLowerCase();
-    return rows.filter((r) => (!since || r.t >= since) && (!term || r.c.some((v) => v.toLowerCase().includes(term))));
+    return rows.filter((r) => (!since || r.t >= since) && r.t < until && (!term || r.c.some((v) => v.toLowerCase().includes(term))));
   }, [rows, q, range, fetchedAt]);
 
   const time = new Date(fetchedAt).toLocaleTimeString("ko-KR", { timeZone: "Asia/Seoul", hour: "2-digit", minute: "2-digit" });

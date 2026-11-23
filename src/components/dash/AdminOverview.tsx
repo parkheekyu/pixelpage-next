@@ -12,7 +12,7 @@ import ProjectCreateForm from "./ProjectCreateForm";
 export interface OverviewRow { project: Project; A: Agg; P: Agg; spark: number[] }
 type SortKey = "menu" | "cost" | "leads" | "cpl" | "roas" | "stale";
 
-export default function AdminOverview({ rows: input, days }: { rows: OverviewRow[]; days: number }) {
+export default function AdminOverview({ rows: input, days }: { rows: OverviewRow[]; days: string }) {
   const router = useRouter(), pathname = usePathname();
   const [pending, start] = useTransition();
   const [sortKey, setSortKey] = useState<SortKey>("menu");
@@ -37,7 +37,7 @@ export default function AdminOverview({ rows: input, days }: { rows: OverviewRow
         <h1>고객사 광고 성과 <small>{rows.length}개사</small></h1>
         <div className="controls">
           <select value={days} onChange={(e) => start(() => router.replace(`${pathname}?days=${e.target.value}`, { scroll: false }))}>
-            <option value={7}>최근 7일</option><option value={14}>최근 14일</option><option value={28}>최근 4주</option>
+            <option value="7">최근 7일</option><option value="14">최근 14일</option><option value="28">최근 4주</option><option value="56">최근 8주</option><option value="month">이번 달</option><option value="prev">지난달</option><option value="max">최대</option>
           </select>
           <select value={sortKey} onChange={(e) => setSortKey(e.target.value as SortKey)}>
             <option value="menu">메뉴 순서</option><option value="cost">광고비 순</option><option value="leads">리드 순</option><option value="cpl">CPL 낮은 순</option><option value="roas">ROAS 높은 순</option><option value="stale">미처리 많은 순</option>
