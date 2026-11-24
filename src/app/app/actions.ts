@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSession, requireSession, requireStaff } from "@/lib/dash/auth";
-import { CUSTOM_TYPES, FUNNEL_ENDS, DROPS, PAYS, STATUSES, type CustomField, type LeadPatch } from "@/lib/dash/types";
+import { CUSTOM_TYPES, DROPS, PAYS, STATUSES, type CustomField, type LeadPatch } from "@/lib/dash/types";
 import { queryLeads, type LeadPage, type LeadQuery } from "@/lib/dash/leads-query";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; error: string };
@@ -282,14 +282,4 @@ export async function setAssignee(projectId: string, leadId: string, assignee: s
 
 export async function ensureSessionOrRedirect() {
   await requireSession();
-}
-
-// ---------- 개요 퍼널 설정 (직원): 브랜드마다 퍼널을 어느 단계까지 볼지 ----------
-export async function setFunnelEnd(projectId: string, end: string): Promise<ActionResult> {
-  const s = await requireStaff();
-  if (!(FUNNEL_ENDS as readonly string[]).includes(end)) return { ok: false, error: "알 수 없는 단계입니다." };
-  const { error } = await s.supabase.from("projects").update({ funnel_end: end === "conv" ? null : end }).eq("id", projectId);
-  if (error) return { ok: false, error: error.message };
-  revalidatePath(`/app/overview/${projectId}`);
-  return { ok: true };
 }

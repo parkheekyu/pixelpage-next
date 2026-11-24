@@ -6,7 +6,6 @@ import { agg, fmtN, fmtW, type Agg } from "@/lib/dash/agg";
 import { FUNNEL_ENDS, type FunnelEnd, type Project } from "@/lib/dash/types";
 import { periodDataDays, periodSlices, REPORT_PERIODS, type ReportPeriod } from "@/lib/dash/report";
 import ProjectNav from "@/components/dash/ProjectNav";
-import FunnelEndSelect from "@/components/dash/FunnelEndSelect";
 
 export const dynamic = "force-dynamic";
 
@@ -52,14 +51,14 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
           {REPORT_PERIODS.map((p) => <Link key={p} href={`/app/overview/${project.id}?days=${p}`} className={p === period ? "on" : ""} role="tab" aria-selected={p === period}>{PERIOD_LABEL[p]}</Link>)}
         </div>
         <Suspense key={period} fallback={<div className="skel" aria-busy="true" aria-label="불러오는 중"><div className="skel-tiles"><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /></div><div className="skel-block" /></div>}>
-          <Funnel project={project} period={period} isStaff={profile.role === "staff"} />
+          <Funnel project={project} period={period} />
         </Suspense>
       </div>
     </>
   );
 }
 
-async function Funnel({ project, period, isStaff }: { project: Project; period: ReportPeriod; isStaff: boolean }) {
+async function Funnel({ project, period }: { project: Project; period: ReportPeriod }) {
   const { supabase } = await requireProject(project.id);
   const data = await loadProjectData(supabase, project, periodDataDays(period));
   const { cur, prev } = periodSlices(data, period);
@@ -73,7 +72,6 @@ async function Funnel({ project, period, isStaff }: { project: Project; period: 
   const cut = all.findIndex((s) => s.key === end);
   const st = cut >= 0 ? all.slice(0, cut + 1) : all;
   const toConv = end === "conv";
-  const endLabels = Object.fromEntries(FUNNEL_ENDS.map((k) => [k, k === "leads" ? "리드" : k === "contacted" ? "연락" : k === "consulted" ? (visit ? "내방" : "상담완료") : "전환"])) as Record<FunnelEnd, string>;
   const top = Math.max(1, st[0]?.n ?? 1);
   const width = (n: number) => (n > 0 ? Math.max(6, (Math.log10(n + 1) / Math.log10(top + 1)) * 100) : 0);
   const steps = st.map((s, i) => {
@@ -97,7 +95,7 @@ async function Funnel({ project, period, isStaff }: { project: Project; period: 
         </section>
 
         <div className="card fn-card">
-          <div className="td-head"><h2>전체 퍼널 <small>{PERIOD_LABEL[period]}</small></h2>{isStaff && <FunnelEndSelect projectId={project.id} value={end} labels={endLabels} />}</div>
+          <div className="td-head"><h2>전체 퍼널 <small>{PERIOD_LABEL[period]}</small></h2></div>
           {empty ? <div className="td-empty">이 기간에는 광고 지출과 리드가 없습니다. 기간을 넓혀 보세요.</div> : (
             <>
               <div className="fnl">
