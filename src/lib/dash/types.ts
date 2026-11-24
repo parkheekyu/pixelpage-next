@@ -41,7 +41,12 @@ export interface Project {
   avg_order_value?: number | null;
   /** 개요 퍼널을 어느 단계까지 보여 줄지. 비어 있으면 전환까지. */
   funnel_end?: FunnelEnd | null;
+  /** 개요 퍼널을 GA4 행동 단계로 짜는 브랜드(온라인 판매형). 있으면 기본 퍼널 대신 이 단계를 순서대로 센다. */
+  funnel_ga4?: Ga4FunnelStep[] | null;
 }
+
+/** GA4 퍼널 한 단계: 이벤트 이름과, 필요하면 이벤트 매개변수(page_location 등)에 들어 있어야 하는 글자 */
+export interface Ga4FunnelStep { name: string; event: string; param?: string; value?: string; note?: string }
 
 /** 개요 퍼널의 마지막 단계 (브랜드별 설정) */
 export const FUNNEL_ENDS = ["leads", "contacted", "consulted", "conv"] as const;

@@ -141,3 +141,32 @@ export async function ga4Commerce(propertyId: string, days = 28): Promise<Ga4Com
     byLanding: land.rows.filter((r) => r.dims[0] && r.dims[0] !== "(not set)" && !/\/(payment|checkout|pay|order|login|auth|oauth|callback)(\/|$)/i.test(r.dims[0])).map((r) => ({ path: r.dims[0], sessions: r.metrics[0], purchases: r.metrics[1], revenue: r.metrics[2] })),
   };
 }
+
+/**
+ * 단계를 순서대로 밟은 사람 수 (GA4 퍼널 보고서, 닫힌 퍼널: 첫 단계부터 차례로 거친 사람만 다음 단계에 센다).
+ * 날짜는 YYYY-MM-DD.
+ */
+export async function ga4Funnel(propertyId: string, start: string, end: string, steps: { name: string; event: string; param?: string; value?: string }[]): Promise<number[]> {
+  const token = await accessToken();
+  const pid = propertyId.replace(/^properties\//, "");
+  const body = {
+    dateRanges: [{ startDate: start, endDate: end }],
+    funnel: {
+      isOpenFunnel: false,
+      steps: steps.map((s) => ({
+        name: s.name,
+        filterExpression: { funnelEventFilter: { eventName: s.event, ...(s.param && s.value ? { funnelParameterFilterExpression: { funnelParameterFilter: { eventParameterName: s.param, stringFilter: { matchType: "CONTAINS", value: s.value } } } } : {}) } },
+      })),
+    },
+  };
+  const r = await fetch(`https://analyticsdata.googleapis.com/v1alpha/properties/${pid}:runFunnelReport`, { method: "POST", headers: { authorization: `Bearer ${token}`, "content-type": "application/json" }, body: JSON.stringify(body), signal: AbortSignal.timeout(30000) });
+  const j = (await r.json()) as { funnelTable?: { rows?: { dimensionValues?: { value: string }[]; metricValues?: { value: string }[] }[] }; error?: { message: string } };
+  if (j.error) throw new Error("GA4: " + j.error.message);
+  const out = steps.map(() => 0);
+  // 행 이름은 "1. 단계명" 꼴. 아무도 도달하지 못한 단계는 행이 없다.
+  for (const row of j.funnelTable?.rows ?? []) {
+    const i = parseInt(row.dimensionValues?.[0]?.value ?? "", 10) - 1;
+    if (i >= 0 && i < out.length) out[i] = Number(row.metricValues?.[0]?.value ?? 0);
+  }
+  return out;
+}

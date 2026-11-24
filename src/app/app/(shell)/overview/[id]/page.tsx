@@ -5,6 +5,7 @@ import { loadProjectData } from "@/lib/dash/data";
 import { agg, fmtN, fmtW, type Agg } from "@/lib/dash/agg";
 import { FUNNEL_ENDS, type FunnelEnd, type Project } from "@/lib/dash/types";
 import { periodDataDays, periodSlices, REPORT_PERIODS, type ReportPeriod } from "@/lib/dash/report";
+import { projectGa4Funnel } from "@/lib/dash/ga4-funnel";
 import ProjectNav from "@/components/dash/ProjectNav";
 
 export const dynamic = "force-dynamic";
@@ -61,7 +62,7 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
 async function Funnel({ project, period }: { project: Project; period: ReportPeriod }) {
   const { supabase } = await requireProject(project.id);
   const data = await loadProjectData(supabase, project, periodDataDays(period));
-  const { cur, prev } = periodSlices(data, period);
+  const { cur, prev, days, end: endMs } = periodSlices(data, period);
   const A = agg(cur.L, cur.S, data.now), P = agg(prev.L, prev.S, data.now);
   const cmp = period !== "max"; // 최대는 앞 기간이 없어 비교하지 않는다
   // "등록 여부" 열로 단계를 정하는 클라이언트(학원형)는 상담완료 대신 내방이라고 부른다
@@ -70,8 +71,17 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
   const end: FunnelEnd = (FUNNEL_ENDS as readonly string[]).includes(project.funnel_end ?? "") ? (project.funnel_end as FunnelEnd) : "conv";
   const all = stages(A, P, visit);
   const cut = all.findIndex((s) => s.key === end);
-  const st = cut >= 0 ? all.slice(0, cut + 1) : all;
-  const toConv = end === "conv";
+  // 온라인 판매형 브랜드는 GA4 행동 단계로 짠 퍼널을 쓴다 (단계를 차례로 밟은 사람 수)
+  const g4 = Array.isArray(project.funnel_ga4) && project.funnel_ga4.length ? project.funnel_ga4 : null;
+  const kst = (ms: number) => new Date(ms + 9 * 3600_000).toISOString().slice(0, 10);
+  const span = days * 86400000;
+  const [gCur, gPrev] = g4 ? await Promise.all([
+    projectGa4Funnel(project.id, kst(endMs - span), kst(endMs - 1), g4),
+    cmp ? projectGa4Funnel(project.id, kst(endMs - 2 * span), kst(endMs - span - 1), g4) : Promise.resolve(null),
+  ]) : [null, null];
+  const custom = g4 && gCur ? g4.map((s, i): Stage => ({ key: i === g4.length - 1 ? "conv" : `g${i}`, label: s.name, n: gCur[i] ?? 0, prev: gPrev?.[i] ?? 0, unit: "명", costLabel: `${s.name} 1명당`, cost: gCur[i] ? A.cost / gCur[i] : 0, note: s.note })) : null;
+  const st = custom ?? (cut >= 0 ? all.slice(0, cut + 1) : all);
+  const toConv = end === "conv" || !!custom;
   const top = Math.max(1, st[0]?.n ?? 1);
   const width = (n: number) => (n > 0 ? Math.max(6, (Math.log10(n + 1) / Math.log10(top + 1)) * 100) : 0);
   const steps = st.map((s, i) => {
@@ -86,7 +96,7 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
     <>
         <section className="kpis">
           <div className="kpi"><span>광고비</span><b>{fmtW(A.cost)}</b></div>
-          <div className="kpi"><span>리드</span><b>{fmtN(steps.find((s) => s.key === "leads")?.n ?? 0)}건</b></div>
+          <div className="kpi"><span>리드</span><b>{fmtN(steps.find((s) => s.key === "leads")?.n ?? A.leads)}건</b></div>
           <div className="kpi"><span>CPL (Meta 기준)</span><b>{fmtW(A.cpl)}</b></div>
           <div className="kpi"><span>CTR</span><b>{A.imps > 0 ? rate(A.clicks / A.imps) : "–"}</b></div>
           <div className="kpi"><span>CPM</span><b>{A.imps > 0 ? fmtW((A.cost / A.imps) * 1000) : "–"}</b></div>
