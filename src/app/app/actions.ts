@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getSession, requireSession, requireStaff } from "@/lib/dash/auth";
-import { CUSTOM_TYPES, DROPS, PAYS, STATUSES, type CustomField, type LeadPatch } from "@/lib/dash/types";
+import { CUSTOM_TYPES, OVERVIEW_KPI_MAX, DROPS, PAYS, STATUSES, type CustomField, type LeadPatch } from "@/lib/dash/types";
 import { queryLeads, type LeadPage, type LeadQuery } from "@/lib/dash/leads-query";
 
 export type ActionResult = { ok: true; message?: string } | { ok: false; error: string };
@@ -282,4 +282,15 @@ export async function setAssignee(projectId: string, leadId: string, assignee: s
 
 export async function ensureSessionOrRedirect() {
   await requireSession();
+}
+
+// ---------- 개요 상단 지표 (직원): 브랜드마다 최대 5개 ----------
+export async function setOverviewKpis(projectId: string, keys: string[]): Promise<ActionResult> {
+  const s = await requireStaff();
+  const clean = [...new Set((keys ?? []).map((k) => String(k)).filter((k) => /^[a-z_]{2,20}(:\d{1,2})?$/.test(k)))];
+  if (clean.length > OVERVIEW_KPI_MAX) return { ok: false, error: `지표는 ${OVERVIEW_KPI_MAX}개까지 고를 수 있습니다.` };
+  const { error } = await s.supabase.from("projects").update({ overview_kpis: clean.length ? clean : null }).eq("id", projectId);
+  if (error) return { ok: false, error: error.message };
+  revalidatePath(`/app/overview/${projectId}`);
+  return { ok: true };
 }

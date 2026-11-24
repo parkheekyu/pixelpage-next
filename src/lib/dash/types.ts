@@ -43,7 +43,12 @@ export interface Project {
   funnel_end?: FunnelEnd | null;
   /** 개요 퍼널을 GA4 행동 단계로 짜는 브랜드(온라인 판매형). 있으면 기본 퍼널 대신 이 단계를 순서대로 센다. */
   funnel_ga4?: Ga4FunnelStep[] | null;
+  /** 개요 상단에 보여 줄 지표(최대 5개). 비어 있으면 기본 구성. */
+  overview_kpis?: string[] | null;
 }
+
+/** 개요 상단 지표는 다섯 개까지만 고른다 */
+export const OVERVIEW_KPI_MAX = 5;
 
 /** GA4 퍼널 한 단계: 이벤트 이름과, 필요하면 이벤트 매개변수(page_location 등)에 들어 있어야 하는 글자 */
 export interface Ga4FunnelStep { name: string; event: string; param?: string; value?: string; note?: string }

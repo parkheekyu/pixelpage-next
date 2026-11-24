@@ -3,9 +3,10 @@ import Link from "next/link";
 import { requireProject, getUnreadCounts } from "@/lib/dash/auth";
 import { loadProjectData } from "@/lib/dash/data";
 import { agg, fmtN, fmtW, type Agg } from "@/lib/dash/agg";
-import { FUNNEL_ENDS, type FunnelEnd, type Project } from "@/lib/dash/types";
+import { FUNNEL_ENDS, OVERVIEW_KPI_MAX, type FunnelEnd, type Project } from "@/lib/dash/types";
 import { periodDataDays, periodSlices, REPORT_PERIODS, type ReportPeriod } from "@/lib/dash/report";
 import { projectGa4Funnel } from "@/lib/dash/ga4-funnel";
+import KpiPicker from "@/components/dash/KpiPicker";
 import ProjectNav from "@/components/dash/ProjectNav";
 
 export const dynamic = "force-dynamic";
@@ -52,14 +53,14 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
           {REPORT_PERIODS.map((p) => <Link key={p} href={`/app/overview/${project.id}?days=${p}`} className={p === period ? "on" : ""} role="tab" aria-selected={p === period}>{PERIOD_LABEL[p]}</Link>)}
         </div>
         <Suspense key={period} fallback={<div className="skel" aria-busy="true" aria-label="불러오는 중"><div className="skel-tiles"><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /></div><div className="skel-block" /></div>}>
-          <Funnel project={project} period={period} />
+          <Funnel project={project} period={period} isStaff={profile.role === "staff"} />
         </Suspense>
       </div>
     </>
   );
 }
 
-async function Funnel({ project, period }: { project: Project; period: ReportPeriod }) {
+async function Funnel({ project, period, isStaff }: { project: Project; period: ReportPeriod; isStaff: boolean }) {
   const { supabase } = await requireProject(project.id);
   const data = await loadProjectData(supabase, project, periodDataDays(period));
   const { cur, prev, days, end: endMs } = periodSlices(data, period);
@@ -81,7 +82,6 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
   ]) : [null, null];
   const custom = g4 && gCur ? g4.map((s, i): Stage => ({ key: i === g4.length - 1 ? "conv" : `g${i}`, label: s.name, n: gCur[i] ?? 0, prev: gPrev?.[i] ?? 0, unit: "명", costLabel: `${s.name} 1명당`, cost: gCur[i] ? A.cost / gCur[i] : 0, note: s.note })) : null;
   const st = custom ?? (cut >= 0 ? all.slice(0, cut + 1) : all);
-  const toConv = end === "conv" || !!custom;
   const top = Math.max(1, st[0]?.n ?? 1);
   const width = (n: number) => (n > 0 ? Math.max(6, (Math.log10(n + 1) / Math.log10(top + 1)) * 100) : 0);
   const steps = st.map((s, i) => {
@@ -92,16 +92,39 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
   const empty = st.every((s) => s.n === 0);
   const before = (i: number) => steps[i - 1].label;
 
+  // 상단 지표: 브랜드마다 고른 것(최대 5개)을 고른 순서대로. 고르지 않았으면 기본 구성.
+  const aov = Number(project.avg_order_value) > 0;
+  const leadN = steps.find((s) => s.key === "leads")?.n ?? A.leads;
+  const kpiList: { key: string; label: string; value: string; sub?: string }[] = [
+    { key: "cost", label: "광고비", value: fmtW(A.cost) },
+    { key: "leads", label: "리드", value: `${fmtN(leadN)}건` },
+    { key: "cpl", label: "CPL (Meta 기준)", value: fmtW(A.cpl) },
+    { key: "ctr", label: "CTR", value: A.imps > 0 ? rate(A.clicks / A.imps) : "–" },
+    { key: "cpm", label: "CPM", value: A.imps > 0 ? fmtW((A.cost / A.imps) * 1000) : "–" },
+    { key: "cpc", label: "CPC", value: A.clicks > 0 ? fmtW(A.cost / A.clicks) : "–" },
+    { key: "imps", label: "노출", value: `${fmtN(A.imps)}회` },
+    { key: "clicks", label: "클릭", value: `${fmtN(A.clicks)}회` },
+    { key: "contacted", label: "연락", value: `${fmtN(A.contacted)}건` },
+    { key: "consulted", label: visit ? "내방" : "상담완료", value: `${fmtN(A.consulted)}건` },
+    { key: "conv", label: "전환", value: `${fmtN(A.conv)}건` },
+    { key: "cvr", label: "전환율 (리드 대비)", value: rate(div(A.conv, A.leads)) },
+    { key: "cpa", label: "전환당 비용", value: A.conv > 0 && A.cost > 0 ? fmtW(A.cpa) : "–" },
+    { key: "revenue", label: aov ? `매출 (객단가 ${fmtN(Number(project.avg_order_value) / 10000)}만 원 추정)` : "확정매출", value: fmtW(A.revenue) },
+    { key: "roas", label: "ROAS", value: A.cost > 0 ? `${(A.roas * 100).toFixed(0)}%` : "–" },
+    ...(custom ? [
+      ...custom.map((s, i) => ({ key: `step:${i}`, label: s.label, value: `${fmtN(s.n)}명` })),
+      { key: "f_rate", label: `${custom[custom.length - 1].label} 전환율 (${custom[0].label} 대비)`, value: rate(div(custom[custom.length - 1].n, custom[0].n)) },
+    ] : []),
+  ];
+  const fallback = custom ? ["step:0", `step:${custom.length - 1}`, "f_rate", "revenue"] : ["cost", "leads", "cpl", "ctr", "cpm"];
+  const picked = (project.overview_kpis ?? []).map((k) => kpiList.find((x) => x.key === k)).filter((x): x is (typeof kpiList)[number] => !!x).slice(0, OVERVIEW_KPI_MAX);
+  const shown = picked.length ? picked : fallback.map((k) => kpiList.find((x) => x.key === k)!).filter(Boolean);
+
   return (
     <>
+        {isStaff && <div className="kpi-bar"><KpiPicker projectId={project.id} options={kpiList.map(({ key, label }) => ({ key, label }))} value={shown.map((k) => k.key)} /></div>}
         <section className="kpis">
-          <div className="kpi"><span>광고비</span><b>{fmtW(A.cost)}</b></div>
-          <div className="kpi"><span>리드</span><b>{fmtN(steps.find((s) => s.key === "leads")?.n ?? A.leads)}건</b></div>
-          <div className="kpi"><span>CPL (Meta 기준)</span><b>{fmtW(A.cpl)}</b></div>
-          <div className="kpi"><span>CTR</span><b>{A.imps > 0 ? rate(A.clicks / A.imps) : "–"}</b></div>
-          <div className="kpi"><span>CPM</span><b>{A.imps > 0 ? fmtW((A.cost / A.imps) * 1000) : "–"}</b></div>
-          {toConv && <div className="kpi"><span>전환</span><b>{fmtN(A.conv)}건</b></div>}
-          {toConv && <div className="kpi"><span>{Number(project.avg_order_value) > 0 ? `매출 (객단가 ${fmtN(Number(project.avg_order_value) / 10000)}만 원 추정) · ROAS` : "확정매출 · ROAS"}</span><b>{fmtW(A.revenue)} <small>{A.cost > 0 ? `${(A.roas * 100).toFixed(0)}%` : "–"}</small></b></div>}
+          {shown.map((k) => <div key={k.key} className="kpi"><span>{k.label}</span><b>{k.value}{k.sub && <small>{k.sub}</small>}</b></div>)}
         </section>
 
         <div className="card fn-card">
