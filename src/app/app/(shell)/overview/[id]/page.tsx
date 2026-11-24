@@ -3,9 +3,10 @@ import Link from "next/link";
 import { requireProject, getUnreadCounts } from "@/lib/dash/auth";
 import { loadProjectData } from "@/lib/dash/data";
 import { agg, fmtN, fmtW, type Agg } from "@/lib/dash/agg";
-import type { Project } from "@/lib/dash/types";
+import { FUNNEL_ENDS, type FunnelEnd, type Project } from "@/lib/dash/types";
 import { periodDataDays, periodSlices, REPORT_PERIODS, type ReportPeriod } from "@/lib/dash/report";
 import ProjectNav from "@/components/dash/ProjectNav";
+import FunnelEndSelect from "@/components/dash/FunnelEndSelect";
 
 export const dynamic = "force-dynamic";
 
@@ -51,14 +52,14 @@ export default async function ProjectOverviewPage({ params, searchParams }: { pa
           {REPORT_PERIODS.map((p) => <Link key={p} href={`/app/overview/${project.id}?days=${p}`} className={p === period ? "on" : ""} role="tab" aria-selected={p === period}>{PERIOD_LABEL[p]}</Link>)}
         </div>
         <Suspense key={period} fallback={<div className="skel" aria-busy="true" aria-label="불러오는 중"><div className="skel-tiles"><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /><div className="skel-tile" /></div><div className="skel-block" /></div>}>
-          <Funnel project={project} period={period} />
+          <Funnel project={project} period={period} isStaff={profile.role === "staff"} />
         </Suspense>
       </div>
     </>
   );
 }
 
-async function Funnel({ project, period }: { project: Project; period: ReportPeriod }) {
+async function Funnel({ project, period, isStaff }: { project: Project; period: ReportPeriod; isStaff: boolean }) {
   const { supabase } = await requireProject(project.id);
   const data = await loadProjectData(supabase, project, periodDataDays(period));
   const { cur, prev } = periodSlices(data, period);
@@ -66,7 +67,13 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
   const cmp = period !== "max"; // 최대는 앞 기간이 없어 비교하지 않는다
   // "등록 여부" 열로 단계를 정하는 클라이언트(학원형)는 상담완료 대신 내방이라고 부른다
   const visit = data.leads.some((l) => (l.custom as Record<string, unknown> | null)?.stage_by === "등록 여부");
-  const st = stages(A, P, visit);
+  // 브랜드마다 퍼널을 어디까지 볼지 다르다 (예: 리드 수집이 목표인 곳은 리드까지만)
+  const end: FunnelEnd = (FUNNEL_ENDS as readonly string[]).includes(project.funnel_end ?? "") ? (project.funnel_end as FunnelEnd) : "conv";
+  const all = stages(A, P, visit);
+  const cut = all.findIndex((s) => s.key === end);
+  const st = cut >= 0 ? all.slice(0, cut + 1) : all;
+  const toConv = end === "conv";
+  const endLabels = Object.fromEntries(FUNNEL_ENDS.map((k) => [k, k === "leads" ? "리드" : k === "contacted" ? "연락" : k === "consulted" ? (visit ? "내방" : "상담완료") : "전환"])) as Record<FunnelEnd, string>;
   const top = Math.max(1, st[0]?.n ?? 1);
   const width = (n: number) => (n > 0 ? Math.max(6, (Math.log10(n + 1) / Math.log10(top + 1)) * 100) : 0);
   const steps = st.map((s, i) => {
@@ -83,12 +90,14 @@ async function Funnel({ project, period }: { project: Project; period: ReportPer
           <div className="kpi"><span>광고비</span><b>{fmtW(A.cost)}</b></div>
           <div className="kpi"><span>리드</span><b>{fmtN(steps.find((s) => s.key === "leads")?.n ?? 0)}건</b></div>
           <div className="kpi"><span>CPL (Meta 기준)</span><b>{fmtW(A.cpl)}</b></div>
-          <div className="kpi"><span>전환</span><b>{fmtN(A.conv)}건</b></div>
-          <div className="kpi"><span>{Number(project.avg_order_value) > 0 ? `매출 (객단가 ${fmtN(Number(project.avg_order_value) / 10000)}만 원 추정) · ROAS` : "확정매출 · ROAS"}</span><b>{fmtW(A.revenue)} <small>{A.cost > 0 ? `${(A.roas * 100).toFixed(0)}%` : "–"}</small></b></div>
+          <div className="kpi"><span>CTR</span><b>{A.imps > 0 ? rate(A.clicks / A.imps) : "–"}</b></div>
+          <div className="kpi"><span>CPM</span><b>{A.imps > 0 ? fmtW((A.cost / A.imps) * 1000) : "–"}</b></div>
+          {toConv && <div className="kpi"><span>전환</span><b>{fmtN(A.conv)}건</b></div>}
+          {toConv && <div className="kpi"><span>{Number(project.avg_order_value) > 0 ? `매출 (객단가 ${fmtN(Number(project.avg_order_value) / 10000)}만 원 추정) · ROAS` : "확정매출 · ROAS"}</span><b>{fmtW(A.revenue)} <small>{A.cost > 0 ? `${(A.roas * 100).toFixed(0)}%` : "–"}</small></b></div>}
         </section>
 
         <div className="card fn-card">
-          <div className="td-head"><h2>전체 퍼널 <small>{PERIOD_LABEL[period]}</small></h2></div>
+          <div className="td-head"><h2>전체 퍼널 <small>{PERIOD_LABEL[period]}</small></h2>{isStaff && <FunnelEndSelect projectId={project.id} value={end} labels={endLabels} />}</div>
           {empty ? <div className="td-empty">이 기간에는 광고 지출과 리드가 없습니다. 기간을 넓혀 보세요.</div> : (
             <>
               <div className="fnl">

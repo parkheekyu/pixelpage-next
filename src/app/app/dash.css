@@ -1279,3 +1279,5 @@ textarea.vx-in { resize: vertical; }
   .pp-dash .fn-bar { grid-column: 1 / -1; order: 3; }
   .pp-dash .fn-total, .pp-dash .fn-cost { display: none; }
   }
+.pp-dash .fn-end { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.pp-dash .fn-end select { font: inherit; font-size: 13px; color: var(--text); background: var(--card); border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px; }
