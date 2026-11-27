@@ -31,6 +31,20 @@
         "mon"
       ],
       "timeout_min": 60
+    },
+    {
+      "id": "client-ad-report",
+      "title": "고객사 광고 성과 일일 보고",
+      "cwd": "/Users/heekyu/픽셀페이지/pixelpage-next",
+      "command": [
+        "node",
+        "scripts/client-ad-report.mjs"
+      ],
+      "times": [
+        "12:00"
+      ],
+      "days": "daily",
+      "timeout_min": 20
     }
   ]
 }
