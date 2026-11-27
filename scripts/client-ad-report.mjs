@@ -64,7 +64,7 @@ for (const p of projects ?? []) {
       blocks.push([c.name, "어제", ...lines(y.data?.[0], i.meta_goal), "최근 7일", ...lines(d7, i.meta_goal)].join("\n"));
     }
     if (!blocks.length) { console.log(`${p.name}: 보고할 진행 중 캠페인 없음`); continue; }
-    const text = `${kst.getUTCMonth() + 1}/${kst.getUTCDate()} 광고 성과예요. (캠페인별 어제 · 최근 7일)\n\n${blocks.join("\n\n")}`;
+    const text = `${kst.getUTCMonth() + 1}/${kst.getUTCDate()} 메타 광고 성과에요. (캠페인별 어제 · 최근 7일)\n\n${blocks.join("\n\n")}`;
     console.log(`\n[${p.name}]\n${text}`);
     if (DRY) continue;
     // 담당 직원 계정으로 그대로 게시 (직원이 말을 덧붙이지 않는다)
