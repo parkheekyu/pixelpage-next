@@ -92,13 +92,15 @@ async function metaBlocks(i) {
 async function googleBlocks(i) {
   const cid = i.google_ads_customer_id.replace(/\D/g, "");
   const [y, w] = await Promise.all([gads(cid, "YESTERDAY"), gads(cid, "LAST_7_DAYS")]);
-  return w.filter((r) => Number(r.metrics?.costMicros ?? 0) > 0)
+  // 고객사별로 이름에 특정 글자가 든 캠페인만 보고할 수 있다 (google_ads_campaign_filter)
+  const only = i.google_ads_campaign_filter?.trim();
+  return w.filter((r) => Number(r.metrics?.costMicros ?? 0) > 0 && (!only || r.campaign.name.includes(only)))
     .sort((a, b) => Number(b.metrics.costMicros) - Number(a.metrics.costMicros))
     .map((r) => [r.campaign.name, "어제", ...glines(y.find((x) => x.campaign.id === r.campaign.id)?.metrics), "최근 7일", ...glines(r.metrics)].join("\n"));
 }
 
 const { data: projects } = await db.from("projects").select("id,name").eq("active", true).order("name");
-const { data: integs } = await db.from("project_integrations").select("project_id,meta_ad_account_id,meta_goal,google_ads_customer_id,slack_channel_id");
+const { data: integs } = await db.from("project_integrations").select("project_id,meta_ad_account_id,meta_goal,google_ads_customer_id,google_ads_campaign_filter,slack_channel_id");
 const kst = new Date(Date.now() + 9 * 3600_000);
 const day = `${kst.getUTCMonth() + 1}/${kst.getUTCDate()}`;
 let sent = 0;
